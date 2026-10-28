@@ -113,7 +113,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
 (function(){
 const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
 const schreib=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-const norm=s=>String(s||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/\s+/g," ").trim();
+const norm=s=>String(s||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();   // Çelik findet man auch als celik
 const ziffern=n=>String(n||"").replace(/\D/g,"").replace(/^0049/,"0").replace(/^49/,"0");
 const de=s=>s&&/^\d{4}-\d{2}-\d{2}$/.test(s)?s.split("-").reverse().join("."):String(s||"");
 const heute=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
@@ -177,6 +177,7 @@ function anhaengen(feld,auf,opt){opt=opt||{};css();const box=document.createElem
   feld.addEventListener("blur",()=>{zu=setTimeout(()=>box.style.display="none",250)});
   return{neu:zeichne}}
 window.mietixKunden={alle,finde,anhaengen,merken,norm,ziffern,de,alter,heute};
+window.dispatchEvent(new Event("mietix-kunden-bereit"));
 })();
 </script>
 <script>
@@ -246,7 +247,7 @@ function agNachricht(e){const vn=e.name.trim().split(/\s+/)[0];let w=$("agWann")
 function angebotListe(){const nur=$("agNurStamm").classList.contains("an");
   const l=ALLE.filter(e=>e.telefon&&!e.keineAngebote&&!e.gesperrt&&!e.warn.length&&(nur?e.mieten>=2:e.mieten>=1))
     .map(e=>Object.assign({war:e.angeschrieben&&tageSeit(e.angeschrieben)<14},e))
-    .sort((a,b)=>(a.war?1:0)-(b.war?1:0)||b.mieten-a.mieten||(b.zuletzt||"")<(a.zuletzt||"")?-1:1);
+    .sort((a,b)=>((a.war?1:0)-(b.war?1:0))||(b.mieten-a.mieten)||((b.zuletzt||"")<(a.zuletzt||"")?-1:1));
   $("agListe").innerHTML=l.length?l.map(e=>'<div class="angebotRow'+(e.war?" war":"")+'" data-n="'+esc(e.name)+'"><div class="t"><b>'+esc(e.name)+'</b><i>'+e.mieten+(e.mieten===1?" Miete":" Mieten")+(e.zuletzt?", zuletzt "+de(e.zuletzt):"")+(e.letztesAuto?", "+esc(e.letztesAuto):"")+(e.war?", angeschrieben "+de(e.angeschrieben):"")+'</i></div><a target="_blank" href="'+wa(e.telefon,agNachricht(e))+'">WhatsApp</a></div>').join("")
     :'<div class="leer">Noch niemand passt. Schalter „Nur Stammkunden“ ausschalten oder erst Verträge anlegen.</div>';
   [...$("agListe").querySelectorAll("a")].forEach(a=>a.onclick=()=>{const n=a.parentElement.dataset.n;MK.merken(n,{angeschrieben:heute});setTimeout(zeichne,300)})}
