@@ -79,7 +79,10 @@ const WA="*Mietix Werkzeuge*\n\nAlles auf einen Blick: https://barankohler.githu
     const offen=anf.filter(a=>a.status==="offen"),kaut=lies("mietixVorgaenge",[]).filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&!x.kautionRueck);
     const auff=auf.filter(a=>!a.erledigt&&!a._weg&&a.aufgabe&&a.bis&&a.bis<=h);
     const z=a=>'<a href="'+a.href+'"'+(a.spaet?' class="spaet"':'')+'><b>'+a.t+'</b><i>'+a.i+'</i></a>';
-    let out='<h2>Heute</h2><div class="hk">';
+    const st=(lies("mietixStand",{}).bruecke)||null;let bz="";
+    if(st&&st.zeit){const alter=(Date.now()-new Date(st.zeit))/3600000;const rot=alter>2||st.ok===false;
+      bz='<div class="hk" style="padding:9px 14px;font-size:13px;color:'+(rot?"#FF6B6B":"var(--grau)")+'">Excel: '+(st.ok===false?st.text:(alter>2?"zuletzt "+st.zeit.slice(0,10).split("-").reverse().join(".")+" "+st.zeit.slice(11)+" (Mac aus oder Brücke steht)":(st.text==="Excel ist aktuell"?"aktuell bis "+st.zeit.slice(11)+" Uhr":st.text+", "+st.zeit.slice(11))))+'</div>'}
+    let out=bz+'<h2>Heute</h2><div class="hk">';
     out+=ab.length?ab.map(x=>z({t:x.name+", "+x.auto,i:"Abholung "+tag(x.vonD)+" "+(x.vonU||""),href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=uebergabe",spaet:x.vonD<h})).join(""):'<div class="leer">Keine Abholung heute oder morgen.</div>';
     out+=zu.length?zu.map(x=>z({t:x.name+", "+x.auto,i:"Rückgabe "+tag(x.bisD)+" "+(x.bisU||""),href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=rueckgabe",spaet:x.bisD<h})).join(""):'';
     if(offen.length)out+=z({t:offen.length+(offen.length===1?" offene Anfrage":" offene Anfragen"),i:"Anfragen-Buch",href:B+"mietix-anfragen/"});
@@ -128,7 +131,7 @@ const KEY="sb_publishable_LVkvpgXMpBbq_OXgwOfTqg_ZRcRkFyQ";   // öffentlich ged
 const SPEICHER={mietixVorgaenge:{tab:"vorgaenge",pk:"nr",liste:true},mietixAnfragen:{tab:"anfragen",pk:"id",liste:true},
   mietixKunden:{tab:"kunden",pk:"name",liste:false},mietixFahrzeuge:{tab:"fahrzeuge",pk:"name",liste:false},
   mietixAusgaben:{tab:"ausgaben",pk:"id",liste:true},mietixSperren:{tab:"sperren",pk:"id",liste:true},
-  mietixAufgaben:{tab:"aufgaben",pk:"id",liste:true},mietixZustand:{tab:"zustand",pk:"id",liste:true},mietixAutos:{tab:"autos",pk:"name",liste:false}};
+  mietixAufgaben:{tab:"aufgaben",pk:"id",liste:true},mietixZustand:{tab:"zustand",pk:"id",liste:true},mietixAutos:{tab:"autos",pk:"name",liste:false},mietixStand:{tab:"stand",pk:"id",liste:false}};
 const roh=Storage.prototype.setItem;
 const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
 const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v))}catch(e){}};
