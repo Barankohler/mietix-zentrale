@@ -88,6 +88,10 @@ const WA="*Mietix Werkzeuge*\n\nAlles auf einen Blick: https://barankohler.githu
     if(offen.length)out+=z({t:offen.length+(offen.length===1?" offene Anfrage":" offene Anfragen"),i:"Anfragen-Buch",href:B+"mietix-anfragen/"});
     if(kaut.length)out+=z({t:kaut.length+(kaut.length===1?" Kaution zurückgeben":" Kautionen zurückgeben"),i:"Verträge, Heute",href:B+"mietix-vertrag/?zeige=heute"});
     if(auff.length)out+=z({t:auff.length+(auff.length===1?" Aufgabe fällig":" Aufgaben fällig"),i:"Autos, Aufgaben",href:B+"mietix-autos/?zeige=aufgaben",spaet:auff.some(a=>a.bis<h)});
+    const sta=lies("mietixAutos",{}),term=[];Object.keys(sta).forEach(n=>[["tuev","TÜV"],["service","Service"],["reifen","Reifen"]].forEach(([k,t])=>{const d=sta[n][k];if(!d)return;const tage=Math.round((new Date(d+"T12:00")-new Date(h+"T12:00"))/86400000);if(tage<=30)term.push({t:t+" "+n,tage,d})}));
+    term.sort((a,b)=>a.tage-b.tage).slice(0,3).forEach(x=>{out+=z({t:x.t,i:x.tage<0?"überfällig":x.tage===0?"heute":"in "+x.tage+" Tagen",href:B+"mietix-autos/",spaet:x.tage<=7})});
+    const mahn=lies("mietixVorgaenge",[]).filter(x=>x.vonD&&x.vonD<h&&!((x.zahlung||{}).rest||{}).am&&((x.zahlung||{}).rest||{}).betrag);
+    if(mahn.length)out+=z({t:mahn.length+(mahn.length===1?" Miete noch offen":" Mieten noch offen"),i:"Verträge, Heute",href:B+"mietix-vertrag/?zeige=heute",spaet:true});
     out+='</div>';
     document.getElementById("heute").innerHTML=out;
   }
