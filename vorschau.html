@@ -89,41 +89,35 @@ input,textarea{width:100%;border:0;background:var(--bg);border-radius:14px;paddi
   <div class="fuss">Das ist alles für heute.</div>
 </section>
 
-<!-- ================= MIETVERTRAG ================= -->
+<!-- ================= MIETVERTRAG: gleicher Aufbau wie das Papier, nur im neuen Kleid ================= -->
 <section class="screen" id="s-vertrag">
   <div class="schritte"><div class="an">1 Vertrag</div><div>2 Übergabe</div><div>3 Rückgabe</div></div>
-  <div class="k">
-    <label>Kunde</label><input value="Max Mustermann" readonly>
-    <div style="font-size:14px;color:var(--grau);margin-top:8px;font-weight:600">Stammkunde, 3. Miete. Daten sind drin.</div>
-  </div>
-  <div class="k">
-    <label>Auto</label>
+  <div class="k"><h2 style="margin:0 0 6px">Mietvertrag-Nr.</h2><input value="000536" readonly></div>
+  <div class="k"><h2 style="margin:0 0 6px">Mieter</h2>
+    <label>Vor- und Nachname</label><input value="Max Mustermann" readonly>
+    <label>Anschrift</label><input value="Musterstraße 12, 55252 Mainz-Kastel" readonly>
+    <div class="zwei"><div><label>Geburtsdatum</label><input value="12.04.1997" readonly></div><div><label>Geburtsort</label><input value="Wiesbaden" readonly></div></div>
+    <label>Telefon</label><input value="0170 1234567" readonly></div>
+  <div class="k"><h2 style="margin:0 0 6px">Fahrzeug</h2>
     <div class="chips"><span class="chip an">Audi R8</span><span class="chip">RS 3</span><span class="chip">RS 5</span><span class="chip">RS 6</span><span class="chip">G 63</span><span class="chip">M 850i</span><span class="chip">mehr …</span></div>
-  </div>
-  <div class="k">
-    <label>Wann</label>
-    <div class="chips"><span class="chip an">Heute</span><span class="chip">Morgen</span><span class="chip">Freitag</span></div>
-    <div class="chips" style="margin-top:8px"><span class="chip">1 Tag</span><span class="chip an">2 Tage</span><span class="chip">3 Tage</span><span class="chip">Wochenende</span></div>
+    <div class="zwei" style="margin-top:10px"><div><label>Kennzeichen</label><input value="WI-MX 620" readonly></div><div><label>km</label><input value="40.655" readonly></div></div></div>
+  <div class="k"><h2 style="margin:0 0 6px">Miete und Preise</h2>
+    <div class="chips"><span class="chip an">Heute</span><span class="chip">Morgen</span><span class="chip">Freitag</span><span class="chip">1 Tag</span><span class="chip an">2 Tage</span><span class="chip">Wochenende</span></div>
     <div class="zwei" style="margin-top:10px"><div><label>von</label><input value="Do 29.10. 10:00" readonly></div><div><label>bis</label><input value="Sa 31.10. 10:00" readonly></div></div>
-  </div>
-  <div class="k">
-    <label>Preis</label>
-    <div class="zwei"><div><input value="1.214,24 €" readonly></div><div><input value="300 km frei" readonly></div></div>
-    <div style="font-size:14px;color:var(--grau);margin-top:8px;font-weight:600">Wie im Preisrechner. Antippen zum Ändern.</div>
-    <div class="summe"><span style="font-weight:700">Gesamt</span><b>1.214,24 €</b></div>
-  </div>
-  <div class="k">
-    <label>Bezahlt</label>
+    <div class="zwei"><div><label>Fahrzeugmiete</label><input value="1.214,24 €" readonly></div><div><label>Freikilometer</label><input value="300 km" readonly></div></div>
+    <div class="summe"><span style="font-weight:700">Gesamtmietpreis</span><b>1.214,24 €</b></div></div>
+  <div class="k"><h2 style="margin:0 0 6px">Zahlungen</h2>
     <div class="z"><span class="t"><b>Anzahlung 200 €</b><i>bar, 20.10.</i></span><span class="chip gruen">✓</span></div>
-    <div class="z"><span class="t"><b>Rest 1.014,24 €</b><i>noch offen</i></span><span class="chip">Bar</span><span class="chip">Karte</span></div>
-    <div class="z"><span class="t"><b>Kaution 2.500 €</b><i>noch offen</i></span><span class="chip">Bar</span><span class="chip">Karte</span></div>
-  </div>
-  <div class="k">
-    <label>Unterschrift Kunde</label>
-    <div style="height:110px;border:2px dashed var(--linie);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#C7C7CC;font-weight:800">Antippen, Handy quer, unterschreiben</div>
-  </div>
+    <div class="z"><span class="t"><b>Restbetrag 1.014,24 €</b><i>noch offen</i></span><span class="chip">Bar</span><span class="chip">Karte</span></div>
+    <div class="z"><span class="t"><b>Kaution 2.500 €</b><i>noch offen</i></span><span class="chip">Bar</span><span class="chip">Karte</span></div></div>
+  <div class="k"><h2 style="margin:0 0 6px">Kaution und Selbstbeteiligung</h2>
+    <div class="chips"><span class="chip an">Geldkaution</span><span class="chip">Fahrzeug als Sicherheit</span></div>
+    <label>Selbstbeteiligung</label><input value="10.000 €" readonly></div>
+  <div class="k"><h2 style="margin:0 0 6px">Unterschriften</h2>
+    <div style="height:110px;border:2px dashed var(--linie);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#C7C7CC;font-weight:800">Mieter: antippen und unterschreiben</div>
+    <div class="chips" style="margin-top:10px"><span class="chip">Bedingungen erhalten</span></div></div>
   <div class="knopf" onclick="toast('Vertrag 000536 gespeichert')">Speichern</div>
-  <div class="fuss">Drucken und WhatsApp kommen nach dem Speichern.</div>
+  <div class="fuss">Gleiche Reihenfolge wie auf dem Papier.</div>
 </section>
 
 <!-- ================= VERTRÄGE ================= -->
