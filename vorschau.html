@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Mietix, so soll es aussehen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* Entwurf 29.10.2026: ein Erscheinungsbild für die ganze Zentrale. Nur Vorschau, tippbar, ohne Daten. */
+:root{--rot:#C4161C;--ink:#1C1C1E;--grau:#8A8A8E;--linie:#ECECEF;--bg:#F4F4F6;--weiss:#fff;--gruen:#1E9E5A;--gelb:#E39B00;--r:20px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Inter,-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.3;-webkit-text-size-adjust:100%}
+.app{max-width:430px;margin:0 auto;min-height:100%;padding-bottom:calc(84px + env(safe-area-inset-bottom));position:relative}
+header{padding:calc(14px + env(safe-area-inset-top)) 20px 6px;display:flex;justify-content:space-between;align-items:flex-end}
+header h1{font-size:30px;font-weight:900;letter-spacing:-.5px}
+header .tag{font-size:14px;color:var(--grau);font-weight:600}
+header .punkt{width:10px;height:10px;border-radius:50%;background:var(--gruen);display:inline-block;margin-left:6px;vertical-align:middle}
+main{padding:8px 16px 0}
+.screen{display:none}.screen.an{display:block}
+h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--grau);margin:18px 4px 8px}
+.k{background:var(--weiss);border-radius:var(--r);padding:16px;margin-bottom:10px;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.z{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--linie);cursor:pointer}
+.z:first-child{border-top:0;padding-top:0}.z:last-child{padding-bottom:0}
+.z .t{flex:1;min-width:0}.z b{display:block;font-size:17px;font-weight:700}.z i{font-style:normal;font-size:14px;color:var(--grau)}
+.z .pfeil{color:#C7C7CC;font-size:22px}
+.uhr{min-width:52px;font-size:15px;font-weight:800;color:var(--ink)}
+.chip{display:inline-block;padding:7px 12px;border-radius:999px;font-size:14px;font-weight:700;background:var(--bg);color:var(--ink)}
+.chip.rot{background:#FDECEC;color:var(--rot)}.chip.gruen{background:#E6F6EC;color:var(--gruen)}.chip.gelb{background:#FFF4DB;color:#9A6700}
+.auto{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;flex:0 0 46px;letter-spacing:.3px}
+.gross{display:flex;gap:10px}
+.gross .k{flex:1;text-align:center;padding:14px 8px}
+.gross .n{font-size:30px;font-weight:900;letter-spacing:-1px}.gross .n.rot{color:var(--rot)}.gross .n.gruen{color:var(--gruen)}
+.gross .l{font-size:13px;color:var(--grau);font-weight:600;margin-top:2px}
+.knopf{display:block;width:100%;background:var(--rot);color:#fff;border:0;border-radius:16px;padding:17px;font:800 18px Inter,sans-serif;text-align:center;cursor:pointer;margin-top:10px}
+.knopf.hell{background:var(--weiss);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--linie)}
+.knopf.gruen{background:#25D366}
+.leiste{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-top:1px solid var(--linie);padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:9}
+.leiste div{max-width:430px;margin:0 auto;display:flex}
+.leiste a{flex:1;text-align:center;text-decoration:none;color:var(--grau);font-size:11px;font-weight:700;padding:4px 0}
+.leiste a svg{display:block;margin:0 auto 3px;width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.leiste a.an{color:var(--rot)}
+/* Formular */
+label{display:block;font-size:13px;font-weight:700;color:var(--grau);margin:12px 0 5px}
+input,textarea{width:100%;border:0;background:var(--bg);border-radius:14px;padding:14px;font:600 18px Inter,sans-serif;color:var(--ink);min-height:52px}
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips .chip{cursor:pointer;padding:10px 14px;font-size:15px}.chips .chip.an{background:var(--rot);color:#fff}
+.schritte{display:flex;gap:6px;margin:4px 0 12px}
+.schritte div{flex:1;text-align:center;padding:9px 0;border-radius:12px;background:var(--bg);font-size:13px;font-weight:800;color:var(--grau)}
+.schritte div.ok{background:#E6F6EC;color:var(--gruen)}.schritte div.an{background:var(--ink);color:#fff}
+.summe{display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;margin-top:12px;border-top:1px solid var(--linie)}
+.summe b{font-size:30px;font-weight:900;color:var(--rot);letter-spacing:-1px}
+.fuss{text-align:center;color:var(--grau);font-size:13px;padding:30px 20px 10px;font-weight:600}
+.band{background:var(--ink);color:#fff;border-radius:var(--r);padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.band b{font-size:19px;display:block}.band i{font-style:normal;font-size:14px;color:#B9B9C0}
+.band .chip{background:#fff;color:var(--ink)}
+.toast{position:fixed;left:16px;right:16px;top:calc(12px + env(safe-area-inset-top));background:var(--ink);color:#fff;border-radius:999px;padding:10px 10px 10px 18px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:15px;z-index:20;max-width:398px;margin:0 auto;transform:translateY(-160%);transition:transform .25s}
+.toast.an{transform:none}.toast span{background:var(--rot);border-radius:999px;padding:8px 14px;font-weight:800}
+.hinweisband{background:#FFF4DB;color:#9A6700;border-radius:14px;padding:12px 14px;font-size:14px;font-weight:700;margin-bottom:10px}
+</style></head><body>
+<div class="app">
+<header><h1 id="titel">Heute</h1><span class="tag" id="datum"></span></header>
+<main>
+
+<!-- ================= HEUTE ================= -->
+<section class="screen an" id="s-heute">
+  <div class="gross">
+    <div class="k"><div class="n">2</div><div class="l">Abholungen</div></div>
+    <div class="k"><div class="n">1</div><div class="l">Rückgabe</div></div>
+    <div class="k"><div class="n rot">1</div><div class="l">Miete offen</div></div>
+  </div>
+  <h2>Abholen</h2>
+  <div class="k">
+    <div class="z" onclick="geh('vertrag')"><span class="uhr">10:00</span><span class="auto" style="background:#C4161C">R8</span><span class="t"><b>Max Mustermann</b><i>Audi R8, bis Fr 31.10.</i></span><span class="chip">Übergabe</span></div>
+    <div class="z"><span class="uhr">14:30</span><span class="auto" style="background:#1C1C1E">G63</span><span class="t"><b>Lena Neu</b><i>Mercedes G 63, bis So 2.11.</i></span><span class="chip gelb">Erinnern</span></div>
+  </div>
+  <h2>Zurück</h2>
+  <div class="k">
+    <div class="z"><span class="uhr">18:00</span><span class="auto" style="background:#3A3A3C">RS3</span><span class="t"><b>Erika Beispiel</b><i>Audi RS 3, seit Di 28.10.</i></span><span class="chip">Rückgabe</span></div>
+  </div>
+  <h2>Noch zu tun</h2>
+  <div class="k">
+    <div class="z"><span class="auto" style="background:#FDECEC;color:#C4161C">€</span><span class="t"><b>Ömer Çelik</b><i>700 € Miete offen seit 29.10.</i></span><span class="chip rot">Erinnern</span></div>
+    <div class="z"><span class="auto" style="background:#E6F6EC;color:#1E9E5A">€</span><span class="t"><b>Max Mustermann</b><i>Kaution 2.500 € zurückgeben</i></span><span class="chip gruen">Zurück</span></div>
+    <div class="z"><span class="auto" style="background:#F4F4F6;color:#1C1C1E">🔧</span><span class="t"><b>Audi RS 5</b><i>Keramikbremse vorne, seit 14.10.</i></span><span class="pfeil">›</span></div>
+  </div>
+  <div class="knopf" onclick="geh('vertrag')">Neuer Mietvertrag</div>
+  <div class="fuss">Das ist alles für heute.</div>
+</section>
+
+<!-- ================= MIETVERTRAG ================= -->
+<section class="screen" id="s-vertrag">
+  <div class="schritte"><div class="an">1 Vertrag</div><div>2 Übergabe</div><div>3 Rückgabe</div></div>
+  <div class="k">
+    <label>Kunde</label><input value="Max Mustermann" readonly>
+    <div style="font-size:14px;color:var(--grau);margin-top:8px;font-weight:600">Stammkunde, 3. Miete. Daten sind drin.</div>
+  </div>
+  <div class="k">
+    <label>Auto</label>
+    <div class="chips"><span class="chip an">Audi R8</span><span class="chip">RS 3</span><span class="chip">RS 5</span><span class="chip">RS 6</span><span class="chip">G 63</span><span class="chip">M 850i</span><span class="chip">mehr …</span></div>
+  </div>
+  <div class="k">
+    <label>Wann</label>
+    <div class="chips"><span class="chip an">Heute</span><span class="chip">Morgen</span><span class="chip">Freitag</span></div>
+    <div class="chips" style="margin-top:8px"><span class="chip">1 Tag</span><span class="chip an">2 Tage</span><span class="chip">3 Tage</span><span class="chip">Wochenende</span></div>
+    <div class="zwei" style="margin-top:10px"><div><label>von</label><input value="Do 29.10. 10:00" readonly></div><div><label>bis</label><input value="Sa 31.10. 10:00" readonly></div></div>
+  </div>
+  <div class="k">
+    <label>Preis</label>
+    <div class="zwei"><div><input value="1.214,24 €" readonly></div><div><input value="300 km frei" readonly></div></div>
+    <div style="font-size:14px;color:var(--grau);margin-top:8px;font-weight:600">Wie im Preisrechner. Antippen zum Ändern.</div>
+    <div class="summe"><span style="font-weight:700">Gesamt</span><b>1.214,24 €</b></div>
+  </div>
+  <div class="k">
+    <label>Bezahlt</label>
+    <div class="z"><span class="t"><b>Anzahlung 200 €</b><i>bar, 20.10.</i></span><span class="chip gruen">✓</span></div>
+    <div class="z"><span class="t"><b>Rest 1.014,24 €</b><i>noch offen</i></span><span class="chip">Bar</span><span class="chip">Karte</span></div>
+    <div class="z"><span class="t"><b>Kaution 2.500 €</b><i>noch offen</i></span><span class="chip">Bar</span><span class="chip">Karte</span></div>
+  </div>
+  <div class="k">
+    <label>Unterschrift Kunde</label>
+    <div style="height:110px;border:2px dashed var(--linie);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#C7C7CC;font-weight:800">Antippen, Handy quer, unterschreiben</div>
+  </div>
+  <div class="knopf" onclick="toast('Vertrag 000536 gespeichert')">Speichern</div>
+  <div class="fuss">Drucken und WhatsApp kommen nach dem Speichern.</div>
+</section>
+
+<!-- ================= VERTRÄGE ================= -->
+<section class="screen" id="s-vertraege">
+  <div class="k" style="padding:10px 14px"><input placeholder="Suchen" style="background:transparent;padding:4px 0;min-height:36px"></div>
+  <h2>Unterwegs</h2>
+  <div class="k">
+    <div class="z"><span class="auto" style="background:#3A3A3C">RS3</span><span class="t"><b>Erika Beispiel</b><i>28.10. bis 30.10. · 000533</i></span><span class="chip rot">600 € offen</span></div>
+  </div>
+  <h2>Gebucht</h2>
+  <div class="k">
+    <div class="z"><span class="auto" style="background:#1C1C1E">M8</span><span class="t"><b>Ömer Çelik</b><i>29.10. bis 31.10. · 000534</i></span><span class="chip gelb">Übergabe offen</span></div>
+    <div class="z"><span class="auto" style="background:#C4161C">R8</span><span class="t"><b>Max Mustermann</b><i>29.10. bis 31.10. · 000536</i></span><span class="chip gelb">Übergabe offen</span></div>
+  </div>
+  <h2>Zurück</h2>
+  <div class="k">
+    <div class="z"><span class="auto" style="background:#C4161C">R8</span><span class="t"><b>Max Mustermann</b><i>10.8. bis 12.8. · 000532</i></span><span class="chip gruen">Fertig</span></div>
+  </div>
+</section>
+
+<!-- ================= KUNDEN ================= -->
+<section class="screen" id="s-kunden">
+  <div class="k" style="padding:10px 14px"><input placeholder="Name, Telefon oder Geburtstag" style="background:transparent;padding:4px 0;min-height:36px"></div>
+  <div class="chips" style="margin:0 4px 6px"><span class="chip an">Alle</span><span class="chip">Stammkunden</span><span class="chip">Achtung</span></div>
+  <div class="k">
+    <div class="z"><span class="auto" style="background:#F4F4F6;color:#1C1C1E">MM</span><span class="t"><b>Max Mustermann</b><i>3 Mieten · zuletzt R8 · 0170 1234567</i></span><span class="chip gruen">Stamm</span></div>
+    <div class="z"><span class="auto" style="background:#F4F4F6;color:#1C1C1E">AV</span><span class="t"><b>Ali Veli</b><i>1 Miete · Schaden offen 2.500 €</i></span><span class="chip rot">Achtung</span></div>
+    <div class="z"><span class="auto" style="background:#F4F4F6;color:#1C1C1E">EB</span><span class="t"><b>Erika Beispiel</b><i>1 Miete · Geburtstag in 2 Tagen</i></span><span class="pfeil">›</span></div>
+    <div class="z"><span class="auto" style="background:#F4F4F6;color:#1C1C1E">ÖÇ</span><span class="t"><b>Ömer Çelik</b><i>2 Mieten · zuletzt M 850i</i></span><span class="pfeil">›</span></div>
+  </div>
+  <div class="knopf gruen">Autos stehen? Stammkunden anschreiben</div>
+</section>
+
+<!-- ================= AUTOS ================= -->
+<section class="screen" id="s-autos">
+  <div class="band"><div><b>9 von 12 frei</b><i>3 unterwegs, keine Werkstatt</i></div><span class="chip">Wer fuhr wann?</span></div>
+  <div class="k">
+    <div class="z"><span class="auto" style="background:#C4161C">R8</span><span class="t"><b>Audi R8</b><i>40.655 km · WI-MX 620</i></span><span class="chip gelb">heute raus</span></div>
+    <div class="z"><span class="auto" style="background:#3A3A3C">RS3</span><span class="t"><b>Audi RS 3</b><i>12.400 km · WI-MX 450</i></span><span class="chip">unterwegs</span></div>
+    <div class="z"><span class="auto" style="background:#3A3A3C">RS5</span><span class="t"><b>Audi RS 5</b><i>45.837 km · 1 Punkt offen</i></span><span class="chip rot">Keramikbremse</span></div>
+    <div class="z"><span class="auto" style="background:#1C1C1E">G63</span><span class="t"><b>Mercedes G 63</b><i>8.100 km · TÜV in 20 Tagen</i></span><span class="chip gelb">TÜV</span></div>
+    <div class="z"><span class="auto" style="background:#1C1C1E">M8</span><span class="t"><b>BMW M 850i</b><i>31.000 km · WI-BM 850</i></span><span class="chip gruen">frei</span></div>
+  </div>
+  <div class="fuss">Antippen: Termine, Zustand, Aufgaben zum Auto.</div>
+</section>
+
+<!-- ================= GELD ================= -->
+<section class="screen" id="s-geld">
+  <div class="gross">
+    <div class="k"><div class="n gruen">8.420</div><div class="l">rein, Oktober</div></div>
+    <div class="k"><div class="n">3.110</div><div class="l">raus, Oktober</div></div>
+  </div>
+  <h2>Ausgabe eintragen</h2>
+  <div class="k">
+    <div class="chips"><span class="chip an">Tanken</span><span class="chip">Wäsche</span><span class="chip">Werkstatt</span><span class="chip">Reifen</span><span class="chip">Sonstiges</span></div>
+    <div class="chips" style="margin-top:8px"><span class="chip an">R8</span><span class="chip">RS 3</span><span class="chip">RS 5</span><span class="chip">G 63</span><span class="chip">mehr …</span></div>
+    <input placeholder="Betrag" style="margin-top:10px;font-size:26px;text-align:center" value="86,40">
+    <div class="knopf" onclick="toast('86,40 € Tanken, Audi R8')">Eintragen</div>
+  </div>
+  <h2>Zuletzt</h2>
+  <div class="k">
+    <div class="z"><span class="t"><b>Tanken, Audi R8</b><i>heute, Berdan</i></span><b style="font-size:17px">86,40 €</b></div>
+    <div class="z"><span class="t"><b>Miete, Erika Beispiel</b><i>gestern, automatisch</i></span><b style="font-size:17px;color:var(--gruen)">+600,00 €</b></div>
+  </div>
+</section>
+</main>
+</div>
+
+<nav class="leiste"><div>
+  <a href="#" data-s="heute" class="an"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Heute</a>
+  <a href="#" data-s="vertraege"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Verträge</a>
+  <a href="#" data-s="kunden"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Kunden</a>
+  <a href="#" data-s="autos"><svg viewBox="0 0 24 24"><path d="M3 13l2-5h14l2 5v5H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/></svg>Autos</a>
+  <a href="#" data-s="geld"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="12" cy="12" r="2.5"/></svg>Geld</a>
+</div></nav>
+<div class="toast" id="toast"><span id="toastT" style="background:none;padding:0;font-weight:700">Gespeichert</span><span>Rückgängig</span></div>
+<script>
+const TITEL={heute:"Heute",vertrag:"Mietvertrag",vertraege:"Verträge",kunden:"Kunden",autos:"Autos",geld:"Geld"};
+function geh(s){document.querySelectorAll(".screen").forEach(e=>e.classList.toggle("an",e.id==="s-"+s));
+  document.querySelectorAll(".leiste a").forEach(a=>a.classList.toggle("an",a.dataset.s===s||(s==="vertrag"&&a.dataset.s==="vertraege")));
+  document.getElementById("titel").textContent=TITEL[s];window.scrollTo(0,0)}
+document.querySelectorAll(".leiste a").forEach(a=>a.onclick=e=>{e.preventDefault();geh(a.dataset.s)});
+document.querySelectorAll(".chips .chip").forEach(c=>c.onclick=()=>{[...c.parentElement.children].forEach(x=>x.classList.remove("an"));c.classList.add("an")});
+function toast(t){const el=document.getElementById("toast");document.getElementById("toastT").textContent=t;el.classList.add("an");setTimeout(()=>el.classList.remove("an"),4000)}
+const d=new Date();document.getElementById("datum").textContent=["So","Mo","Di","Mi","Do","Fr","Sa"][d.getDay()]+" "+d.getDate()+"."+(d.getMonth()+1)+".";
+</script>
+</body></html>
