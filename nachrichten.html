@@ -10,7 +10,7 @@
 body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.35}
 header{background:#fff;border-bottom:3px solid var(--rot);padding:calc(12px + env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:5}
 header h1{font-size:20px;font-weight:900}header h1 span{color:var(--rot)}header a{font-size:13px;color:var(--grau);text-decoration:none;float:right;margin-top:3px}
-main{max-width:680px;margin:0 auto;padding:14px 16px 60px}
+main{max-width:680px;margin:0 auto;padding:14px 16px 60vh}
 h2.thema{font-size:24px;font-weight:900;color:var(--text);margin:28px 4px 10px;display:flex;align-items:center;gap:10px;scroll-margin-top:150px}
 h2.thema span{background:var(--rot);color:#fff;font-size:12px;border-radius:999px;padding:2px 9px}
 .sprung{position:sticky;top:calc(52px + env(safe-area-inset-top));z-index:4;display:flex;gap:7px;overflow-x:auto;padding:10px 0;background:var(--bg);scrollbar-width:none}
@@ -106,7 +106,7 @@ Wichtig für Ihre Wochenendplanung: Sonntags ist keine Rückgabe möglich. Sie k
 2 Samstag bis Montag
 3 Freitag bis Montag
 
-Welche Variante passt Ihnen am besten?</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t3"><h2 class="thema">Kaution <span>2</span></h2><div class="n" data-k="__kaution__"><b>Kautionen und Zahlung</b><div class="v">Kautionsliste kommt aus der Preisdatei …</div><pre>Kautionsliste kommt aus der Preisdatei …</pre><div class="k"><div class="kop">Kopieren</div></div></div><div class="n" data-k="__vollmacht__"><b>Fahrzeug als Kaution, Vollmacht</b><div class="v">Sie können statt der Geldkaution Ihr eigenes Fahrzeug als Sicherheit hinterlegen. Das geht, wenn:</div><pre>*Fahrzeug als Kaution*
+Welche Variante passt Ihnen am besten?</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t3"><h2 class="thema">Kaution <span>2</span></h2><div class="n" data-k="__kaution__"><b>Kautionen und Zahlung</b><div class="v">Die Kaution richtet sich nach dem jeweiligen Fahrzeug …</div><pre>Die Kaution richtet sich nach dem jeweiligen Fahrzeug …</pre><div class="k"><div class="kop">Kopieren</div></div></div><div class="n" data-k="__vollmacht__"><b>Fahrzeug als Kaution, Vollmacht</b><div class="v">Sie können statt der Geldkaution Ihr eigenes Fahrzeug als Sicherheit hinterlegen. Das geht, wenn:</div><pre>*Fahrzeug als Kaution*
 
 Sie können statt der Geldkaution Ihr eigenes Fahrzeug als Sicherheit hinterlegen. Das geht, wenn:
 
@@ -239,15 +239,20 @@ document.querySelectorAll(".n").forEach(el=>{
   el.querySelector(".kop").onclick=async()=>{const t=textVon(el);try{await navigator.clipboard.writeText(t);{const l=luecken(t);meldung(l.length?"Kopiert. Noch ausfüllen: "+l.join(", "):"Kopiert, jetzt in WhatsApp einfügen")}}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();meldung("Kopiert")}};
 });
 fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(!p||!p.cars)return;
-  const el=document.querySelector('[data-k="__kaution__"] pre');if(el){el.textContent=kautionText(p.cars.slice().sort((a,b)=>b.gp-a.gp).map(c=>({n:(c.anzeige||c.n).replace(" performance"," Performance"),kaution:c.kaution})));markieren(el.closest(".n"))}}).catch(()=>{});
+  const el=document.querySelector('[data-k="__kaution__"] pre');if(el){el.closest(".n").querySelector(".v").textContent="Die Kaution richtet sich nach dem jeweiligen Fahrzeug";el.textContent=kautionText(p.cars.slice().sort((a,b)=>b.gp-a.gp).map(c=>({n:(c.anzeige||c.n).replace(" performance"," Performance"),kaution:c.kaution})));markieren(el.closest(".n"))}}).catch(()=>{});
 const norm=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 $("suche").addEventListener("input",()=>{const q=norm($("suche").value).trim();let treffer=0;
   document.querySelectorAll("section").forEach(sec=>{let n=0;sec.querySelectorAll(".n").forEach(el=>{const ok=!q||q.split(/\s+/).every(w=>norm(el.textContent+" "+sec.querySelector("h2").textContent).includes(w));
     el.style.display=ok?"":"none";if(ok){n++;if(q)el.classList.add("auf")}else el.classList.remove("auf")});sec.style.display=n?"":"none";treffer+=n;if(!q)sec.querySelectorAll(".n").forEach(el=>el.classList.remove("auf"))});
   $("nichts").style.display=treffer?"none":"block";document.querySelector(".sprung").style.display=q?"none":""});
 const links=[...document.querySelectorAll(".sprung a")];
+// Sprung genau unter die Leiste: Abstand jedes Mal aus Kopf und Leiste ausrechnen (Handy und Mac sind verschieden hoch)
+links.forEach(a=>a.onclick=ev=>{ev.preventDefault();const z=document.querySelector(a.getAttribute("href"));if(!z)return;
+  const nav=document.querySelector(".sprung"),unten=Math.min(nav.getBoundingClientRect().top,parseFloat(getComputedStyle(nav).top)||0)+nav.offsetHeight;
+  window.scrollTo(0,Math.max(0,window.scrollY+z.getBoundingClientRect().top-unten-8));   // sofort, ohne Gleiten: landet immer genau
+  links.forEach(x=>x.classList.toggle("an",x===a))});
 const beob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle("an",a.getAttribute("href")==="#"+e.target.id));
-  const a=links.find(a=>a.classList.contains("an"));if(a)a.scrollIntoView({inline:"center",block:"nearest"})}}),{rootMargin:"-130px 0px -60% 0px"});
+  const a=links.find(a=>a.classList.contains("an"));if(a){const nav=document.querySelector(".sprung");nav.scrollTo({left:a.offsetLeft-nav.clientWidth/2+a.offsetWidth/2,behavior:"smooth"})}}}),{rootMargin:"-130px 0px -60% 0px"});
 document.querySelectorAll("section").forEach(x=>beob.observe(x));
 </script>
 <script>/* Mietix Abgleich: Verträge, Anfragen, Kunden und Fahrzeuge auf allen Geräten gleich (Supabase Frankfurt, seit 26.10.2026).
