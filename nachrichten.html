@@ -25,12 +25,17 @@ h2.thema span{background:var(--rot);color:#fff;font-size:12px;border-radius:999p
 .k .kop{background:var(--rot);color:#fff}.k .wa{background:#25D366;color:#fff}.k .pdf{background:#fff;color:var(--text);border:1.5px solid var(--rand)}
 .hinweis{font-size:13px;color:var(--grau);margin:0 4px 6px}
 input{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px Inter,system-ui,sans-serif;min-height:46px;background:#fff}
+#suche{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px Inter,system-ui,sans-serif;min-height:46px;background:#fff}
+pre mark{background:#FFE58A;border-radius:4px;padding:0 3px;color:inherit}
+.n .luecke{display:inline-block;background:#FFF4D6;color:#9A6700;font-size:11px;font-weight:800;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+.leer{color:var(--grau);text-align:center;padding:24px 10px;font-weight:600;display:none}
 .meld{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2E2E30;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
 .meld.an{opacity:1}
 </style></head><body>
 <header><a href="./">Zentrale</a><h1>MIETIX <span>NACHRICHTEN</span></h1></header>
 <main>
-<div class="hinweis">Antippen zeigt den ganzen Text. „Kopieren“, dann in WhatsApp einfügen.</div>
+<input id="suche" type="search" autocomplete="off" placeholder="Suchen, z. B. Kaution, Anzahlung, R8">
+<div class="hinweis" style="margin-top:8px">Antippen zeigt den ganzen Text. Gelb markiert = noch ausfüllen.</div>
 <nav class="sprung"><a href="#t0">Erster Kontakt</a><a href="#t1">Fahrzeuge</a><a href="#t2">Wochenende</a><a href="#t3">Kaution</a><a href="#t4">Anzahlung</a><a href="#t5">Reservierung</a><a href="#t6">Abholung und Rückgabe</a><a href="#t7">Danach</a></nav><section id="t0"><h2 class="thema">Erster Kontakt <span>3</span></h2><div class="n" data-k="willkommen"><b>Willkommen</b><div class="v">Bitte senden Sie uns Ihren gewünschten Buchungszeitraum (Abhol- und Rückgabedatum). Im Anschluss erhalten Sie von uns die verfügbaren Fahrzeuge inklusive Preisen für diesen Zeitraum.</div><pre>HERZLICH WILLKOMMEN BEI MIETIX😊
 Danke für Ihr Vertrauen in unsere Sportwagenvermietung!
 
@@ -147,6 +152,7 @@ Vielen Dank für Ihr Vertrauen, beim nächsten Mal klappt
 es hoffentlich.
 
 Wir sind jederzeit für Sie da!😊</pre><div class="k"><div class="kop">Kopieren</div></div></div></section>
+<div class="leer" id="nichts">Nichts gefunden.</div>
 </main>
 <div class="meld" id="meld"></div>
 <script>
@@ -158,12 +164,28 @@ const nummer=r=>{let n=(r||"").replace(/[^0-9+]/g,"");if(!n)return"";if(n.starts
 function kautionText(cars){const z=cars.map(c=>"• "+c.n+": "+(c.kaution||0).toLocaleString("de-DE")+" €");
   return "💳 Kautionen & Zahlungsarten\n\nDie Kaution richtet sich nach dem jeweiligen Fahrzeug:\n\n"+z.join("\n")+"\n\nZahlungsmöglichkeiten:\n💵 Barzahlung\n💳 Kartenzahlung\n🚗 Eigenes Fahrzeug als Kaution\n\nAlternativ kann ein eigenes Fahrzeug als Sicherheit hinterlegt werden. Dafür benötigen wir Fahrzeugschein, Fahrzeugbrief und einen Fahrzeugschlüssel. Das Fahrzeug muss einen Mindestwert von 2.500 € haben."}
 function textVon(el){const p=el.querySelector("pre");return p.textContent}
+// Zeilen wie "Fahrzeug:" oder "Betrag:" ohne Inhalt sind Lücken zum Ausfüllen: gelb markieren, Zahl an der Karte
+const LUECKE=/^(\s*(?:\d+\.\s*)?[A-Za-zÄÖÜäöüß][^:\n]{0,40}:)\s*$/;
+// Lücke nur, wenn danach eine leere Zeile oder das Ende kommt (sonst ist es eine Überschrift über einer Liste)
+// Nummerierte Zeilen ("1. Stadt:") sind Fragen an den Kunden, die füllt er selbst aus
+const istLuecke=(zs,i)=>LUECKE.test(zs[i])&&!/^\s*\d+\.?\s/.test(zs[i])&&(i===zs.length-1||!zs[i+1].trim()||zs[i+1].includes(":"));
+function luecken(t){const zs=t.split("\n");return zs.filter((z,i)=>istLuecke(zs,i)).map(z=>z.trim().replace(/^\d+\.\s*/,"").replace(/:$/,""))}
+function markieren(el){const p=el.querySelector("pre"),t=p.textContent,l=luecken(t);
+  const zs=t.split("\n");p.innerHTML=zs.map((z,i)=>istLuecke(zs,i)?'<mark>'+z.replace(/&/g,"&amp;").replace(/</g,"&lt;")+'</mark>':z.replace(/&/g,"&amp;").replace(/</g,"&lt;")).join("\n");
+  const b=el.querySelector("b"),alt=b.querySelector(".luecke");if(alt)alt.remove();
+  if(l.length){const s=document.createElement("span");s.className="luecke";s.textContent=l.length+" ausfüllen";b.appendChild(s)}}
+document.querySelectorAll(".n").forEach(markieren);
 document.querySelectorAll(".n").forEach(el=>{
   el.querySelector("b").onclick=()=>el.classList.toggle("auf");el.querySelector(".v").onclick=()=>el.classList.toggle("auf");
-  el.querySelector(".kop").onclick=async()=>{const t=textVon(el);try{await navigator.clipboard.writeText(t);meldung("Kopiert, jetzt in WhatsApp einfügen")}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();meldung("Kopiert")}};
+  el.querySelector(".kop").onclick=async()=>{const t=textVon(el);try{await navigator.clipboard.writeText(t);{const l=luecken(t);meldung(l.length?"Kopiert. Noch ausfüllen: "+l.join(", "):"Kopiert, jetzt in WhatsApp einfügen")}}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();meldung("Kopiert")}};
 });
 fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(!p||!p.cars)return;
-  const el=document.querySelector('[data-k="__kaution__"] pre');if(el)el.textContent=kautionText(p.cars.slice().sort((a,b)=>b.gp-a.gp).map(c=>({n:(c.anzeige||c.n).replace(" performance"," Performance"),kaution:c.kaution})))}).catch(()=>{});
+  const el=document.querySelector('[data-k="__kaution__"] pre');if(el){el.textContent=kautionText(p.cars.slice().sort((a,b)=>b.gp-a.gp).map(c=>({n:(c.anzeige||c.n).replace(" performance"," Performance"),kaution:c.kaution})));markieren(el.closest(".n"))}}).catch(()=>{});
+const norm=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+$("suche").addEventListener("input",()=>{const q=norm($("suche").value).trim();let treffer=0;
+  document.querySelectorAll("section").forEach(sec=>{let n=0;sec.querySelectorAll(".n").forEach(el=>{const ok=!q||q.split(/\s+/).every(w=>norm(el.textContent+" "+sec.querySelector("h2").textContent).includes(w));
+    el.style.display=ok?"":"none";if(ok){n++;if(q)el.classList.add("auf")}else el.classList.remove("auf")});sec.style.display=n?"":"none";treffer+=n;if(!q)sec.querySelectorAll(".n").forEach(el=>el.classList.remove("auf"))});
+  $("nichts").style.display=treffer?"none":"block";document.querySelector(".sprung").style.display=q?"none":""});
 const links=[...document.querySelectorAll(".sprung a")];
 const beob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle("an",a.getAttribute("href")==="#"+e.target.id));
   const a=links.find(a=>a.classList.contains("an"));if(a)a.scrollIntoView({inline:"center",block:"nearest"})}}),{rootMargin:"-130px 0px -60% 0px"});
