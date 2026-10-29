@@ -11,12 +11,17 @@ body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--tex
 header{background:#fff;border-bottom:3px solid var(--rot);padding:calc(12px + env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:5}
 header h1{font-size:20px;font-weight:900}header h1 span{color:var(--rot)}header a{font-size:13px;color:var(--grau);text-decoration:none;float:right;margin-top:3px}
 main{max-width:680px;margin:0 auto;padding:14px 16px 60px}
-h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--grau);margin:18px 4px 8px}
-.n{background:#fff;border-radius:18px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--rand)}
+h2.thema{font-size:24px;font-weight:900;color:var(--text);margin:28px 4px 10px;display:flex;align-items:center;gap:10px;scroll-margin-top:150px}
+h2.thema span{background:var(--rot);color:#fff;font-size:12px;border-radius:999px;padding:2px 9px}
+.sprung{position:sticky;top:calc(52px + env(safe-area-inset-top));z-index:4;display:flex;gap:7px;overflow-x:auto;padding:10px 0;background:var(--bg);scrollbar-width:none}
+.sprung::-webkit-scrollbar{display:none}
+.sprung a{flex:0 0 auto;background:#fff;border:1px solid var(--rand);border-radius:999px;padding:8px 13px;font-weight:800;font-size:14px;color:var(--text);text-decoration:none}
+.sprung a.an{background:var(--rot);border-color:var(--rot);color:#fff}
+.n{background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--rand)}
 .n b{display:block;font-size:16px}.n .v{font-size:13px;color:var(--grau);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .n pre{display:none;white-space:pre-wrap;font:14px/1.45 Inter,system-ui,sans-serif;background:var(--bg);border-radius:12px;padding:12px;margin-top:10px}
 .n.auf pre{display:block}
-.k{display:flex;gap:8px;margin-top:10px}.k div,.k a{flex:1;text-align:center;border-radius:12px;padding:11px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none}
+.k{display:flex;gap:8px;margin-top:10px}.k div,.k a{flex:1;text-align:center;border-radius:12px;padding:10px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none}
 .k .kop{background:var(--rot);color:#fff}.k .wa{background:#25D366;color:#fff}.k .pdf{background:#fff;color:var(--text);border:1.5px solid var(--rand)}
 .hinweis{font-size:13px;color:var(--grau);margin:0 4px 6px}
 input{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px Inter,system-ui,sans-serif;min-height:46px;background:#fff}
@@ -27,7 +32,7 @@ input{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;fo
 <main>
 <div class="hinweis">Antippen zeigt den Text. „Kopieren“ und in WhatsApp einfügen, oder gleich „WhatsApp“ mit der Nummer unten.</div>
 <input id="nr" type="tel" inputmode="tel" placeholder="Handynummer des Kunden (für den WhatsApp-Knopf)">
-<h2>Anfrage kommt rein</h2><div class="n" data-k="willkommen"><b>Willkommen</b><div class="v">Bitte senden Sie uns Ihren gewünschten Buchungszeitraum (Abhol- und Rückgabedatum). Im Anschluss erhalten Sie von uns die verfügbaren Fahrzeuge inklusive Preisen für diesen Zeitraum.</div><pre>HERZLICH WILLKOMMEN BEI MIETIX😊
+<nav class="sprung"><a href="#t0">Erster Kontakt</a><a href="#t1">Fahrzeuge</a><a href="#t2">Preis und Angebot</a><a href="#t3">Kaution</a><a href="#t4">Anzahlung</a><a href="#t5">Reservierung</a><a href="#t6">Abholung und Rückgabe</a><a href="#t7">Danach</a></nav><section id="t0"><h2 class="thema">Erster Kontakt <span>3</span></h2><div class="n" data-k="willkommen"><b>Willkommen</b><div class="v">Bitte senden Sie uns Ihren gewünschten Buchungszeitraum (Abhol- und Rückgabedatum). Im Anschluss erhalten Sie von uns die verfügbaren Fahrzeuge inklusive Preisen für diesen Zeitraum.</div><pre>HERZLICH WILLKOMMEN BEI MIETIX😊
 Danke für Ihr Vertrauen in unsere Sportwagenvermietung!
 
 Bitte senden Sie uns Ihren gewünschten Buchungszeitraum (Abhol- und Rückgabedatum). Im Anschluss erhalten Sie von uns die verfügbaren Fahrzeuge inklusive Preisen für diesen Zeitraum.</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="stadtundalter"><b>Stadt und Alter abfragen</b><div class="v">Aktuell läuft bei uns eine Aktion, da hole ich Ihnen das bestmögliche Angebot heraus. Dafür brauche ich nur zwei Angaben von Ihnen:</div><pre>UNSERE AKTION FÜR SIE
@@ -45,21 +50,19 @@ Ausweis: Personalausweis oder Reisepass
 
 Führerschein: seit mindestens 2 Jahren
 
-Wohnsitz: in Deutschland</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="uhrzeiten"><b>Übergabezeiten</b><div class="v">Abholung: täglich ab 10 Uhr</div><pre>UNSERE ÜBERGABEZEITEN
+Wohnsitz: in Deutschland</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div></section><section id="t1"><h2 class="thema">Fahrzeuge <span>12</span></h2><div class="n"><b>Alle Fahrzeuge auf einmal</b><div class="v">• Audi RS Q8, 600 PS, Baujahr 2022</div><pre>UNSERE FAHRZEUGE
 
-Abholung: täglich ab 10 Uhr
-Rückgabe: täglich bis 18 Uhr
-Sonntag: keine Rückgabe möglich
-
-So nehmen wir uns für jede Übergabe ausreichend Zeit für Sie.</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="wochenende"><b>Wochenende</b><div class="v">Wichtig für Ihre Wochenendplanung: Sonntags ist keine Rückgabe möglich. Sie können daher wählen:</div><pre>WOCHENENDMIETE
-
-Wichtig für Ihre Wochenendplanung: Sonntags ist keine Rückgabe möglich. Sie können daher wählen:
-
-1 Freitag bis Samstag
-2 Samstag bis Montag
-3 Freitag bis Montag
-
-Welche Variante passt Ihnen am besten?</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="adresse"><b>Adresse</b><div class="v">Sie finden uns hier: Peter-Sander-Straße 43 B, 55252 Mainz-Kastel, Google Maps: https://maps.app.goo.gl/cBmRRr4jpmYEBbeq6 . Bei Fragen zur Anfahrt bin ich jederzeit für Sie erreichbar!😊</div><pre>Sie finden uns hier: Peter-Sander-Straße 43 B, 55252 Mainz-Kastel, Google Maps: https://maps.app.goo.gl/cBmRRr4jpmYEBbeq6 . Bei Fragen zur Anfahrt bin ich jederzeit für Sie erreichbar!😊</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><h2>Angebot</h2><div class="n" data-k="frei"><b>Termin ist frei</b><div class="v">Ihr Wunschtermin ist frei:</div><pre>GUTE NACHRICHTEN
+• Audi RS Q8, 600 PS, Baujahr 2022
+• Audi RS 6, 600 PS, Baujahr 2024
+• Audi R8 Performance, V10, 570 PS, Baujahr 2024
+• Audi RS 5 ABT, 510 PS, Baujahr 2023
+• Audi RS 3 Limousine, 400 PS, Baujahr 2024
+• Mercedes C 63 S AMG, Coupe, 510 PS, Baujahr 2023
+• Mercedes E 400 d, Limousine, 400 PS, Baujahr 2022
+• VW Golf 8 GTI Clubsport, Akrapovic, 300 PS, Baujahr 2025
+• VW Golf 8 2.0 Diesel, 150 PS, Baujahr 2025, Automatik
+• Mercedes-Benz S 580L AMG Chauffeur-Paket, V8, Baujahr 2024
+• BMW 8er Coupe, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>Audi RS Q8</b><div class="v">600 PS, Baujahr 2022</div><pre>Audi RS Q8, 600 PS, Baujahr 2022</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>Audi RS 6</b><div class="v">600 PS, Baujahr 2024</div><pre>Audi RS 6, 600 PS, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>Audi R8 Performance</b><div class="v">V10, 570 PS, Baujahr 2024</div><pre>Audi R8 Performance, V10, 570 PS, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>Audi RS 5 ABT</b><div class="v">510 PS, Baujahr 2023</div><pre>Audi RS 5 ABT, 510 PS, Baujahr 2023</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>Audi RS 3 Limousine</b><div class="v">400 PS, Baujahr 2024</div><pre>Audi RS 3 Limousine, 400 PS, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>Mercedes C 63 S AMG</b><div class="v">Coupe, 510 PS, Baujahr 2023</div><pre>Mercedes C 63 S AMG, Coupe, 510 PS, Baujahr 2023</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>Mercedes E 400 d</b><div class="v">Limousine, 400 PS, Baujahr 2022</div><pre>Mercedes E 400 d, Limousine, 400 PS, Baujahr 2022</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>VW Golf 8 GTI Clubsport</b><div class="v">Akrapovic, 300 PS, Baujahr 2025</div><pre>VW Golf 8 GTI Clubsport, Akrapovic, 300 PS, Baujahr 2025</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>VW Golf 8 2.0 Diesel</b><div class="v">150 PS, Baujahr 2025, Automatik</div><pre>VW Golf 8 2.0 Diesel, 150 PS, Baujahr 2025, Automatik</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>Mercedes-Benz S 580L AMG Chauffeur-Paket</b><div class="v">V8, Baujahr 2024</div><pre>Mercedes-Benz S 580L AMG Chauffeur-Paket, V8, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n"><b>BMW 8er Coupe</b><div class="v">Baujahr 2024</div><pre>BMW 8er Coupe, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div></section><section id="t2"><h2 class="thema">Preis und Angebot <span>4</span></h2><div class="n" data-k="frei"><b>Termin ist frei</b><div class="v">Ihr Wunschtermin ist frei:</div><pre>GUTE NACHRICHTEN
 
 Ihr Wunschtermin ist frei:
 
@@ -87,7 +90,15 @@ Regulärer Preis:
 
 Ihr Preis heute:
 
-Soll ich das Fahrzeug für Sie reservieren?</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="__kaution__"><b>Kautionen und Zahlung</b><div class="v">Kautionsliste kommt aus der Preisdatei …</div><pre>Kautionsliste kommt aus der Preisdatei …</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="__vollmacht__"><b>Fahrzeug als Kaution, Vollmacht</b><div class="v">Sie können statt der Geldkaution Ihr eigenes Fahrzeug als Sicherheit hinterlegen. Das geht, wenn:</div><pre>FAHRZEUG ALS KAUTION
+Soll ich das Fahrzeug für Sie reservieren?</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="wochenende"><b>Wochenende</b><div class="v">Wichtig für Ihre Wochenendplanung: Sonntags ist keine Rückgabe möglich. Sie können daher wählen:</div><pre>WOCHENENDMIETE
+
+Wichtig für Ihre Wochenendplanung: Sonntags ist keine Rückgabe möglich. Sie können daher wählen:
+
+1 Freitag bis Samstag
+2 Samstag bis Montag
+3 Freitag bis Montag
+
+Welche Variante passt Ihnen am besten?</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div></section><section id="t3"><h2 class="thema">Kaution <span>2</span></h2><div class="n" data-k="__kaution__"><b>Kautionen und Zahlung</b><div class="v">Kautionsliste kommt aus der Preisdatei …</div><pre>Kautionsliste kommt aus der Preisdatei …</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="__vollmacht__"><b>Fahrzeug als Kaution, Vollmacht</b><div class="v">Sie können statt der Geldkaution Ihr eigenes Fahrzeug als Sicherheit hinterlegen. Das geht, wenn:</div><pre>FAHRZEUG ALS KAUTION
 
 Sie können statt der Geldkaution Ihr eigenes Fahrzeug als Sicherheit hinterlegen. Das geht, wenn:
 
@@ -96,7 +107,22 @@ Sie können statt der Geldkaution Ihr eigenes Fahrzeug als Sicherheit hinterlege
 3. Ein Fahrzeugschlüssel bei uns bleibt
 
 Ist das Fahrzeug nicht auf Ihren Namen angemeldet, brauchen wir diese Vollmacht vom Eigentümer, ausgefüllt und unterschrieben:
-https://barankohler.github.io/mietix-zentrale/vollmacht.pdf</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div><a class="pdf" href="vollmacht.pdf" target="_blank">Vollmacht (PDF)</a></div></div><h2>Reservierung</h2><div class="n" data-k="reserviert"><b>Reservierung bestätigt</b><div class="v">Fahrzeug:</div><pre>IHRE RESERVIERUNG IST BESTÄTIGT
+https://barankohler.github.io/mietix-zentrale/vollmacht.pdf</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div><a class="pdf" href="vollmacht.pdf" target="_blank">Vollmacht (PDF)</a></div></div></section><section id="t4"><h2 class="thema">Anzahlung <span>2</span></h2><div class="n" data-k="__anzahlung__"><b>Anzahlung 30 Prozent</b><div class="v">Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.</div><pre>ANZAHLUNG
+
+Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.
+
+Betrag:
+Empfänger: Baran Köhler
+IBAN: DE59 5105 0015 0997 0123 49
+Verwendungszweck: Vor- und Nachname, Fahrzeugmodell
+
+Den Restbetrag zahlen Sie bequem bei Abholung.</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="eingang"><b>Zahlung eingegangen</b><div class="v">Ihre Zahlung ist eingegangen, herzlichen Dank!</div><pre>Ihre Zahlung ist eingegangen, herzlichen Dank!
+
+Fahrzeug:
+
+Ihr Fahrzeug ist damit verbindlich für Sie reserviert.
+
+Wir freuen uns auf Sie!</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div></section><section id="t5"><h2 class="thema">Reservierung <span>2</span></h2><div class="n" data-k="reserviert"><b>Reservierung bestätigt</b><div class="v">Fahrzeug:</div><pre>IHRE RESERVIERUNG IST BESTÄTIGT
 
 Fahrzeug:
 
@@ -114,13 +140,7 @@ Für den Mietvertrag benötige ich noch folgende Angaben von Ihnen:
 
 3. Geburtsdatum:
 
-Ihre Daten behandeln wir selbstverständlich vertraulich.</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="eingang"><b>Zahlung eingegangen</b><div class="v">Ihre Zahlung ist eingegangen, herzlichen Dank!</div><pre>Ihre Zahlung ist eingegangen, herzlichen Dank!
-
-Fahrzeug:
-
-Ihr Fahrzeug ist damit verbindlich für Sie reserviert.
-
-Wir freuen uns auf Sie!</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><h2>Abholung</h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>MORGEN IST ES SO WEIT
+Ihre Daten behandeln wir selbstverständlich vertraulich.</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div></section><section id="t6"><h2 class="thema">Abholung und Rückgabe <span>5</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>MORGEN IST ES SO WEIT
 
 Hallo, Ihr Fahrzeug steht morgen für Sie bereit:
 
@@ -130,7 +150,13 @@ Abholung ab:
 
 Mitbringen: Führerschein, Ausweis, Kaution
 
-Wir freuen uns auf Sie!</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><h2>Rückgabe</h2><div class="n" data-k="rückgabe"><b>Erinnerung Rückgabe</b><div class="v">Hallo, eine kurze Erinnerung an Ihre Rückgabe:</div><pre>IHRE RÜCKGABE
+Wir freuen uns auf Sie!</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="uhrzeiten"><b>Übergabezeiten</b><div class="v">Abholung: täglich ab 10 Uhr</div><pre>UNSERE ÜBERGABEZEITEN
+
+Abholung: täglich ab 10 Uhr
+Rückgabe: täglich bis 18 Uhr
+Sonntag: keine Rückgabe möglich
+
+So nehmen wir uns für jede Übergabe ausreichend Zeit für Sie.</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="adresse"><b>Adresse</b><div class="v">Sie finden uns hier: Peter-Sander-Straße 43 B, 55252 Mainz-Kastel, Google Maps: https://maps.app.goo.gl/cBmRRr4jpmYEBbeq6 . Bei Fragen zur Anfahrt bin ich jederzeit für Sie erreichbar!😊</div><pre>Sie finden uns hier: Peter-Sander-Straße 43 B, 55252 Mainz-Kastel, Google Maps: https://maps.app.goo.gl/cBmRRr4jpmYEBbeq6 . Bei Fragen zur Anfahrt bin ich jederzeit für Sie erreichbar!😊</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="rückgabe"><b>Erinnerung Rückgabe</b><div class="v">Hallo, eine kurze Erinnerung an Ihre Rückgabe:</div><pre>IHRE RÜCKGABE
 
 Hallo, eine kurze Erinnerung an Ihre Rückgabe:
 
@@ -148,12 +174,12 @@ Regulärer Preis:
 
 Ihr Preis Angebot:
 
-Gültig bis zur Rückgabe, eine kurze Nachricht genügt!</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><h2>Danach</h2><div class="n" data-k="bewertung"><b>Bewertung</b><div class="v">Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://www.google.com/maps/place/Mietix+Sportwagenvermietung+Wiesbaden+(n%C3%A4he+Frankfurt)+%2F+Autovermietung/@50.0294841,8.2772095,17z/data=!3m1!5s0x47bd97b5cd691095:0x473d6ed3f49bb5a2!4m8!3m7!1s0x47bd97354842e1d7:0x58b35c4c60c4cba8!8m2!3d50.0294841!4d8.2797898!9m1!1b1!16s%2Fg%2F11y8rgn43r?authuser=1&amp;entry=ttu&amp;g_ep=EgoyMDI2MDcxNS4wIKXMDSoASAFQAw%3D%3D .</div><pre>Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://www.google.com/maps/place/Mietix+Sportwagenvermietung+Wiesbaden+(n%C3%A4he+Frankfurt)+%2F+Autovermietung/@50.0294841,8.2772095,17z/data=!3m1!5s0x47bd97b5cd691095:0x473d6ed3f49bb5a2!4m8!3m7!1s0x47bd97354842e1d7:0x58b35c4c60c4cba8!8m2!3d50.0294841!4d8.2797898!9m1!1b1!16s%2Fg%2F11y8rgn43r?authuser=1&amp;entry=ttu&amp;g_ep=EgoyMDI2MDcxNS4wIKXMDSoASAFQAw%3D%3D .
+Gültig bis zur Rückgabe, eine kurze Nachricht genügt!</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div></section><section id="t7"><h2 class="thema">Danach <span>2</span></h2><div class="n" data-k="bewertung"><b>Bewertung</b><div class="v">Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://www.google.com/maps/place/Mietix+Sportwagenvermietung+Wiesbaden+(n%C3%A4he+Frankfurt)+%2F+Autovermietung/@50.0294841,8.2772095,17z/data=!3m1!5s0x47bd97b5cd691095:0x473d6ed3f49bb5a2!4m8!3m7!1s0x47bd97354842e1d7:0x58b35c4c60c4cba8!8m2!3d50.0294841!4d8.2797898!9m1!1b1!16s%2Fg%2F11y8rgn43r?authuser=1&amp;entry=ttu&amp;g_ep=EgoyMDI2MDcxNS4wIKXMDSoASAFQAw%3D%3D .</div><pre>Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://www.google.com/maps/place/Mietix+Sportwagenvermietung+Wiesbaden+(n%C3%A4he+Frankfurt)+%2F+Autovermietung/@50.0294841,8.2772095,17z/data=!3m1!5s0x47bd97b5cd691095:0x473d6ed3f49bb5a2!4m8!3m7!1s0x47bd97354842e1d7:0x58b35c4c60c4cba8!8m2!3d50.0294841!4d8.2797898!9m1!1b1!16s%2Fg%2F11y8rgn43r?authuser=1&amp;entry=ttu&amp;g_ep=EgoyMDI2MDcxNS4wIKXMDSoASAFQAw%3D%3D .
 Dauert nur eine Minute, herzlichen Dank!</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="nächstesmal"><b>Nächstes Mal</b><div class="v">Schade, dass es diesmal nicht geklappt hat.</div><pre>Schade, dass es diesmal nicht geklappt hat.
 Vielen Dank für Ihr Vertrauen, beim nächsten Mal klappt
 es hoffentlich.
 
-Wir sind jederzeit für Sie da!😊</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><h2>Autos</h2><div class="hinweis">Ein Auto antippen, kopieren, fertig.</div><div class="n" data-k="auto"><b>Audi RS Q8</b><div class="v">600 PS, Baujahr 2022</div><pre>Audi RS Q8, 600 PS, Baujahr 2022</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>Audi RS 6</b><div class="v">600 PS, Baujahr 2024</div><pre>Audi RS 6, 600 PS, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>Audi R8 Performance</b><div class="v">V10, 570 PS, Baujahr 2024</div><pre>Audi R8 Performance, V10, 570 PS, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>Audi RS 5 ABT</b><div class="v">510 PS, Baujahr 2023</div><pre>Audi RS 5 ABT, 510 PS, Baujahr 2023</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>Audi RS 3 Limousine</b><div class="v">400 PS, Baujahr 2024</div><pre>Audi RS 3 Limousine, 400 PS, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>Mercedes C 63 S AMG</b><div class="v">Coupe, 510 PS, Baujahr 2023</div><pre>Mercedes C 63 S AMG, Coupe, 510 PS, Baujahr 2023</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>Mercedes E 400 d</b><div class="v">Limousine, 400 PS, Baujahr 2022</div><pre>Mercedes E 400 d, Limousine, 400 PS, Baujahr 2022</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>VW Golf 8 GTI Clubsport</b><div class="v">Akrapovic, 300 PS, Baujahr 2025</div><pre>VW Golf 8 GTI Clubsport, Akrapovic, 300 PS, Baujahr 2025</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>VW Golf 8 2.0 Diesel</b><div class="v">150 PS, Baujahr 2025, Automatik</div><pre>VW Golf 8 2.0 Diesel, 150 PS, Baujahr 2025, Automatik</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>Mercedes-Benz S 580L AMG Chauffeur-Paket</b><div class="v">V8, Baujahr 2024</div><pre>Mercedes-Benz S 580L AMG Chauffeur-Paket, V8, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div><div class="n" data-k="auto"><b>BMW 8er Coupe</b><div class="v">Baujahr 2024</div><pre>BMW 8er Coupe, Baujahr 2024</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div>
+Wir sind jederzeit für Sie da!😊</pre><div class="k"><div class="kop">Kopieren</div><div class="wa">WhatsApp</div></div></div></section>
 </main>
 <div class="meld" id="meld"></div>
 <script>
@@ -171,6 +197,10 @@ document.querySelectorAll(".n").forEach(el=>{
   el.querySelector(".wa").onclick=()=>{const n=nummer($("nr").value);window.open("https://wa.me/"+(n?n+"?text=":"?text=")+encodeURIComponent(textVon(el)),"_blank")}});
 fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(!p||!p.cars)return;
   const el=document.querySelector('[data-k="__kaution__"] pre');if(el)el.textContent=kautionText(p.cars.map(c=>({n:(c.anzeige||c.n).replace(" performance"," Performance"),kaution:c.kaution})))}).catch(()=>{});
+const links=[...document.querySelectorAll(".sprung a")];
+const beob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle("an",a.getAttribute("href")==="#"+e.target.id));
+  const a=links.find(a=>a.classList.contains("an"));if(a)a.scrollIntoView({inline:"center",block:"nearest"})}}),{rootMargin:"-130px 0px -60% 0px"});
+document.querySelectorAll("section").forEach(x=>beob.observe(x));
 try{const w=JSON.parse(localStorage.getItem("mietixNummer")||"null");if(w&&w.nr&&Date.now()-w.zeit<7200000)$("nr").value=w.nr}catch(e){}
 $("nr").addEventListener("input",()=>{try{localStorage.setItem("mietixNummer",JSON.stringify({nr:$("nr").value,zeit:Date.now()}))}catch(e){}});
 </script>
