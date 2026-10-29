@@ -22,7 +22,11 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--grau);
 .z .t{flex:1;min-width:0}.z b{display:block;font-size:15px}.z i{font-style:normal;font-size:13px;color:var(--grau)}
 .z button{flex:0 0 auto;background:var(--rot);color:#fff;border:0;border-radius:999px;padding:10px 14px;font:800 14px Inter,system-ui,sans-serif;cursor:pointer}
 .z button.hell{background:#fff;color:var(--text);border:1.5px solid var(--rand)}
-.leer{color:var(--grau);text-align:center;padding:22px 10px;font-weight:600}
+.leer{color:var(--grau);text-align:center;padding:16px 10px;font-weight:600;font-size:14px}
+.bereich{margin-bottom:12px}.bereich .kopf{display:flex;justify-content:space-between;align-items:center;padding:0 6px 6px}
+.bereich .kopf b{font-size:15px}.bereich .kopf span{background:var(--rot);color:#fff;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:800}
+.bereich .kopf span.null{background:#E4E4E7;color:var(--grau)}
+.z .haken{display:inline-block;background:#E8F6EE;color:var(--gruen);font-size:11px;font-weight:800;border-radius:6px;padding:2px 6px;margin-right:4px}
 .hinweis{font-size:13px;color:var(--grau);margin:0 4px 10px;line-height:1.45}
 .meld{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2E2E30;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9;white-space:nowrap}
 .meld.an{opacity:1}
@@ -30,13 +34,11 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--grau);
 <header><a href="./">Zentrale</a><h1>MIETIX <span>PAPIERKORB</span> <i id="abgleichPunkt" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B0B0B3;vertical-align:middle;margin-left:4px"></i></h1></header>
 <main>
 <div id="abgleich"></div>
-<div class="hinweis">Nichts wird endgültig gelöscht. Was du auf einer Seite löschst, liegt 90 Tage hier und kommt mit einem Tipp zurück, auf allen Geräten.</div>
-<h2>Gelöscht</h2>
-<div class="karte" id="geloescht"></div>
-<h2>Erledigte Zustand-Punkte</h2>
-<div class="karte" id="zustand"></div>
-<h2>Erledigte Aufgaben, letzte 60 Tage</h2>
-<div class="karte" id="aufgaben"></div>
+<div class="hinweis">Nichts wird endgültig gelöscht. Was du löschst, liegt 90 Tage hier, nach Bereichen getrennt, und kommt mit einem Tipp zurück, auf allen Geräten.</div>
+<div id="geloescht"></div>
+<h2>Erledigt</h2>
+<div class="bereich"><div class="kopf"><b>Zustand-Punkte, erledigt</b><span id="nZustand"></span></div><div class="karte" id="zustand"></div></div>
+<div class="bereich"><div class="kopf"><b>Aufgaben, erledigt (60 Tage)</b><span id="nAufgaben"></span></div><div class="karte" id="aufgaben"></div></div>
 </main>
 <div class="meld" id="meld"></div>
 <script>
@@ -48,13 +50,20 @@ const de=s=>{if(!s)return"";const d=new Date(s);if(isNaN(d))return String(s).sli
 function meldung(t){const m=$("meld");m.textContent=t;m.classList.add("an");clearTimeout(m._t);m._t=setTimeout(()=>m.classList.remove("an"),1800)}
 function zeichne(){
   const pk=(window.mietixPapierkorb?window.mietixPapierkorb():lies("mietixPapierkorb",[]).slice().sort((a,b)=>a.zeit<b.zeit?1:-1));
-  $("geloescht").innerHTML=pk.length?pk.map(e=>'<div class="z"><div class="t"><b>'+esc(e.text)+'</b><i>gelöscht '+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Der Papierkorb ist leer.</div>';
+  // Ein Kasten je Bereich, immer in derselben Reihenfolge, auch wenn leer
+  const BEREICHE=[["mietixVorgaenge","Mietverträge"],["mietixAnfragen","Anfragen"],["mietixKunden","Kunden"],["mietixAusgaben","Ausgaben (Geld)"],["mietixSperren","Sperren (Kalender)"],["mietixZustand","Zustand-Punkte (Autos)"],["mietixAufgaben","Aufgaben"]];
+  const extra=e=>{if(e.ablage!=="mietixVorgaenge")return"";const v=e.eintrag||{};return '<span class="haken">Vertrag</span>'+(v.ueb?'<span class="haken">Übergabe</span>':"")+(v.rueck?'<span class="haken">Rückgabe</span>':"")+(v.schaden?'<span class="haken">Schaden</span>':"")};
+  $("geloescht").innerHTML=BEREICHE.map(([k,t])=>{const l=pk.filter(e=>e.ablage===k);
+    return '<div class="bereich"><div class="kopf"><b>'+t+'</b><span class="'+(l.length?"":"null")+'">'+l.length+'</span></div><div class="karte">'+
+      (l.length?l.map(e=>'<div class="z"><div class="t"><b>'+esc(e.text)+'</b><i>'+extra(e)+'gelöscht '+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts gelöscht.</div>')+'</div></div>'}).join("");
   [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Zurückgeholt.");zeichne()}else meldung("Ging nicht, bitte anmelden.")});
   const z=lies("mietixZustand",[]).filter(x=>x.erledigt).sort((a,b)=>(b.erledigtAm||"")<(a.erledigtAm||"")?-1:1);
+  $("nZustand").textContent=z.length;$("nZustand").className=z.length?"":"null";
   $("zustand").innerHTML=z.length?z.map(x=>'<div class="z"><div class="t"><b>'+esc(x.auto)+': '+esc(x.text)+'</b><i>erledigt '+de(x.erledigtAm||x.datum)+'</i></div><button class="hell" data-z="'+esc(x.id)+'">Wieder öffnen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
   [...$("zustand").querySelectorAll("button[data-z]")].forEach(b=>b.onclick=()=>{const l=lies("mietixZustand",[]),x=l.find(y=>y.id===b.dataset.z);if(x){x.erledigt=false;delete x.erledigtAm;schreib("mietixZustand",l);meldung("Wieder offen.");zeichne()}});
   const grenze=new Date(Date.now()-60*864e5).toISOString().slice(0,10);
   const a=lies("mietixAufgaben",[]).filter(x=>x.erledigt&&!x._weg&&String(x.erledigt)>=grenze).sort((p,q)=>String(q.erledigt).localeCompare(String(p.erledigt)));
+  $("nAufgaben").textContent=a.length;$("nAufgaben").className=a.length?"":"null";
   $("aufgaben").innerHTML=a.length?a.map(x=>'<div class="z"><div class="t"><b>'+esc(x.aufgabe)+'</b><i>erledigt '+de(x.erledigt)+'</i></div><button class="hell" data-a="'+esc(x.id)+'">Wieder öffnen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
   [...$("aufgaben").querySelectorAll("button[data-a]")].forEach(b=>b.onclick=()=>{const l=lies("mietixAufgaben",[]),x=l.find(y=>y.id===b.dataset.a);if(x){delete x.erledigt;x.status="Offen";schreib("mietixAufgaben",l);meldung("Wieder offen.");zeichne()}});
 }
