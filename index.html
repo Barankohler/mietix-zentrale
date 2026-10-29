@@ -41,6 +41,9 @@ button{width:100%;padding:15px;margin-top:22px;border:1px solid var(--rand);bord
   background:var(--kachel);color:#fff;font:700 16px Inter,system-ui,sans-serif}
 button:active{background:#26262B}
 #heute .hk{background:var(--kachel);border:1px solid var(--rand);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+#heute a.mini{display:block;text-decoration:none;color:#fff}#heute .mini table{border-collapse:separate;border-spacing:3px;width:100%;table-layout:fixed}
+#heute .mini th{font-size:11px;color:var(--grau);font-weight:700;text-align:center;line-height:1.1}#heute .mini th:first-child{text-align:left;width:34%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:#fff}
+#heute .mini td{height:18px;padding:0}#heute .mini td i{display:block;height:18px;border-radius:5px;background:#1E6B3A}#heute .mini td.b i{background:#C4161C}#heute .mini td.s i{background:#4A4A4F}
 #heute h2{margin-top:18px}
 #heute a{display:flex;justify-content:space-between;gap:10px;color:#fff;text-decoration:none;padding:9px 0;border-bottom:1px solid var(--rand);font-size:15px}
 #heute a:last-child{border-bottom:0}#heute a b{font-weight:700}#heute a i{font-style:normal;color:var(--grau);font-size:13px;white-space:nowrap}
@@ -106,6 +109,19 @@ const WA="*Mietix Werkzeuge*\n\nAlles auf einen Blick: https://barankohler.githu
     const mahn=lies("mietixVorgaenge",[]).filter(x=>x.vonD&&x.vonD<h&&!((x.zahlung||{}).rest||{}).am&&((x.zahlung||{}).rest||{}).betrag);
     if(mahn.length)out+=z({t:mahn.length+(mahn.length===1?" Miete noch offen":" Mieten noch offen"),i:"Verträge, Heute",href:B+"mietix-vertrag/?zeige=heute",spaet:true});
     out+='</div>';
+    // Belegung der nächsten 7 Tage: ein Blick, ein Tipp zur großen Tafel (29.10.2026)
+    const alle=lies("mietixVorgaenge",[]),anfr=lies("mietixAnfragen",[]),sperr=lies("mietixSperren",[]);
+    let autos=Object.keys(lies("mietixAutos",{}));if(!autos.length)autos=[...new Set(alle.map(x=>x.auto).filter(Boolean))];
+    if(autos.length){const kurz=n=>n.replace("Mercedes-Benz ","").replace(" Chauffeur-Paket","").replace(" Limousine","").replace(" performance","").replace("Mercedes ","");
+      const tage=[];for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()+i);tage.push(iso(d))}
+      const ueber=(a1,b1,a2,b2)=>a1<b2&&b1>a2,plus1=t=>{const d=new Date(t+"T12:00");d.setDate(d.getDate()+1);return iso(d)};
+      const stand=(auto,t)=>{const t2=plus1(t);
+        if(sperr.some(x=>x.auto===auto&&x.von&&x.bis&&ueber(t,t2,x.von,x.bis)))return"s";
+        if(alle.some(x=>x.auto===auto&&x.status!=="zurück"&&x.vonD&&x.bisD&&ueber(t,t2,x.vonD,x.bisD)))return"b";
+        if(anfr.some(x=>x.auto===auto&&x.status==="gebucht"&&x.von&&x.bis&&ueber(t,t2,x.von,x.bis)))return"b";return"f"};
+      const wt=["So","Mo","Di","Mi","Do","Fr","Sa"];
+      out+='<h2>Belegung, 7 Tage</h2><a class="hk mini" href="'+B+'mietix-belegung/"><table><tr><th></th>'+tage.map(t=>'<th>'+wt[new Date(t+"T12:00").getDay()]+'<br>'+(+t.slice(8))+'</th>').join("")+'</tr>'+
+        autos.map(a=>'<tr><th>'+kurz(a)+'</th>'+tage.map(t=>'<td class="'+stand(a,t)+'"><i></i></td>').join("")+'</tr>').join("")+'</table><div class="tipp" style="margin:8px 0 0">Antippen für die ganze Tafel, 30 Tage, mit Namen.</div></a>'}
     document.getElementById("heute").innerHTML=out;
   }
   zeichne();
