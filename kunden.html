@@ -431,7 +431,8 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   "#mietixRueck{position:fixed;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));transform:translateY(-160%);z-index:9999;background:#2E2E30;color:#fff;"+
   "border-radius:999px;padding:8px 8px 8px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 14px Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);"+
   "transition:transform .25s;max-width:560px;margin:0 auto;white-space:nowrap}#mietixRueck span{overflow:hidden;text-overflow:ellipsis;min-width:0}"+
-  "#mietixRueck.an{transform:translateY(0)}#mietixRueck button{background:#C4161C;color:#fff;border:0;border-radius:999px;padding:9px 14px;font:800 14px Inter,system-ui,sans-serif;cursor:pointer}";
+  "#mietixRueck.an{transform:translateY(0)}#mietixRueck span{flex:1 1 auto}"+
+  "#mietixRueck button{flex:0 0 auto!important;width:auto!important;min-height:0!important;height:auto!important;margin:0!important;box-shadow:none!important;background:#C4161C!important;color:#fff!important;border:0!important;border-radius:999px!important;padding:9px 14px!important;font:800 14px Inter,system-ui,sans-serif!important;cursor:pointer;display:inline-block!important}";
 document.head.appendChild(css);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
 window.addEventListener("online",abgleichen);
