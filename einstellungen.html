@@ -49,7 +49,7 @@ document.getElementById("kopieren").onclick=async function(){const k=this,alt=k.
 (function(){const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
   const uhrDe=(z,mitTag)=>{const d=new Date(z),p=n=>String(n).padStart(2,"0");return (mitTag?p(d.getDate())+"."+p(d.getMonth()+1)+". ":"")+p(d.getHours())+":"+p(d.getMinutes())};
   function stand(){const st=(lies("mietixStand",{}).bruecke)||null,el=document.getElementById("bruecke");if(!st||!st.zeit){el.textContent="";return}
-    const alter=(Date.now()-new Date(st.zeit))/3600000;el.textContent="Excel: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true)":"aktuell bis "+uhrDe(st.zeit)+" Uhr"))}
+    const alter=(Date.now()-new Date(st.zeit))/3600000;el.textContent="Excel: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true)+" Uhr":"aktuell bis "+uhrDe(st.zeit)+" Uhr"))}
   stand();window.addEventListener("mietix-abgleich",stand)})();
 </script>
 <script>/* Mietix Abgleich: Verträge, Anfragen, Kunden und Fahrzeuge auf allen Geräten gleich (Supabase Frankfurt, seit 26.10.2026).

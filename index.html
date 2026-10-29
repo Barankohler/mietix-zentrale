@@ -88,7 +88,7 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
     const p=document.getElementById("punkt");p.className="";
     if(!sitzung){text=""}
     else if(st&&st.zeit){const alter=(Date.now()-new Date(st.zeit))/3600000;const rot=alter>2||st.ok===false;p.className=rot?"rot":"gruen";
-      text="Excel: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true). Mac aus oder ohne Internet?":"aktuell bis "+uhrDe(st.zeit)+" Uhr"))}
+      text="Excel: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true)+" Uhr. Mac aus oder ohne Internet?":"aktuell bis "+uhrDe(st.zeit)+" Uhr"))}
     else{p.className="gruen";text="Angemeldet, alles gesichert."}
     document.getElementById("bruecke").textContent=text;
   }
