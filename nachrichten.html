@@ -387,7 +387,7 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
         pwSetzen=false;zeigen();abgleichen()}catch(e){f.textContent=e.message}};return}
   const pkt=document.getElementById("abgleichPunkt");
   if(pkt)pkt.style.background=!sitzung?"#B0B0B3":fehler?"#C4161C":"#1B8A4B";
-  if(!sitzung){el.innerHTML='<div class="abgl rot"><b>Dieses Gerät ist nicht angemeldet</b><div class="abgl-text">Was du hier einträgst, liegt nur auf diesem Gerät und ist nicht gesichert. Einmal anmelden, dann ist alles auf allen Geräten und im Speicher.</div>'+
+  if(!sitzung){el.innerHTML='<div class="abgl rot"><b>Nicht angemeldet</b><div class="abgl-text">Einmal anmelden, dann ist alles gesichert.</div>'+
     '<input id="ablMail" type="email" inputmode="email" autocomplete="username" placeholder="E-Mail">'+
     '<input id="ablPw" type="password" autocomplete="current-password" placeholder="Passwort">'+
     '<button id="ablLos" type="button">Anmelden</button><div class="abgl-fehler" id="ablFehler">'+linkFehler+'</div>'+
