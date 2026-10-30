@@ -79,18 +79,19 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
     <div class="chip" data-s="zuletzt">Zuletzt gemietet</div>
     <div class="chip" data-s="mieten">Meiste Mieten</div>
   </div>
-  <div class="hinweis">Stammkunde ab 2 Mieten. Lange nicht da: letzte Miete vor mehr als 90 Tagen. Antippen zeigt alles und füllt den neuen Vertrag.</div>
+  <div class="hinweis">Stammkunde ab 2 Mieten, lange nicht da ab 90 Tagen.</div>
 </div>
 
 <button class="knopf gruen" id="angebotAuf" type="button">Angebot verschicken (Autos stehen, Kunden anschreiben)</button>
 <div class="karte versteckt" id="angebot" style="margin-top:10px">
   <h2>Angebot an Stammkunden</h2>
+  <div class="hinweis" id="agFrei" style="margin:0 0 6px"></div>
   <label>Was ist frei?</label><input id="agWas" placeholder="z. B. Audi R8 und Mercedes G 63">
   <label>Wann?</label><input id="agWann" placeholder="z. B. dieses Wochenende, Freitag bis Sonntag">
   <label>Nachricht (Vorname, Was und Wann werden eingesetzt)</label>
   <textarea id="agText"></textarea>
   <div class="schalter"><span>Nur Stammkunden (2 und mehr Mieten)</span><div class="chip gruen an" id="agNurStamm">An</div></div>
-  <div class="hinweis">Antippen öffnet WhatsApp mit der fertigen Nachricht. Der Kunde wird als „angeschrieben“ gemerkt und 14 Tage lang nicht wieder vorgeschlagen. Kunden mit Achtung-Hinweis und Kunden, die keine Angebote wollen, stehen nicht in der Liste.</div>
+  <div class="hinweis">Antippen öffnet WhatsApp. Angeschriebene kommen 14 Tage nicht wieder.</div>
   <div id="agListe" style="margin-top:8px"></div>
 </div>
 
@@ -98,7 +99,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
 <div id="liste"></div>
 <div class="karte" style="margin-top:14px">
   <h2>Neuer Kunde ohne Vertrag</h2>
-  <div class="hinweis" style="margin:0 0 8px">Normalerweise kommt jeder Kunde von selbst hierher, sobald ein Vertrag oder eine Anfrage da ist. Nur für Kunden, die du vorab anlegen willst.</div>
+  <div class="hinweis" style="margin:0 0 8px">Nur nötig, wenn noch kein Vertrag und keine Anfrage da ist.</div>
   <input id="neuName" placeholder="Vor- und Nachname">
   <input id="neuTel" inputmode="tel" placeholder="Telefon" style="margin-top:8px">
   <button class="knopf hell" id="neuLos" type="button">Kunde anlegen</button>
@@ -253,7 +254,26 @@ function angebotListe(){const nur=$("agNurStamm").classList.contains("an");
   $("agListe").innerHTML=l.length?l.map(e=>'<div class="angebotRow'+(e.war?" war":"")+'" data-n="'+esc(e.name)+'"><div class="t"><b>'+esc(e.name)+'</b><i>'+e.mieten+(e.mieten===1?" Miete":" Mieten")+(e.zuletzt?", zuletzt "+de(e.zuletzt):"")+(e.letztesAuto?", "+esc(e.letztesAuto):"")+(e.war?", angeschrieben "+de(e.angeschrieben):"")+'</i></div><a target="_blank" href="'+wa(e.telefon,agNachricht(e))+'">WhatsApp</a></div>').join("")
     :'<div class="leer">Noch niemand passt. Schalter „Nur Stammkunden“ ausschalten oder erst Verträge anlegen.</div>';
   [...$("agListe").querySelectorAll("a")].forEach(a=>a.onclick=()=>{const n=a.parentElement.dataset.n;MK.merken(n,{angeschrieben:heute});setTimeout(zeichne,300)})}
-$("angebotAuf").onclick=()=>{$("angebot").classList.toggle("versteckt");if(!$("angebot").classList.contains("versteckt")){agLaden();angebotListe();$("angebot").scrollIntoView({behavior:"smooth"})}};
+/* Was ist am Wochenende frei? Kommt aus dem Kalender (Verträge, gebuchte Anfragen, Sperren), nicht mehr von Hand (30.10.2026) */
+let FLOTTE=null;
+fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(p&&p.cars)FLOTTE=p.cars.map(c=>c.anzeige||c.n)}).catch(()=>{});
+function wochenendeFrei(){const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  const h=new Date(heute),wt=h.getDay(),fr=new Date(h);fr.setDate(h.getDate()+(wt===6?-1:wt===0?-2:(5-wt)));const so=new Date(fr);so.setDate(fr.getDate()+2);
+  const von=isoD(fr)<heute?heute:isoD(fr),bis=isoD(so),ueber=(a,b)=>a&&b&&a<bis&&b>von;
+  const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+  const autos=FLOTTE||Object.keys(lies("mietixAutos",{}));if(!autos.length)return null;
+  const belegt=new Set();lies("mietixVorgaenge",[]).forEach(v=>{if(v.status!=="zurück"&&ueber(v.vonD,v.bisD))belegt.add(v.auto)});
+  lies("mietixAnfragen",[]).forEach(a=>{if(a.status==="gebucht"&&ueber(a.von,a.bis))belegt.add(a.auto)});
+  lies("mietixSperren",[]).forEach(x=>{if(ueber(x.von,x.bis))belegt.add(x.auto)});
+  const kurz=n=>String(n).replace(/^(Audi|Mercedes-Benz|Mercedes|VW|BMW) /,m=>m).replace(/ (Chauffeur-Paket|Limousine|performance|Clubsport)/g,"");
+  const frei=autos.filter(n=>!belegt.has(n)).map(kurz),de=d=>String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+".";
+  const was=frei.length>1?frei.slice(0,-1).join(", ")+" und "+frei[frei.length-1]:(frei[0]||"");
+  return{was,wann:"dieses Wochenende, Freitag "+de(fr)+" bis Sonntag "+de(so),anzahl:frei.length}}
+function agVorschlag(){const w=wochenendeFrei();if(!w)return;let a={};try{a=JSON.parse(localStorage.getItem("mietixAngebot")||"{}")||{}}catch(e){}
+  if(!$("agWas").value.trim()||$("agWas").value===a.autoWas)$("agWas").value=w.was;if(!$("agWann").value.trim()||$("agWann").value===a.autoWann)$("agWann").value=w.wann;
+  a.autoWas=w.was;a.autoWann=w.wann;try{localStorage.setItem("mietixAngebot",JSON.stringify(Object.assign(a,{was:$("agWas").value,wann:$("agWann").value})))}catch(e){}
+  $("agFrei").textContent=w.anzahl?"Aus dem Kalender: "+w.anzahl+(w.anzahl===1?" Auto ist":" Autos sind")+" am Wochenende frei. Ändern geht.":"Laut Kalender ist am Wochenende alles vergeben."}
+$("angebotAuf").onclick=()=>{$("angebot").classList.toggle("versteckt");if(!$("angebot").classList.contains("versteckt")){agLaden();agVorschlag();angebotListe();$("angebot").scrollIntoView({behavior:"smooth"})}};
 ["agWas","agWann","agText"].forEach(id=>$(id).addEventListener("input",()=>{agMerken();angebotListe()}));
 $("agNurStamm").onclick=()=>{const an=!$("agNurStamm").classList.contains("an");$("agNurStamm").classList.toggle("an",an);$("agNurStamm").textContent=an?"An":"Aus";agMerken();angebotListe()};
 /* Suche, Filter, Sortierung */
