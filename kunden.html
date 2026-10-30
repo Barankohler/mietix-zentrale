@@ -59,6 +59,25 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
 .angebotRow.war a{background:#EFEFF1;color:var(--grau)}
 .versteckt{display:none}
 .leer{text-align:center;color:var(--grau);font-size:15px;font-weight:600;padding:26px 10px}
+
+.mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
+.mxKnopf span,.mxKlapp>summary span{flex:1;min-width:0}
+.mxKnopf b,.mxKlapp>summary b{display:block;font-size:16px;font-weight:800;color:#1C1C1E}
+.mxKnopf i,.mxKlapp>summary i{display:block;font-style:normal;font-size:13px;color:#8A8A8E;margin-top:2px;font-weight:600}
+.mxKnopf em,.mxKlapp>summary em{flex:0 0 auto;font-style:normal;font-size:28px;color:#C4161C;font-weight:700;line-height:1;transition:transform .15s}
+.mxKnopf:active,.mxKlapp>summary:active{background:#F6F6F7}
+.mxKlapp>summary{list-style:none}.mxKlapp>summary::-webkit-details-marker{display:none}
+.mxKlapp[open]>summary{margin-bottom:10px}.mxKlapp[open]>summary em{transform:rotate(90deg)}
+.mxBg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;display:none}.mxBg.auf{display:block}
+.mxFenster{position:fixed;left:0;right:0;bottom:0;z-index:91;background:#fff;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:none;box-shadow:0 -10px 30px rgba(0,0,0,.18);margin:0 auto;max-width:560px;box-sizing:border-box;text-align:left}
+.mxFenster.auf{display:block}
+@media(min-width:700px){.mxFenster{top:50%;bottom:auto;transform:translateY(-50%);border-radius:22px;width:calc(100% - 48px);padding:20px}}
+.mxKopf{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.mxKopf h3{font-size:19px;font-weight:900;margin:0;color:#1C1C1E}
+.mxZu{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:0;background:#F2F2F4;font-size:17px;font-weight:800;cursor:pointer;color:#1C1C1E;font-family:inherit}
+.mxKlein{margin-top:8px}.mxKlein>summary{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:14px;font-weight:800;color:#1C1C1E;background:#F2F2F4;border-radius:999px;padding:9px 14px;min-height:40px;box-sizing:border-box}
+.mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
+.mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
 </style></head><body>
 <header><a href="./">Zentrale</a><h1>MIETIX <span>KUNDEN</span> <i id="abgleichPunkt" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B0B0B3;vertical-align:middle;margin-left:4px"></i></h1></header>
 <main>
@@ -74,17 +93,18 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
     <div class="chip" data-f="achtung">Achtung</div>
     <div class="chip" data-f="geb">Geburtstag bald</div>
   </div>
+  <details class="mxKlein"><summary>Sortieren: <span id="sortName">A bis Z</span> <em>›</em></summary>
   <div class="chips" id="sortierung">
     <div class="chip an" data-s="name">A bis Z</div>
     <div class="chip" data-s="zuletzt">Zuletzt gemietet</div>
     <div class="chip" data-s="mieten">Meiste Mieten</div>
   </div>
-  <div class="hinweis">Stammkunde ab 2 Mieten, lange nicht da ab 90 Tagen.</div>
+  <div class="hinweis">Stammkunde ab 2 Mieten, lange nicht da ab 90 Tagen.</div></details>
 </div>
 
-<button class="knopf gruen" id="angebotAuf" type="button">Angebot verschicken (freie Autos, Stammkunden anschreiben)</button>
-<div class="karte versteckt" id="angebot" style="margin-top:10px">
-  <h2>Angebot an Stammkunden</h2>
+<button class="mxKnopf" id="angebotAuf" type="button"><span><b>Angebot verschicken</b><i>Freie Autos, Stammkunden per WhatsApp anschreiben</i></span><em>›</em></button>
+<div class="mxFenster" id="fAngebot" role="dialog" aria-label="Angebot an Stammkunden"><div class="mxKopf"><h3>Angebot an Stammkunden</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+<div id="angebot">
   <div class="hinweis" id="agFrei" style="margin:0 0 6px"></div>
   <label>Was ist frei?</label><input id="agWas" placeholder="z. B. Audi R8 und Mercedes G 63">
   <label>Wann?</label><input id="agWann" placeholder="z. B. dieses Wochenende, Freitag bis Sonntag">
@@ -93,18 +113,18 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
   <div class="schalter"><span>Nur Stammkunden (2 und mehr Mieten)</span><div class="chip gruen an" id="agNurStamm">An</div></div>
   <div class="hinweis">Antippen öffnet WhatsApp. Wer angeschrieben wurde, steht 14 Tage nicht mehr in dieser Liste.</div>
   <div id="agListe" style="margin-top:8px"></div>
-</div>
+</div></div>
 
 <div class="zahl" id="zahl"></div>
 <div id="liste"></div>
-<div class="karte" style="margin-top:14px">
-  <h2>Neuer Kunde ohne Vertrag</h2>
-  <div class="hinweis" style="margin:0 0 8px">Nur nötig, wenn noch kein Vertrag und keine Anfrage da ist.</div>
+<div style="margin-top:14px"><button class="mxKnopf" type="button" data-fenster="fNeu"><span><b>Neuer Kunde ohne Vertrag</b><i>Nur nötig, wenn noch kein Vertrag und keine Anfrage da ist</i></span><em>›</em></button></div>
+</main>
+<div class="mxFenster" id="fNeu" role="dialog" aria-label="Neuer Kunde ohne Vertrag"><div class="mxKopf"><h3>Neuer Kunde ohne Vertrag</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <p class="mxText">Nur nötig, wenn noch kein Vertrag und keine Anfrage da ist.</p>
   <input id="neuName" placeholder="Vor- und Nachname">
   <input id="neuTel" inputmode="tel" placeholder="Telefon" style="margin-top:8px">
   <button class="knopf hell" id="neuLos" type="button">Kunde anlegen</button>
 </div>
-</main>
 <div class="meld" id="meld"></div>
 <script>/* Mietix Kundenstamm (seit 28.10.2026): ein Kunde, einmal gespeichert, überall gefunden.
    Quelle: mietixKunden (Name -> Daten, abgeglichen über alle Geräte), dazu alles, was in Verträgen (mietixVorgaenge)
@@ -233,7 +253,7 @@ function zeichne(){ALLE=MK.alle();const l=gefiltert();
   [...$("liste").querySelectorAll(".k")].forEach(el=>el.onclick=()=>{AUF=AUF===el.dataset.n?null:el.dataset.n;zeichne();
     if(AUF){const k=$("liste").querySelector(".k.auf");if(k)k.scrollIntoView({block:"start",behavior:"smooth"})}});
   if(AUF)detailKnoepfe(l.find(e=>e.name===AUF));
-  if(!$("angebot").classList.contains("versteckt"))angebotListe()}
+  if($("fAngebot").classList.contains("auf"))angebotListe()}
 function detailKnoepfe(e){if(!e||!$("dSpeichern"))return;
   $("dKeine").onclick=()=>{const an=!$("dKeine").classList.contains("an");$("dKeine").classList.toggle("an",an);$("dKeine").textContent=an?"An":"Aus"};
   $("dSpeichern").onclick=()=>{MK.merken(e.name,{telefon:$("dTel").value.trim(),anschrift:$("dAnschrift").value.trim(),geb:$("dGeb").value,gebort:$("dGebort").value.trim(),
@@ -273,15 +293,15 @@ function agVorschlag(){const w=wochenendeFrei();if(!w)return;let a={};try{a=JSON
   if(!$("agWas").value.trim()||$("agWas").value===a.autoWas)$("agWas").value=w.was;if(!$("agWann").value.trim()||$("agWann").value===a.autoWann)$("agWann").value=w.wann;
   a.autoWas=w.was;a.autoWann=w.wann;try{localStorage.setItem("mietixAngebot",JSON.stringify(Object.assign(a,{was:$("agWas").value,wann:$("agWann").value})))}catch(e){}
   $("agFrei").textContent=w.anzahl?"Aus dem Kalender: "+w.anzahl+(w.anzahl===1?" Auto ist":" Autos sind")+" am Wochenende frei. Ändern geht.":"Laut Kalender ist am Wochenende alles vergeben."}
-$("angebotAuf").onclick=()=>{$("angebot").classList.toggle("versteckt");if(!$("angebot").classList.contains("versteckt")){agLaden();agVorschlag();angebotListe();$("angebot").scrollIntoView({behavior:"smooth"})}};
+$("angebotAuf").onclick=()=>{mxAuf("fAngebot");agLaden();agVorschlag();angebotListe()};
 ["agWas","agWann","agText"].forEach(id=>$(id).addEventListener("input",()=>{agMerken();angebotListe()}));
 $("agNurStamm").onclick=()=>{const an=!$("agNurStamm").classList.contains("an");$("agNurStamm").classList.toggle("an",an);$("agNurStamm").textContent=an?"An":"Aus";agMerken();angebotListe()};
 /* Suche, Filter, Sortierung */
 $("suche").addEventListener("input",zeichne);
 [...$("filter").children].forEach(c=>c.onclick=()=>{[...$("filter").children].forEach(x=>x.classList.remove("an"));c.classList.add("an");FILTER=c.dataset.f;zeichne()});
-[...$("sortierung").children].forEach(c=>c.onclick=()=>{[...$("sortierung").children].forEach(x=>x.classList.remove("an"));c.classList.add("an");SORT=c.dataset.s;zeichne()});
+[...$("sortierung").children].forEach(c=>c.onclick=()=>{[...$("sortierung").children].forEach(x=>x.classList.remove("an"));c.classList.add("an");SORT=c.dataset.s;$("sortName").textContent=c.textContent;c.closest("details").open=false;zeichne()});
 $("neuLos").onclick=()=>{const n=$("neuName").value.trim();if(n.split(/\s+/).length<2){meldung("Bitte Vor- und Nachname.");return}
-  MK.merken(n,{telefon:$("neuTel").value.trim()});$("neuName").value="";$("neuTel").value="";AUF=n;meldung("Angelegt.");zeichne()};
+  MK.merken(n,{telefon:$("neuTel").value.trim()});$("neuName").value="";$("neuTel").value="";AUF=n;mxZu();meldung("Angelegt.");zeichne()};
 (()=>{const q=new URLSearchParams(location.search).get("kunde");if(q){AUF=q;$("suche").value=q;history.replaceState(null,"",location.pathname)}})();
 zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
@@ -517,5 +537,16 @@ window.addEventListener("online",abgleichen);
 setInterval(abgleichen,60000);
 zeigen();abgleichen();
 })();
+</script><script>
+/* Fenster (30.10.2026): Knopf mit data-fenster öffnet, ✕, Tipp daneben oder Esc schließt */
+(function(){if(window.mxAuf)return;
+  let bg=document.querySelector(".mxBg");if(!bg){bg=document.createElement("div");bg.className="mxBg";document.body.appendChild(bg)}
+  window.mxAuf=function(id){const f=document.getElementById(id);if(!f)return;mxZu();bg.classList.add("auf");f.classList.add("auf");
+    document.documentElement.style.overflow="hidden";document.body.style.overflow="hidden";f.scrollTop=0};
+  window.mxZu=function(){document.querySelectorAll(".mxFenster.auf").forEach(f=>f.classList.remove("auf"));bg.classList.remove("auf");
+    document.documentElement.style.overflow="";document.body.style.overflow=""};
+  document.addEventListener("click",function(e){const k=e.target.closest("[data-fenster]");if(k){e.preventDefault();mxAuf(k.dataset.fenster);return}
+    if(e.target.closest(".mxZu")||e.target===bg)mxZu()});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")mxZu()})})();
 </script>
 </body></html>
