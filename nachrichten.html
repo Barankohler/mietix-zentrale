@@ -425,6 +425,9 @@ window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),
   if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
     roh.call(localStorage,"mietixEntwurfVertrag",JSON.stringify(Object.assign({},e.eintrag,{zeit:new Date().toISOString()})));
     window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
+  if(e.ablage==="schadensbelege"){const st=lies("mietixStand",{}),r=Object.assign({liste:[],max:{}},st.schadensbelege||{});   // Schadensbeleg (30.10.2026)
+    if(!r.liste.some(x=>x.nr===e.eintrag.nr))r.liste=r.liste.concat([e.eintrag]);st.schadensbelege=r;merk("mietixPapierkorb",pk.filter(x=>x.id!==id));
+    localStorage.setItem("mietixStand",JSON.stringify(st));window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixStand","mietixPapierkorb"]}));return true}
   const c=SPEICHER[e.ablage];if(!c)return false;const m=alsMap(e.ablage,lies(e.ablage,c.liste?[]:{}));m[e.schluessel]=e.eintrag;
   merk("mietixPapierkorb",pk.filter(x=>x.id!==id));localStorage.setItem(e.ablage,JSON.stringify(ausMap(e.ablage,m)));
   window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:[e.ablage,"mietixPapierkorb"]}));return true};
