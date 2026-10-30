@@ -36,10 +36,10 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--grau);
 <header><a href="./">Zentrale</a><h1>MIETIX <span>PAPIERKORB</span> <i id="abgleichPunkt" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B0B0B3;vertical-align:middle;margin-left:4px"></i></h1></header>
 <main>
 <div id="abgleich"></div>
-<div class="hinweis">Gelöschtes liegt 90 Tage hier und kommt mit einem Tipp zurück.</div>
+<div class="hinweis">Gelöschtes liegt 90 Tage hier und kommt mit einmal Antippen zurück.</div>
 <div id="geloescht"></div>
 <h2>Erledigt</h2>
-<div class="bereich"><div class="kopf"><b>Zustand-Punkte, erledigt</b><span id="nZustand"></span></div><div class="karte" id="zustand"></div></div>
+<div class="bereich"><div class="kopf"><b>Zustand, erledigte Punkte</b><span id="nZustand"></span></div><div class="karte" id="zustand"></div></div>
 <div class="bereich"><div class="kopf"><b>Aufgaben, erledigt (60 Tage)</b><span id="nAufgaben"></span></div><div class="karte" id="aufgaben"></div></div>
 </main>
 <div class="meld" id="meld"></div>
@@ -53,12 +53,12 @@ function meldung(t){const m=$("meld");m.textContent=t;m.classList.add("an");clea
 function zeichne(){
   const pk=(window.mietixPapierkorb?window.mietixPapierkorb():lies("mietixPapierkorb",[]).slice().sort((a,b)=>a.zeit<b.zeit?1:-1));
   // Ein Kasten je Bereich, immer in derselben Reihenfolge, auch wenn leer
-  const BEREICHE=[["mietixVorgaenge","Mietverträge"],["mietixAnfragen","Anfragen"],["mietixKunden","Kunden"],["mietixAusgaben","Ausgaben (Geld)"],["mietixSperren","Sperren (Kalender)"],["mietixZustand","Zustand-Punkte (Autos)"],["mietixAufgaben","Aufgaben"]];
+  const BEREICHE=[["mietixVorgaenge","Verträge"],["mietixAnfragen","Anfragen"],["mietixKunden","Kunden"],["mietixAusgaben","Ausgaben (Geld)"],["mietixSperren","Sperren (Kalender)"],["mietixZustand","Zustand (Autos)"],["mietixAufgaben","Aufgaben"]];
   const extra=e=>{if(e.ablage==="mietixEntwurfVertrag")return'<span class="haken">angefangen, nicht gespeichert</span>';if(e.ablage!=="mietixVorgaenge")return"";const v=e.eintrag||{};return '<span class="haken">Vertrag</span>'+(v.ueb?'<span class="haken">Übergabe</span>':"")+(v.rueck?'<span class="haken">Rückgabe</span>':"")+(v.schaden?'<span class="haken">Schaden</span>':"")};
   $("geloescht").innerHTML=BEREICHE.map(([k,t])=>{const l=pk.filter(e=>e.ablage===k||(k==="mietixVorgaenge"&&e.ablage==="mietixEntwurfVertrag"));
     return '<div class="bereich"><div class="kopf"><b>'+t+'</b><span class="'+(l.length?"":"null")+'">'+l.length+'</span></div><div class="karte">'+
       (l.length?l.map(e=>'<div class="z"><div class="t"><b>'+esc(e.text)+'</b><i>'+extra(e)+'gelöscht '+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts gelöscht.</div>')+'</div></div>'}).join("");
-  [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Zurückgeholt.");zeichne()}else meldung("Ging nicht, bitte anmelden.")});
+  [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Zurückgeholt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.")});
   const z=lies("mietixZustand",[]).filter(x=>x.erledigt).sort((a,b)=>(b.erledigtAm||"")<(a.erledigtAm||"")?-1:1);
   $("nZustand").textContent=z.length;$("nZustand").className=z.length?"":"null";
   $("zustand").innerHTML=z.length?z.map(x=>'<div class="z"><div class="t"><b>'+esc(x.auto)+': '+esc(x.text)+'</b><i>erledigt '+de(x.erledigtAm||x.datum)+'</i></div><button class="hell" data-z="'+esc(x.id)+'">Wieder öffnen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';

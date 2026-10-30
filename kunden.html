@@ -82,7 +82,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
   <div class="hinweis">Stammkunde ab 2 Mieten, lange nicht da ab 90 Tagen.</div>
 </div>
 
-<button class="knopf gruen" id="angebotAuf" type="button">Angebot verschicken (Autos stehen, Kunden anschreiben)</button>
+<button class="knopf gruen" id="angebotAuf" type="button">Angebot verschicken (freie Autos, Stammkunden anschreiben)</button>
 <div class="karte versteckt" id="angebot" style="margin-top:10px">
   <h2>Angebot an Stammkunden</h2>
   <div class="hinweis" id="agFrei" style="margin:0 0 6px"></div>
@@ -91,7 +91,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
   <label>Nachricht (Vorname, Was und Wann werden eingesetzt)</label>
   <textarea id="agText"></textarea>
   <div class="schalter"><span>Nur Stammkunden (2 und mehr Mieten)</span><div class="chip gruen an" id="agNurStamm">An</div></div>
-  <div class="hinweis">Antippen öffnet WhatsApp. Angeschriebene kommen 14 Tage nicht wieder.</div>
+  <div class="hinweis">Antippen öffnet WhatsApp. Wer angeschrieben wurde, steht 14 Tage nicht mehr in dieser Liste.</div>
   <div id="agListe" style="margin-top:8px"></div>
 </div>
 
@@ -214,7 +214,7 @@ function detail(e){const V="../mietix-vertrag/";
   let h='<div class="detail" onclick="event.stopPropagation()">';
   if(e.warn.length)h+='<div class="rot" style="margin:6px 0">ACHTUNG: '+esc(e.warn.join(". "))+'</div>';
   h+='<div class="zwei"><a class="knopf klein" href="tel:'+esc(MK.ziffern(e.telefon))+'">Anrufen</a><a class="knopf klein wa" target="_blank" href="'+wa(e.telefon)+'">WhatsApp</a></div>';
-  h+='<a class="knopf klein hell" style="margin-top:8px" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">Neuer Mietvertrag, alles schon drin</a>';
+  h+='<a class="knopf klein hell" style="margin-top:8px" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">Neuer Vertrag, alles schon drin</a>';
   h+='<label>Telefon</label><input id="dTel" inputmode="tel" value="'+esc(e.telefon)+'"><label>Anschrift</label><input id="dAnschrift" value="'+esc(e.anschrift)+'">';
   h+='<div class="zwei"><div><label>Geburtsdatum</label><input id="dGeb" type="date" value="'+esc(e.geb)+'"></div><div><label>Geburtsort</label><input id="dGebort" value="'+esc(e.gebort)+'"></div></div>';
   h+='<label>E-Mail</label><input id="dEmail" type="email" value="'+esc(e.email)+'"><label>Notiz (nur für uns)</label><textarea id="dNotiz" placeholder="z. B. pünktlich, mag den R8, fragt immer freitags">'+esc(e.notiz)+'</textarea>';
