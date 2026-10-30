@@ -123,12 +123,13 @@ let sitzung=lies("mietixSitzung",null),laeuft=false,nochmal=false,zuletzt=null,f
 
 /* ---------- Anmeldung ---------- */
 async function auth(pfad,body){const r=await fetch(URL_+"/auth/v1/"+pfad,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
-  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error_description||j.msg||j.message||"Anmeldung fehlgeschlagen");return j}
+  const j=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(j.error_description||j.msg||j.message||"Anmeldung fehlgeschlagen");e.status=r.status;throw e}return j}
 function sichern(j){sitzung={token:j.access_token,neu:j.refresh_token,bis:Date.now()+(j.expires_in||3600)*1000-60000,
   email:(j.user&&j.user.email)||(sitzung&&sitzung.email)||""};merk("mietixSitzung",sitzung)}
 async function token(){if(!sitzung)return null;
   if(Date.now()>sitzung.bis){try{sichern(await auth("token?grant_type=refresh_token",{refresh_token:sitzung.neu}))}
-    catch(e){if(navigator.onLine){sitzung=null;localStorage.removeItem("mietixSitzung");zeigen()}return null}}
+    // Abmelden nur, wenn der Speicher die Anmeldung wirklich ablehnt, nicht bei schlechtem Netz (30.10.2026)
+    catch(e){if(e.status>=400&&e.status<500){sitzung=null;localStorage.removeItem("mietixSitzung");zeigen()}return null}}
   return sitzung.token}
 async function api(pfad,opt){const t=await token();if(!t)throw new Error("nicht angemeldet");
   const r=await fetch(URL_+"/rest/v1/"+pfad,Object.assign({},opt,{headers:Object.assign({apikey:KEY,Authorization:"Bearer "+t,"Content-Type":"application/json"},(opt||{}).headers||{})}));
@@ -137,28 +138,80 @@ async function api(pfad,opt){const t=await token();if(!t)throw new Error("nicht 
 /* ---------- Abgleich ---------- */
 function alsMap(k,w){const c=SPEICHER[k],m={};if(c.liste)(w||[]).forEach(x=>{if(x&&x[c.pk]!==undefined)m[String(x[c.pk])]=x});else Object.assign(m,w||{});return m}
 function ausMap(k,m){const c=SPEICHER[k];if(!c.liste)return m;return Object.keys(m).sort().map(p=>m[p])}
+/* Zusammenführen statt Überschreiben (30.10.2026, Nachtschicht):
+   - Erst holen, dann schicken. So kennt jedes Gerät den neuesten Stand, bevor es seinen eigenen hochlädt.
+   - Je Eintrag merkt sich das Gerät, wie er beim letzten Abgleich aussah (Fingerabdruck je Feld).
+     Haben beide Geräte verschiedene Felder geändert, kommen beide Änderungen zusammen.
+   - Haben beide dasselbe Feld verschieden geändert, bleibt die Fassung dieses Geräts stehen und die andere
+     Fassung liegt im Papierkorb ("Andere Fassung"), dort kann man sie wiederherstellen. Nichts verschwindet still.
+   - Geändert schlägt Gelöscht: wird ein Eintrag hier geändert und dort gelöscht, bleibt er da.
+   - Beim Holen wird zwei Minuten überlappend gefragt, damit kein Eintrag wegen ungleich gehender Uhren fehlt. */
+const UEBERLAPPUNG=2*60*1000;
+const FELDWEISE={mietixVorgaenge:1,mietixAnfragen:1,mietixKunden:1,mietixFahrzeuge:1,mietixAutos:1};
+// Inhalt unabhängig von der Reihenfolge der Felder (die Datenbank sortiert Felder um)
+const ordne=x=>Array.isArray(x)?x.map(ordne):x&&typeof x==="object"?Object.keys(x).sort().reduce((o,n)=>{o[n]=ordne(x[n]);return o},{}):x;
+const fp=x=>hash(JSON.stringify(ordne(x))===undefined?"":JSON.stringify(ordne(x)));
+// Fingerabdruck stimmt mit der Grundlage überein (neue Form oder die Form vor dem 30.10.2026)
+const gleichBasis=(x,b)=>b!==undefined&&(fp(x)===b||hash(JSON.stringify(x))===b);
+const felderVon=x=>{const f={};if(x&&typeof x==="object"&&!Array.isArray(x))Object.keys(x).forEach(n=>f[n]=fp(x[n]));return f};
+function andereFassung(k,p,eintrag){if(k==="mietixPapierkorb"||k==="mietixStand")return;
+  const pk=lies("mietixPapierkorb",[]),jetzt=new Date().toISOString(),c=SPEICHER[k];
+  const s=fp(eintrag);if(pk.some(x=>x.ablage===k&&x.schluessel===p&&fp(x.eintrag)===s))return;
+  pk.push({id:k+":"+p+":"+Date.now()+":f",ablage:k,schluessel:p,eintrag,zeit:jetzt,andere:true,
+    text:"Andere Fassung: "+(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(eintrag||{})});
+  merk("mietixPapierkorb",pk)}
+function zusammen(k,p,lokal,server,basisHash,basisFelder){
+  // Rückgabe: der Eintrag, der hier stehen soll (undefined = löschen)
+  const lokalGeaendert=lokal===undefined?(basisHash!==undefined&&basisHash!=="weg"):!gleichBasis(lokal,basisHash);
+  if(server&&server._weg){if(lokal===undefined)return undefined;
+    if(basisHash!==undefined&&lokalGeaendert)return lokal;          // hier geändert, dort gelöscht: bleibt da
+    return undefined}
+  if(lokal===undefined){if(basisHash!==undefined&&basisHash!=="weg"&&gleichBasis(server,basisHash))return undefined; // hier gelöscht, dort unverändert
+    return server}
+  if(fp(lokal)===fp(server))return lokal;
+  if(basisHash===undefined){andereFassung(k,p,lokal);return server}  // erstes Mal auf diesem Gerät: gemeinsamer Stand gilt, eigener liegt im Papierkorb
+  if(!lokalGeaendert)return server;                                   // hier nichts geändert: neuer Stand gilt
+  if(gleichBasis(server,basisHash))return lokal;                               // dort nichts geändert: eigener Stand bleibt
+  // beide geändert
+  if(FELDWEISE[k]&&basisFelder&&typeof lokal==="object"&&typeof server==="object"&&!Array.isArray(lokal)){
+    const out={},namen=new Set([...Object.keys(lokal),...Object.keys(server),...Object.keys(basisFelder)]);let streit=false;
+    namen.forEach(n=>{const lf=n in lokal?fp(lokal[n]):undefined,sf=n in server?fp(server[n]):undefined,bf=basisFelder[n];
+      if(lf===sf){if(n in lokal)out[n]=lokal[n]}
+      else if(lf===bf){if(n in server)out[n]=server[n]}
+      else if(sf===bf){if(n in lokal)out[n]=lokal[n]}
+      else{streit=true;if(n in lokal)out[n]=lokal[n];else if(n in server)out[n]=server[n]}});
+    if(streit)andereFassung(k,p,server);
+    return out}
+  andereFassung(k,p,server);return lokal}
 async function abgleichen(){
   if(!sitzung||!navigator.onLine)return;if(laeuft){nochmal=true;return}laeuft=true;fehler="";zeigen();
   const H=lies("mietixAbgleich",{}),geholt=[];
   try{
-    for(const k of Object.keys(SPEICHER)){const c=SPEICHER[k],h=H[k]=H[k]||{zeit:"",hash:{}},m=alsMap(k,lies(k,c.liste?[]:{}));
-      // 1) hoch: alles, was sich hier seit dem letzten Abgleich geändert hat (auch Gelöschtes)
-      const jetzt=new Date().toISOString(),hoch=[];
-      Object.keys(m).forEach(p=>{const s=JSON.stringify(m[p]);if(h.hash[p]!==hash(s))hoch.push({[c.pk]:p,daten:m[p],geaendert:jetzt})});
-      Object.keys(h.hash).forEach(p=>{if(!(p in m)&&h.hash[p]!=="weg")hoch.push({[c.pk]:p,daten:{_weg:true},geaendert:jetzt})});
-      for(let i=0;i<hoch.length;i+=200)await api(c.tab+"?on_conflict="+c.pk,{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(hoch.slice(i,i+200))});
-      hoch.forEach(z=>h.hash[z[c.pk]]=z.daten._weg?"weg":hash(JSON.stringify(z.daten)));
-      if(k==="mietixVorgaenge"){const max=Math.max(0,...Object.keys(m).filter(n=>/^\d{6}$/.test(n)).map(Number));
-        if(max)await api("rpc/vertragsnummer_mindestens",{method:"POST",body:JSON.stringify({n:max})})}
-      // 2) runter: was die anderen Geräte seit dem letzten Mal geschickt haben
-      const seit=h.zeit?"&geaendert=gt."+encodeURIComponent(h.zeit):"";
+    for(const k of Object.keys(SPEICHER)){const c=SPEICHER[k],h=H[k]=H[k]||{zeit:"",hash:{}};if(!h.felder)h.felder={};
+      // 1) runter: was die anderen Geräte geschickt haben, Eintrag für Eintrag zusammengeführt
+      const ab=h.zeit?new Date(new Date(h.zeit).getTime()-UEBERLAPPUNG).toISOString():"";
+      const seit=ab?"&geaendert=gt."+encodeURIComponent(ab):"";
       const zeilen=await api(c.tab+"?select="+c.pk+",daten,geaendert&order=geaendert.asc"+seit,{method:"GET"})||[];
       let anders=false;const m2=alsMap(k,lies(k,c.liste?[]:{}));
-      zeilen.forEach(z=>{const p=String(z[c.pk]);h.zeit=z.geaendert>h.zeit?z.geaendert:h.zeit;
-        if(z.daten&&z.daten._weg){if(p in m2){delete m2[p];anders=true}h.hash[p]="weg";return}
-        const s=JSON.stringify(z.daten);if(!(p in m2)||JSON.stringify(m2[p])!==s){m2[p]=z.daten;anders=true}h.hash[p]=hash(s)});
-      if(anders){merk(k,ausMap(k,m2));geholt.push(k)}}
-    merk("mietixAbgleich",H);zuletzt=new Date();
+      zeilen.forEach(z=>{const p=String(z[c.pk]);if(z.geaendert>h.zeit)h.zeit=z.geaendert;
+        const vorher=p in m2?JSON.stringify(m2[p]):undefined;
+        const ergebnis=zusammen(k,p,m2[p],z.daten,h.hash[p],h.felder[p]);
+        if(ergebnis===undefined){if(p in m2){delete m2[p];anders=true}}
+        else if(JSON.stringify(ergebnis)!==vorher){m2[p]=ergebnis;anders=true}
+        // Grundlage für das nächste Mal ist jetzt der gemeinsame Stand
+        if(z.daten&&z.daten._weg){h.hash[p]="weg";delete h.felder[p]}
+        else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
+      if(anders){merk(k,ausMap(k,m2));geholt.push(k)}
+      // 2) hoch: alles, was hier anders ist als der gemeinsame Stand (auch Gelöschtes)
+      const m=alsMap(k,lies(k,c.liste?[]:{})),jetzt=new Date().toISOString(),hoch=[];
+      Object.keys(m).forEach(p=>{if(gleichBasis(m[p],h.hash[p])){h.hash[p]=fp(m[p]);return}hoch.push({[c.pk]:p,daten:m[p],geaendert:jetzt})});
+      Object.keys(h.hash).forEach(p=>{if(!(p in m)&&h.hash[p]!=="weg")hoch.push({[c.pk]:p,daten:{_weg:true},geaendert:jetzt})});
+      for(let i=0;i<hoch.length;i+=200)await api(c.tab+"?on_conflict="+c.pk,{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(hoch.slice(i,i+200))});
+      hoch.forEach(z=>{const p=z[c.pk];if(z.daten._weg){h.hash[p]="weg";delete h.felder[p]}else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
+      if(k==="mietixVorgaenge"){const max=Math.max(0,...Object.keys(m).filter(n=>/^\d{6}$/.test(n)).map(Number));
+        if(max)await api("rpc/vertragsnummer_mindestens",{method:"POST",body:JSON.stringify({n:max})})}
+      merk("mietixAbgleich",H)}
+    zuletzt=new Date();
     if(geholt.length)window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:geholt}));
   }catch(e){fehler=e.message||"Abgleich fehlgeschlagen"}
   laeuft=false;zeigen();if(nochmal){nochmal=false;setTimeout(abgleichen,500)}}
