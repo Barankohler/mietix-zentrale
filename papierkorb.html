@@ -58,16 +58,16 @@ function zeichne(){
   $("geloescht").innerHTML=BEREICHE.map(([k,t])=>{const l=pk.filter(e=>e.ablage===k||(k==="mietixVorgaenge"&&e.ablage==="mietixEntwurfVertrag"));
     return '<div class="bereich"><div class="kopf"><b>'+t+'</b><span class="'+(l.length?"":"null")+'">'+l.length+'</span></div><div class="karte">'+
       (l.length?l.map(e=>'<div class="z"><div class="t"><b>'+esc(e.text)+'</b><i>'+extra(e)+(/^Andere Fassung/.test(e.text||"")?'zur Seite gelegt ':'gelöscht ')+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts gelöscht.</div>')+'</div></div>'}).join("");
-  [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Zurückgeholt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.")});
+  [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Wiederhergestellt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.")});
   const z=lies("mietixZustand",[]).filter(x=>x.erledigt).sort((a,b)=>(b.erledigtAm||"")<(a.erledigtAm||"")?-1:1);
   $("nZustand").textContent=z.length;$("nZustand").className=z.length?"":"null";
-  $("zustand").innerHTML=z.length?z.map(x=>'<div class="z"><div class="t"><b>'+esc(x.auto)+': '+esc(x.text)+'</b><i>erledigt '+de(x.erledigtAm||x.datum)+'</i></div><button class="hell" data-z="'+esc(x.id)+'">Wieder öffnen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
-  [...$("zustand").querySelectorAll("button[data-z]")].forEach(b=>b.onclick=()=>{const l=lies("mietixZustand",[]),x=l.find(y=>y.id===b.dataset.z);if(x){x.erledigt=false;delete x.erledigtAm;schreib("mietixZustand",l);meldung("Wieder offen.");zeichne()}});
+  $("zustand").innerHTML=z.length?z.map(x=>'<div class="z"><div class="t"><b>'+esc(x.auto)+': '+esc(x.text)+'</b><i>erledigt '+de(x.erledigtAm||x.datum)+'</i></div><button class="hell" data-z="'+esc(x.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
+  [...$("zustand").querySelectorAll("button[data-z]")].forEach(b=>b.onclick=()=>{const l=lies("mietixZustand",[]),x=l.find(y=>y.id===b.dataset.z);if(x){x.erledigt=false;delete x.erledigtAm;schreib("mietixZustand",l);meldung("Wiederhergestellt.");zeichne()}});
   const grenze=new Date(Date.now()-60*864e5).toISOString().slice(0,10);
   const a=lies("mietixAufgaben",[]).filter(x=>x.erledigt&&!x._weg&&String(x.erledigt)>=grenze).sort((p,q)=>String(q.erledigt).localeCompare(String(p.erledigt)));
   $("nAufgaben").textContent=a.length;$("nAufgaben").className=a.length?"":"null";
-  $("aufgaben").innerHTML=a.length?a.map(x=>'<div class="z"><div class="t"><b>'+esc(x.aufgabe)+'</b><i>erledigt '+de(x.erledigt)+'</i></div><button class="hell" data-a="'+esc(x.id)+'">Wieder öffnen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
-  [...$("aufgaben").querySelectorAll("button[data-a]")].forEach(b=>b.onclick=()=>{const l=lies("mietixAufgaben",[]),x=l.find(y=>y.id===b.dataset.a);if(x){delete x.erledigt;x.status="Offen";schreib("mietixAufgaben",l);meldung("Wieder offen.");zeichne()}});
+  $("aufgaben").innerHTML=a.length?a.map(x=>'<div class="z"><div class="t"><b>'+esc(x.aufgabe)+'</b><i>erledigt '+de(x.erledigt)+'</i></div><button class="hell" data-a="'+esc(x.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
+  [...$("aufgaben").querySelectorAll("button[data-a]")].forEach(b=>b.onclick=()=>{const l=lies("mietixAufgaben",[]),x=l.find(y=>y.id===b.dataset.a);if(x){delete x.erledigt;x.status="Offen";schreib("mietixAufgaben",l);meldung("Wiederhergestellt.");zeichne()}});
 }
 zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
