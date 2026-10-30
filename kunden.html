@@ -117,19 +117,19 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
 
 <div class="zahl" id="zahl"></div>
 <div id="liste"></div>
-<div style="margin-top:14px"><button class="mxKnopf" type="button" data-fenster="fNeu"><span><b>Neuer Kunde ohne Vertrag</b><i>Nur nötig, wenn noch kein Vertrag und keine Anfrage da ist</i></span><em>›</em></button></div>
+<div style="margin-top:14px"><button class="mxKnopf" type="button" data-fenster="fNeu"><span><b>Neuer Kunde ohne Mietvertrag</b><i>Nur nötig, wenn noch kein Mietvertrag und keine Anfrage da ist</i></span><em>›</em></button></div>
 </main>
-<div class="mxFenster" id="fNeu" role="dialog" aria-label="Neuer Kunde ohne Vertrag"><div class="mxKopf"><h3>Neuer Kunde ohne Vertrag</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
-  <p class="mxText">Nur nötig, wenn noch kein Vertrag und keine Anfrage da ist.</p>
+<div class="mxFenster" id="fNeu" role="dialog" aria-label="Neuer Kunde ohne Mietvertrag"><div class="mxKopf"><h3>Neuer Kunde ohne Mietvertrag</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <p class="mxText">Nur nötig, wenn noch kein Mietvertrag und keine Anfrage da ist.</p>
   <input id="neuName" placeholder="Vor- und Nachname">
   <input id="neuTel" inputmode="tel" placeholder="Telefon" style="margin-top:8px">
   <button class="knopf hell" id="neuLos" type="button">Kunde anlegen</button>
 </div>
 <div class="meld" id="meld"></div>
 <script>/* Mietix Kundenstamm (seit 28.10.2026): ein Kunde, einmal gespeichert, überall gefunden.
-   Quelle: mietixKunden (Name -> Daten, abgeglichen über alle Geräte), dazu alles, was in Verträgen (mietixVorgaenge)
+   Quelle: mietixKunden (Name -> Daten, abgeglichen über alle Geräte), dazu alles, was in Mietverträgen (mietixVorgaenge)
    und Anfragen (mietixAnfragen) steht. Nichts wird doppelt eingetippt: Suche nach Name, Telefon, Geburtsdatum, Ort.
-   window.mietixKunden.alle()               alle Kunden mit Verlauf (Verträge, Anfragen, Schäden)
+   window.mietixKunden.alle()               alle Kunden mit Verlauf (Mietverträge, Anfragen, Schäden)
    window.mietixKunden.finde(text)          Treffer zu einem Suchtext
    window.mietixKunden.anhaengen(feld, auf)  Trefferliste unter einem Eingabefeld, antippen ruft auf(kunde)
    window.mietixKunden.merken(name, werte)  Felder eines Kunden im gemeinsamen Speicher ändern */
@@ -180,7 +180,7 @@ function finde(text,liste){const tok=String(text||"").trim().split(/\s+/).filter
 function merken(name,werte){const K=lies("mietixKunden",{});const alt=Object.keys(K).find(n=>norm(n)===norm(name))||String(name).trim();
   const d=Object.assign({},K[alt]||{});Object.keys(werte).forEach(k=>{if(werte[k]===null||werte[k]===undefined||werte[k]==="")delete d[k];else d[k]=werte[k]});
   K[alt]=d;schreib("mietixKunden",K);return d}
-function zeile(e){const info=[e.geb?"geb. "+de(e.geb):"",e.telefon,e.ort,e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten"):"noch kein Vertrag"].filter(Boolean).join("  |  ");
+function zeile(e){const info=[e.geb?"geb. "+de(e.geb):"",e.telefon,e.ort,e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten"):"noch kein Mietvertrag"].filter(Boolean).join("  |  ");
   return'<div class="ksT"><b>'+esc(e.name)+(e.warn.length?' <i class="ksWarn">ACHTUNG</i>':"")+'</b><span>'+esc(info)+'</span></div>'}
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
 let cssDa=false;
@@ -225,7 +225,7 @@ function gefiltert(){let l=MK.finde($("suche").value,ALLE);if(!$("suche").value.
   return l}
 function wa(tel,text){const z=MK.ziffern(tel);if(!z)return"";const int=z.startsWith("0")?"49"+z.slice(1):z;return"https://wa.me/"+int+(text?"?text="+encodeURIComponent(text):"")}
 function karte(e){const gb=gebBald(e);
-  const info=[e.telefon,e.alter?e.alter+" Jahre":"",e.ort,e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten")+(e.zuletzt?", zuletzt "+de(e.zuletzt):"")+(e.letztesAuto?", "+e.letztesAuto:""):(e.anfragen.length?"nur Anfrage, noch kein Vertrag":"noch kein Vertrag")].filter(Boolean).join("  |  ");
+  const info=[e.telefon,e.alter?e.alter+" Jahre":"",e.ort,e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten")+(e.zuletzt?", zuletzt "+de(e.zuletzt):"")+(e.letztesAuto?", "+e.letztesAuto:""):(e.anfragen.length?"nur Anfrage, noch kein Mietvertrag":"noch kein Mietvertrag")].filter(Boolean).join("  |  ");
   return'<div class="k'+(AUF===e.name?" auf":"")+'" data-n="'+esc(e.name)+'"><b>'+esc(e.name)
     +(e.warn.length?'<span class="w">ACHTUNG</span>':"")+(e.mieten>=2?'<span class="s">Stammkunde</span>':"")+(gb!==false?'<span class="s">Geburtstag '+(gb===0?"heute":"in "+gb+" Tagen")+'</span>':"")
     +(e.keineAngebote?'<span class="g">keine Angebote</span>':"")+(e.gesperrt?'<span class="g">Daten auf Wunsch gelöscht</span>':"")+'</b><div class="i">'+esc(info)+'</div>'
@@ -234,13 +234,13 @@ function detail(e){const V="../mietix-vertrag/";
   let h='<div class="detail" onclick="event.stopPropagation()">';
   if(e.warn.length)h+='<div class="rot" style="margin:6px 0">ACHTUNG: '+esc(e.warn.join(". "))+'</div>';
   h+='<div class="zwei"><a class="knopf klein" href="tel:'+esc(MK.ziffern(e.telefon))+'">Anrufen</a><a class="knopf klein wa" target="_blank" href="'+wa(e.telefon)+'">WhatsApp</a></div>';
-  h+='<a class="knopf klein hell" style="margin-top:8px" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">Neuer Vertrag, alles schon drin</a>';
+  h+='<a class="knopf klein hell" style="margin-top:8px" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">Neuer Mietvertrag, alles schon drin</a>';
   h+='<label>Telefon</label><input id="dTel" inputmode="tel" value="'+esc(e.telefon)+'"><label>Anschrift</label><input id="dAnschrift" value="'+esc(e.anschrift)+'">';
   h+='<div class="zwei"><div><label>Geburtsdatum</label><input id="dGeb" type="date" value="'+esc(e.geb)+'"></div><div><label>Geburtsort</label><input id="dGebort" value="'+esc(e.gebort)+'"></div></div>';
   h+='<label>E-Mail</label><input id="dEmail" type="email" value="'+esc(e.email)+'"><label>Notiz (nur für uns)</label><textarea id="dNotiz" placeholder="z. B. pünktlich, mag den R8, fragt immer freitags">'+esc(e.notiz)+'</textarea>';
   h+='<div class="schalter"><span>Keine Angebote mehr schicken</span><div class="chip'+(e.keineAngebote?" an":"")+'" id="dKeine">'+(e.keineAngebote?"An":"Aus")+'</div></div>';
   h+='<button class="knopf" id="dSpeichern" type="button">Speichern</button>';
-  if(e.vertraege.length){h+='<div class="verlauf"><label>Verträge</label>'+e.vertraege.slice().reverse().map(v=>'<div><a href="'+V+'?nr='+esc(v.nr)+'">'+esc(v.nr)+'</a> '+esc(v.auto)+' <i>'+de(v.von)+(v.bis?" bis "+de(v.bis):"")+(v.preis?", "+EUR.format(v.preis):"")+(v.status==="zurück"?", zurück":"")+(v.mieteOffen?'</i> <span class="rot">Miete offen</span><i>':"")+'</i></div>').join("")+'</div>'}
+  if(e.vertraege.length){h+='<div class="verlauf"><label>Mietverträge</label>'+e.vertraege.slice().reverse().map(v=>'<div><a href="'+V+'?nr='+esc(v.nr)+'">'+esc(v.nr)+'</a> '+esc(v.auto)+' <i>'+de(v.von)+(v.bis?" bis "+de(v.bis):"")+(v.preis?", "+EUR.format(v.preis):"")+(v.status==="zurück"?", zurück":"")+(v.mieteOffen?'</i> <span class="rot">Miete offen</span><i>':"")+'</i></div>').join("")+'</div>'}
   if(e.umsatz)h+='<div class="hinweis">Umsatz gesamt: '+EUR.format(e.umsatz)+'</div>';
   if(e.schaeden.length){h+='<div class="verlauf"><label>Schäden (aus der Excel)</label>'+e.schaeden.map(s=>'<div>'+esc(s.datum||"")+' '+esc(s.auto||"")+' <i>'+esc(s.schaden||"")+(s.kvnr?", KV-Nr "+esc(s.kvnr):"")+(s.kv?", KV "+EUR.format(s.kv):"")+(s.offen?'</i> <span class="rot">offen '+EUR.format(s.offen)+(s.frist?", Frist "+esc(s.frist):"")+'</span><i>':"")+'</i></div>').join("")+'</div>'}
   if(e.anfragen.length){h+='<div class="verlauf"><label>Anfragen</label>'+e.anfragen.slice().reverse().slice(0,5).map(a=>'<div>'+de(a.tag)+' <i>'+esc(a.auto)+(a.von?", "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+(a.status?", "+esc(a.status):"")+'</i></div>').join("")+'</div>'}
@@ -258,7 +258,7 @@ function detailKnoepfe(e){if(!e||!$("dSpeichern"))return;
   $("dKeine").onclick=()=>{const an=!$("dKeine").classList.contains("an");$("dKeine").classList.toggle("an",an);$("dKeine").textContent=an?"An":"Aus"};
   $("dSpeichern").onclick=()=>{MK.merken(e.name,{telefon:$("dTel").value.trim(),anschrift:$("dAnschrift").value.trim(),geb:$("dGeb").value,gebort:$("dGebort").value.trim(),
     email:$("dEmail").value.trim(),notiz:$("dNotiz").value.trim(),keineAngebote:$("dKeine").classList.contains("an")||null});meldung("Gespeichert, auf allen Geräten.");zeichne()};
-  $("dLoeschen").onclick=ev=>{ev.preventDefault();if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+" löschen? Die Verträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
+  $("dLoeschen").onclick=ev=>{ev.preventDefault();if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+" löschen? Die Mietverträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
     MK.merken(e.name,{telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true});meldung("Daten gelöscht.");zeichne()}}
 /* Angebot an Stammkunden */
 const AG_STD="Hallo {vorname}, hier ist Mietix. {wann} ist bei uns noch frei: {was}. Wenn du Lust hast, sag kurz Bescheid, dann machen wir dir einen guten Preis.";
@@ -272,9 +272,9 @@ function angebotListe(){const nur=$("agNurStamm").classList.contains("an");
     .map(e=>Object.assign({war:e.angeschrieben&&tageSeit(e.angeschrieben)<14},e))
     .sort((a,b)=>((a.war?1:0)-(b.war?1:0))||(b.mieten-a.mieten)||((b.zuletzt||"")<(a.zuletzt||"")?-1:1));
   $("agListe").innerHTML=l.length?l.map(e=>'<div class="angebotRow'+(e.war?" war":"")+'" data-n="'+esc(e.name)+'"><div class="t"><b>'+esc(e.name)+'</b><i>'+e.mieten+(e.mieten===1?" Miete":" Mieten")+(e.zuletzt?", zuletzt "+de(e.zuletzt):"")+(e.letztesAuto?", "+esc(e.letztesAuto):"")+(e.war?", angeschrieben "+de(e.angeschrieben):"")+'</i></div><a target="_blank" href="'+wa(e.telefon,agNachricht(e))+'">WhatsApp</a></div>').join("")
-    :'<div class="leer">Noch niemand passt. Schalter „Nur Stammkunden“ ausschalten oder erst Verträge anlegen.</div>';
+    :'<div class="leer">Noch niemand passt. Schalter „Nur Stammkunden“ ausschalten oder erst Mietverträge anlegen.</div>';
   [...$("agListe").querySelectorAll("a")].forEach(a=>a.onclick=()=>{const n=a.parentElement.dataset.n;MK.merken(n,{angeschrieben:heute});setTimeout(zeichne,300)})}
-/* Was ist am Wochenende frei? Kommt aus dem Kalender (Verträge, gebuchte Anfragen, Sperren), nicht mehr von Hand (30.10.2026) */
+/* Was ist am Wochenende frei? Kommt aus dem Kalender (Mietverträge, gebuchte Anfragen, Sperren), nicht mehr von Hand (30.10.2026) */
 let FLOTTE=null;
 fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(p&&p.cars)FLOTTE=p.cars.map(c=>c.anzeige||c.n)}).catch(()=>{});
 function wochenendeFrei(){const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
@@ -307,7 +307,7 @@ zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)zeichne()});
 </script>
-<script>/* Mietix Abgleich: Verträge, Anfragen, Kunden und Fahrzeuge auf allen Geräten gleich (Supabase Frankfurt, seit 26.10.2026).
+<script>/* Mietix Abgleich: Mietverträge, Anfragen, Kunden und Fahrzeuge auf allen Geräten gleich (Supabase Frankfurt, seit 26.10.2026).
    Wird von tools/vertrag/build_html.py und tools/anfragen/build_html.py in die Seite eingebaut.
    - Die Werkzeuge arbeiten weiter nur mit localStorage. Dieser Baustein merkt jede Änderung an den vier Speichern,
      schickt sie hoch und holt neue Stände der anderen Geräte (beim Start, beim Zurückkehren zur Seite, jede Minute).
@@ -431,9 +431,9 @@ Storage.prototype.setItem=function(k,v){const alt=(this===localStorage&&SPEICHER
    2. Papierkorb: was aus einer Liste verschwindet, landet in mietixPapierkorb (Tabelle papierkorb, 90 Tage) und
       kann in der Zentrale wiederhergestellt werden (window.mietixWiederherstellen).
    3. Die Datenbank schreibt dazu jede Änderung in die Tabelle verlauf (SQL in tools/vertrag/speicher.sql). */
-const NAMEN={mietixVorgaenge:"Vertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
+const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
-const BESCHRIFTUNG={mietixVorgaenge:x=>"Vertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
+const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
   mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?String(x.betrag).replace(".",",")+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
@@ -447,7 +447,7 @@ function sicherheitsnetz(k,alt,neu){
       const grenze=new Date(Date.now()-90*864e5).toISOString();merk("mietixPapierkorb",pk.filter(x=>x.zeit>grenze));
       if(sitzung){clearTimeout(warte);warte=setTimeout(abgleichen,800)}}}catch(e){}}
   if(rueckLaeuft)return;
-  // Rückgängig: Änderungen innerhalb von 0,7 Sekunden gehören zusammen (z. B. Vertrag + Kunde + Fahrzeug)
+  // Rückgängig: Änderungen innerhalb von 0,7 Sekunden gehören zusammen (z. B. Mietvertrag + Kunde + Fahrzeug)
   const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]=alt;
   rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
 let rueckLaeuft=false,rueckTimer=null;
@@ -456,13 +456,13 @@ function rueckZeigen(text){let el=document.getElementById("mietixRueck");
     el.querySelector("button").onclick=rueckgaengig}
   el.querySelector("span").textContent="Gespeichert: "+text;el.classList.add("an");clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),8000)}
 function rueckgaengig(){if(!burst)return;
-  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Vertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
+  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
   try{Object.keys(b).forEach(k=>{if(b[k]===null)localStorage.removeItem(k);else roh.call(localStorage,k,b[k])})}finally{rueckLaeuft=false}
   const el=document.getElementById("mietixRueck");if(el){el.querySelector("span").textContent="Zurückgeholt.";clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),1500)}
   window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
-  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Vertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
+  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
     roh.call(localStorage,"mietixEntwurfVertrag",JSON.stringify(Object.assign({},e.eintrag,{zeit:new Date().toISOString()})));
     window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
   const c=SPEICHER[e.ablage];if(!c)return false;const m=alsMap(e.ablage,lies(e.ablage,c.liste?[]:{}));m[e.schluessel]=e.eintrag;

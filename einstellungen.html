@@ -38,13 +38,13 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
 <button class="knopf" id="kopieren" type="button">Alle Links kopieren</button>
 
 <h2>Unterschrift Vermieter</h2>
-<div class="k"><a class="z" href="https://barankohler.github.io/mietix-vertrag/?zeige=vertraege"><span class="t"><b>Im Vertragswerkzeug hinterlegen</b><i>Reiter Verträge, ganz unten</i></span><span class="pfeil">›</span></a></div>
+<div class="k"><a class="z" href="https://barankohler.github.io/mietix-vertrag/?zeige=vertraege"><span class="t"><b>Unter Mietverträge hinterlegen</b><i>Reiter Mietverträge, ganz unten</i></span><span class="pfeil">›</span></a></div>
 
 <h2>Stände</h2>
 <div class="hinweis">Sicherungspunkte der ganzen Zentrale liegen auf dem Mac (Personal-OS, projects, mietix, staende) und in iCloud (Excel Archiv, Mietix, Stände). Zu Claude sagen: „Hol Stand 4 zurück.“</div>
 </div>
 <script>
-const WA="*Mietix*\n\nZentrale: https://barankohler.github.io/mietix-zentrale/\nAnfragen: https://barankohler.github.io/mietix-anfragen/\nKalender: https://barankohler.github.io/mietix-belegung/\nAngebot: https://barankohler.github.io/mietix-belegung/?zeige=angebot\nVerträge: https://barankohler.github.io/mietix-vertrag/\nKunden: https://barankohler.github.io/mietix-zentrale/kunden.html\nAutos: https://barankohler.github.io/mietix-autos/\nGeld: https://barankohler.github.io/mietix-geld/\nSchäden: https://barankohler.github.io/mietix-schadensabrechnung/\nNachrichten: https://barankohler.github.io/mietix-zentrale/nachrichten.html\nStory: https://barankohler.github.io/mietix-story/\nPreisrechner: https://barankohler.github.io/mietix-preisrechner/\nUmsatz-Radar: https://barankohler.github.io/mietix-umsatz-radar/\nEndabrechnung: https://barankohler.github.io/mietix-endabrechnung/\nPapierkorb: https://barankohler.github.io/mietix-zentrale/papierkorb.html\nEinstellungen: https://barankohler.github.io/mietix-zentrale/einstellungen.html";
+const WA="*Mietix*\n\nZentrale: https://barankohler.github.io/mietix-zentrale/\nAnfragen: https://barankohler.github.io/mietix-anfragen/\nKalender: https://barankohler.github.io/mietix-belegung/\nAngebot: https://barankohler.github.io/mietix-belegung/?zeige=angebot\nMietverträge: https://barankohler.github.io/mietix-vertrag/\nKunden: https://barankohler.github.io/mietix-zentrale/kunden.html\nAutos: https://barankohler.github.io/mietix-autos/\nGeld: https://barankohler.github.io/mietix-geld/\nSchäden: https://barankohler.github.io/mietix-schadensabrechnung/\nNachrichten: https://barankohler.github.io/mietix-zentrale/nachrichten.html\nStory: https://barankohler.github.io/mietix-story/\nPreisrechner: https://barankohler.github.io/mietix-preisrechner/\nUmsatz-Radar: https://barankohler.github.io/mietix-umsatz-radar/\nEndabrechnung: https://barankohler.github.io/mietix-endabrechnung/\nPapierkorb: https://barankohler.github.io/mietix-zentrale/papierkorb.html\nEinstellungen: https://barankohler.github.io/mietix-zentrale/einstellungen.html";
 document.getElementById("kopieren").onclick=async function(){const k=this,alt=k.textContent;
   try{await navigator.clipboard.writeText(WA);k.textContent="Kopiert"}catch(e){try{await navigator.share({text:WA});return}catch(e2){k.textContent="Kopieren nicht möglich"}}
   setTimeout(()=>{k.textContent=alt},1600)};
@@ -54,7 +54,7 @@ document.getElementById("kopieren").onclick=async function(){const k=this,alt=k.
     const alter=(Date.now()-new Date(st.zeit))/3600000;el.textContent="Excel: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true)+" Uhr":"aktuell bis "+uhrDe(st.zeit)+" Uhr"))}
   stand();window.addEventListener("mietix-abgleich",stand)})();
 </script>
-<script>/* Mietix Abgleich: Verträge, Anfragen, Kunden und Fahrzeuge auf allen Geräten gleich (Supabase Frankfurt, seit 26.10.2026).
+<script>/* Mietix Abgleich: Mietverträge, Anfragen, Kunden und Fahrzeuge auf allen Geräten gleich (Supabase Frankfurt, seit 26.10.2026).
    Wird von tools/vertrag/build_html.py und tools/anfragen/build_html.py in die Seite eingebaut.
    - Die Werkzeuge arbeiten weiter nur mit localStorage. Dieser Baustein merkt jede Änderung an den vier Speichern,
      schickt sie hoch und holt neue Stände der anderen Geräte (beim Start, beim Zurückkehren zur Seite, jede Minute).
@@ -178,9 +178,9 @@ Storage.prototype.setItem=function(k,v){const alt=(this===localStorage&&SPEICHER
    2. Papierkorb: was aus einer Liste verschwindet, landet in mietixPapierkorb (Tabelle papierkorb, 90 Tage) und
       kann in der Zentrale wiederhergestellt werden (window.mietixWiederherstellen).
    3. Die Datenbank schreibt dazu jede Änderung in die Tabelle verlauf (SQL in tools/vertrag/speicher.sql). */
-const NAMEN={mietixVorgaenge:"Vertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
+const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
-const BESCHRIFTUNG={mietixVorgaenge:x=>"Vertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
+const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
   mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?String(x.betrag).replace(".",",")+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
@@ -194,7 +194,7 @@ function sicherheitsnetz(k,alt,neu){
       const grenze=new Date(Date.now()-90*864e5).toISOString();merk("mietixPapierkorb",pk.filter(x=>x.zeit>grenze));
       if(sitzung){clearTimeout(warte);warte=setTimeout(abgleichen,800)}}}catch(e){}}
   if(rueckLaeuft)return;
-  // Rückgängig: Änderungen innerhalb von 0,7 Sekunden gehören zusammen (z. B. Vertrag + Kunde + Fahrzeug)
+  // Rückgängig: Änderungen innerhalb von 0,7 Sekunden gehören zusammen (z. B. Mietvertrag + Kunde + Fahrzeug)
   const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]=alt;
   rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
 let rueckLaeuft=false,rueckTimer=null;
@@ -203,13 +203,13 @@ function rueckZeigen(text){let el=document.getElementById("mietixRueck");
     el.querySelector("button").onclick=rueckgaengig}
   el.querySelector("span").textContent="Gespeichert: "+text;el.classList.add("an");clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),8000)}
 function rueckgaengig(){if(!burst)return;
-  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Vertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
+  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
   try{Object.keys(b).forEach(k=>{if(b[k]===null)localStorage.removeItem(k);else roh.call(localStorage,k,b[k])})}finally{rueckLaeuft=false}
   const el=document.getElementById("mietixRueck");if(el){el.querySelector("span").textContent="Zurückgeholt.";clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),1500)}
   window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
-  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Vertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
+  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
     roh.call(localStorage,"mietixEntwurfVertrag",JSON.stringify(Object.assign({},e.eintrag,{zeit:new Date().toISOString()})));
     window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
   const c=SPEICHER[e.ablage];if(!c)return false;const m=alsMap(e.ablage,lies(e.ablage,c.liste?[]:{}));m[e.schluessel]=e.eintrag;
