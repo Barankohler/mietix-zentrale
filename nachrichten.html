@@ -16,6 +16,7 @@ h2.thema span{background:var(--rot);color:#fff;font-size:12px;border-radius:999p
 .sprung{position:sticky;top:calc(52px + env(safe-area-inset-top));z-index:4;display:flex;gap:7px;overflow-x:auto;padding:10px 0;background:var(--bg);scrollbar-width:none}
 .sprung::-webkit-scrollbar{display:none}
 .sprung a{flex:0 0 auto;background:#fff;border:1px solid var(--rand);border-radius:999px;padding:8px 13px;font-weight:800;font-size:14px;color:var(--text);text-decoration:none}
+.sprung{flex-wrap:wrap;overflow-x:visible}   /* fünf Punkte, alle auf einen Blick (30.10.2026) */
 .sprung a.an{background:var(--rot);border-color:var(--rot);color:#fff}
 .n{background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--rand)}
 .n b{display:block;font-size:16px}.n .v{font-size:13px;color:var(--grau);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -42,7 +43,7 @@ pre mark{background:#FFE58A;border-radius:4px;padding:0 3px;color:inherit}
 <div id="abgleich"></div>
 <input id="suche" type="search" autocomplete="off" placeholder="Suchen, z. B. Kaution, Anzahlung, R8">
 <div class="hinweis" style="margin-top:8px">Antippen zeigt den ganzen Text. Gelb markiert = noch ausfüllen.</div>
-<nav class="sprung"><a href="#t0">Erster Kontakt</a><a href="#t1">Kaution</a><a href="#t2">Anzahlung</a><a href="#t3">Reservierung</a><a href="#t4">Abholung und Rückgabe</a><a href="#t5">Danach</a><a href="#t6">Fahrzeuge</a><a href="#t7">Wochenende</a></nav><section id="t0"><h2 class="thema">Erster Kontakt <span>6</span></h2><div class="n" data-k="willkommen"><b>Willkommen</b><div class="v">Bitte senden Sie uns Ihren gewünschten Buchungszeitraum (Abhol- und Rückgabedatum). Im Anschluss erhalten Sie von uns die verfügbaren Fahrzeuge inklusive Preisen für diesen Zeitraum.</div><pre>*Herzlich willkommen bei Mietix 😊*
+<nav class="sprung"><a href="#t1">Kaution</a><a href="#t2">Reservierung</a><a href="#t3">Anzahlung</a><a href="#t6">Fahrzeuge</a><a href="#mietbedingungen">Mietbedingungen</a></nav><section id="t0"><h2 class="thema">Erster Kontakt <span>6</span></h2><div class="n" data-k="willkommen"><b>Willkommen</b><div class="v">Bitte senden Sie uns Ihren gewünschten Buchungszeitraum (Abhol- und Rückgabedatum). Im Anschluss erhalten Sie von uns die verfügbaren Fahrzeuge inklusive Preisen für diesen Zeitraum.</div><pre>*Herzlich willkommen bei Mietix 😊*
 Danke für Ihr Vertrauen in unsere Sportwagenvermietung!
 
 Bitte senden Sie uns Ihren gewünschten Buchungszeitraum (Abhol- und Rückgabedatum). Im Anschluss erhalten Sie von uns die verfügbaren Fahrzeuge inklusive Preisen für diesen Zeitraum.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="__alles__"><b>Alles Wichtige auf einmal</b><div class="v">Mindestalter: 20 Jahre</div><pre>*Alles Wichtige auf einen Blick*
@@ -70,7 +71,7 @@ Aktuell läuft bei uns eine Aktion, da hole ich Ihnen das bestmögliche Angebot 
 1. Stadt:
 2. Alter:
 
-Dann melde ich mich in wenigen Minuten mit Ihrem persönlichen Aktionspreis.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="mietbedingungen"><b>Mietbedingungen</b><div class="v">Mindestalter: 20 Jahre</div><pre>*Mietbedingungen*
+Dann melde ich mich in wenigen Minuten mit Ihrem persönlichen Aktionspreis.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div><div class="n" id="mietbedingungen" data-k="mietbedingungen"><b>Mietbedingungen</b><div class="v">Mindestalter: 20 Jahre</div><pre>*Mietbedingungen*
 
 Mindestalter: 20 Jahre
 
@@ -106,24 +107,7 @@ Sie können statt der Geldkaution Ihr eigenes Fahrzeug als Sicherheit hinterlege
 3. Ein Fahrzeugschlüssel bei uns bleibt
 
 Ist das Fahrzeug nicht auf Ihren Namen angemeldet, brauchen wir diese Vollmacht vom Eigentümer, ausgefüllt und unterschrieben:
-https://barankohler.github.io/mietix-zentrale/vollmacht.pdf</pre><div class="k"><div class="kop">Kopieren</div><a class="pdf" href="vollmacht.pdf" target="_blank">Vollmacht (PDF)</a></div><a href="#" class="aend">Text ändern</a></div></section><section id="t2"><h2 class="thema">Anzahlung <span>2</span></h2><div class="n" data-k="__anzahlung__"><b>Anzahlung 30 Prozent</b><div class="v">Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.</div><input class="miete" type="text" inputmode="decimal" placeholder="Mietpreis eintragen, 30 % rechnen sich"><pre>*Anzahlung*
-
-Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.
-
-Betrag:
-Empfänger: Baran Köhler
-IBAN: DE59 5105 0015 0997 0123 49
-Verwendungszweck: Vor- und Nachname, Fahrzeugmodell
-
-Den Restbetrag zahlen Sie bequem bei Abholung.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="eingang"><b>Zahlung eingegangen</b><div class="v">Ihre Zahlung ist eingegangen, herzlichen Dank!</div><pre>Ihre Zahlung ist eingegangen, herzlichen Dank!
-
-Fahrzeug:
-
-Ihr Fahrzeug ist damit verbindlich für Sie reserviert.
-
-Wir freuen uns auf Sie!
-
-Haben Sie noch eine Frage zur Abholung? Schreiben Sie uns jederzeit.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t3"><h2 class="thema">Reservierung <span>2</span></h2><div class="n" data-k="reserviert"><b>Reservierung bestätigt</b><div class="v">Fahrzeug:</div><pre>*Ihre Reservierung ist bestätigt*
+https://barankohler.github.io/mietix-zentrale/vollmacht.pdf</pre><div class="k"><div class="kop">Kopieren</div><a class="pdf" href="vollmacht.pdf" target="_blank">Vollmacht (PDF)</a></div><a href="#" class="aend">Text ändern</a></div></section><section id="t2"><h2 class="thema">Reservierung <span>2</span></h2><div class="n" data-k="reserviert"><b>Reservierung bestätigt</b><div class="v">Fahrzeug:</div><pre>*Ihre Reservierung ist bestätigt*
 
 Fahrzeug:
 
@@ -141,7 +125,24 @@ Für den Mietvertrag benötige ich noch folgende Angaben von Ihnen:
 
 3. Geburtsdatum:
 
-Ihre Daten behandeln wir selbstverständlich vertraulich.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t4"><h2 class="thema">Abholung und Rückgabe <span>3</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>*Morgen ist es so weit*
+Ihre Daten behandeln wir selbstverständlich vertraulich.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t3"><h2 class="thema">Anzahlung <span>2</span></h2><div class="n" data-k="__anzahlung__"><b>Anzahlung 30 Prozent</b><div class="v">Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.</div><input class="miete" type="text" inputmode="decimal" placeholder="Mietpreis eintragen, 30 % rechnen sich"><pre>*Anzahlung*
+
+Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.
+
+Betrag:
+Empfänger: Baran Köhler
+IBAN: DE59 5105 0015 0997 0123 49
+Verwendungszweck: Vor- und Nachname, Fahrzeugmodell
+
+Den Restbetrag zahlen Sie bequem bei Abholung.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="eingang"><b>Zahlung eingegangen</b><div class="v">Ihre Zahlung ist eingegangen, herzlichen Dank!</div><pre>Ihre Zahlung ist eingegangen, herzlichen Dank!
+
+Fahrzeug:
+
+Ihr Fahrzeug ist damit verbindlich für Sie reserviert.
+
+Wir freuen uns auf Sie!
+
+Haben Sie noch eine Frage zur Abholung? Schreiben Sie uns jederzeit.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t4"><h2 class="thema">Abholung und Rückgabe <span>3</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>*Morgen ist es so weit*
 
 Hallo, Ihr Fahrzeug steht morgen für Sie bereit:
 
@@ -261,6 +262,7 @@ const links=[...document.querySelectorAll(".sprung a")];
 links.forEach(a=>a.onclick=ev=>{ev.preventDefault();const z=document.querySelector(a.getAttribute("href"));if(!z)return;
   const nav=document.querySelector(".sprung"),unten=Math.min(nav.getBoundingClientRect().top,parseFloat(getComputedStyle(nav).top)||0)+nav.offsetHeight;
   window.scrollTo(0,Math.max(0,window.scrollY+z.getBoundingClientRect().top-unten-8));   // sofort, ohne Gleiten: landet immer genau
+  if(z.classList.contains("n"))z.classList.add("auf");
   links.forEach(x=>x.classList.toggle("an",x===a))});
 const beob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle("an",a.getAttribute("href")==="#"+e.target.id));
   const a=links.find(a=>a.classList.contains("an"));if(a){const nav=document.querySelector(".sprung");nav.scrollTo({left:a.offsetLeft-nav.clientWidth/2+a.offsetWidth/2,behavior:"smooth"})}}}),{rootMargin:"-130px 0px -60% 0px"});
