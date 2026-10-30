@@ -209,6 +209,9 @@ function rueckgaengig(){if(!burst)return;
   const el=document.getElementById("mietixRueck");if(el){el.querySelector("span").textContent="Zurückgeholt.";clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),1500)}
   window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
+  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Vertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
+    roh.call(localStorage,"mietixEntwurfVertrag",JSON.stringify(Object.assign({},e.eintrag,{zeit:new Date().toISOString()})));
+    window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
   const c=SPEICHER[e.ablage];if(!c)return false;const m=alsMap(e.ablage,lies(e.ablage,c.liste?[]:{}));m[e.schluessel]=e.eintrag;
   merk("mietixPapierkorb",pk.filter(x=>x.id!==id));localStorage.setItem(e.ablage,JSON.stringify(ausMap(e.ablage,m)));
   window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:[e.ablage,"mietixPapierkorb"]}));return true};
