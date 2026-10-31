@@ -104,6 +104,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     const tag=d=>d<hi?"überfällig seit "+de(d):d===hi?"heute":"morgen ("+WT[m.getDay()]+" "+de(mo)+")",morgen=[];   // „morgen“ immer mit Datum (Baran, 31.10.2026)   // Morgen steht seit 31.10.2026 in einem eigenen Abschnitt (Baran)
     v.filter(x=>!x.ueb&&x.vonD<=mo).sort((a,b)=>(a.vonD+(a.vonU||"")).localeCompare(b.vonD+(b.vonU||""))).forEach(x=>out.push({uhr:x.vonD===hi?(x.vonU||""):"",uhrM:x.vonU||"",t:x.name,i:x.auto+", Abholung "+tag(x.vonD),k:"Übergabe",art:x.vonD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=uebergabe"}));
     v.filter(x=>x.ueb&&x.bisD<=mo).sort((a,b)=>(a.bisD+(a.bisU||"")).localeCompare(b.bisD+(b.bisU||""))).forEach(x=>out.push({uhr:x.bisD===hi?(x.bisU||""):"",uhrM:x.bisU||"",t:x.name,i:x.auto+", Rückgabe "+tag(x.bisD),k:"Rückgabe",art:x.bisD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=rueckgabe"}));
+    // Miete offen erst nach der Übergabe, sonst steht dort schon „Abholung überfällig“ (Prüfung 31.10.2026)
     // Ein Heute (Liste Punkt 11): auch Kaution zurückgeben, Miete noch offen und gebucht ohne Mietvertrag
     const offenB=x=>(!((x.zahlung||{}).rest||{}).am?zahl(((x.zahlung||{}).rest||{}).betrag):0)+(x.verlaengerungen||[]).filter(y=>!y.bezahlt).reduce((s,y)=>s+(+y.aufpreis||0),0);
     const rest=[],tageSeit=d=>Math.round((new Date(hi)-new Date(String(d).slice(0,10)))/864e5);
@@ -111,7 +112,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     alle.filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&!x.kautionRueck).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD),lang=s>7;
       rest.push({t:x.name,i:"Kaution "+EUR(zahl(x.zahlung.kaut.betrag))+" zurückgeben"+(lang?", schon "+s+" Tage!":""),k:"Kaution",art:lang?"rot":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"kaution",nr:x.nr})});
     // Miete offen schon am Tag der Übergabe (31.10.2026, Prüfbericht: vorher erst ab dem nächsten Tag sichtbar)
-    alle.filter(x=>x.vonD&&(x.vonD<hi||(x.vonD===hi&&x.ueb))&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"bezahlt",nr:x.nr})});
+    alle.filter(x=>x.vonD&&x.vonD<=hi&&x.ueb&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"bezahlt",nr:x.nr})});
     // Endabrechnung offen: Zusatzkosten nach der Rückgabe, die keine Kaution deckt (31.10.2026, Prüfbericht)
     const endOffen=x=>{const e=x.endabrechnung||{},k=(x.zahlung||{}).kaut||{};if(x.status!=="zurück"||!(+e.summe>0)||e.bezahlt)return 0;
       if(k.am&&!x.kautionRueck)return 0;   // Kaution liegt noch da: wird beim Zurückgeben verrechnet
@@ -426,7 +427,7 @@ function rueckZeigen(text){let el=document.getElementById("mietixRueck");
   const andere=()=>{try{return[...document.querySelectorAll("#meldung,#zMeld,#erfolgBox.auf,.bMeld,.meld.an,#meld.an")].some(m=>m.offsetParent!==null&&getComputedStyle(m).display!=="none"&&getComputedStyle(m).opacity!=="0")}catch(e){return false}};
   let n=0;const los=()=>{if(andere()&&n++<20){rueckTimer=setTimeout(los,200);return}el.classList.add("an");rueckTimer=setTimeout(()=>el.classList.remove("an"),6000)};los()}
 function rueckgaengig(){if(!burst)return;
-  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
+  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
   try{Object.keys(b).forEach(k=>{if(b[k]===null)localStorage.removeItem(k);else roh.call(localStorage,k,b[k])})}finally{rueckLaeuft=false}
   const el=document.getElementById("mietixRueck");if(el){el.querySelector("span").textContent="Zurückgeholt.";clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),1500)}

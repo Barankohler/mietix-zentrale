@@ -294,7 +294,9 @@ function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="
   let h='<div class="kTop"><a href="#" id="kZu">‹ Kunden</a><button type="button" id="kBearb">'+(BEARB?"Fertig":"Bearbeiten")+'</button></div><div class="blatt">';
   h+='<div class="kk"><div class="av" style="background:'+farbe(e.name)+'">'+esc(ini(e.name))+'</div><h2>'+esc(e.name)+'</h2><p>'+esc(unter)+(e.umsatz?", Umsatz "+EUR.format(e.umsatz):"")+'</p></div>';
   if(e.warn.length)h+='<div class="warnung">Achtung: '+esc(e.warn.join(". "))+'</div>';
-  h+='<div class="knoepfe"><a class="gr" target="_blank" href="'+(wa(e.telefon)||"#")+'">'+SVG_WA+'WhatsApp</a><a href="'+(tel?"tel:"+esc(tel):"#")+'">'+SVG_TEL+'Anrufen</a><a class="rt" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">'+SVG_MV+'Mietvertrag</a></div>';
+  // ohne Telefonnummer grau und nicht antippbar (31.10.2026, Prüfung: tat sonst einfach nichts)
+  const aus=' style="opacity:.35;pointer-events:none" aria-disabled="true"';
+  h+='<div class="knoepfe"><a class="gr" target="_blank" href="'+(wa(e.telefon)||"#")+'"'+(wa(e.telefon)?"":aus)+'>'+SVG_WA+'WhatsApp</a><a href="'+(tel?"tel:"+esc(tel):"#")+'"'+(tel?"":aus)+'>'+SVG_TEL+'Anrufen</a><a class="rt" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">'+SVG_MV+'Mietvertrag</a></div>';
   if(!BEARB){
     h+='<div class="ab">Kontakt</div><div class="feld"><div class="zl"><span>Telefon</span>'+wert(e.telefon)+'</div><div class="zl"><span>Straße</span>'+wert(str)+'</div><div class="zl"><span>PLZ, Wohnort</span>'+wert(plzOrt)+'</div>'
       +'<div class="zl"><span>Geburtstag</span>'+wert(e.geb?de(e.geb)+(e.alter?" ("+e.alter+")":""):"")+'</div><div class="zl"><span>Geburtsort</span>'+wert(e.gebort)+'</div><div class="zl"><span>E-Mail</span>'+wert(e.email)+'</div></div>';
@@ -528,7 +530,7 @@ function rueckZeigen(text){let el=document.getElementById("mietixRueck");
   const andere=()=>{try{return[...document.querySelectorAll("#meldung,#zMeld,#erfolgBox.auf,.bMeld,.meld.an,#meld.an")].some(m=>m.offsetParent!==null&&getComputedStyle(m).display!=="none"&&getComputedStyle(m).opacity!=="0")}catch(e){return false}};
   let n=0;const los=()=>{if(andere()&&n++<20){rueckTimer=setTimeout(los,200);return}el.classList.add("an");rueckTimer=setTimeout(()=>el.classList.remove("an"),6000)};los()}
 function rueckgaengig(){if(!burst)return;
-  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
+  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
   try{Object.keys(b).forEach(k=>{if(b[k]===null)localStorage.removeItem(k);else roh.call(localStorage,k,b[k])})}finally{rueckLaeuft=false}
   const el=document.getElementById("mietixRueck");if(el){el.querySelector("span").textContent="Zurückgeholt.";clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),1500)}
