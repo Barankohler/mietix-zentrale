@@ -598,6 +598,17 @@ zeigen();abgleichen();
     ".mxSym{display:inline-block;width:19px;height:19px;vertical-align:-4px;margin-right:6px;stroke:#C4161C;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}"+
     "@media(max-width:360px){header .mxStart,.topbar .mxStart{padding:4px 8px 4px 6px!important;margin-right:6px!important;font-size:12px!important}.mxSym{display:none}}"+
     "@media(max-width:480px){.topbar .brand-sub{display:none}}"+
+    /* Design für alle Seiten (31.10.2026, Baran: „seriöse, schöne App. Übersichtlich, klar und direkt“) */
+    "body,input,button,select,textarea{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Arial,sans-serif!important}"+
+    "body{background:#F2F2F7!important;color:#1C1C1E}"+
+    "*:not(.mxFenster):not(#mietixRueck):not(#erfolgBox){box-shadow:none!important}"+
+    "input:focus,textarea:focus,select:focus{outline:2px solid #C4161C!important;outline-offset:-2px}"+
+    "h2,.karte h2,h2.gruppe,.feldname,.sTitel{text-transform:none!important;letter-spacing:-.2px!important;font-size:17px!important;font-weight:700!important;color:#1C1C1E!important}"+
+    (istStart?"":"header{display:block!important;padding-left:16px!important;padding-right:16px!important}header h1,.topbar h1{margin:0!important;padding:0!important}"+
+      ".mxTop{display:flex;align-items:center;justify-content:space-between;min-height:34px;margin-bottom:4px}"+
+      "header h1 .mxTitel,.topbar h1 .mxTitel{font-size:28px;font-weight:800;letter-spacing:-.5px;color:#1C1C1E!important;transition:font-size .15s}"+
+      "html.mxKlein header h1 .mxTitel,html.mxKlein .topbar h1 .mxTitel{font-size:18px}html.mxKlein .mxTop{min-height:0;margin-bottom:0}"+
+      ".topbar{display:block!important;padding:calc(10px + env(safe-area-inset-top)) 16px 10px!important}.topbar .brand,.topbar .brand-sub{display:none!important}")+
     /* App-Gefühl: nichts markieren, nicht zoomen, kein grauer Tipp-Schatten */
     "html{-webkit-text-size-adjust:100%;touch-action:manipulation}"+
     "button,a,.chip,.knopf,.kachel,.mxKnopf,summary,[data-fenster],label,.reiter div,.tag,.minik,.z,.vorgang,.punkt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}"+
@@ -610,9 +621,16 @@ zeigen();abgleichen();
 
   // ‹ Start und Symbol in der Kopfzeile
   const ziel=document.querySelector("header h1")||document.querySelector(".topbar");
+  const TITEL={anfragen:"Anfragen",angebot:"Angebot",kalender:"Kalender",vertrag:"Mietverträge",kunden:"Kunden",autos:"Autos",geld:"Geld",
+    schaeden:/schadensformular/.test(pfad)?"Schadensmeldung":/schadensklaerung/.test(pfad)?"Schadensklärung":"Schäden",nachrichten:"Nachrichten",zahlen:"Zahlen",story:"Story",papierkorb:"Papierkorb",einstellungen:"Einstellungen"};
   if(ziel&&!istStart&&!document.querySelector(".mxStart")){
-    if(SYM[art]){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("class","mxSym");s.innerHTML=SYM[art];ziel.insertBefore(s,ziel.firstChild)}
-    const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");ziel.insertBefore(a,ziel.firstChild)}
+    const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");
+    const top=document.createElement("div");top.className="mxTop";top.appendChild(a);
+    const punkt=ziel.querySelector("#abgleichPunkt"),titel=TITEL[art]||(ziel.textContent||"").replace(/^\s*MIETIX\s*/i,"").trim();
+    let h=ziel;if(ziel.tagName!=="H1"){h=document.createElement("h1");ziel.appendChild(h)}
+    h.innerHTML='<span class="mxTitel">'+titel+'</span>';if(punkt){punkt.style.marginLeft="8px";punkt.style.verticalAlign="middle";h.appendChild(punkt)}
+    h.parentNode.insertBefore(top,h);
+    addEventListener("scroll",()=>document.documentElement.classList.toggle("mxKlein",scrollY>40),{passive:true})}
 
   // Wischen vom linken Rand = zurück (nur als App, im Browser macht das Safari)
   const alsApp=navigator.standalone||matchMedia("(display-mode: standalone)").matches;

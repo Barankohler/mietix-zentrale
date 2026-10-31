@@ -27,10 +27,11 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
 .k{background:#fff;border-radius:20px;padding:4px 16px;margin-bottom:10px}
 .z{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--linie);text-decoration:none;color:var(--ink)}
 .z:first-child{border-top:0}
-.z .uhr{min-width:48px;font-size:15px;font-weight:800}
+.z .uhr{min-width:48px;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}#heute .z .uhr{color:var(--rot)}
 .z .t{flex:1;min-width:0}.z b{display:block;font-size:17px;font-weight:700}.z i{font-style:normal;font-size:14px;color:var(--grau)}
-.chip{display:inline-block;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:800;background:var(--bg);color:var(--ink);white-space:nowrap}
-.chip.rot{background:#FDECEC;color:var(--rot)}.chip.gruen{background:#E6F6EC;color:var(--gruen)}.chip.gelb{background:var(--gelbbg);color:var(--gelb)}
+.chip{display:inline-block;padding:6px 9px;border-radius:6px;font-size:12px;font-weight:700;background:#F2F2F7;color:#3A3A3C;white-space:nowrap}
+.chip.rot{background:#FDECEC;color:#A31318}.chip.gruen{background:#E6F4EA;color:#1B6B3A}.chip.gelb{background:var(--gelbbg);color:var(--gelb)}
+/* Status-Schilder (31.10.2026): Übergabe grün, Rückgabe rot, morgen grau, ohne Haken */
 .leer{padding:18px 0;color:var(--grau);font-weight:600;text-align:center}
 .kacheln{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kachel{position:relative;display:block;background:#fff;border-radius:20px;padding:18px 8px 14px;text-align:center;font-weight:800;font-size:17px;color:var(--ink);text-decoration:none;box-shadow:0 1px 0 rgba(0,0,0,.03)}
@@ -92,14 +93,15 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
   const zahl=v=>{if(v==null)return 0;const s=String(v).trim();if(!s)return 0;return parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""))||0};
   if(window.navigator.standalone)document.getElementById("homeTipp").style.display="none";
   // Zeilen mit Aktion (31.10.2026, Baran: „nebendran eintragen“): Bezahlt und Kaution zurück direkt hier, der Name führt weiter in den Mietvertrag
-  function zeile(a){if(a.akt)return '<div class="z" data-akt="'+a.akt+'" data-nr="'+esc(a.nr)+'"><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><a class="t" href="'+a.href+'" style="color:inherit;text-decoration:none"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></a><button type="button" class="chip akt'+(a.art?" "+a.art:"")+'">'+(a.akt==="bezahlt"?"Bezahlt?":"Zurück?")+'</button></div>';
+  function zeile(a){if(!a.grau&&!a.akt){if(a.k==="Übergabe"&&a.art!=="rot")a=Object.assign({},a,{art:"gruen"});if(a.k==="Rückgabe")a=Object.assign({},a,{art:"rot"})}
+    if(a.akt)return '<div class="z" data-akt="'+a.akt+'" data-nr="'+esc(a.nr)+'"><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><a class="t" href="'+a.href+'" style="color:inherit;text-decoration:none"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></a><button type="button" class="chip akt'+(a.art?" "+a.art:"")+'">'+(a.akt==="bezahlt"?"Bezahlt?":"Zurück?")+'</button></div>';
     return '<a class="z" href="'+a.href+'"'+(a.nf?' data-nf="'+esc(a.nf)+'"':"")+'><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><span class="t"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></span><span class="chip'+(a.art?" "+a.art:"")+'">'+a.k+'</span></a>'}
   function zeichne(){
     const h=new Date(),hi=iso(h),m=new Date();m.setDate(m.getDate()+1);const mo=iso(m);
     document.getElementById("heuteTitel").textContent="Heute, "+WT[h.getDay()]+" "+h.getDate()+"."+(h.getMonth()+1)+".";
     const kunden0=lies("mietixKunden",{}),alle=lies("mietixVorgaenge",[]),v=alle.filter(x=>x.status!=="zurück"),anf=lies("mietixAnfragen",[]),auf=lies("mietixAufgaben",[]),zust=lies("mietixZustand",[]);
     const out=[];
-    const tag=d=>d<hi?"überfällig seit "+de(d):d===hi?"heute":"morgen",morgen=[];   // Morgen steht seit 31.10.2026 in einem eigenen Abschnitt (Baran)
+    const tag=d=>d<hi?"überfällig seit "+de(d):d===hi?"heute":"morgen ("+WT[m.getDay()]+" "+de(mo)+")",morgen=[];   // „morgen“ immer mit Datum (Baran, 31.10.2026)   // Morgen steht seit 31.10.2026 in einem eigenen Abschnitt (Baran)
     v.filter(x=>!x.ueb&&x.vonD<=mo).sort((a,b)=>(a.vonD+(a.vonU||"")).localeCompare(b.vonD+(b.vonU||""))).forEach(x=>out.push({uhr:x.vonD===hi?(x.vonU||""):"",uhrM:x.vonU||"",t:x.name,i:x.auto+", Abholung "+tag(x.vonD),k:"Übergabe",art:x.vonD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=uebergabe"}));
     v.filter(x=>x.ueb&&x.bisD<=mo).sort((a,b)=>(a.bisD+(a.bisU||"")).localeCompare(b.bisD+(b.bisU||""))).forEach(x=>out.push({uhr:x.bisD===hi?(x.bisU||""):"",uhrM:x.bisU||"",t:x.name,i:x.auto+", Rückgabe "+tag(x.bisD),k:"Rückgabe",art:x.bisD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=rueckgabe"}));
     // Ein Heute (Liste Punkt 11): auch Kaution zurückgeben, Miete noch offen und gebucht ohne Mietvertrag
@@ -118,7 +120,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
       const bis2=mo+"T23:59",schon={};
       bl.forEach((x,i)=>bl.forEach((y,j)=>{if(j<=i||x.a!==y.a||!ue(x.v,x.b,y.v,y.b))return;const ab=x.v>y.v?x.v:y.v;if(ab>bis2||(x.b<hi&&y.b<hi))return;
         const key=x.a+x.w+y.w;if(schon[key])return;schon[key]=1;
-        rest.unshift({t:x.a+" doppelt verplant",i:x.w+" und "+y.w+", "+(ab.slice(0,10)<=hi?"heute":"morgen"),k:"Prüfen",art:"rot",href:B+"mietix-belegung/"})}))}
+        rest.unshift({t:x.a+" doppelt verplant",i:x.w+" und "+y.w+", "+(ab.slice(0,10)<=hi?"heute":"morgen ("+WT[m.getDay()]+" "+de(mo)+")"),k:"Prüfen",art:"rot",href:B+"mietix-belegung/"})}))}
     // Nachfassen: Angebot seit 2 Tagen ohne Antwort, Mietbeginn noch nicht vorbei
     const WA_NACH=[];
     const nach=anf.filter(a=>a.status==="angebot"&&a.nummer&&!a.nachgefasst&&(!a.von||a.von>=hi)).filter(a=>{const s=tageSeit((a.angebot&&a.angebot.am)||a.tag);return s>=2&&s<=14});
@@ -129,7 +131,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     anf.filter(a=>a.status==="gebucht"&&a.von&&a.von<=mo&&a.von>=iso(new Date(Date.now()-864e5))&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von))
       .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",uhrM:a.vonU||"",morgen:a.von===mo,t:a.name||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
     // alles von morgen in den eigenen Abschnitt, dort mit Uhrzeit statt „morgen“
-    for(let i=out.length-1;i>=0;i--){const x=out[i];if(/(Abholung|Rückgabe) morgen$/.test(x.i)||(x.k==="Mietvertrag"&&x.morgen)){morgen.unshift(Object.assign({},x,{i:x.i.replace(/, (Abholung|Rückgabe) morgen$/,", $1"),uhr:x.uhrM||""}));out.splice(i,1)}}
+    for(let i=out.length-1;i>=0;i--){const x=out[i];if(/(Abholung|Rückgabe) morgen \(/.test(x.i)||(x.k==="Mietvertrag"&&x.morgen)){morgen.unshift(Object.assign({},x,{i:x.i.replace(/, (Abholung|Rückgabe) morgen \(.*\)$/,", $1"),uhr:x.uhrM||""}));out.splice(i,1)}}
     out.push(...rest);
     const autoPunkte=[];auf.filter(a=>!a.erledigt&&!a._weg&&a.aufgabe&&a.bis&&a.bis<=hi).forEach(a=>autoPunkte.push({t:a.aufgabe,i:a.bis<hi?"überfällig seit "+de(a.bis):"heute fällig",k:"Aufgabe",art:"gelb",href:B+"mietix-autos/?zeige=aufgaben"}));
     zust.filter(z=>!z.erledigt&&z.auto).forEach(z=>autoPunkte.push({t:z.auto,i:z.text+(z.datum?", seit "+de(z.datum):""),k:"Zustand",art:"gelb",href:B+"mietix-autos/"}));
@@ -144,7 +146,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     document.getElementById("heute").innerHTML=out.length?out.map(zeile).join(""):(erl?'<div class="fertig">Alles erledigt ✓<i>'+erl+(erl===1?" Übergabe oder Rückgabe":" Übergaben und Rückgaben")+' heute. Stark!</i></div>':'<div class="fertig" style="color:var(--grau)">Heute ist nichts zu tun ✓<i>Alles im Griff.</i></div>');
     const mt=document.getElementById("morgenTitel");mt.textContent="Morgen, "+WT[m.getDay()]+" "+m.getDate()+"."+(m.getMonth()+1)+".";
     mt.classList.toggle("versteckt",!morgen.length);document.getElementById("morgenK").classList.toggle("versteckt",!morgen.length);
-    document.getElementById("morgen").innerHTML=morgen.map(zeile).join("");
+    document.getElementById("morgen").innerHTML=morgen.map(x=>zeile(Object.assign({},x,{art:"",grau:true}))).join("");
     aktionen(hi);waRunde(alle,anf,hi,mo,WA_NACH);
     document.querySelectorAll("#heute a[data-nf]").forEach(el=>{el.target="_blank";el.addEventListener("click",()=>{const l=lies("mietixAnfragen",[]),x=l.find(y=>y.id===el.dataset.nf);if(x){x.nachgefasst=hi;try{localStorage.setItem("mietixAnfragen",JSON.stringify(l))}catch(e){}}setTimeout(zeichne,800)})});
     // Gruß und kleiner Erfolg des Monats
@@ -179,19 +181,20 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
   const waNr2=t=>{let n=String(t||"").replace(/\D/g,"");if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="49"+n.slice(1);return n};
   const vn=s=>String(s||"").trim().split(/\s+/)[0];
   let WA_LISTE=[];
+  const TAGE=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"],tagLang=d=>{const x=new Date(d+"T12:00");return TAGE[x.getDay()]+", "+d.split("-").reverse().join(".")};
   function waRunde(alle,anf,hi,mo,nach){const L=[],ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,preis=a=>PREISE&&PREISE.cars.find(c=>c.n===a||c.anzeige===a);
     const frei=(v)=>!alle.some(x=>x.nr!==v.nr&&x.auto===v.auto&&x.status!=="zurück"&&x.vonD&&x.bisD&&ue(hi,mo,x.vonD,x.bisD))
       &&!anf.some(a=>a.status==="gebucht"&&a.auto===v.auto&&a.von&&a.bis&&ue(hi,mo,a.von,a.bis))&&!lies("mietixSperren",[]).some(s=>s.auto===v.auto&&s.von&&s.bis&&ue(hi,mo,s.von,s.bis));
     alle.forEach(v=>{if(!v.telefon)return;const z=v.zahlung||{};
       // Erinnerung an die Abholung morgen
-      if(v.vonD===mo&&!v.ueb&&!v.erinnert)L.push({t:v.name,i:"Erinnerung an die Abholung morgen",tel:v.telefon,mark:{nr:v.nr,feld:"erinnert"},
+      if(v.vonD===mo&&!v.ueb&&!v.erinnert)L.push({t:v.name,i:"Erinnerung an die Abholung morgen ("+de(mo)+")",tel:v.telefon,mark:{nr:v.nr,feld:"erinnert"},
         text:"Hallo "+vn(v.name)+",\n\nkurze Erinnerung an Ihre Abholung morgen, "+de(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
           ((z.kaut||{}).am||v.kautionArt==="fahrzeug"?"":"\n- Kaution "+eur2(zahl((z.kaut||{}).betrag))+" €")+((z.rest||{}).am?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\n\nBis morgen!\nIhr Mietix-Team"});
       // Verlängerung anbieten: Rückgabe heute, Auto morgen frei
       if(v.ueb&&v.status!=="zurück"&&v.bisD===hi&&!v.verlAngeboten&&frei(v)){const c=preis(v.auto),tp=c?c.gp:0,vs=tp?Math.max(9,Math.round(tp*0.85/10)*10-1):0;
-        L.push({t:v.name,i:"Verlängerung anbieten, "+v.auto+" ist morgen frei",tel:v.telefon,mark:{nr:v.nr,feld:"verlAngeboten"},
-          text:"*Ihr "+v.auto+" ist morgen noch frei*\n\nDer Wagen ist morgen nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\n\n"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
-            "\n\nEine kurze Antwort genügt, dann verlängern wir bis morgen "+(v.bisU?v.bisU+" Uhr":"")+".\n\nViele Grüße\nIhr Mietix-Team"})}
+        L.push({t:v.name,i:"Verlängerung anbieten, "+v.auto+" ist morgen ("+de(mo)+") frei",tel:v.telefon,mark:{nr:v.nr,feld:"verlAngeboten"},
+          text:"*Ihr "+v.auto+" ist morgen noch frei*\n\nDer Wagen ist morgen, "+tagLang(mo)+", nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\n\n"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
+            "\n\nEine kurze Antwort genügt, dann verlängern wir bis morgen, "+tagLang(mo)+(v.bisU?", "+v.bisU+" Uhr":"")+".\n\nViele Grüße\nIhr Mietix-Team"})}
       // Kilometerpaket anbieten: Abholung heute oder morgen, noch kein Paket
       const c=preis(v.auto);
       if(!v.ueb&&(v.vonD===hi||v.vonD===mo)&&!v.paketKm&&!v.kmAngeboten&&c&&c.km&&c.km.length>1){const st=PREISE.kmStufen||[50,100,150,200,300];
@@ -528,6 +531,17 @@ zeigen();abgleichen();
     ".mxSym{display:inline-block;width:19px;height:19px;vertical-align:-4px;margin-right:6px;stroke:#C4161C;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}"+
     "@media(max-width:360px){header .mxStart,.topbar .mxStart{padding:4px 8px 4px 6px!important;margin-right:6px!important;font-size:12px!important}.mxSym{display:none}}"+
     "@media(max-width:480px){.topbar .brand-sub{display:none}}"+
+    /* Design für alle Seiten (31.10.2026, Baran: „seriöse, schöne App. Übersichtlich, klar und direkt“) */
+    "body,input,button,select,textarea{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Arial,sans-serif!important}"+
+    "body{background:#F2F2F7!important;color:#1C1C1E}"+
+    "*:not(.mxFenster):not(#mietixRueck):not(#erfolgBox){box-shadow:none!important}"+
+    "input:focus,textarea:focus,select:focus{outline:2px solid #C4161C!important;outline-offset:-2px}"+
+    "h2,.karte h2,h2.gruppe,.feldname,.sTitel{text-transform:none!important;letter-spacing:-.2px!important;font-size:17px!important;font-weight:700!important;color:#1C1C1E!important}"+
+    (istStart?"":"header{display:block!important;padding-left:16px!important;padding-right:16px!important}header h1,.topbar h1{margin:0!important;padding:0!important}"+
+      ".mxTop{display:flex;align-items:center;justify-content:space-between;min-height:34px;margin-bottom:4px}"+
+      "header h1 .mxTitel,.topbar h1 .mxTitel{font-size:28px;font-weight:800;letter-spacing:-.5px;color:#1C1C1E!important;transition:font-size .15s}"+
+      "html.mxKlein header h1 .mxTitel,html.mxKlein .topbar h1 .mxTitel{font-size:18px}html.mxKlein .mxTop{min-height:0;margin-bottom:0}"+
+      ".topbar{display:block!important;padding:calc(10px + env(safe-area-inset-top)) 16px 10px!important}.topbar .brand,.topbar .brand-sub{display:none!important}")+
     /* App-Gefühl: nichts markieren, nicht zoomen, kein grauer Tipp-Schatten */
     "html{-webkit-text-size-adjust:100%;touch-action:manipulation}"+
     "button,a,.chip,.knopf,.kachel,.mxKnopf,summary,[data-fenster],label,.reiter div,.tag,.minik,.z,.vorgang,.punkt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}"+
@@ -540,9 +554,16 @@ zeigen();abgleichen();
 
   // ‹ Start und Symbol in der Kopfzeile
   const ziel=document.querySelector("header h1")||document.querySelector(".topbar");
+  const TITEL={anfragen:"Anfragen",angebot:"Angebot",kalender:"Kalender",vertrag:"Mietverträge",kunden:"Kunden",autos:"Autos",geld:"Geld",
+    schaeden:/schadensformular/.test(pfad)?"Schadensmeldung":/schadensklaerung/.test(pfad)?"Schadensklärung":"Schäden",nachrichten:"Nachrichten",zahlen:"Zahlen",story:"Story",papierkorb:"Papierkorb",einstellungen:"Einstellungen"};
   if(ziel&&!istStart&&!document.querySelector(".mxStart")){
-    if(SYM[art]){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("class","mxSym");s.innerHTML=SYM[art];ziel.insertBefore(s,ziel.firstChild)}
-    const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");ziel.insertBefore(a,ziel.firstChild)}
+    const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");
+    const top=document.createElement("div");top.className="mxTop";top.appendChild(a);
+    const punkt=ziel.querySelector("#abgleichPunkt"),titel=TITEL[art]||(ziel.textContent||"").replace(/^\s*MIETIX\s*/i,"").trim();
+    let h=ziel;if(ziel.tagName!=="H1"){h=document.createElement("h1");ziel.appendChild(h)}
+    h.innerHTML='<span class="mxTitel">'+titel+'</span>';if(punkt){punkt.style.marginLeft="8px";punkt.style.verticalAlign="middle";h.appendChild(punkt)}
+    h.parentNode.insertBefore(top,h);
+    addEventListener("scroll",()=>document.documentElement.classList.toggle("mxKlein",scrollY>40),{passive:true})}
 
   // Wischen vom linken Rand = zurück (nur als App, im Browser macht das Safari)
   const alsApp=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
