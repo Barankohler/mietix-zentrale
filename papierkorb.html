@@ -58,7 +58,10 @@ function zeichne(){
   $("geloescht").innerHTML=BEREICHE.map(([k,t])=>{const l=pk.filter(e=>e.ablage===k||(k==="mietixVorgaenge"&&e.ablage==="mietixEntwurfVertrag"));
     return '<div class="bereich"><div class="kopf"><b>'+t+'</b><span class="'+(l.length?"":"null")+'">'+l.length+'</span></div><div class="karte">'+
       (l.length?l.map(e=>'<div class="z"><div class="t"><b>'+esc(e.text)+'</b><i>'+extra(e)+(/^Andere Fassung/.test(e.text||"")?'zur Seite gelegt ':'gelöscht ')+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts gelöscht.</div>')+'</div></div>'}).join("");
-  [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Wiederhergestellt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.")});
+  [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{const e=pk.find(y=>y.id===b.dataset.pk)||{},x=e.eintrag||{};
+    // Belegt wieder ein Auto: lieber nachfragen (31.10.2026, Baran)
+    if((e.ablage==="mietixVorgaenge"||(e.ablage==="mietixAnfragen"&&x.status==="gebucht"))&&x.auto&&!confirm((e.ablage==="mietixVorgaenge"?"Mietvertrag":"Buchung")+" von "+(x.name||"ohne Namen")+" wiederherstellen?\n\n"+x.auto+" ist dann "+de(x.vonD||x.von)+" bis "+de(x.bisD||x.bis)+" wieder belegt."))return;
+    if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Wiederhergestellt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.")});
   const z=lies("mietixZustand",[]).filter(x=>x.erledigt).sort((a,b)=>(b.erledigtAm||"")<(a.erledigtAm||"")?-1:1);
   $("nZustand").textContent=z.length;$("nZustand").className=z.length?"":"null";
   $("zustand").innerHTML=z.length?z.map(x=>'<div class="z"><div class="t"><b>'+esc(x.auto)+': '+esc(x.text)+'</b><i>erledigt '+de(x.erledigtAm||x.datum)+'</i></div><button class="hell" data-z="'+esc(x.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
