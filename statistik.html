@@ -83,14 +83,16 @@ function zeichne(){const S=(lies("mietixStand",{})||{}).statistik;
   const M=S.monate,jetzt=M[M.length-1],vor=M.length>1?M[M.length-2]:null,h=new Date();
   const tageMonat=new Date(h.getFullYear(),h.getMonth()+1,0).getDate(),tag=jetzt.m===h.toISOString().slice(0,7)?h.getDate():tageMonat;
   const gewinn=jetzt.rein-jetzt.raus,hoch=Math.round(jetzt.rein/tag*tageMonat);
-  const d=pz(jetzt.rein,vor&&vor.rein);
+  // Vergleich mit demselben Zeitraum im Vormonat (1. bis heute), sonst erschreckt am Monatsanfang ein großes Minus
+  const V=S.vergleich,fair=V&&vor&&V.vormonat===vor.name&&tag<tageMonat;
+  const d=pz(jetzt.rein,fair?V.vormonatBisTag:(vor&&vor.rein));
   const unterwegs=lies("mietixVorgaenge",[]).filter(v=>v.status!=="zurück"&&v.vonD&&v.bisD&&v.vonD<=h.toISOString().slice(0,10)&&v.bisD>=h.toISOString().slice(0,10)).length;
   let html="";
 
   // 1. Der Monat in einer Zahl
   html+='<div class="karte held"><div class="monat">'+jetzt.name.toUpperCase()+' BIS JETZT</div><div class="gross">'+eur(jetzt.rein)+'</div>'+
-    (d!=null&&vor?'<div class="vgl '+(d>=0?"hoch":"runter")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+' % gegenüber '+vor.name+' ('+eur(vor.rein)+')</div>':"")+
-    '<div class="drei"><div class="kach"><b class="'+(gewinn>=0?"hoch":"runter")+'">'+eur(gewinn)+'</b><i>übrig nach Ausgaben</i></div>'+
+    (d!=null&&vor?'<div class="vgl '+(d>=0?"hoch":"runter")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+' % gegenüber '+(fair?'1. bis '+V.tag+'. '+vor.name+' ('+eur(V.vormonatBisTag)+')':vor.name+' ('+eur(vor.rein)+')')+'</div>':"")+
+    '<div class="drei"><div class="kach"><b class="'+(gewinn>=0?"hoch":"runter")+'">'+eur(gewinn)+'</b><i>Ergebnis '+jetzt.name+' (rein minus raus)</i></div>'+
     '<div class="kach"><b>'+jetzt.mieten+'</b><i>Mieten bezahlt</i></div><div class="kach"><b>'+unterwegs+'</b><i>Autos gerade unterwegs</i></div></div></div>';
 
   // 2. Reicht es? Fixkosten gegen Tempo
