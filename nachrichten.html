@@ -141,7 +141,7 @@ Ihr Fahrzeug ist damit verbindlich für Sie reserviert.
 
 Wir freuen uns auf Sie!
 
-Haben Sie noch eine Frage zur Abholung? Schreiben Sie uns jederzeit.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t4"><h2 class="thema">Abholung und Rückgabe <span>3</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>*Morgen ist es so weit*
+Haben Sie noch eine Frage zur Abholung? Schreiben Sie uns jederzeit.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t4"><h2 class="thema">Abholung und Rückgabe <span>4</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>*Morgen ist es so weit*
 
 Hallo, Ihr Fahrzeug steht morgen für Sie bereit:
 
@@ -169,7 +169,13 @@ Regulärer Preis:
 
 Ihr Angebotspreis:
 
-Gültig bis zur Rückgabe, eine kurze Nachricht genügt!</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t5"><h2 class="thema">Danach <span>2</span></h2><div class="n" data-k="bewertung"><b>Bewertung</b><div class="v">Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://maps.google.com/?cid=6391553779279645608</div><pre>Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://maps.google.com/?cid=6391553779279645608
+Gültig bis zur Rückgabe, eine kurze Nachricht genügt!</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="__kmpaket__"><b>Kilometerpaket anbieten</b><div class="v">Sie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.</div><select class="miete"><option value="">Fahrzeug wählen, die Pakete kommen automatisch</option></select><pre>*Mehr Kilometer, weniger zahlen*
+
+Sie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.
+
+Fahrzeug:
+
+Welches Paket darf ich Ihnen dazubuchen?</pre><div class="k"><div class="kop">Kopieren</div></div></div></section><section id="t5"><h2 class="thema">Danach <span>2</span></h2><div class="n" data-k="bewertung"><b>Bewertung</b><div class="v">Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://maps.google.com/?cid=6391553779279645608</div><pre>Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://maps.google.com/?cid=6391553779279645608
 Dauert nur eine Minute, herzlichen Dank!
 
 Wir freuen uns, Sie bald wieder bei uns zu begrüßen!</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="nächstesmal"><b>Nächstes Mal</b><div class="v">Schade, dass es diesmal nicht geklappt hat.</div><pre>Schade, dass es diesmal nicht geklappt hat.
@@ -229,11 +235,19 @@ const zahlDE=s=>{s=String(s||"").replace(/[^\d,.]/g,"");if(!s)return 0;if(s.incl
 function zeige(el){const k=el.dataset.k;if(!k||k==="auto")return markieren(el);
   const eig=eigene()[k];let t=eig||BASIS[k];
   if(k==="__anzahlung__"){const m=zahlDE(el.querySelector(".miete").value);if(m)t=t.replace(/^Betrag:[^\n]*$/m,"Betrag: "+eur(Math.round(m*30)/100)+" € (30 % von "+eur(m)+" €)")}
+  if(k==="__kmpaket__")t=kmPaketText(el.querySelector(".miete").value)||BASIS[k];
   if(k!=="__kaution__")el.querySelector("pre").textContent=t;markieren(el);
   const b=el.querySelector("b"),alt=b.querySelector(".eig");if(alt)alt.remove();if(eig){const s=document.createElement("span");s.className="eig";s.textContent="eigener Text";b.appendChild(s)}}
+// Kilometerpaket: Preise je Auto aus der Preisliste, daneben was dieselben Kilometer als Mehrkilometer kosten würden
+let PREISE=null;
+function kmPaketText(name){const c=PREISE&&PREISE.cars.find(x=>(x.anzeige||x.n)===name);if(!c||!c.km||c.km.length<2)return"";
+  const st=PREISE.kmStufen||[50,100,150,200,300];
+  return "*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\n"+
+    "Ihr "+name.replace(" performance"," Performance")+":\n"+st.map((k,i)=>"• +"+k.toLocaleString("de-DE")+" km für "+eur(c.km[i+1])+" € (statt "+eur(k*c.kmPreis)+" €)").join("\n")+
+    "\n\nOhne Paket kostet jeder Mehrkilometer "+eur(c.kmPreis)+" €. Mit dem großen Paket sparen Sie "+eur(st[st.length-1]*c.kmPreis-c.km[st.length])+" €.\n\nWelches Paket darf ich Ihnen dazubuchen?"}
 function alleZeigen(){document.querySelectorAll(".n").forEach(zeige)}
 alleZeigen();
-document.querySelectorAll(".miete").forEach(i=>{i.onclick=e=>e.stopPropagation();i.addEventListener("input",()=>zeige(i.closest(".n")))});
+document.querySelectorAll(".miete").forEach(i=>{i.onclick=e=>e.stopPropagation();["input","change"].forEach(t=>i.addEventListener(t,()=>zeige(i.closest(".n"))))});
 function speichereEigene(k,wert){const st=lies("mietixStand",{});const n=Object.assign({},st.nachrichten||{});if(wert===null)delete n[k];else n[k]=wert;st.nachrichten=n;
   try{localStorage.setItem("mietixStand",JSON.stringify(st))}catch(e){}}
 document.querySelectorAll(".aend").forEach(a=>a.onclick=ev=>{ev.preventDefault();const el=a.closest(".n"),k=el.dataset.k;if(el.querySelector("textarea"))return;
@@ -250,6 +264,8 @@ document.querySelectorAll(".n").forEach(el=>{
   el.querySelector(".kop").onclick=async()=>{const t=textVon(el);try{await navigator.clipboard.writeText(t);{const l=luecken(t);meldung(l.length?"Kopiert. Noch ausfüllen: "+l.join(", "):"Kopiert, jetzt in WhatsApp einfügen")}}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();meldung("Kopiert")}};
 });
 fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(!p||!p.cars)return;
+  PREISE=p;const ks=document.querySelector('[data-k="__kmpaket__"]');
+  if(ks){ks.querySelector(".miete").innerHTML+=p.cars.filter(c=>c.km&&c.km.length>1).sort((a,b)=>b.gp-a.gp).map(c=>'<option>'+(c.anzeige||c.n)+'</option>').join("");zeige(ks)}
   const el=document.querySelector('[data-k="__kaution__"] pre');if(el){el.closest(".n").querySelector(".v").textContent="Die Kaution richtet sich nach dem jeweiligen Fahrzeug";el.textContent=kautionText(p.cars.slice().sort((a,b)=>b.gp-a.gp).map(c=>({n:(c.anzeige||c.n).replace(" performance"," Performance"),kaution:c.kaution})));markieren(el.closest(".n"))}}).catch(()=>{});
 const norm=t=>String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 $("suche").addEventListener("input",()=>{const q=norm($("suche").value).trim();let treffer=0;
