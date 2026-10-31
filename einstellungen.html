@@ -74,6 +74,61 @@ const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v));return true}ca
 // Jede Anfrage an den Speicher höchstens 20 Sekunden (31.10.2026): sonst hing der Abgleich bei schlechtem Netz für immer
 const holeMit=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);return fetch(u,Object.assign({},o,{signal:c.signal})).finally(()=>clearTimeout(t))};
 const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)};
+/* ---------- Unterschriften im eigenen Gerätespeicher (31.10.2026, Baran: auch bei 100 Mietverträgen flüssig, iPad, Handy, Laptop) ----------
+   localStorage hat in Safari nur 5 MB. Bilder (data:image…) liegen darum in IndexedDB (viel größer), in localStorage steht nur "bild:<Kennung>".
+   Der gemeinsame Speicher bekommt immer das ganze Bild, nie die Kennung. Fehlt ein Bild auf dem Gerät, wird es dort geholt.
+   Ohne IndexedDB (privates Fenster) bleibt alles wie vorher im localStorage. */
+const istBild=x=>typeof x==="string"&&x.length>200&&x.startsWith("data:image/");
+const istMarke=x=>typeof x==="string"&&x.startsWith("bild:");
+const h2=s=>{let a=0x811c9dc5;for(let i=0;i<s.length;i++){a^=s.charCodeAt(i);a=Math.imul(a,16777619)}return(a>>>0).toString(36)};
+const MARKEN=new Map(),BILD=new Map();
+const marke=s=>{let m=MARKEN.get(s);if(!m){m="bild:"+s.length.toString(36)+"-"+(Number(hash(s))>>>0).toString(36)+"-"+h2(s);MARKEN.set(s,m)}return m};
+const durch=(x,f)=>typeof x==="string"?f(x):Array.isArray(x)?x.map(y=>durch(y,f)):x&&typeof x==="object"?Object.keys(x).reduce((o,n)=>{o[n]=durch(x[n],f);return o},{}):x;
+let DB=null;
+const dbAuf=()=>DB||(DB=new Promise((ok,no)=>{try{const r=indexedDB.open("mietix",1);r.onupgradeneeded=()=>r.result.createObjectStore("bilder");
+  r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error);r.onblocked=()=>no(new Error("blockiert"))}catch(e){no(e)}}).catch(e=>{DB=null;throw e}));
+const dbRein=paare=>dbAuf().then(db=>new Promise((ok,no)=>{const t=db.transaction("bilder","readwrite"),st=t.objectStore("bilder");
+  paare.forEach(([k,v])=>st.put(v,k));t.oncomplete=()=>ok(true);t.onerror=t.onabort=()=>no(t.error||new Error("IndexedDB"))}));
+const dbHol=k=>dbAuf().then(db=>new Promise(ok=>{const r=db.transaction("bilder").objectStore("bilder").get(k);r.onsuccess=()=>ok(r.result||null);r.onerror=()=>ok(null)})).catch(()=>null);
+// Bilder raus: erst wenn sie sicher im Gerätespeicher liegen, kommt die Kennung zurück (sonst Fehler, dann bleibt das Bild stehen)
+async function bilderRaus(w){const neu=[];const s=durch(w,x=>{if(!istBild(x))return x;const m=marke(x);BILD.set(m,x);neu.push([m,x]);return m});
+  if(neu.length)await dbRein(neu);return s}
+// Alles vom gemeinsamen Speicher einmal in den Gerätespeicher holen (nur nötig, wenn das Gerät Bilder verloren hat)
+let ALLE_BILDER=null;
+function alleBilderHolen(){if(ALLE_BILDER)return ALLE_BILDER;
+  ALLE_BILDER=(async()=>{const neu=[];for(const t of["vorgaenge","stand","papierkorb"]){const z=await api(t+"?select=daten",{method:"GET"})||[];
+      durch(z.map(r=>r.daten),x=>{if(istBild(x)){const m=marke(x);if(!BILD.has(m)){BILD.set(m,x);neu.push([m,x])}}return x})}
+    try{if(neu.length)await dbRein(neu)}catch(e){}})().catch(e=>{ALLE_BILDER=null});return ALLE_BILDER}
+async function bildZuMarke(m){if(BILD.has(m))return BILD.get(m);const d=await dbHol(m);if(d){BILD.set(m,d);return d}return null}
+// Bilder rein: für den gemeinsamen Speicher und für das PDF. null = ein Bild fehlt überall, dann nichts hochschicken.
+async function bilderRein(w){const marken=new Set();durch(w,x=>{if(istMarke(x))marken.add(x);return x});if(!marken.size)return w;
+  for(const m of marken)if(!(await bildZuMarke(m))){if(sitzung&&navigator.onLine)await alleBilderHolen();break}
+  for(const m of marken)if(!BILD.has(m))return null;
+  return durch(w,x=>istMarke(x)?BILD.get(x):x)}
+window.mietixBild=async s=>{if(!istMarke(s))return s;const d=await bildZuMarke(s);if(d)return d;
+  if(sitzung&&navigator.onLine){await alleBilderHolen();if(BILD.has(s))return BILD.get(s)}return""};
+window.mietixBilderRein=bilderRein;
+/* Sicher auslagern: nur Einträge, die genau so schon im gemeinsamen Speicher liegen (Fingerabdruck = Grundlage).
+   Grund: Eine alte, noch offene Mietix-Seite kennt die Kennungen nicht. Stimmt die Grundlage, schickt sie nichts;
+   wäre der Eintrag noch nicht oben, könnte sie sonst die Kennung statt der Unterschrift hochschicken.
+   Die Grundlage wird gleich mit auf die ausgelagerte Form gesetzt (der Fingerabdruck ist derselbe). Ohne Anmeldung: immer. */
+async function sicherRaus(k,w,H){const c=SPEICHER[k];if(!c)return bilderRaus(w);
+  const h=H[k]=H[k]||{zeit:"",hash:{},felder:{}};if(!h.felder)h.felder={};const m=alsMap(k,w);let neu=false;
+  for(const p of Object.keys(m)){if(!JSON.stringify(m[p]).includes('"data:image/'))continue;
+    if(sitzung&&!gleichBasis(m[p],h.hash[p]))continue;   // noch nicht oben: bleibt vorerst ganz
+    m[p]=await bilderRaus(m[p]);neu=true;if(sitzung){h.hash[p]=fp(m[p]);if(FELDWEISE[k])h.felder[p]=felderVon(m[p])}}
+  return neu?ausMap(k,m):w}
+// Was die Seiten mit Bild in den localStorage schreiben, wird kurz danach ausgelagert
+let ausT=null,ausLauf=false;
+const auslagernBald=()=>{clearTimeout(ausT);ausT=setTimeout(auslagern,300)};
+async function auslagern(){if(ausLauf){auslagernBald();return}ausLauf=true;
+  try{for(const k of Object.keys(SPEICHER).concat(["mietixEntwurfProtokolle"])){const r=localStorage.getItem(k);if(!r||r.indexOf('"data:image/')<0)continue;
+      let w;try{w=JSON.parse(r)}catch(e){continue}
+      const H=lies("mietixAbgleich",{}),hv=JSON.stringify(H),s=await sicherRaus(k,w,H);if(s===w)continue;
+      if(localStorage.getItem(k)!==r||(laeuft&&k in SPEICHER)){auslagernBald();continue}   // inzwischen geändert oder Abgleich läuft: gleich noch einmal
+      if(JSON.stringify(lies("mietixAbgleich",{}))!==hv){auslagernBald();continue}
+      if(k in SPEICHER)merk("mietixAbgleich",H);roh.call(localStorage,k,JSON.stringify(s))}}
+  catch(e){}finally{ausLauf=false}}
 let NEU_AUFBAU=false,sitzung=lies("mietixSitzung",null),laeuft=false,nochmal=false,zuletzt=null,fehler="";
 
 /* ---------- Anmeldung ---------- */
@@ -102,12 +157,13 @@ function ausMap(k,m){const c=SPEICHER[k];if(!c.liste)return m;return Object.keys
    - Geändert schlägt Gelöscht: wird ein Eintrag hier geändert und dort gelöscht, bleibt er da.
    - Beim Holen wird zwei Minuten überlappend gefragt, damit kein Eintrag wegen ungleich gehender Uhren fehlt. */
 const UEBERLAPPUNG=2*60*1000;
-const FELDWEISE={mietixVorgaenge:1,mietixAnfragen:1,mietixKunden:1,mietixFahrzeuge:1,mietixAutos:1};
+const FELDWEISE={mietixVorgaenge:1,mietixAnfragen:1,mietixKunden:1,mietixFahrzeuge:1,mietixAutos:1,mietixStand:1};
 // Inhalt unabhängig von der Reihenfolge der Felder (die Datenbank sortiert Felder um)
-const ordne=x=>Array.isArray(x)?x.map(ordne):x&&typeof x==="object"?Object.keys(x).sort().reduce((o,n)=>{o[n]=ordne(x[n]);return o},{}):x;
+const ordne=x=>istBild(x)?marke(x):Array.isArray(x)?x.map(ordne):x&&typeof x==="object"?Object.keys(x).sort().reduce((o,n)=>{o[n]=ordne(x[n]);return o},{}):x;
 const fp=x=>hash(JSON.stringify(ordne(x))===undefined?"":JSON.stringify(ordne(x)));
 // Fingerabdruck stimmt mit der Grundlage überein (neue Form oder die Form vor dem 30.10.2026)
-const gleichBasis=(x,b)=>b!==undefined&&(fp(x)===b||hash(JSON.stringify(x))===b);
+const ordneRoh=x=>Array.isArray(x)?x.map(ordneRoh):x&&typeof x==="object"?Object.keys(x).sort().reduce((o,n)=>{o[n]=ordneRoh(x[n]);return o},{}):x;
+const gleichBasis=(x,b)=>b!==undefined&&(fp(x)===b||hash(JSON.stringify(x))===b||hash(JSON.stringify(ordneRoh(x)))===b);
 // Fingerabdruck je Feld, bei Unterobjekten (zahlung, ueb, rueck …) zusätzlich je Unterfeld "feld.unter" (31.10.2026: zwei Handys, zwei Zahlungen)
 const istObj=x=>x&&typeof x==="object"&&!Array.isArray(x);
 const felderVon=x=>{const f={};if(istObj(x))Object.keys(x).forEach(n=>{f[n]=fp(x[n]);if(istObj(x[n]))Object.keys(x[n]).forEach(u=>f[n+"."+u]=fp(x[n][u]))});return f};
@@ -168,23 +224,30 @@ async function abgleichen(){
         // Grundlage für das nächste Mal ist jetzt der gemeinsame Stand
         if(z.daten&&z.daten._weg){h.hash[p]="weg";delete h.felder[p]}
         else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
-      if(anders){if(!merk(k,ausMap(k,m2)))throw new Error("Speicher auf diesem Gerät voll");geholt.push(k)}
+      if(anders){let w=ausMap(k,m2);try{w=await sicherRaus(k,w,H)}catch(e){}
+        if(!merk(k,w))throw new Error("Speicher auf diesem Gerät voll");geholt.push(k)}
       // 2) hoch: alles, was hier anders ist als der gemeinsame Stand (auch Gelöschtes)
       const m=alsMap(k,lies(k,c.liste?[]:{})),jetzt=new Date().toISOString(),hoch=[];
-      Object.keys(m).forEach(p=>{if(gleichBasis(m[p],h.hash[p])){h.hash[p]=fp(m[p]);return}hoch.push({[c.pk]:p,daten:m[p],geaendert:jetzt})});
+      let ohneBild=0;
+      for(const p of Object.keys(m)){if(gleichBasis(m[p],h.hash[p])){h.hash[p]=fp(m[p]);continue}
+        const daten=await bilderRein(m[p]);if(daten===null){ohneBild++;continue}   // nie eine Kennung statt Unterschrift hochschicken
+        hoch.push({[c.pk]:p,daten,geaendert:jetzt})}
+      if(ohneBild)fehler="Unterschrift fehlt auf diesem Gerät ("+ohneBild+"x), bitte Baran Bescheid geben";
       Object.keys(h.hash).forEach(p=>{if(!(p in m)&&h.hash[p]!=="weg")hoch.push({[c.pk]:p,daten:{_weg:true},geaendert:jetzt})});
       for(let i=0;i<hoch.length;i+=200)await api(c.tab+"?on_conflict="+c.pk,{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(hoch.slice(i,i+200))});
       hoch.forEach(z=>{const p=z[c.pk];if(z.daten._weg){h.hash[p]="weg";delete h.felder[p]}else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
       if(k==="mietixVorgaenge"){const max=Math.max(0,...Object.keys(m).filter(n=>/^\d{6}$/.test(n)).map(Number));
         if(max)await api("rpc/vertragsnummer_mindestens",{method:"POST",body:JSON.stringify({n:max})})}
       merk("mietixAbgleich",H)}
+    if(fehler)throw new Error(fehler);
     zuletzt=new Date();if(NEU_AUFBAU){merk("mietixNeuAufbau1",true);NEU_AUFBAU=false}
     if(geholt.length)window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:geholt}));
   }catch(e){fehler=e.message||"Abgleich fehlgeschlagen"}
-  laeuft=false;zeigen();if(nochmal){nochmal=false;setTimeout(abgleichen,500)}}
+  laeuft=false;zeigen();auslagernBald();if(nochmal){nochmal=false;setTimeout(abgleichen,500)}}
 // Jede Änderung an den vier Speichern löst kurz danach einen Abgleich aus
 let warte=null;
 Storage.prototype.setItem=function(k,v){const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);
+  if(this===localStorage&&(SPEICHER[k]||k==="mietixEntwurfProtokolle")&&typeof v==="string"&&v.indexOf('"data:image/')>=0)auslagernBald();
   if(this===localStorage&&SPEICHER[k]){clearTimeout(warte);warte=setTimeout(abgleichen,800);if(k!=="mietixStand"&&k!=="mietixPapierkorb")sicherheitsnetz(k,alt,v)}};
 
 /* ---------- Sicherheitsnetz (28.10.2026, Baran: "Verklicken darf nichts verlieren") ----------
@@ -311,7 +374,7 @@ document.head.appendChild(css);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
 window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
 setInterval(abgleichen,60000);
-zeigen();abgleichen();
+zeigen();abgleichen();auslagernBald();
 })();
 </script>
 <script>
