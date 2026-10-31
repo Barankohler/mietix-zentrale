@@ -135,7 +135,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
       WA_NACH.push({t:a.name||a.nummer,i:"Angebot nachfragen"+(a.auto?", "+a.auto:""),tel:a.nummer,text:txt,mark:{anf:a.id}})});
     const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
     anf.filter(a=>a.status==="gebucht"&&a.von&&a.von<=mo&&a.von>=iso(new Date(Date.now()-864e5))&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von))
-      .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",uhrM:a.vonU||"",morgen:a.von===mo,t:a.name||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
+      .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",uhrM:a.vonU||"",morgen:a.von===mo,t:a.name||a.nummer||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
     // alles von morgen in den eigenen Abschnitt, dort mit Uhrzeit statt „morgen“
     for(let i=out.length-1;i>=0;i--){const x=out[i];if(/(Abholung|Rückgabe) morgen \(/.test(x.i)||(x.k==="Mietvertrag"&&x.morgen)){morgen.unshift(Object.assign({},x,{i:x.i.replace(/, (Abholung|Rückgabe) morgen \(.*\)$/,", $1"),uhr:x.uhrM||""}));out.splice(i,1)}}
     out.push(...rest);
