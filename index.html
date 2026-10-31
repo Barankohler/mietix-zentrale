@@ -44,6 +44,27 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
 .tipp{font-size:12px;color:var(--grau);text-align:center;margin-top:14px;line-height:1.5}
 /* 31.10.2026: Gruß, Suche, Fortschritt, Erfolg */
 #gruss{font-size:15px;font-weight:700;color:var(--grau);margin:-4px 4px 12px}#gruss b{color:var(--ink)}
+/* 31.10.2026: vier Zahlen und Umsatz-Karte */
+.zk{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.zk a{display:block;background:#fff;border-radius:18px;padding:14px 4px 12px;text-align:center;text-decoration:none;color:var(--ink);box-shadow:0 1px 0 rgba(0,0,0,.03);min-width:0}
+.zk a:active{background:#F0F0F2}
+.zk b{display:block;font-size:32px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.zk i{display:block;font-style:normal;font-size:10px;font-weight:800;letter-spacing:.3px;color:#6E6E73;margin-top:6px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zk em{display:block;font-style:normal;font-size:12px;font-weight:600;color:var(--grau);margin-top:3px;line-height:1.2}
+.zk .gr b{color:var(--gruen)}.zk .rt b{color:var(--rot)}.zk .alarm{background:#FDECEC;box-shadow:inset 0 0 0 2px #F3B7B9}.zk .alarm b{color:var(--rot)}
+.um{display:block;background:#1C1C1E;color:#fff;border-radius:20px;padding:16px 16px 14px;margin-bottom:12px;text-decoration:none}
+.umz{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.umt{font-size:12px;font-weight:800;letter-spacing:.8px;color:#A1A1A6;text-transform:uppercase}.umm{font-size:14px;font-weight:700;color:#D1D1D6;white-space:nowrap}
+.umg{display:block;font-size:40px;font-weight:800;letter-spacing:-1px;margin-top:2px;font-variant-numeric:tabular-nums}
+.umb{position:relative;display:block;height:14px;background:#3A3A3C;border-radius:7px;margin:12px 0 6px}
+.umv{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#C4161C,#FF5A5F);border-radius:7px;transition:width .6s ease}.umv.gut{background:linear-gradient(90deg,#1E9E5A,#4CD38A)}
+.umf{position:absolute;right:0;top:-4px;bottom:-4px;width:3px;background:#fff;border-radius:2px}
+.umu{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:#A1A1A6;font-weight:600}.umu b{color:#fff}
+.umzl{display:grid;gap:7px;margin-top:12px;border-top:1px solid #3A3A3C;padding-top:10px;font-size:14px;font-weight:600;color:#D1D1D6}
+.umzl>span{display:flex;justify-content:space-between;gap:8px}.umzl b{color:#fff;white-space:nowrap}.umzl .neg{color:#FF6B6B}.umzl .pos{color:#4CD38A}
+.zk a{padding:14px 3px 12px}
+@media(min-width:700px){.zk i{font-size:11px;letter-spacing:.6px}}
+@media(max-width:360px){.zk{gap:6px}.zk b{font-size:26px}.zk i{font-size:9px;letter-spacing:0}.zk em{font-size:11px}.umg{font-size:34px}}
 .such{position:relative;margin-bottom:12px}
 .such input{width:100%;border:0;border-radius:16px;background:#fff;padding:15px 16px 15px 46px;font-size:17px;font-weight:600;box-shadow:0 1px 0 rgba(0,0,0,.03);-webkit-appearance:none;outline:none}
 .such input:focus{box-shadow:0 0 0 2px var(--rot)}
@@ -65,11 +86,12 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 <div id="stand"><div id="abgleich"></div><div id="bruecke" class="tipp" style="text-align:left;margin:0 4px 6px"></div></div>
 
 <div id="gruss"></div>
+<div class="zk" id="zk"><a class="gr" href="https://barankohler.github.io/mietix-belegung/"><b id="zkU">&nbsp;</b><i>Unterwegs</i><em>bei Kunden</em></a><a id="zkSt" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot"><b id="zkS">&nbsp;</b><i>Stehen</i><em id="zkST">jetzt vermieten</em></a><a href="https://barankohler.github.io/mietix-vertrag/"><b id="zkUe">&nbsp;</b><i>Übergabe</i><em id="zkUeT">heute</em></a><a class="rt" href="https://barankohler.github.io/mietix-vertrag/"><b id="zkR">&nbsp;</b><i>Rückgabe</i><em id="zkRT">heute</em></a></div><a class="um versteckt" id="um" href="https://barankohler.github.io/mietix-zentrale/statistik.html"><span class="umz"><span class="umt" id="umT">Mietumsatz</span><span class="umm" id="umM"></span></span><span class="umg" id="umG"></span><span class="umb"><span class="umv" id="umV"></span><span class="umf"></span></span><span class="umu"><span id="umP"></span><span id="umF"></span></span><span class="umzl" id="umZ"></span></a>
 <div class="such"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="suche" type="search" placeholder="Kunde, Auto, Nummer, Telefon" autocomplete="off" enterkeyhint="search"></div>
 <div id="treffer"></div>
 <div class="kacheln" style="margin-top:6px"><a class="kachel" href="https://barankohler.github.io/mietix-anfragen/" data-zaehler="anfragen"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>Anfragen</a><a class="kachel" href="https://barankohler.github.io/mietix-belegung/"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Kalender</a><a class="kachel" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 12h3M13 12h3M8 16h3M13 16h3"/></svg>Angebot</a><a class="kachel" href="https://barankohler.github.io/mietix-vertrag/" data-zaehler="vertraege"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Mietverträge</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/kunden.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Kunden</a><a class="kachel" href="https://barankohler.github.io/mietix-autos/" data-zaehler="autos"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M3 13l2-5h14l2 5v5H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/></svg>Autos</a><a class="kachel" href="https://barankohler.github.io/mietix-geld/"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="12" cy="12" r="2.5"/></svg>Geld</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/statistik.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Zahlen</a><a class="kachel" href="https://barankohler.github.io/mietix-schadensabrechnung/" data-zaehler="schaeden"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h0"/></svg>Schäden</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/nachrichten.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>Nachrichten</a></div>
 
-<h2 id="heuteTitel">Heute</h2>
+<h2 id="heuteTitel">Zu erledigen</h2>
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
 <h2 id="waTitel" class="versteckt">WhatsApp heute</h2>
 <div class="k versteckt" id="waK"><button type="button" class="waNext" id="waNext">Nächste senden ›</button><div id="wa"></div></div>
@@ -98,7 +120,6 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     return '<a class="z" href="'+a.href+'"'+(a.nf?' data-nf="'+esc(a.nf)+'"':"")+'><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><span class="t"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></span><span class="chip'+(a.art?" "+a.art:"")+'">'+a.k+'</span></a>'}
   function zeichne(){
     const h=new Date(),hi=iso(h),m=new Date();m.setDate(m.getDate()+1);const mo=iso(m);
-    document.getElementById("heuteTitel").textContent="Heute, "+WT[h.getDay()]+" "+h.getDate()+"."+(h.getMonth()+1)+".";
     const kunden0=lies("mietixKunden",{}),alle=lies("mietixVorgaenge",[]),v=alle.filter(x=>x.status!=="zurück"),anf=lies("mietixAnfragen",[]),auf=lies("mietixAufgaben",[]),zust=lies("mietixZustand",[]);
     const out=[];
     const tag=d=>d<hi?"überfällig seit "+de(d):d===hi?"heute":"morgen ("+WT[m.getDay()]+" "+de(mo)+")",morgen=[];   // „morgen“ immer mit Datum (Baran, 31.10.2026)   // Morgen steht seit 31.10.2026 in einem eigenen Abschnitt (Baran)
@@ -139,6 +160,9 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
       .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",uhrM:a.vonU||"",morgen:a.von===mo,t:a.name||a.nummer||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
     // alles von morgen in den eigenen Abschnitt, dort mit Uhrzeit statt „morgen“
     for(let i=out.length-1;i>=0;i--){const x=out[i];if(/(Abholung|Rückgabe) morgen \(/.test(x.i)||(x.k==="Mietvertrag"&&x.morgen)){morgen.unshift(Object.assign({},x,{i:x.i.replace(/, (Abholung|Rückgabe) morgen \(.*\)$/,", $1"),uhr:x.uhrM||""}));out.splice(i,1)}}
+    zahlenZeichnen(alle,anf,hi);
+    for(let i=out.length-1;i>=0;i--)if(["Übergabe","Rückgabe","Mietvertrag"].includes(out[i].k))out.splice(i,1);
+    morgen.length=0;
     out.push(...rest);
     const autoPunkte=[];auf.filter(a=>!a.erledigt&&!a._weg&&a.aufgabe&&a.bis&&a.bis<=hi).forEach(a=>autoPunkte.push({t:a.aufgabe,i:a.bis<hi?"überfällig seit "+de(a.bis):"heute fällig",k:"Aufgabe",art:"gelb",href:B+"mietix-autos/?zeige=aufgaben"}));
     zust.filter(z=>!z.erledigt&&z.auto).forEach(z=>autoPunkte.push({t:z.auto,i:z.text+(z.datum?", seit "+de(z.datum):""),k:"Zustand",art:"gelb",href:B+"mietix-autos/"}));
@@ -148,8 +172,9 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     // Fortschritt heute: erledigte Übergaben und Rückgaben von heute gegen alles, was heute ansteht (31.10.2026)
     const erl=alle.filter(x=>x.ueb&&String(x.ueb.datum||"").slice(0,10)===hi).length+alle.filter(x=>x.rueck&&String(x.rueck.datum||"").slice(0,10)===hi).length;
     const offenHeute=out.filter(x=>x.k==="Übergabe"||x.k==="Rückgabe").length,ges=erl+offenHeute;
-    const fo=document.getElementById("fort");fo.classList.toggle("versteckt",!ges);
+    const fo=document.getElementById("fort");fo.classList.add("versteckt");
     if(ges){fo.querySelector("i").style.width=Math.round(erl/ges*100)+"%";fo.querySelector("span").textContent=erl+" von "+ges+" erledigt"}
+    document.getElementById("heuteTitel").classList.toggle("versteckt",!out.length);document.getElementById("heuteK").classList.toggle("versteckt",!out.length);
     document.getElementById("heute").innerHTML=out.length?out.map(zeile).join(""):(erl?'<div class="fertig">Alles erledigt ✓<i>'+erl+(erl===1?" Übergabe oder Rückgabe":" Übergaben und Rückgaben")+' heute. Stark!</i></div>':'<div class="fertig" style="color:var(--grau)">Heute ist nichts zu tun ✓<i>Alles im Griff.</i></div>');
     const mt=document.getElementById("morgenTitel");mt.textContent="Morgen, "+WT[m.getDay()]+" "+m.getDate()+"."+(m.getMonth()+1)+".";
     mt.classList.toggle("versteckt",!morgen.length);document.getElementById("morgenK").classList.toggle("versteckt",!morgen.length);
@@ -185,6 +210,32 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     else{p.className="gruen";text="Angemeldet, alles gesichert."}
     document.getElementById("bruecke").textContent=text;
   }
+  // Vier Zahlen und Umsatz-Karte (31.10.2026, Baran: „4 Autos stehen, wir müssen Gas geben“)
+  function zahlenZeichnen(alle,anf,hi){
+    const lebt=x=>x.status!=="storniert"&&!x._weg,nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
+    const flotte=PREISE&&PREISE.cars?PREISE.cars.map(c=>c.anzeige||c.n):null,name=a=>{const c=PREISE&&PREISE.cars&&PREISE.cars.find(c=>c.n===a||c.anzeige===a);return c?(c.anzeige||c.n):a};
+    const weg=new Set(alle.filter(x=>lebt(x)&&x.ueb&&x.status!=="zurück"&&x.auto).map(x=>name(x.auto)));
+    const gesperrt=new Set(lies("mietixSperren",[]).filter(s=>!s._weg&&s.auto&&s.von&&s.bis&&s.von<=hi&&s.bis>=hi).map(s=>name(s.auto)));
+    const set=(id,t)=>{document.getElementById(id).textContent=t};
+    set("zkU",weg.size);
+    if(flotte){const steht=flotte.filter(a=>!weg.has(a)&&!gesperrt.has(a)).length;set("zkS",steht);
+      document.getElementById("zkSt").className=steht?"alarm":"gr";set("zkST",steht?"jetzt vermieten":"alle unterwegs")}
+    const ue=alle.filter(x=>lebt(x)&&x.vonD===hi),ueA=anf.filter(a=>a.status==="gebucht"&&a.von===hi&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von));
+    const ueE=ue.filter(x=>x.ueb).length,ueN=ue.length+ueA.length;set("zkUe",ueN);set("zkUeT",ueN&&ueE?ueE+" erledigt":"heute");
+    const ru=alle.filter(x=>lebt(x)&&x.bisD===hi&&x.ueb),ruE=ru.filter(x=>x.status==="zurück").length;set("zkR",ru.length);set("zkRT",ru.length&&ruE?ruE+" erledigt":"heute");
+    // Umsatz-Karte: Mietumsatz des Monats aus der Excel (Brücke), gegen Fixkosten und Vormonat bis zum selben Tag
+    const st=(lies("mietixStand",{})||{}).statistik||{},mon=hi.slice(0,7),M=(st.monate||[]).find(x=>x.m===mon),fix=+((st.fix||{}).gesamt)||0;
+    const um=document.getElementById("um");um.classList.toggle("versteckt",!M);if(!M)return;
+    const MN=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],e0=n=>Math.round(+n||0).toLocaleString("de-DE")+" €";
+    const miete=+M.miete||0;set("umT","Mietumsatz "+MN[+mon.slice(5)-1]);set("umM",(+M.mieten||0)+((+M.mieten||0)===1?" Miete":" Mieten"));set("umG",e0(miete));
+    const pr=fix?Math.min(100,Math.round(miete/fix*100)):0,v=document.getElementById("umV");v.style.width=(fix?pr:0)+"%";v.classList.toggle("gut",fix>0&&miete>=fix);
+    document.getElementById("umP").textContent=fix?(miete>=fix?"Fixkosten gedeckt":pr+" % der Fixkosten"):"";
+    document.getElementById("umF").innerHTML=fix?"Fixkosten <b>"+e0(fix)+"</b>":"";
+    const vg=st.vergleich||{},vm=+vg.vormonatMieteBisTag||0,z=[];
+    if(fix)z.push(miete>=fix?["Über den Fixkosten","+"+e0(miete-fix),"pos"]:["Bis zu den Fixkosten fehlen",e0(fix-miete),"neg"]);
+    if(vm>0&&vg.vormonat){const d=Math.round((miete/vm-1)*100);z.push([vg.vormonat+" bis zum "+vg.tag+".",e0(vm)+'  <span class="'+(d>=0?"pos":"neg")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+" %</span>",""])}
+    if(+((st.fix||{}).proTag))z.push(["Jeder Tag kostet",e0(st.fix.proTag),""]);
+    document.getElementById("umZ").innerHTML=z.map(x=>'<span><span>'+esc(x[0])+'</span><b class="'+x[2]+'">'+x[1]+'</b></span>').join("")}
   // WhatsApp heute (31.10.2026, Baran: „morgens alle Nachrichten auf einmal“, Verlängerung und km-Paket als Umsatzbringer)
   let PREISE=null;fetch("https://barankohler.github.io/mietix-preise/preise.json").then(r=>r.json()).then(j=>{PREISE=j;zeichne()}).catch(()=>{});
   const eur2=n=>{n=+n||0;return n.toLocaleString("de-DE",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})};
