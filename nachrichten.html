@@ -174,7 +174,7 @@ Regulärer Preis:
 
 Ihr Angebotspreis:
 
-Gültig bis zur Rückgabe, eine kurze Nachricht genügt!</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t6"><h2 class="thema">Danach <span>2</span></h2><div class="n" data-k="bewertung"><b>Bewertung</b><div class="v">Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://maps.google.com/?cid=6391553779279645608</div><pre>Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://maps.google.com/?cid=6391553779279645608
+Gültig bis zur Rückgabe, eine kurze Nachricht genügt!</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t6"><h2 class="thema">Danach <span>2</span></h2><div class="n" data-k="bewertung"><b>Bewertung</b><div class="v">Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://search.google.com/local/writereview?placeid=ChIJ1-FCSDWXvUcRqMvEYExcs1g</div><pre>Wenn Ihnen die Fahrt gefallen hat, würden wir uns über eine kurze Google-Bewertung riesig freuen: https://search.google.com/local/writereview?placeid=ChIJ1-FCSDWXvUcRqMvEYExcs1g
 Dauert nur eine Minute, herzlichen Dank!
 
 Wir freuen uns, Sie bald wieder bei uns zu begrüßen!</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="nächstesmal"><b>Nächstes Mal</b><div class="v">Schade, dass es diesmal nicht geklappt hat.</div><pre>Schade, dass es diesmal nicht geklappt hat.
@@ -235,7 +235,7 @@ function zeige(el){const k=el.dataset.k;if(!k||k==="auto")return markieren(el);
   const eig=eigene()[k];let t=eig||BASIS[k];
   if(k==="__anzahlung__"){const m=zahlDE(el.querySelector(".miete").value);if(m)t=t.replace(/^Betrag:[^\n]*$/m,"Betrag: "+eur(Math.round(m*30)/100)+" € (30 % von "+eur(m)+" €)")}
   if(k==="__kmpaket__")t=kmPaketText(el.querySelector(".miete").value)||BASIS[k];
-  if(k!=="__kaution__")el.querySelector("pre").textContent=t;markieren(el);
+  if(k!=="__kaution__")el.querySelector("pre").textContent=mitDatum(t);markieren(el);
   const b=el.querySelector("b"),alt=b.querySelector(".eig");if(alt)alt.remove();if(eig){const s=document.createElement("span");s.className="eig";s.textContent="eigener Text";b.appendChild(s)}}
 // Kilometerpaket: Preise je Auto aus der Preisliste, daneben was dieselben Kilometer als Mehrkilometer kosten würden
 let PREISE=null;
@@ -244,6 +244,13 @@ function kmPaketText(name){const c=PREISE&&PREISE.cars.find(x=>(x.anzeige||x.n)=
   return "*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\n"+
     "Ihr "+name.replace(" performance"," Performance")+", für Ihre ganze Miete:\n"+st.map((k,i)=>"• +"+k.toLocaleString("de-DE")+" km für "+eur(c.km[i+1])+" € (statt "+eur(k*c.kmPreis)+" €)").join("\n")+
     "\n\nOhne Paket kostet jeder Mehrkilometer "+eur(c.kmPreis)+" €. Mit dem großen Paket sparen Sie "+eur(st[st.length-1]*c.kmPreis-c.km[st.length])+" €.\n\nWelches Paket darf ich Ihnen dazubuchen?"}
+// „morgen“ und „übermorgen“ bekommen immer das Datum dazu (31.10.2026, Baran: „damit wir auf der sicheren Seite sind“).
+// Überschriften (*…*) bleiben, steht schon ein Datum dahinter, passiert nichts.
+const WTAG=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+function tagText(n){const d=new Date();d.setDate(d.getDate()+n);return WTAG[d.getDay()]+", "+String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear()}
+function mitDatum(t){return String(t).split("\n").map(z=>/^\s*\*/.test(z)?z:z.replace(/(^|[^A-Za-zÄÖÜäöüß])(übermorgen|Übermorgen|morgen|Morgen)(?![A-Za-zäöüß])/g,(all,vor,w,pos,str)=>{
+    const rest=str.slice(pos+all.length);if(/^,?\s*(\(|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag|\d{1,2}\.\d)/.test(rest))return all;
+    const dat=tagText(/^ü/i.test(w)?2:1);return vor+w+(/^\s*[A-Za-zÄÖÜäöüß0-9]/.test(rest)?", "+dat+",":" ("+dat+")")})).join("\n")}
 function alleZeigen(){document.querySelectorAll(".n").forEach(zeige)}
 alleZeigen();
 document.querySelectorAll(".miete").forEach(i=>{i.onclick=e=>e.stopPropagation();["input","change"].forEach(t=>i.addEventListener(t,()=>zeige(i.closest(".n"))))});
