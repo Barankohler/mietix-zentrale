@@ -599,4 +599,26 @@ zeigen();abgleichen();
   window.mxEinheit=alle;alle();
   new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input"))setzen(n);else if(n.querySelectorAll)alle(n)}})
     .observe(document.body,{childList:true,subtree:true})})();
+</script><script>
+/* Anschrift getrennt (31.10.2026) */
+(function(){if(window.mxAnschrift)return;
+  const desc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
+  const st=document.createElement("style");st.textContent=".mxAZ{display:grid;grid-template-columns:minmax(90px,32%) 1fr;gap:10px}.mxAZ>div{min-width:0}.mxAZ input{width:100%;box-sizing:border-box}";document.head.appendChild(st);
+  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/);
+    if(m){s=m[1].trim().replace(/,$/,"");p=m[2];o=m[3].trim()}else if(voll)s=v;else o=v;return{s,p,o}}
+  function setzen(inp){if(inp.dataset.mxA)return;inp.dataset.mxA="1";const voll=inp.dataset.anschrift!=="plzort";
+    const lab=inp.previousElementSibling&&inp.previousElementSibling.tagName==="LABEL"?inp.previousElementSibling:null;
+    const ic=inp.className,lc=lab?lab.className:"",feld=(t,l,extra)=>lab?'<label class="'+lc+'">'+l+'</label><input class="'+ic+'" data-t="'+t+'" autocomplete="off"'+(extra||"")+'>':'<input class="'+ic+'" data-t="'+t+'" placeholder="'+l+'" autocomplete="off"'+(extra||"")+'>';
+    const w=document.createElement("div");w.className="mxAnschr";
+    w.innerHTML=(voll?feld("s","Straße und Hausnummer"):"")+'<div class="mxAZ"><div>'+feld("p","PLZ",' inputmode="numeric" maxlength="5"')+'</div><div>'+feld("o","Wohnort")+'</div></div>';
+    inp.after(w);inp.style.display="none";if(lab)lab.style.display="none";
+    const f=t=>w.querySelector('[data-t="'+t+'"]');
+    const verteilen=v=>{const x=teile(v,voll);if(f("s"))desc.set.call(f("s"),x.s);desc.set.call(f("p"),x.p);desc.set.call(f("o"),x.o)};
+    const zusammen=()=>{const s=f("s")?desc.get.call(f("s")).trim():"",p=desc.get.call(f("p")).trim(),o=desc.get.call(f("o")).trim(),po=(p+" "+o).trim();return voll?[s,po].filter(Boolean).join(", "):po};
+    Object.defineProperty(inp,"value",{configurable:true,get(){return desc.get.call(this)},set(v){desc.set.call(this,v);verteilen(v)}});
+    verteilen(desc.get.call(inp));
+    w.querySelectorAll("input").forEach(e=>e.addEventListener("input",()=>{desc.set.call(inp,zusammen());inp.dispatchEvent(new Event("input",{bubbles:true}));inp.dispatchEvent(new Event("change",{bubbles:true}))}))}
+  window.mxAnschrift=setzen;
+  const alle=w=>(w||document).querySelectorAll("input[data-anschrift]").forEach(setzen);alle();
+  new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input[data-anschrift]"))setzen(n);else if(n.querySelectorAll)alle(n)}}).observe(document.body,{childList:true,subtree:true})})();
 </script></body></html>

@@ -3,33 +3,32 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#C4161C">
 <title>Mietix Nachrichten</title><link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--rot:#C4161C;--text:#2E2E30;--rand:#E4E4E7;--grau:#6F6F72;--bg:#F6F6F7;--gruen:#1B8A4B}
+:root{--rot:#C4161C;--text:#1C1C1E;--rand:#E5E5EA;--grau:#8E8E93;--bg:#F2F2F7;--gruen:#1B8A4B}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.35}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.35}
 header{background:#fff;border-bottom:3px solid var(--rot);padding:calc(12px + env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:5}
 header h1{font-size:20px;font-weight:900}header h1 span{color:var(--rot)}header a{font-size:13px;color:var(--grau);text-decoration:none;float:right;margin-top:3px}
 main{max-width:680px;margin:0 auto;padding:14px 16px 60vh}
-h2.thema{font-size:24px;font-weight:900;color:var(--text);margin:28px 4px 10px;display:flex;align-items:center;gap:10px;scroll-margin-top:150px}
-h2.thema span{background:var(--rot);color:#fff;font-size:12px;border-radius:999px;padding:2px 9px}
+h2.thema{font-size:22px;font-weight:700;letter-spacing:-.3px;color:var(--text);margin:28px 4px 10px;display:flex;align-items:center;gap:10px;scroll-margin-top:150px}
+h2.thema span{background:#E5E5EA;color:#3A3A3C;font-size:12px;border-radius:999px;padding:2px 9px}
 .sprung{position:sticky;top:calc(52px + env(safe-area-inset-top));z-index:4;display:flex;gap:7px;overflow-x:auto;padding:10px 0;background:var(--bg);scrollbar-width:none}
 .sprung::-webkit-scrollbar{display:none}
 .sprung a{flex:0 0 auto;background:#fff;border:1px solid var(--rand);border-radius:999px;padding:8px 13px;font-weight:800;font-size:14px;color:var(--text);text-decoration:none}
 .sprung{flex-wrap:wrap;overflow-x:visible}   /* fünf Punkte, alle auf einen Blick (30.10.2026) */
 .sprung a.an{background:var(--rot);border-color:var(--rot);color:#fff}
-.n{background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--rand)}
-.n b{display:block;font-size:16px}.n .v{font-size:13px;color:var(--grau);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.n pre{display:none;white-space:pre-wrap;font:14px/1.45 Inter,system-ui,sans-serif;background:var(--bg);border-radius:12px;padding:12px;margin-top:10px}
+.n{background:#fff;border-radius:12px;padding:13px 14px;margin-bottom:8px;border:0}
+.n b{display:block;font-size:16px;font-weight:600}.n .v{font-size:13px;color:var(--grau);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.n pre{display:none;white-space:pre-wrap;font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;background:var(--bg);border-radius:12px;padding:12px;margin-top:10px}
 .n.auf pre{display:block}.miete{display:none}.n.auf .miete{display:block}
-.k{display:flex;gap:8px;margin-top:10px}.k div,.k a{flex:1;text-align:center;border-radius:12px;padding:10px;font-weight:800;font-size:14px;cursor:pointer;text-decoration:none}
-.k .kop{background:var(--rot);color:#fff}.k .wa{background:#25D366;color:#fff}.k .pdf{background:#fff;color:var(--text);border:1.5px solid var(--rand)}
+.k{display:flex;gap:8px;margin-top:10px}.k div,.k a{flex:1;text-align:center;border-radius:12px;padding:11px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none}
+.k .kop{background:var(--bg);color:var(--rot)}.k .wa{background:#25D366;color:#fff}.k .pdf{background:#fff;color:var(--text);border:1.5px solid var(--rand)}
 .hinweis{font-size:13px;color:var(--grau);margin:0 4px 6px}
-input{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px Inter,system-ui,sans-serif;min-height:46px;background:#fff}
-#suche{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px Inter,system-ui,sans-serif;min-height:46px;background:#fff}
-.miete{width:100%;border:1.5px solid #FFE58A;background:#FFFBEA;border-radius:12px;padding:11px;font:700 16px Inter,system-ui,sans-serif;min-height:44px;margin-top:10px}
+input{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:46px;background:#fff}
+#suche{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:46px;background:#fff}
+.miete{width:100%;border:1.5px solid #FFE58A;background:#FFFBEA;border-radius:12px;padding:11px;font:700 16px -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:44px;margin-top:10px}
 .aend{display:none;font-size:13px;color:var(--grau);font-weight:700;margin-top:10px;text-decoration:none}.n.auf .aend{display:inline-block}
-.n textarea{width:100%;min-height:220px;border:1.5px solid var(--rot);border-radius:12px;padding:12px;font:14px/1.45 Inter,system-ui,sans-serif;margin-top:10px}
+.n textarea{width:100%;min-height:220px;border:1.5px solid var(--rot);border-radius:12px;padding:12px;font:14px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;margin-top:10px}
 .n .eig{display:inline-block;background:#E8F6EE;color:var(--gruen);font-size:11px;font-weight:800;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
 .k .hell{background:#fff;color:var(--text);border:1.5px solid var(--rand)}
 pre mark{background:#FFE58A;border-radius:4px;padding:0 3px;color:inherit}
@@ -41,7 +40,7 @@ pre mark{background:#FFE58A;border-radius:4px;padding:0 3px;color:inherit}
 <header><h1>MIETIX <span>NACHRICHTEN</span></h1></header>
 <main>
 <div id="abgleich"></div>
-<input id="suche" type="search" autocomplete="off" placeholder="Suchen, z. B. Kaution, Anzahlung, R8">
+<input id="suche" type="search" autocomplete="off" placeholder="Kaution, Anzahlung, R8 …">
 <div class="hinweis" style="margin-top:8px">Antippen zeigt den ganzen Text. Gelb markiert = noch ausfüllen.</div>
 <nav class="sprung"><a href="#t1">Kaution</a><a href="#t2">Reservierung</a><a href="#t3">Anzahlung</a><a href="#t4">Kilometerpakete</a><a href="#t7">Fahrzeuge</a><a href="#mietbedingungen">Mietbedingungen</a></nav><section id="t0"><h2 class="thema">Erster Kontakt <span>6</span></h2><div class="n" data-k="willkommen"><b>Willkommen</b><div class="v">Bitte senden Sie uns Ihren gewünschten Buchungszeitraum (Abhol- und Rückgabedatum). Im Anschluss erhalten Sie von uns die verfügbaren Fahrzeuge inklusive Preisen für diesen Zeitraum.</div><pre>*Herzlich willkommen bei Mietix 😊*
 Danke für Ihr Vertrauen in unsere Sportwagenvermietung!
@@ -124,7 +123,7 @@ Für den Mietvertrag benötige ich noch folgende Angaben von Ihnen:
 
 3. Geburtsdatum:
 
-Ihre Daten behandeln wir selbstverständlich vertraulich.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t3"><h2 class="thema">Anzahlung <span>2</span></h2><div class="n" data-k="__anzahlung__"><b>Anzahlung 30 Prozent</b><div class="v">Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.</div><input class="miete" type="text" inputmode="decimal" placeholder="Mietpreis eintragen, die 30 % werden ausgerechnet"><pre>*Anzahlung*
+Ihre Daten behandeln wir selbstverständlich vertraulich.</pre><div class="k"><div class="kop">Kopieren</div></div><a href="#" class="aend">Text ändern</a></div></section><section id="t3"><h2 class="thema">Anzahlung <span>2</span></h2><div class="n" data-k="__anzahlung__"><b>Anzahlung 30 Prozent</b><div class="v">Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.</div><input class="miete" type="text" inputmode="decimal" placeholder="Mietpreis"><pre>*Anzahlung*
 
 Um das Fahrzeug fest für Sie zu reservieren, nehmen wir eine Anzahlung von 30 % des Mietpreises. Sobald die Anzahlung eingegangen ist, ist das Fahrzeug verbindlich für Sie reserviert.
 
@@ -632,4 +631,26 @@ zeigen();abgleichen();
   window.mxEinheit=alle;alle();
   new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input"))setzen(n);else if(n.querySelectorAll)alle(n)}})
     .observe(document.body,{childList:true,subtree:true})})();
+</script><script>
+/* Anschrift getrennt (31.10.2026) */
+(function(){if(window.mxAnschrift)return;
+  const desc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
+  const st=document.createElement("style");st.textContent=".mxAZ{display:grid;grid-template-columns:minmax(90px,32%) 1fr;gap:10px}.mxAZ>div{min-width:0}.mxAZ input{width:100%;box-sizing:border-box}";document.head.appendChild(st);
+  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/);
+    if(m){s=m[1].trim().replace(/,$/,"");p=m[2];o=m[3].trim()}else if(voll)s=v;else o=v;return{s,p,o}}
+  function setzen(inp){if(inp.dataset.mxA)return;inp.dataset.mxA="1";const voll=inp.dataset.anschrift!=="plzort";
+    const lab=inp.previousElementSibling&&inp.previousElementSibling.tagName==="LABEL"?inp.previousElementSibling:null;
+    const ic=inp.className,lc=lab?lab.className:"",feld=(t,l,extra)=>lab?'<label class="'+lc+'">'+l+'</label><input class="'+ic+'" data-t="'+t+'" autocomplete="off"'+(extra||"")+'>':'<input class="'+ic+'" data-t="'+t+'" placeholder="'+l+'" autocomplete="off"'+(extra||"")+'>';
+    const w=document.createElement("div");w.className="mxAnschr";
+    w.innerHTML=(voll?feld("s","Straße und Hausnummer"):"")+'<div class="mxAZ"><div>'+feld("p","PLZ",' inputmode="numeric" maxlength="5"')+'</div><div>'+feld("o","Wohnort")+'</div></div>';
+    inp.after(w);inp.style.display="none";if(lab)lab.style.display="none";
+    const f=t=>w.querySelector('[data-t="'+t+'"]');
+    const verteilen=v=>{const x=teile(v,voll);if(f("s"))desc.set.call(f("s"),x.s);desc.set.call(f("p"),x.p);desc.set.call(f("o"),x.o)};
+    const zusammen=()=>{const s=f("s")?desc.get.call(f("s")).trim():"",p=desc.get.call(f("p")).trim(),o=desc.get.call(f("o")).trim(),po=(p+" "+o).trim();return voll?[s,po].filter(Boolean).join(", "):po};
+    Object.defineProperty(inp,"value",{configurable:true,get(){return desc.get.call(this)},set(v){desc.set.call(this,v);verteilen(v)}});
+    verteilen(desc.get.call(inp));
+    w.querySelectorAll("input").forEach(e=>e.addEventListener("input",()=>{desc.set.call(inp,zusammen());inp.dispatchEvent(new Event("input",{bubbles:true}));inp.dispatchEvent(new Event("change",{bubbles:true}))}))}
+  window.mxAnschrift=setzen;
+  const alle=w=>(w||document).querySelectorAll("input[data-anschrift]").forEach(setzen);alle();
+  new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input[data-anschrift]"))setzen(n);else if(n.querySelectorAll)alle(n)}}).observe(document.body,{childList:true,subtree:true})})();
 </script></body></html>
