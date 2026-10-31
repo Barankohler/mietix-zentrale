@@ -169,6 +169,21 @@ function alle(){
   A.forEach(a=>{if(!a||!a.name)return;const e=hol(a.name,"anfrage");if(!e)return;
     if(!e.gesperrt){if(!e.telefon&&a.nummer)e.telefon=String(a.nummer);if(!e.ort&&a.ort)e.ort=String(a.ort)}
     e.anfragen.push({tag:a.tag||"",auto:a.auto||"",von:a.von||"",bis:a.bis||"",status:a.status||""})});
+  // Ältere Mieten aus der Excel (Reiter Geld, 31.10.2026): kommen über die Brücke als mietixStand.statistik.verlauf.
+  // Gleicher Kunde über Telefon oder Namen (auch Nachname zuerst), gleiche Miete wie ein Mietvertrag (Auto, ±3 Tage) zählt nur einmal.
+  const S=(lies("mietixStand",{})||{}).statistik,VL=S&&Array.isArray(S.verlauf)?S.verlauf:[];
+  if(VL.length){const dreh=n=>norm(n).split(" ").sort().join(" "),nachTel={},nachName={};
+    Object.values(m).forEach(e=>{const z=ziffern(e.telefon);if(z.length>=6)nachTel[z]=e;nachName[dreh(e.name)]=e});
+    VL.forEach(x=>{if(!x||!x.name)return;const z=ziffern(x.tel);
+      let e=(z.length>=6&&nachTel[z])||nachName[dreh(x.name)];
+      if(!e){e=hol(x.name,"excel");if(!e)return;nachName[dreh(x.name)]=e;if(z.length>=6)nachTel[z]=e}
+      if(e.gesperrt)return;if(!e.telefon&&x.tel)e.telefon=String(x.tel);
+      const tage=(a,b)=>Math.abs((new Date(a)-new Date(b))/864e5);
+      (Array.isArray(x.liste)?x.liste:[]).forEach(r=>{if(!r||!r.d)return;
+        if(e.vertraege.some(v=>!v.alt&&v.von&&tage(v.von,r.d)<=3&&(!r.auto||!v.auto||v.auto===r.auto)))return;
+        // Anzahlung und Rest stehen in der Excel als zwei Zeilen: selbes Auto, höchstens 1 Tag auseinander = eine Miete
+        const gl=e.vertraege.find(v=>v.alt&&tage(v.von,r.d)<=1&&v.auto===(r.auto||""));if(gl){gl.preis+=+r.b||0;return}
+        e.vertraege.push({nr:"",auto:r.auto||"",von:r.d,bis:"",preis:+r.b||0,status:"",alt:true})})})}
   return Object.values(m).map(e=>{
     e.vertraege.sort((a,b)=>(a.von||"")<(b.von||"")?-1:1);e.anfragen.sort((a,b)=>(a.tag||"")<(b.tag||"")?-1:1);
     e.mieten=e.vertraege.length;e.zuletzt=e.mieten?e.vertraege[e.mieten-1].von:"";e.letztesAuto=e.mieten?e.vertraege[e.mieten-1].auto:"";
@@ -284,7 +299,7 @@ function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="
     h+='<div class="ab">Kontakt</div><div class="feld"><div class="zl"><span>Telefon</span>'+wert(e.telefon)+'</div><div class="zl"><span>Straße</span>'+wert(str)+'</div><div class="zl"><span>PLZ, Wohnort</span>'+wert(plzOrt)+'</div>'
       +'<div class="zl"><span>Geburtstag</span>'+wert(e.geb?de(e.geb)+(e.alter?" ("+e.alter+")":""):"")+'</div><div class="zl"><span>Geburtsort</span>'+wert(e.gebort)+'</div><div class="zl"><span>E-Mail</span>'+wert(e.email)+'</div></div>';
     h+='<div class="ab">Mietverträge<span>'+(e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten"):"keine")+'</span></div>';
-    h+=e.vertraege.length?'<div class="feld">'+e.vertraege.slice().reverse().map(v=>'<a class="mv" href="'+V+'?nr='+esc(v.nr)+'"><div>'+esc(v.auto)+'<i>'+de(v.von)+(v.bis?" bis "+de(v.bis):"")+", Nr. "+esc(v.nr)+(v.mieteOffen?' <span class="rot">Miete offen</span>':"")+'</i></div><b>'+(v.preis?EUR.format(v.preis):"")+'</b></a>').join("")+'</div>':'<div class="feld"><div class="zl"><span>Noch kein Mietvertrag</span></div></div>';
+    h+=e.vertraege.length?'<div class="feld">'+e.vertraege.slice().reverse().map(v=>v.alt?'<div class="mv"><div>'+esc(v.auto||"Miete")+'<i>'+de(v.von)+', aus der Excel</i></div><b>'+(v.preis?EUR.format(v.preis):"")+'</b></div>':'<a class="mv" href="'+V+'?nr='+esc(v.nr)+'"><div>'+esc(v.auto)+'<i>'+de(v.von)+(v.bis?" bis "+de(v.bis):"")+", Nr. "+esc(v.nr)+(v.mieteOffen?' <span class="rot">Miete offen</span>':"")+'</i></div><b>'+(v.preis?EUR.format(v.preis):"")+'</b></a>').join("")+'</div>':'<div class="feld"><div class="zl"><span>Noch kein Mietvertrag</span></div></div>';
     if(e.schaeden.length)h+='<div class="ab">Schäden<span>'+e.schaeden.length+'</span></div><div class="feld">'+e.schaeden.map(s=>'<div class="mv"><div>'+esc(s.auto||"Schaden")+'<i>'+esc([s.datum,s.schaden].filter(Boolean).join(", "))+'</i></div><b>'+(s.offen?'<span class="rot">offen '+EUR.format(s.offen)+'</span>':s.kv?EUR.format(s.kv):"")+'</b></div>').join("")+'</div>';
     if(e.anfragen.length)h+='<div class="ab">Anfragen<span>'+e.anfragen.length+'</span></div><div class="feld">'+e.anfragen.slice().reverse().slice(0,5).map(a=>'<div class="mv"><div>'+esc(a.auto||"Anfrage")+'<i>'+de(a.tag)+(a.von?", für "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+'</i></div><b style="font-weight:600;color:#8E8E93">'+esc(a.status||"")+'</b></div>').join("")+'</div>';
     h+='<div class="ab">Notiz</div><div class="notiz">'+(e.notiz?esc(e.notiz):'<span style="color:#8E8E93">Keine Notiz. Unter „Bearbeiten“ eintragen.</span>')+'</div>';
