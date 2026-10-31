@@ -243,7 +243,7 @@ let PREISE=null;
 function kmPaketText(name){const c=PREISE&&PREISE.cars.find(x=>(x.anzeige||x.n)===name);if(!c||!c.km||c.km.length<2)return"";
   const st=PREISE.kmStufen||[50,100,150,200,300];
   return "*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\n"+
-    "Ihr "+name.replace(" performance"," Performance")+":\n"+st.map((k,i)=>"• +"+k.toLocaleString("de-DE")+" km für "+eur(c.km[i+1])+" € (statt "+eur(k*c.kmPreis)+" €)").join("\n")+
+    "Ihr "+name.replace(" performance"," Performance")+", für Ihre ganze Miete:\n"+st.map((k,i)=>"• +"+k.toLocaleString("de-DE")+" km für "+eur(c.km[i+1])+" € (statt "+eur(k*c.kmPreis)+" €)").join("\n")+
     "\n\nOhne Paket kostet jeder Mehrkilometer "+eur(c.kmPreis)+" €. Mit dem großen Paket sparen Sie "+eur(st[st.length-1]*c.kmPreis-c.km[st.length])+" €.\n\nWelches Paket darf ich Ihnen dazubuchen?"}
 function alleZeigen(){document.querySelectorAll(".n").forEach(zeige)}
 alleZeigen();

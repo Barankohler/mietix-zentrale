@@ -41,14 +41,29 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
 .unten{display:flex;justify-content:center;gap:10px;margin-top:12px;font-size:15px;font-weight:700}
 .unten a{color:var(--grau);text-decoration:none;padding:12px 10px}
 .tipp{font-size:12px;color:var(--grau);text-align:center;margin-top:14px;line-height:1.5}
+/* 31.10.2026: Gruß, Suche, Fortschritt, Erfolg */
+#gruss{font-size:15px;font-weight:700;color:var(--grau);margin:-4px 4px 12px}#gruss b{color:var(--ink)}
+.such{position:relative;margin-bottom:12px}
+.such input{width:100%;border:0;border-radius:16px;background:#fff;padding:15px 16px 15px 46px;font-size:17px;font-weight:600;box-shadow:0 1px 0 rgba(0,0,0,.03);-webkit-appearance:none;outline:none}
+.such input:focus{box-shadow:0 0 0 2px var(--rot)}
+.such svg{position:absolute;left:16px;top:50%;width:20px;height:20px;transform:translateY(-50%);stroke:var(--grau);fill:none;stroke-width:2.2;stroke-linecap:round}
+#treffer{background:#fff;border-radius:16px;padding:2px 16px;margin:-4px 0 12px}#treffer:empty{display:none}#treffer .uhr{display:none}
+#fort{display:flex;align-items:center;gap:10px;padding:12px 0 4px;font-size:14px;font-weight:800;color:var(--grau)}
+#fort .bal{flex:1;height:8px;border-radius:99px;background:var(--linie);overflow:hidden}#fort .bal i{display:block;height:100%;background:var(--gruen);border-radius:99px;transition:width .5s ease}
+.fertig{padding:22px 0;text-align:center;color:var(--gruen);font-weight:800;font-size:18px}.fertig i{display:block;font-style:normal;font-size:14px;color:var(--grau);font-weight:600;margin-top:4px}
+body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(min-width:700px){.app{max-width:720px}.kacheln{grid-template-columns:repeat(3,1fr)}.kachel:last-child:nth-child(odd){grid-column:auto}}
 </style></head><body><div class="app">
 <header><h1>Mietix<span>.</span></h1><span id="punkt" title="Anmeldung und Stand"></span></header>
 <div id="stand"><div id="abgleich"></div><div id="bruecke" class="tipp" style="text-align:left;margin:0 4px 6px"></div></div>
 
+<div id="gruss"></div>
+<div class="such"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="suche" type="search" placeholder="Kunde, Auto, Nummer, Telefon" autocomplete="off" enterkeyhint="search"></div>
+<div id="treffer"></div>
 <div class="kacheln" style="margin-top:6px"><a class="kachel" href="https://barankohler.github.io/mietix-anfragen/" data-zaehler="anfragen"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>Anfragen</a><a class="kachel" href="https://barankohler.github.io/mietix-belegung/"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Kalender</a><a class="kachel" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 12h3M13 12h3M8 16h3M13 16h3"/></svg>Angebot</a><a class="kachel" href="https://barankohler.github.io/mietix-vertrag/" data-zaehler="vertraege"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Mietverträge</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/kunden.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Kunden</a><a class="kachel" href="https://barankohler.github.io/mietix-autos/" data-zaehler="autos"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M3 13l2-5h14l2 5v5H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/></svg>Autos</a><a class="kachel" href="https://barankohler.github.io/mietix-geld/"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="12" cy="12" r="2.5"/></svg>Geld</a><a class="kachel" href="https://barankohler.github.io/mietix-schadensabrechnung/" data-zaehler="schaeden"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h0"/></svg>Schäden</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/nachrichten.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>Nachrichten</a></div>
 
 <h2 id="heuteTitel">Heute</h2>
-<div class="k" id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div>
+<div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
 <h2 id="ausTitel" class="versteckt">Ausstieg 30.06.2027</h2>
 <div class="k versteckt" id="aus"></div>
 
@@ -66,7 +81,7 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
   const EUR=n=>(+n||0).toLocaleString("de-DE",{minimumFractionDigits:0,maximumFractionDigits:2})+" €";
   const zahl=v=>{if(v==null)return 0;const s=String(v).trim();if(!s)return 0;return parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""))||0};
   if(window.navigator.standalone)document.getElementById("homeTipp").style.display="none";
-  function zeile(a){return '<a class="z" href="'+a.href+'"><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><span class="t"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></span><span class="chip'+(a.art?" "+a.art:"")+'">'+a.k+'</span></a>'}
+  function zeile(a){return '<a class="z" href="'+a.href+'"'+(a.nf?' data-nf="'+esc(a.nf)+'"':"")+'><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><span class="t"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></span><span class="chip'+(a.art?" "+a.art:"")+'">'+a.k+'</span></a>'}
   function zeichne(){
     const h=new Date(),hi=iso(h),m=new Date();m.setDate(m.getDate()+1);const mo=iso(m);
     document.getElementById("heuteTitel").textContent="Heute, "+WT[h.getDay()]+" "+h.getDate()+"."+(h.getMonth()+1)+".";
@@ -77,9 +92,26 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
     v.filter(x=>x.ueb&&x.bisD<=mo).sort((a,b)=>(a.bisD+(a.bisU||"")).localeCompare(b.bisD+(b.bisU||""))).forEach(x=>out.push({uhr:x.bisD===hi?(x.bisU||""):"",t:x.name,i:x.auto+", Rückgabe "+tag(x.bisD),k:"Rückgabe",art:x.bisD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=rueckgabe"}));
     // Ein Heute (Liste Punkt 11): auch Kaution zurückgeben, Miete noch offen und gebucht ohne Mietvertrag
     const offenB=x=>(!((x.zahlung||{}).rest||{}).am?zahl(((x.zahlung||{}).rest||{}).betrag):0)+(x.verlaengerungen||[]).filter(y=>!y.bezahlt).reduce((s,y)=>s+(+y.aufpreis||0),0);
-    const rest=[];
-    alle.filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&!x.kautionRueck).forEach(x=>rest.push({t:x.name,i:"Kaution "+EUR(zahl(x.zahlung.kaut.betrag))+" zurückgeben",k:"Kaution",art:"gruen",href:B+"mietix-vertrag/?zeige=heute"}));
-    alle.filter(x=>x.vonD&&x.vonD<hi&&offenB(x)>0).forEach(x=>rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen",k:"Offen",art:"rot",href:B+"mietix-vertrag/?zeige=heute"}));
+    const rest=[],tageSeit=d=>Math.round((new Date(hi)-new Date(String(d).slice(0,10)))/864e5);
+    // Warnung, bevor es Geld kostet (31.10.2026): Kaution über 7 Tage, Miete über 3 Tage offen
+    alle.filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&!x.kautionRueck).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD),lang=s>7;
+      rest.push({t:x.name,i:"Kaution "+EUR(zahl(x.zahlung.kaut.betrag))+" zurückgeben"+(lang?", schon "+s+" Tage!":""),k:"Kaution",art:lang?"rot":"gruen",href:B+"mietix-vertrag/?zeige=heute"})});
+    alle.filter(x=>x.vonD&&x.vonD<hi&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?zeige=heute"})});
+    // Doppelt verplant heute oder morgen: zwei Mieten, Buchungen oder Sperren mit demselben Auto zur selben Zeit
+    {const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,""),ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,bl=[];
+      alle.filter(x=>x.status!=="zurück"&&x.auto&&x.vonD&&x.bisD).forEach(x=>bl.push({a:x.auto,v:x.vonD+"T"+(x.vonU||"10:00"),b:x.bisD+"T"+(x.bisU||"10:00"),w:x.name}));
+      anf.filter(a=>a.status==="gebucht"&&a.auto&&a.von&&a.bis&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.auto===a.auto&&ue(a.von,a.bis,x.vonD,x.bisD)))
+        .forEach(a=>bl.push({a:a.auto,v:a.von+"T"+(a.vonU||"10:00"),b:a.bis+"T"+(a.bisU||"10:00"),w:a.name||"Buchung"}));
+      lies("mietixSperren",[]).forEach(s=>{if(s.auto&&s.von&&s.bis&&!s._weg)bl.push({a:s.auto,v:s.von+"T00:00",b:s.bis+"T23:59",w:"Sperre"})});
+      const bis2=mo+"T23:59",schon={};
+      bl.forEach((x,i)=>bl.forEach((y,j)=>{if(j<=i||x.a!==y.a||!ue(x.v,x.b,y.v,y.b))return;const ab=x.v>y.v?x.v:y.v;if(ab>bis2||(x.b<hi&&y.b<hi))return;
+        const key=x.a+x.w+y.w;if(schon[key])return;schon[key]=1;
+        rest.unshift({t:x.a+" doppelt verplant",i:x.w+" und "+y.w+", "+(ab.slice(0,10)<=hi?"heute":"morgen"),k:"Prüfen",art:"rot",href:B+"mietix-belegung/"})}))}
+    // Nachfassen: Angebot seit 2 Tagen ohne Antwort, Mietbeginn noch nicht vorbei
+    const nach=anf.filter(a=>a.status==="angebot"&&a.nummer&&!a.nachgefasst&&(!a.von||a.von>=hi)).filter(a=>{const s=tageSeit((a.angebot&&a.angebot.am)||a.tag);return s>=2&&s<=14});
+    const waNr=t=>{let n=String(t||"").replace(/\D/g,"");if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="49"+n.slice(1);return n};
+    nach.forEach(a=>{const vn=String(a.name||"").trim().split(/\s+/)[0],txt="Hallo"+(vn?" "+vn:"")+",\n\nich wollte kurz nachfragen, ob unser Angebot"+(a.auto?" für den "+a.auto:"")+(a.von?" vom "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+" noch passt. Gerne halte ich Ihnen das Fahrzeug frei.\n\nViele Grüße\nIhr Mietix-Team";
+      rest.push({t:a.name||a.nummer,i:"Angebot ohne Antwort"+(a.auto?", "+a.auto:""),k:"Nachfragen",art:"gelb",href:"https://wa.me/"+waNr(a.nummer)+"?text="+encodeURIComponent(txt),nf:a.id})});
     const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
     anf.filter(a=>a.status==="gebucht"&&a.von&&a.von<=mo&&a.von>=iso(new Date(Date.now()-864e5))&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von))
       .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",t:a.name||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
@@ -89,7 +121,17 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
     const sta=lies("mietixAutos",{});Object.keys(sta).forEach(n=>[["tuev","TÜV"],["service","Service"],["reifen","Reifen"],["garantie","Garantie"]].forEach(([k,t])=>{const d=sta[n][k];if(!d)return;const tage=Math.round((new Date(String(d).slice(0,10))-new Date(hi))/864e5);
       if(tage<=14)autoPunkte.push({t:n,i:t+(tage<0?" überfällig":tage===0?" heute":" in "+tage+" Tagen"),k:t,art:tage<=7?"rot":"gelb",href:B+"mietix-autos/"})}));
     const offen=anf.filter(a=>a.status==="offen").length;
-    document.getElementById("heute").innerHTML=out.length?out.map(zeile).join(""):'<div class="leer">Heute ist nichts zu tun.</div>';
+    // Fortschritt heute: erledigte Übergaben und Rückgaben von heute gegen alles, was heute ansteht (31.10.2026)
+    const erl=alle.filter(x=>x.ueb&&String(x.ueb.datum||"").slice(0,10)===hi).length+alle.filter(x=>x.rueck&&String(x.rueck.datum||"").slice(0,10)===hi).length;
+    const offenHeute=out.filter(x=>x.k==="Übergabe"||x.k==="Rückgabe").filter(x=>!/morgen/.test(x.i)).length,ges=erl+offenHeute;
+    const fo=document.getElementById("fort");fo.classList.toggle("versteckt",!ges);
+    if(ges){fo.querySelector("i").style.width=Math.round(erl/ges*100)+"%";fo.querySelector("span").textContent=erl+" von "+ges+" erledigt"}
+    document.getElementById("heute").innerHTML=out.length?out.map(zeile).join(""):(erl?'<div class="fertig">Alles erledigt ✓<i>'+erl+(erl===1?" Übergabe oder Rückgabe":" Übergaben und Rückgaben")+' heute. Stark!</i></div>':'<div class="fertig" style="color:var(--grau)">Heute ist nichts zu tun ✓<i>Alles im Griff.</i></div>');
+    document.querySelectorAll("#heute a[data-nf]").forEach(el=>{el.target="_blank";el.addEventListener("click",()=>{const l=lies("mietixAnfragen",[]),x=l.find(y=>y.id===el.dataset.nf);if(x){x.nachgefasst=hi;try{localStorage.setItem("mietixAnfragen",JSON.stringify(l))}catch(e){}}setTimeout(zeichne,800)})});
+    // Gruß und kleiner Erfolg des Monats
+    const stu=h.getHours(),gr=stu<11?"Guten Morgen":stu<18?"Guten Tag":"Guten Abend",mon=hi.slice(0,7),MN=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+    const mieten=alle.filter(x=>String(x.vonD||"").slice(0,7)===mon).length;
+    document.getElementById("gruss").innerHTML=gr+"!"+(mieten?' Im '+MN[h.getMonth()]+' bisher <b>'+mieten+(mieten===1?" Miete":" Mieten")+'</b>.':"");
     // Ausstieg (Liste Punkt 23): ab März 2027 eine kleine Liste, was bis zum 30.06.2027 erledigt sein muss
     const AUS="2027-06-30",ausL=[];
     if(hi>="2027-03-01"){
@@ -112,8 +154,21 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
     else{p.className="gruen";text="Angemeldet, alles gesichert."}
     document.getElementById("bruecke").textContent=text;
   }
+  // Suchen statt Scrollen (31.10.2026): Kunde, Auto, Kennzeichen, Mietvertrag-Nummer, Telefon
+  const nrm=t=>String(t||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+  function suchen(){const q=nrm(document.getElementById("suche").value),zi=q.replace(/\D/g,""),el=document.getElementById("treffer");
+    if(q.length<2){el.innerHTML="";return}
+    const t=[],alle=lies("mietixVorgaenge",[]).slice().sort((a,b)=>String(b.vonD||"").localeCompare(String(a.vonD||"")));
+    alle.forEach(x=>{const tel=String(x.telefon||"").replace(/\D/g,"");
+      if(nrm(x.name).includes(q)||nrm(x.auto).includes(q)||nrm(x.kz).replace(/[\s-]/g,"").includes(q.replace(/[\s-]/g,""))||String(x.nr||"").includes(q)||(zi.length>=4&&tel.includes(zi)))
+        t.push({uhr:"",t:x.name,i:"Mietvertrag "+x.nr+", "+x.auto+", "+de(x.vonD)+" bis "+de(x.bisD),k:x.status==="zurück"?"Zurück":x.ueb?"Unterwegs":"Gebucht",art:x.status==="zurück"?"":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)})});
+    const kb=lies("mietixKunden",{}),schon=new Set(t.map(x=>nrm(x.t)));
+    Object.keys(kb).forEach(n=>{const k=kb[n]||{};if(k._weg||schon.has(nrm(n)))return;const tel=String(k.telefon||"").replace(/\D/g,"");
+      if(nrm(n).includes(q)||(zi.length>=4&&tel.includes(zi)))t.push({uhr:"",t:n,i:k.telefon||"Kunde",k:"Kunde",art:"",href:B+"mietix-zentrale/kunden.html?kunde="+encodeURIComponent(n)})});
+    el.innerHTML=t.length?t.slice(0,8).map(zeile).join(""):'<div class="leer">Nichts gefunden.</div>'}
+  document.getElementById("suche").addEventListener("input",suchen);
   document.getElementById("punkt").onclick=()=>document.getElementById("stand").classList.toggle("auf");
-  zeichne();
+  zeichne();setTimeout(()=>document.body.classList.add("geladen"),600);   // Einblenden nur beim Öffnen, nie beim Abgleich (kein Flackern)
   (function(){const t=setInterval(()=>{if(window.mietixAbgleichen){clearInterval(t);zeichne();if(!lies("mietixSitzung",null))document.getElementById("stand").classList.add("auf")}},150)})();
   window.addEventListener("mietix-abgleich",zeichne);
   document.addEventListener("visibilitychange",function(){if(!document.hidden)zeichne()});

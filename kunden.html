@@ -70,8 +70,10 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
 .mxKlapp[open]>summary{margin-bottom:10px}.mxKlapp[open]>summary em{transform:rotate(90deg)}
 .mxBg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;display:none}.mxBg.auf{display:block}
 .mxFenster{position:fixed;left:0;right:0;bottom:0;z-index:91;background:#fff;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:none;box-shadow:0 -10px 30px rgba(0,0,0,.18);margin:0 auto;max-width:560px;box-sizing:border-box;text-align:left}
-.mxFenster.auf{display:block}
-@media(min-width:700px){.mxFenster{top:50%;bottom:auto;transform:translateY(-50%);border-radius:22px;width:calc(100% - 48px);padding:20px}}
+.mxFenster.auf{display:block;animation:mxHoch .22s ease-out}.mxBg.auf{animation:mxBlende .2s ease-out}
+@keyframes mxHoch{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}@keyframes mxBlende{from{opacity:0}to{opacity:1}}
+@media(min-width:700px){.mxFenster{top:50%;bottom:auto;transform:translateY(-50%);border-radius:22px;width:calc(100% - 48px);padding:20px}.mxFenster.auf{animation:mxMitte .2s ease-out}}
+@keyframes mxMitte{from{transform:translateY(-46%);opacity:0}to{transform:translateY(-50%);opacity:1}}
 .mxKopf{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
 .mxKopf h3{font-size:19px;font-weight:900;margin:0;color:#1C1C1E}
 .mxZu{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:0;background:#F2F2F4;font-size:17px;font-weight:800;cursor:pointer;color:#1C1C1E;font-family:inherit}
@@ -79,7 +81,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
 .mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
 .mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
 </style></head><body>
-<header><a href="./">Zentrale</a><h1>MIETIX <span>KUNDEN</span> <i id="abgleichPunkt" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B0B0B3;vertical-align:middle;margin-left:4px"></i></h1></header>
+<header><h1>MIETIX <span>KUNDEN</span> <i id="abgleichPunkt" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B0B0B3;vertical-align:middle;margin-left:4px"></i></h1></header>
 <main>
 <div id="abgleich"></div>
 
@@ -552,4 +554,43 @@ zeigen();abgleichen();
     if(e.target.closest(".mxZu")||e.target===bg)mxZu()});
   document.addEventListener("keydown",function(e){if(e.key==="Escape")mxZu()})})();
 </script>
-</body></html>
+<script>
+/* ‹ Start oben links (31.10.2026) */
+(function(){if(document.querySelector(".mxStart"))return;
+  const ziel=document.querySelector("header h1")||document.querySelector(".topbar");if(!ziel)return;
+  const st=document.createElement("style");st.textContent=".mxStart{display:inline-flex;align-items:center;gap:2px;margin-right:10px;padding:5px 11px 5px 8px;border-radius:999px;border:1.5px solid currentColor;color:inherit;text-decoration:none;font:800 13px/1 -apple-system,Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none;vertical-align:middle;opacity:.8;-webkit-tap-highlight-color:transparent}.mxStart b{font-size:17px;line-height:13px;margin-top:-2px}.mxStart:active{opacity:.5}header h1{white-space:nowrap}header .mxStart,.topbar .mxStart{float:none!important;margin:0 10px 0 0!important;padding:5px 11px 5px 8px!important;font-size:13px!important;color:inherit!important}@media(max-width:360px){header .mxStart,.topbar .mxStart{padding:4px 8px 4px 6px!important;margin-right:6px!important;font-size:12px!important}}@media(max-width:480px){.topbar .brand-sub{display:none}}.topbar{overflow:hidden}";
+  document.head.appendChild(st);
+  const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");
+  ziel.insertBefore(a,ziel.firstChild)})();
+</script><script>
+/* Einheit fest im Zahlenfeld (31.10.2026) */
+(function(){if(window.mxEinheit)return;
+  const REGELN=[[/€|&euro;|\beur\b|betrag|preis|kaution|einbehalt|aufpreis|kosten|wert\b|selbstbeteiligung/i,"€"],
+    [/rabatt|prozent/i,"%"],[/liter/i,"Liter"],[/profiltiefe|\bmm\b/i,"mm"],[/stück|schlüssel/i,"Stück"],[/^\s*alter\b/i,"Jahre"],
+    [/kilometer|\bkm\b|freikm/i,"km"]];
+  const AUS=new Set(["nr"]);   // Mietvertrag-Nummer bleibt ohne Einheit
+  function beschriftung(f){let l=f.id?document.querySelector('label[for="'+f.id+'"]'):null;
+    if(!l){let e=f.previousElementSibling;while(e&&!l){if(e.tagName==="LABEL")l=e;e=e.previousElementSibling}}
+    if(!l&&f.parentElement){const ls=f.parentElement.querySelectorAll("label");if(ls.length===1)l=ls[0]}
+    return l}
+  function einheit(f){if(f.dataset.einheit!==undefined)return f.dataset.einheit;
+    if(/^(VL|VR|HL|HR)$/.test(f.placeholder||""))return"mm";   // Profiltiefe je Rad, eine Beschriftung für vier Felder
+    // Einheit steht schon direkt am Feld (€-Kästchen davor, "km" dahinter): nichts doppelt
+    for(const n of [f.previousElementSibling,f.nextElementSibling])if(n&&n.tagName!=="LABEL"&&n.tagName!=="INPUT"&&/^\s*(€|km|%|prozent|liter|mm)/i.test(n.textContent||""))return"";
+    const l=beschriftung(f),t=((l?l.textContent:"")+" "+(f.placeholder||"")).trim();
+    for(const [re,e] of REGELN)if(re.test(t))return e;return""}
+  function bild(e){const w=Math.round(e.length*10.5+4),
+      svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="22"><text x="'+w+'" y="16" text-anchor="end" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#8A8A8E">'+e+'</text></svg>';
+    return{url:'url("data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)+'")',w}}
+  function setzen(f){if(f.dataset.mxE||AUS.has(f.id)||f.type==="date"||f.type==="time")return;
+    const e=einheit(f);f.dataset.mxE="1";if(!e)return;const b=bild(e),pr=parseFloat(getComputedStyle(f).paddingRight)||12;
+    f.style.backgroundImage=b.url;f.style.backgroundRepeat="no-repeat";f.style.backgroundPosition="right "+Math.max(12,pr)+"px center";
+    f.style.paddingRight=(Math.max(12,pr)+b.w+8)+"px";
+    // dieselbe Einheit am Ende der Beschriftung ist jetzt doppelt
+    const l=beschriftung(f),t=l&&l.lastChild;if(t&&t.nodeType===3){const ende={"€":/\s*€\s*$/,"km":/\s*\(km\)\s*$/,"mm":/\s+in mm\s*$/,"Stück":/\s*\(Stück\)\s*$/}[e];
+      if(ende&&ende.test(t.nodeValue)&&t.nodeValue.replace(ende,"").trim())t.nodeValue=t.nodeValue.replace(ende,"")}}
+  function alle(w){(w||document).querySelectorAll('input[inputmode="decimal"],input[inputmode="numeric"],input[type="number"]').forEach(setzen)}
+  window.mxEinheit=alle;alle();
+  new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input"))setzen(n);else if(n.querySelectorAll)alle(n)}})
+    .observe(document.body,{childList:true,subtree:true})})();
+</script></body></html>
