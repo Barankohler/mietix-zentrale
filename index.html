@@ -48,6 +48,10 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
 .such input:focus{box-shadow:0 0 0 2px var(--rot)}
 .such svg{position:absolute;left:16px;top:50%;width:20px;height:20px;transform:translateY(-50%);stroke:var(--grau);fill:none;stroke-width:2.2;stroke-linecap:round}
 #treffer{background:#fff;border-radius:16px;padding:2px 16px;margin:-4px 0 12px}#treffer:empty{display:none}#treffer .uhr{display:none}
+.z .akt{border:0;font-family:inherit;cursor:pointer}.wahl{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 14px 60px}
+.wahl b{flex-basis:100%;font-size:13px;color:var(--grau);font-weight:700}
+.wahl span{padding:10px 14px;border-radius:999px;background:var(--bg);font-weight:800;font-size:14px;cursor:pointer}.wahl span.gr{background:var(--gruen);color:#fff}
+.wahl a{padding:10px 4px;font-weight:700;font-size:14px;color:var(--grau)}
 #fort{display:flex;align-items:center;gap:10px;padding:12px 0 4px;font-size:14px;font-weight:800;color:var(--grau)}
 #fort .bal{flex:1;height:8px;border-radius:99px;background:var(--linie);overflow:hidden}#fort .bal i{display:block;height:100%;background:var(--gruen);border-radius:99px;transition:width .5s ease}
 .fertig{padding:22px 0;text-align:center;color:var(--gruen);font-weight:800;font-size:18px}.fertig i{display:block;font-style:normal;font-size:14px;color:var(--grau);font-weight:600;margin-top:4px}
@@ -64,6 +68,8 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 
 <h2 id="heuteTitel">Heute</h2>
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
+<h2 id="morgenTitel" class="versteckt">Morgen</h2>
+<div class="k versteckt" id="morgenK"><div id="morgen"></div></div>
 <h2 id="ausTitel" class="versteckt">Ausstieg 30.06.2027</h2>
 <div class="k versteckt" id="aus"></div>
 
@@ -81,22 +87,24 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
   const EUR=n=>(+n||0).toLocaleString("de-DE",{minimumFractionDigits:0,maximumFractionDigits:2})+" €";
   const zahl=v=>{if(v==null)return 0;const s=String(v).trim();if(!s)return 0;return parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""))||0};
   if(window.navigator.standalone)document.getElementById("homeTipp").style.display="none";
-  function zeile(a){return '<a class="z" href="'+a.href+'"'+(a.nf?' data-nf="'+esc(a.nf)+'"':"")+'><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><span class="t"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></span><span class="chip'+(a.art?" "+a.art:"")+'">'+a.k+'</span></a>'}
+  // Zeilen mit Aktion (31.10.2026, Baran: „nebendran eintragen“): Bezahlt und Kaution zurück direkt hier, der Name führt weiter in den Mietvertrag
+  function zeile(a){if(a.akt)return '<div class="z" data-akt="'+a.akt+'" data-nr="'+esc(a.nr)+'"><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><a class="t" href="'+a.href+'" style="color:inherit;text-decoration:none"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></a><button type="button" class="chip akt'+(a.art?" "+a.art:"")+'">'+(a.akt==="bezahlt"?"Bezahlt?":"Zurück?")+'</button></div>';
+    return '<a class="z" href="'+a.href+'"'+(a.nf?' data-nf="'+esc(a.nf)+'"':"")+'><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><span class="t"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></span><span class="chip'+(a.art?" "+a.art:"")+'">'+a.k+'</span></a>'}
   function zeichne(){
     const h=new Date(),hi=iso(h),m=new Date();m.setDate(m.getDate()+1);const mo=iso(m);
     document.getElementById("heuteTitel").textContent="Heute, "+WT[h.getDay()]+" "+h.getDate()+"."+(h.getMonth()+1)+".";
     const kunden0=lies("mietixKunden",{}),alle=lies("mietixVorgaenge",[]),v=alle.filter(x=>x.status!=="zurück"),anf=lies("mietixAnfragen",[]),auf=lies("mietixAufgaben",[]),zust=lies("mietixZustand",[]);
     const out=[];
-    const tag=d=>d<hi?"überfällig seit "+de(d):d===hi?"heute":"morgen";
-    v.filter(x=>!x.ueb&&x.vonD<=mo).sort((a,b)=>(a.vonD+(a.vonU||"")).localeCompare(b.vonD+(b.vonU||""))).forEach(x=>out.push({uhr:x.vonD===hi?(x.vonU||""):"",t:x.name,i:x.auto+", Abholung "+tag(x.vonD),k:"Übergabe",art:x.vonD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=uebergabe"}));
-    v.filter(x=>x.ueb&&x.bisD<=mo).sort((a,b)=>(a.bisD+(a.bisU||"")).localeCompare(b.bisD+(b.bisU||""))).forEach(x=>out.push({uhr:x.bisD===hi?(x.bisU||""):"",t:x.name,i:x.auto+", Rückgabe "+tag(x.bisD),k:"Rückgabe",art:x.bisD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=rueckgabe"}));
+    const tag=d=>d<hi?"überfällig seit "+de(d):d===hi?"heute":"morgen",morgen=[];   // Morgen steht seit 31.10.2026 in einem eigenen Abschnitt (Baran)
+    v.filter(x=>!x.ueb&&x.vonD<=mo).sort((a,b)=>(a.vonD+(a.vonU||"")).localeCompare(b.vonD+(b.vonU||""))).forEach(x=>out.push({uhr:x.vonD===hi?(x.vonU||""):"",uhrM:x.vonU||"",t:x.name,i:x.auto+", Abholung "+tag(x.vonD),k:"Übergabe",art:x.vonD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=uebergabe"}));
+    v.filter(x=>x.ueb&&x.bisD<=mo).sort((a,b)=>(a.bisD+(a.bisU||"")).localeCompare(b.bisD+(b.bisU||""))).forEach(x=>out.push({uhr:x.bisD===hi?(x.bisU||""):"",uhrM:x.bisU||"",t:x.name,i:x.auto+", Rückgabe "+tag(x.bisD),k:"Rückgabe",art:x.bisD<hi?"rot":"",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=rueckgabe"}));
     // Ein Heute (Liste Punkt 11): auch Kaution zurückgeben, Miete noch offen und gebucht ohne Mietvertrag
     const offenB=x=>(!((x.zahlung||{}).rest||{}).am?zahl(((x.zahlung||{}).rest||{}).betrag):0)+(x.verlaengerungen||[]).filter(y=>!y.bezahlt).reduce((s,y)=>s+(+y.aufpreis||0),0);
     const rest=[],tageSeit=d=>Math.round((new Date(hi)-new Date(String(d).slice(0,10)))/864e5);
     // Warnung, bevor es Geld kostet (31.10.2026): Kaution über 7 Tage, Miete über 3 Tage offen
     alle.filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&!x.kautionRueck).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD),lang=s>7;
-      rest.push({t:x.name,i:"Kaution "+EUR(zahl(x.zahlung.kaut.betrag))+" zurückgeben"+(lang?", schon "+s+" Tage!":""),k:"Kaution",art:lang?"rot":"gruen",href:B+"mietix-vertrag/?zeige=heute"})});
-    alle.filter(x=>x.vonD&&x.vonD<hi&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?zeige=heute"})});
+      rest.push({t:x.name,i:"Kaution "+EUR(zahl(x.zahlung.kaut.betrag))+" zurückgeben"+(lang?", schon "+s+" Tage!":""),k:"Kaution",art:lang?"rot":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"kaution",nr:x.nr})});
+    alle.filter(x=>x.vonD&&x.vonD<hi&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"bezahlt",nr:x.nr})});
     // Doppelt verplant heute oder morgen: zwei Mieten, Buchungen oder Sperren mit demselben Auto zur selben Zeit
     {const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,""),ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,bl=[];
       alle.filter(x=>x.status!=="zurück"&&x.auto&&x.vonD&&x.bisD).forEach(x=>bl.push({a:x.auto,v:x.vonD+"T"+(x.vonU||"10:00"),b:x.bisD+"T"+(x.bisU||"10:00"),w:x.name}));
@@ -114,7 +122,9 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
       rest.push({t:a.name||a.nummer,i:"Angebot ohne Antwort"+(a.auto?", "+a.auto:""),k:"Nachfragen",art:"gelb",href:"https://wa.me/"+waNr(a.nummer)+"?text="+encodeURIComponent(txt),nf:a.id})});
     const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
     anf.filter(a=>a.status==="gebucht"&&a.von&&a.von<=mo&&a.von>=iso(new Date(Date.now()-864e5))&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von))
-      .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",t:a.name||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
+      .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",uhrM:a.vonU||"",morgen:a.von===mo,t:a.name||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
+    // alles von morgen in den eigenen Abschnitt, dort mit Uhrzeit statt „morgen“
+    for(let i=out.length-1;i>=0;i--){const x=out[i];if(/(Abholung|Rückgabe) morgen$/.test(x.i)||(x.k==="Mietvertrag"&&x.morgen)){morgen.unshift(Object.assign({},x,{i:x.i.replace(/, (Abholung|Rückgabe) morgen$/,", $1"),uhr:x.uhrM||""}));out.splice(i,1)}}
     out.push(...rest);
     const autoPunkte=[];auf.filter(a=>!a.erledigt&&!a._weg&&a.aufgabe&&a.bis&&a.bis<=hi).forEach(a=>autoPunkte.push({t:a.aufgabe,i:a.bis<hi?"überfällig seit "+de(a.bis):"heute fällig",k:"Aufgabe",art:"gelb",href:B+"mietix-autos/?zeige=aufgaben"}));
     zust.filter(z=>!z.erledigt&&z.auto).forEach(z=>autoPunkte.push({t:z.auto,i:z.text+(z.datum?", seit "+de(z.datum):""),k:"Zustand",art:"gelb",href:B+"mietix-autos/"}));
@@ -123,10 +133,14 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     const offen=anf.filter(a=>a.status==="offen").length;
     // Fortschritt heute: erledigte Übergaben und Rückgaben von heute gegen alles, was heute ansteht (31.10.2026)
     const erl=alle.filter(x=>x.ueb&&String(x.ueb.datum||"").slice(0,10)===hi).length+alle.filter(x=>x.rueck&&String(x.rueck.datum||"").slice(0,10)===hi).length;
-    const offenHeute=out.filter(x=>x.k==="Übergabe"||x.k==="Rückgabe").filter(x=>!/morgen/.test(x.i)).length,ges=erl+offenHeute;
+    const offenHeute=out.filter(x=>x.k==="Übergabe"||x.k==="Rückgabe").length,ges=erl+offenHeute;
     const fo=document.getElementById("fort");fo.classList.toggle("versteckt",!ges);
     if(ges){fo.querySelector("i").style.width=Math.round(erl/ges*100)+"%";fo.querySelector("span").textContent=erl+" von "+ges+" erledigt"}
     document.getElementById("heute").innerHTML=out.length?out.map(zeile).join(""):(erl?'<div class="fertig">Alles erledigt ✓<i>'+erl+(erl===1?" Übergabe oder Rückgabe":" Übergaben und Rückgaben")+' heute. Stark!</i></div>':'<div class="fertig" style="color:var(--grau)">Heute ist nichts zu tun ✓<i>Alles im Griff.</i></div>');
+    const mt=document.getElementById("morgenTitel");mt.textContent="Morgen, "+WT[m.getDay()]+" "+m.getDate()+"."+(m.getMonth()+1)+".";
+    mt.classList.toggle("versteckt",!morgen.length);document.getElementById("morgenK").classList.toggle("versteckt",!morgen.length);
+    document.getElementById("morgen").innerHTML=morgen.map(zeile).join("");
+    aktionen(hi);
     document.querySelectorAll("#heute a[data-nf]").forEach(el=>{el.target="_blank";el.addEventListener("click",()=>{const l=lies("mietixAnfragen",[]),x=l.find(y=>y.id===el.dataset.nf);if(x){x.nachgefasst=hi;try{localStorage.setItem("mietixAnfragen",JSON.stringify(l))}catch(e){}}setTimeout(zeichne,800)})});
     // Gruß und kleiner Erfolg des Monats
     const stu=h.getHours(),gr=stu<11?"Guten Morgen":stu<18?"Guten Tag":"Guten Abend",mon=hi.slice(0,7),MN=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
@@ -154,6 +168,25 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     else{p.className="gruen";text="Angemeldet, alles gesichert."}
     document.getElementById("bruecke").textContent=text;
   }
+  // Bezahlt und Kaution zurück direkt in der Zeile (31.10.2026)
+  const ZA=[["bar","Bar"],["ec","EC-Karte"],["kredit","Kreditkarte"],["ueberweisung","Überweisung"]];
+  function vAendern(nr,fn){const l=lies("mietixVorgaenge",[]),v=l.find(x=>x.nr===nr);if(!v)return null;fn(v);try{localStorage.setItem("mietixVorgaenge",JSON.stringify(l))}catch(e){}return v}
+  function hinweis(t){let m=document.getElementById("zMeld");if(!m){m=document.createElement("div");m.id="zMeld";m.style.cssText="position:fixed;left:16px;right:16px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:60;background:#1E9E5A;color:#fff;font-weight:800;text-align:center;padding:14px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:400px;margin:0 auto";document.body.appendChild(m)}
+    m.textContent=t;m.style.display="block";clearTimeout(m._t);m._t=setTimeout(()=>m.style.display="none",2600)}
+  let OFFEN_AKT="";   // offene Auswahl bleibt offen, auch wenn der Abgleich die Liste neu zeichnet
+  function aktionen(hi){document.querySelectorAll("#heute [data-akt]").forEach(z=>{const k=z.querySelector("button.akt");k.onclick=()=>{
+      const da=z.nextElementSibling&&z.nextElementSibling.classList.contains("wahl");document.querySelectorAll("#heute .wahl").forEach(w=>w.remove());OFFEN_AKT="";if(da)return;
+      OFFEN_AKT=z.dataset.nr+"|"+z.dataset.akt;
+      const w=document.createElement("div");w.className="wahl";const nr=z.dataset.nr,v=lies("mietixVorgaenge",[]).find(x=>x.nr===nr);if(!v)return;
+      if(z.dataset.akt==="bezahlt"){w.innerHTML="<b>Wie bezahlt?</b>"+ZA.map(([a,t])=>'<span data-za="'+a+'">'+t+"</span>").join("");
+        w.querySelectorAll("[data-za]").forEach(c=>c.onclick=()=>{vAendern(nr,x=>{const zz=x.zahlung=x.zahlung||{},r=zz.rest=zz.rest||{};r.art=c.dataset.za;r.am=hi;let s=0;
+          (x.verlaengerungen||[]).forEach(y=>{if(!y.bezahlt){y.bezahlt=true;y.bezahltAm=hi;if(!y.imRest)s+=+y.aufpreis||0}});if(s)r.betrag=(zahl(r.betrag)+s).toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2})});
+          OFFEN_AKT="";hinweis("✓ "+v.name+": als bezahlt eingetragen");zeichne()})}
+      else{const kb=zahl(((v.zahlung||{}).kaut||{}).betrag);w.innerHTML="<b>Kaution "+EUR(kb)+" an "+esc(v.name)+"</b>"+'<span class="gr" data-k="voll">Komplett zurück</span><a href="'+B+'mietix-vertrag/?zeige=heute">Mit Einbehalt …</a>';
+        w.querySelector("[data-k]").onclick=()=>{if(!confirm("Kaution "+EUR(kb)+" komplett an "+v.name+" zurückgegeben?"))return;
+          vAendern(nr,x=>{x.kautionRueck={betrag:kb,einbehalt:0,grund:"",am:hi}});OFFEN_AKT="";hinweis("✓ Kaution "+EUR(kb)+" zurück");zeichne()}}
+      z.after(w)}});
+    if(OFFEN_AKT){const [nr,akt]=OFFEN_AKT.split("|"),z=document.querySelector('#heute [data-akt="'+akt+'"][data-nr="'+nr+'"]');OFFEN_AKT="";if(z)z.querySelector("button.akt").click()}}
   // Suchen statt Scrollen (31.10.2026): Kunde, Auto, Kennzeichen, Mietvertrag-Nummer, Telefon
   const nrm=t=>String(t||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
   function suchen(){const q=nrm(document.getElementById("suche").value),zi=q.replace(/\D/g,""),el=document.getElementById("treffer");
