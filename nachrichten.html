@@ -341,7 +341,9 @@ const ordne=x=>Array.isArray(x)?x.map(ordne):x&&typeof x==="object"?Object.keys(
 const fp=x=>hash(JSON.stringify(ordne(x))===undefined?"":JSON.stringify(ordne(x)));
 // Fingerabdruck stimmt mit der Grundlage überein (neue Form oder die Form vor dem 30.10.2026)
 const gleichBasis=(x,b)=>b!==undefined&&(fp(x)===b||hash(JSON.stringify(x))===b);
-const felderVon=x=>{const f={};if(x&&typeof x==="object"&&!Array.isArray(x))Object.keys(x).forEach(n=>f[n]=fp(x[n]));return f};
+// Fingerabdruck je Feld, bei Unterobjekten (zahlung, ueb, rueck …) zusätzlich je Unterfeld "feld.unter" (31.10.2026: zwei Handys, zwei Zahlungen)
+const istObj=x=>x&&typeof x==="object"&&!Array.isArray(x);
+const felderVon=x=>{const f={};if(istObj(x))Object.keys(x).forEach(n=>{f[n]=fp(x[n]);if(istObj(x[n]))Object.keys(x[n]).forEach(u=>f[n+"."+u]=fp(x[n][u]))});return f};
 function andereFassung(k,p,eintrag){if(k==="mietixPapierkorb"||k==="mietixStand")return;
   const pk=lies("mietixPapierkorb",[]),jetzt=new Date().toISOString(),c=SPEICHER[k];
   const s=fp(eintrag);if(pk.some(x=>x.ablage===k&&x.schluessel===p&&fp(x.eintrag)===s))return;
@@ -367,6 +369,13 @@ function zusammen(k,p,lokal,server,basisHash,basisFelder){
       if(lf===sf){if(n in lokal)out[n]=lokal[n]}
       else if(lf===bf){if(n in server)out[n]=server[n]}
       else if(sf===bf){if(n in lokal)out[n]=lokal[n]}
+      else if(istObj(lokal[n])&&istObj(server[n])){   // beide Geräte haben im selben Unterobjekt geändert: Unterfeld für Unterfeld
+        const o={},un=new Set([...Object.keys(lokal[n]),...Object.keys(server[n])]);
+        un.forEach(u=>{const lu=u in lokal[n]?fp(lokal[n][u]):undefined,su=u in server[n]?fp(server[n][u]):undefined,bu=basisFelder[n+"."+u];
+          if(lu===su||su===bu){if(u in lokal[n])o[u]=lokal[n][u]}
+          else if(lu===bu){if(u in server[n])o[u]=server[n][u]}
+          else{streit=true;if(u in lokal[n])o[u]=lokal[n][u]}});
+        out[n]=o}
       else{streit=true;if(n in lokal)out[n]=lokal[n];else if(n in server)out[n]=server[n]}});
     if(streit)andereFassung(k,p,server);
     return out}
@@ -662,7 +671,7 @@ zeigen();abgleichen();
   const desc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
   const st=document.createElement("style");st.textContent=".mxAZ{display:grid;grid-template-columns:minmax(90px,32%) 1fr;gap:10px}.mxAZ>div{min-width:0}.mxAZ input{width:100%;box-sizing:border-box}";document.head.appendChild(st);
   function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/);
-    if(m){s=m[1].trim().replace(/,$/,"");p=m[2];o=m[3].trim()}else if(voll)s=v;else o=v;return{s,p,o}}
+    if(m){s=m[1].trim().replace(/,$/,"");p=m[2];o=m[3].trim()}else if(voll&&/\d/.test(v))s=v;else o=v.replace(/^,\s*/,"");return{s,p,o}}   // ohne Hausnummer ist es ein Ort (31.10.2026)
   function setzen(inp){if(inp.dataset.mxA)return;inp.dataset.mxA="1";const voll=inp.dataset.anschrift!=="plzort";
     const lab=inp.previousElementSibling&&inp.previousElementSibling.tagName==="LABEL"?inp.previousElementSibling:null;
     const ic=inp.className,lc=lab?lab.className:"",feld=(t,l,extra)=>lab?'<label class="'+lc+'">'+l+'</label><input class="'+ic+'" data-t="'+t+'" autocomplete="off"'+(extra||"")+'>':'<input class="'+ic+'" data-t="'+t+'" placeholder="'+l+'" autocomplete="off"'+(extra||"")+'>';
