@@ -3,62 +3,83 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#C4161C">
+<meta name="theme-color" content="#FFFFFF">
 <title>Mietix Kunden</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-input,select,textarea{font-size:16px;font-family:inherit;max-width:100%;box-sizing:border-box}input[type=date],input[type=time],input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;min-height:44px}select{min-width:0}
-
-:root{--rot:#C4161C;--text:#2E2E30;--rand:#E4E4E7;--grau:#6F6F72;--bg:#F6F6F7;--gruen:#1B8A4B;--hell:#FDECEC}
+:root{--rot:#C4161C;--ink:#1C1C1E;--grau:#8E8E93;--linie:#E5E5EA;--bg:#F2F2F7;--gruen:#1B6B3A}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.35}
-header{background:#fff;border-bottom:3px solid var(--rot);padding:calc(12px + env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:5}
-header h1{font-size:20px;font-weight:900;letter-spacing:.5px}header h1 span{color:var(--rot)}
-header a{font-size:15px;color:var(--grau);text-decoration:none;float:right;margin-top:-8px;padding:12px 0 12px 16px}
-main{max-width:680px;margin:0 auto;padding:14px 16px 90px}
-.karte{background:#fff;border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid var(--rand)}
-.karte h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--rot);margin-bottom:10px}
-label{display:block;font-size:12px;font-weight:700;color:var(--grau);margin:10px 0 4px}
-input,select,textarea{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px 13px;font:600 16px Inter,system-ui,sans-serif;color:var(--text);background:#fff;min-height:46px}
-textarea{min-height:90px;line-height:1.4}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-offset:-2px}
-#suche{font-size:18px;padding:14px;min-height:52px}
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
-.chip{padding:9px 12px;border-radius:999px;border:1px solid var(--rand);background:#fff;font-weight:700;font-size:14px;cursor:pointer;user-select:none}
-.chip.an{background:var(--rot);border-color:var(--rot);color:#fff}
-.chip.gruen.an{background:var(--gruen);border-color:var(--gruen)}
-.hinweis{font-size:13px;color:var(--grau);margin-top:6px;line-height:1.4}
-.zahl{font-size:13px;color:var(--grau);margin:4px 0 10px;font-weight:600}
-.k{background:#fff;border:1px solid var(--rand);border-radius:16px;padding:13px 14px;margin-bottom:8px;cursor:pointer}
-.k:active{background:var(--hell)}
-.k b{font-size:16px;display:block}.k .i{font-size:13px;color:var(--grau);margin-top:3px}
-.k .w{display:inline-block;background:var(--hell);color:var(--rot);font-size:11px;font-weight:800;border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:middle}
-.k .s{display:inline-block;background:#E8F6EE;color:var(--gruen);font-size:11px;font-weight:800;border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:middle}
-.k .g{display:inline-block;background:#EFEFF1;color:var(--grau);font-size:11px;font-weight:800;border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:middle}
-.k.auf{cursor:default;border-color:var(--rot)}
-.detail{margin-top:10px;border-top:1px solid var(--rand);padding-top:6px}
-.zwei{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.knopf{display:block;width:100%;text-align:center;background:var(--rot);color:#fff;border:0;border-radius:12px;padding:13px;font:800 16px Inter,system-ui,sans-serif;cursor:pointer;text-decoration:none;margin-top:8px}
-.knopf.hell{background:#fff;color:var(--text);border:1px solid var(--rand)}
-.knopf.wa{background:#25D366}
-.knopf.gruen{background:var(--gruen)}
-.knopf.klein{padding:10px;font-size:14px;margin-top:0}
-.verlauf{margin-top:8px}.verlauf div{font-size:13px;padding:7px 0;border-bottom:1px solid #F0F0F2}.verlauf div:last-child{border-bottom:0}
-.verlauf a{color:var(--rot);text-decoration:none;font-weight:700}
-.verlauf i{font-style:normal;color:var(--grau)}
-.rot{color:var(--rot);font-weight:700}
-.meld{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2E2E30;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9;white-space:nowrap}
-.meld.an{opacity:1}
-.schalter{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;font-size:14px;font-weight:700}
-.schalter .chip{margin:0}
-.angebotRow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F0F0F2}
-.angebotRow:last-child{border-bottom:0}.angebotRow .t{flex:1;min-width:0}.angebotRow b{font-size:15px;display:block}.angebotRow i{font-style:normal;font-size:12px;color:var(--grau)}
-.angebotRow a{flex:0 0 auto;background:#25D366;color:#fff;text-decoration:none;font-weight:800;font-size:13px;border-radius:999px;padding:9px 13px}
-.angebotRow.war a{background:#EFEFF1;color:var(--grau)}
-.versteckt{display:none}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.3}
+input,select,textarea{font-size:16px;font-family:inherit;max-width:100%;box-sizing:border-box}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;min-height:44px}
+header{background:#fff;border-bottom:3px solid var(--rot);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;position:sticky;top:0;z-index:5}
+header h1{font-size:20px;font-weight:900}
+.plus{position:absolute;right:16px;top:calc(10px + env(safe-area-inset-top));width:38px;height:38px;border-radius:50%;background:var(--rot);color:#fff;border:0;font-size:26px;line-height:38px;text-align:center;cursor:pointer;font-family:inherit}
+.such{margin-top:10px;position:relative}
+.such input{width:100%;border:0;background:#F2F2F7;border-radius:12px;padding:11px 14px 11px 38px;font-size:17px;min-height:44px}
+.such svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--grau);fill:none;stroke-width:2.2;stroke-linecap:round}
+.filter{display:flex;gap:8px;overflow-x:auto;margin-top:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.filter::-webkit-scrollbar{display:none}
+.filter span{flex:0 0 auto;padding:8px 13px;border-radius:999px;background:#F2F2F7;font-weight:700;font-size:14px;color:#3A3A3C;cursor:pointer;user-select:none}
+.filter span.an{background:var(--ink);color:#fff}.filter span b{color:var(--rot);margin-left:4px}.filter span.an b{color:#FF8A8F}
+main{max-width:640px;margin:0 auto;padding:12px 16px 90px}
+.kz{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.kz div{background:#fff;border-radius:12px;padding:11px 12px}.kz b{display:block;font-size:20px;font-weight:800}.kz i{font-style:normal;font-size:12px;color:var(--grau);font-weight:600}
+.zeile1{display:flex;justify-content:space-between;align-items:center;margin:4px 4px 6px;font-size:13px;color:var(--grau);font-weight:600}
+.zeile1 select{border:0;background:none;color:var(--rot);font-weight:700;font-size:13px;min-height:0;padding:4px 0;text-align:right}
+.buchst{font-size:13px;font-weight:800;color:var(--rot);margin:14px 4px 6px}
+.liste{background:#fff;border-radius:12px;overflow:hidden}
+.k{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:.5px solid var(--linie);cursor:pointer;min-height:60px}.k:first-child{border-top:0}.k:active{background:#F7F7F9}
+.av{flex:0 0 42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;letter-spacing:.3px}
+.t{flex:1;min-width:0}.t b{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:700;min-width:0}.t b span.n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t i{display:block;font-style:normal;font-size:13px;color:#3A3A3C;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.t i.ort{color:var(--grau);margin-top:1px}
+.tag{flex:0 0 auto;font-size:10px;font-weight:800;padding:3px 6px;border-radius:6px;letter-spacing:.3px}.tag.stamm{background:#FFF4DB;color:#9A6700}.tag.ach{background:#FDECEC;color:#A31318}.tag.geb{background:#E6F4EA;color:var(--gruen)}.tag.grau{background:#F2F2F7;color:#3A3A3C}
+.ak{display:flex;gap:6px;flex:0 0 auto}.ak a{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.ak .wa{background:#E7F9EE}.ak .tel{background:#F2F2F7}.ak svg,.knoepfe svg{width:18px;height:18px;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
 .leer{text-align:center;color:var(--grau);font-size:15px;font-weight:600;padding:26px 10px}
+/* Kundenkarte */
+#karte{position:fixed;inset:0;z-index:20;background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch;display:none}#karte.auf{display:block}
+.kTop{position:sticky;top:0;z-index:2;background:#fff;border-bottom:3px solid var(--rot);padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;justify-content:space-between;align-items:center}
+.kTop a{color:var(--ink);text-decoration:none;font-weight:800;font-size:13px;border:1.5px solid currentColor;border-radius:999px;padding:5px 11px 5px 8px;opacity:.8}
+.kTop button{border:0;background:none;color:var(--rot);font-weight:700;font-size:17px;font-family:inherit;cursor:pointer}
+.blatt{max-width:640px;margin:0 auto;padding:14px 16px 60px}
+.kk{text-align:center;padding:6px 0 4px}.kk .av{width:76px;height:76px;margin:0 auto 10px;font-size:26px;flex:none}.kk h2{font-size:24px!important;font-weight:800;letter-spacing:-.4px}.kk p{color:var(--grau);font-weight:600;font-size:14px;margin-top:4px}
+.knoepfe{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.knoepfe a{background:#fff;border-radius:12px;padding:12px 6px;text-align:center;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none}
+.knoepfe a svg{display:block;margin:0 auto 6px;width:22px;height:22px}.knoepfe .gr{color:#128C4A}.knoepfe .rt{color:var(--rot)}
+.ab{display:flex;justify-content:space-between;align-items:baseline;font-size:17px;font-weight:700;margin:18px 4px 8px}.ab span{font-size:13px;color:var(--grau);font-weight:600}
+.feld{background:#fff;border-radius:12px;padding:0 14px}
+.zl{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:.5px solid var(--linie);font-size:15px;min-height:46px;align-items:center}.zl:first-child{border-top:0}
+.zl span{color:#3A3A3C}.zl b{font-weight:600;text-align:right;overflow-wrap:anywhere}.zl b.leer2{color:var(--grau);font-weight:500}
+.mv{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-top:.5px solid var(--linie);font-size:15px;text-decoration:none;color:var(--ink);align-items:center}.mv:first-child{border-top:0}
+.mv i{font-style:normal;color:var(--grau);font-size:13px;display:block;margin-top:2px}.mv b{font-weight:700;white-space:nowrap}.mv .rot{color:var(--rot);font-size:12px;font-weight:700}
+.notiz{background:#fff;border-radius:12px;padding:12px 14px;font-size:15px;color:#3A3A3C;white-space:pre-wrap}
+.tipp{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:11px 13px;font-size:14px;font-weight:600;margin-top:12px}
+.warnung{background:#FDECEC;color:#A31318;border-radius:12px;padding:11px 13px;font-size:14px;font-weight:700;margin-top:10px}
+.loeschen{display:block;text-align:center;margin-top:22px;color:var(--grau);font-size:14px}
+/* Bearbeiten */
+.form{background:#fff;border-radius:12px;padding:6px 14px 14px}
+.form label{display:block;font-size:13px;font-weight:600;color:#3A3A3C;margin:12px 0 5px}
+.form input,.form textarea{width:100%;border:1px solid var(--linie);border-radius:10px;padding:11px 12px;font-size:16px;min-height:44px;background:#fff;color:var(--ink)}
+.form textarea{min-height:90px;line-height:1.4}
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.knopf{display:block;width:100%;text-align:center;background:var(--rot);color:#fff;border:0;border-radius:12px;padding:14px;font-weight:700;font-size:17px;font-family:inherit;cursor:pointer;margin-top:14px}
+.schalter{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0 0;font-size:15px}
+.sw{width:51px;height:31px;border-radius:999px;background:#E5E5EA;position:relative;cursor:pointer;flex:0 0 auto;transition:background .2s}.sw::after{content:"";position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff;transition:left .2s}
+.sw.an{background:#34C759}.sw.an::after{left:22px}
+/* Angebot */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{padding:9px 12px;border-radius:999px;border:1px solid var(--linie);background:#fff;font-weight:600;font-size:14px;cursor:pointer;user-select:none;color:var(--ink)}
+.chip.an{background:var(--ink);border-color:var(--ink);color:#fff}.chip.belegt{color:#C7C7CC;text-decoration:line-through;cursor:default}
+.agZeit{display:grid;grid-template-columns:1fr 118px;gap:8px;margin-top:6px}
+.agZeit input{width:100%;border:1px solid var(--linie);border-radius:10px;padding:10px;font-size:16px;min-height:44px}
+.agLab{display:block;font-size:13px;font-weight:600;color:#3A3A3C;margin:12px 0 2px}
+.agVorschau{background:#F2F2F7;border-radius:12px;padding:12px;font-size:14px;white-space:pre-wrap;margin-top:8px;color:#3A3A3C}
+.agRow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:.5px solid var(--linie)}.agRow:first-child{border-top:0}
+.agRow .t b{font-size:15px}.agRow a{flex:0 0 auto;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:13px;border-radius:999px;padding:9px 13px}
+.agRow.war a{background:#F2F2F7;color:var(--grau)}
+.meld{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1C1C1E;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
+.meld.an{opacity:1}
+.versteckt{display:none!important}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
 .mxKnopf span,.mxKlapp>summary span{flex:1;min-width:0}
@@ -81,51 +102,38 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--rot);outline-off
 .mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
 .mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
 </style></head><body>
-<header><h1>MIETIX <span>KUNDEN</span> <i id="abgleichPunkt" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B0B0B3;vertical-align:middle;margin-left:4px"></i></h1></header>
+<header><h1>MIETIX <span>KUNDEN</span> <i id="abgleichPunkt" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#B0B0B3;vertical-align:middle;margin-left:4px"></i></h1>
+  <button class="plus" type="button" data-fenster="fNeu" aria-label="Neuer Kunde">+</button>
+  <div class="such"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="suche" type="search" autocomplete="off" placeholder="Name, Telefon oder Ort"></div>
+  <div class="filter" id="filter"><span class="an" data-f="alle">Alle<b id="nAlle"></b></span><span data-f="stamm">Stammkunden<b id="nStamm"></b></span><span data-f="lange">Lange nicht da<b id="nLange"></b></span><span data-f="achtung">Achtung<b id="nAchtung"></b></span><span data-f="geb">Geburtstag<b id="nGeb"></b></span></div>
+</header>
 <main>
 <div id="abgleich"></div>
+<div class="kz"><div><b id="kzAlle">0</b><i>Kunden</i></div><div><b id="kzStamm">0</b><i>Stammkunden</i></div><div><b id="kzNeu">0</b><i id="kzNeuT">neu im Monat</i></div></div>
+<button class="mxKnopf" id="angebotAuf" type="button"><span><b>Angebot verschicken</b><i>Freie Autos an Stammkunden per WhatsApp</i></span><em>›</em></button>
+<div class="zeile1"><span id="zahl"></span><select id="sortierung" aria-label="Sortieren"><option value="name">A bis Z</option><option value="zuletzt">Zuletzt gemietet</option><option value="mieten">Meiste Mieten</option></select></div>
+<div id="liste"></div>
+</main>
 
-<div class="karte">
-  <h2>Kunde suchen</h2>
-  <input id="suche" type="search" autocomplete="off" placeholder="Name, Telefon oder Ort">
-  <div class="chips" id="filter">
-    <div class="chip an" data-f="alle">Alle</div>
-    <div class="chip" data-f="stamm">Stammkunden</div>
-    <div class="chip" data-f="lange">Lange nicht da</div>
-    <div class="chip" data-f="achtung">Achtung</div>
-    <div class="chip" data-f="geb">Geburtstag bald</div>
-  </div>
-  <details class="mxKlein"><summary>Sortieren: <span id="sortName">A bis Z</span> <em>›</em></summary>
-  <div class="chips" id="sortierung">
-    <div class="chip an" data-s="name">A bis Z</div>
-    <div class="chip" data-s="zuletzt">Zuletzt gemietet</div>
-    <div class="chip" data-s="mieten">Meiste Mieten</div>
-  </div>
-  <div class="hinweis">Stammkunde ab 2 Mieten, lange nicht da ab 90 Tagen.</div></details>
+<div id="karte"></div>
+
+<div class="mxFenster" id="fAngebot" role="dialog" aria-label="Angebot verschicken"><div class="mxKopf"><h3>Angebot verschicken</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <span class="agLab">Zeitraum</span>
+  <div class="chips" id="agDauer"><div class="chip" data-d="1">1 Tag</div><div class="chip" data-d="2">2 Tage</div><div class="chip" data-d="3">3 Tage</div><div class="chip" data-d="7">1 Woche</div></div>
+  <div class="chips" id="agWe"><div class="chip" data-we="5,1">Fr bis Sa</div><div class="chip" data-we="5,2">Fr bis So</div><div class="chip" data-we="6,2">Sa bis Mo</div><div class="chip" data-we="5,3">Fr bis Mo</div></div>
+  <span class="agLab">Übergabe</span><div class="agZeit"><input type="date" id="agVon"><input type="time" id="agVonU" value="10:00"></div>
+  <span class="agLab">Rückgabe</span><div class="agZeit"><input type="date" id="agBis"><input type="time" id="agBisU" value="10:00"></div>
+  <span class="agLab">Fahrzeuge antippen</span><div class="chips" id="agAutos"></div>
+  <span class="agLab">Nachricht</span><div class="agVorschau" id="agVorschau"></div>
+  <div class="schalter"><span>Nur Stammkunden (ab 2 Mieten)</span><div class="sw an" id="agNurStamm"></div></div>
+  <div style="margin-top:10px" id="agListe"></div>
+  <p class="mxText" style="margin-top:10px">Antippen öffnet WhatsApp mit der fertigen Nachricht. Wer angeschrieben wurde, steht 14 Tage weiter unten und grau.</p>
 </div>
 
-<button class="mxKnopf" id="angebotAuf" type="button"><span><b>Angebot verschicken</b><i>Freie Autos, Stammkunden per WhatsApp anschreiben</i></span><em>›</em></button>
-<div class="mxFenster" id="fAngebot" role="dialog" aria-label="Angebot an Stammkunden"><div class="mxKopf"><h3>Angebot an Stammkunden</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
-<div id="angebot">
-  <div class="hinweis" id="agFrei" style="margin:0 0 6px"></div>
-  <label>Was ist frei?</label><input id="agWas">
-  <label>Wann?</label><input id="agWann">
-  <label>Nachricht (Vorname, Was und Wann werden eingesetzt)</label>
-  <textarea id="agText"></textarea>
-  <div class="schalter"><span>Nur Stammkunden (2 und mehr Mieten)</span><div class="chip gruen an" id="agNurStamm">An</div></div>
-  <div class="hinweis">Antippen öffnet WhatsApp. Wer angeschrieben wurde, steht 14 Tage nicht mehr in dieser Liste.</div>
-  <div id="agListe" style="margin-top:8px"></div>
-</div></div>
-
-<div class="zahl" id="zahl"></div>
-<div id="liste"></div>
-<div style="margin-top:14px"><button class="mxKnopf" type="button" data-fenster="fNeu"><span><b>Neuer Kunde ohne Mietvertrag</b><i>Nur nötig, wenn noch kein Mietvertrag und keine Anfrage da ist</i></span><em>›</em></button></div>
-</main>
-<div class="mxFenster" id="fNeu" role="dialog" aria-label="Neuer Kunde ohne Mietvertrag"><div class="mxKopf"><h3>Neuer Kunde ohne Mietvertrag</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
-  <p class="mxText">Nur nötig, wenn noch kein Mietvertrag und keine Anfrage da ist.</p>
-  <input id="neuName" placeholder="Vor- und Nachname">
-  <input id="neuTel" inputmode="tel" placeholder="Telefon" style="margin-top:8px">
-  <button class="knopf hell" id="neuLos" type="button">Kunde anlegen</button>
+<div class="mxFenster" id="fNeu" role="dialog" aria-label="Neuer Kunde"><div class="mxKopf"><h3>Neuer Kunde</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <p class="mxText">Nur nötig, wenn es noch keinen Mietvertrag und keine Anfrage gibt.</p>
+  <div class="form" style="padding:0;background:none"><input id="neuName" placeholder="Vor- und Nachname"><input id="neuTel" inputmode="tel" placeholder="Telefon" style="margin-top:8px"></div>
+  <button class="knopf" id="neuLos" type="button">Kunde anlegen</button>
 </div>
 <div class="meld" id="meld"></div>
 <script>/* Mietix Kundenstamm (seit 28.10.2026): ein Kunde, einmal gespeichert, überall gefunden.
@@ -208,14 +216,27 @@ window.dispatchEvent(new Event("mietix-kunden-bereit"));
 <script>
 const $=id=>document.getElementById(id);
 const MK=window.mietixKunden,de=MK.de,heute=MK.heute();
-const EUR=new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR"});
+const EUR=new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0});
 const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
-let FILTER="alle",SORT="name",AUF=null,ALLE=[];
+const MON=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const WT=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+let FILTER="alle",SORT="name",AUF=null,BEARB=false,ALLE=[];
 function meldung(t){const m=$("meld");m.textContent=t;m.classList.add("an");clearTimeout(m._t);m._t=setTimeout(()=>m.classList.remove("an"),1800)}
 function tageSeit(iso){if(!iso)return 99999;return Math.round((new Date(heute)-new Date(iso))/864e5)}
 function gebBald(e){if(!/^\d{4}-\d{2}-\d{2}$/.test(e.geb||""))return false;const h=new Date(heute);
   for(const j of [h.getFullYear(),h.getFullYear()+1]){const g=new Date(j,+e.geb.slice(5,7)-1,+e.geb.slice(8,10));const d=Math.round((g-h)/864e5);if(d>=0&&d<=14)return d}return false}
-function gefiltert(){let l=MK.finde($("suche").value,ALLE);if(!$("suche").value.trim())l=ALLE.slice();
+const FARBEN=["#C4161C","#0E7490","#7C3AED","#B45309","#15803D","#475569","#9333EA","#BE185D","#1D4ED8"];
+function farbe(n){let h=0;for(const c of String(n))h=(h*31+c.charCodeAt(0))>>>0;return FARBEN[h%FARBEN.length]}
+function ini(n){const t=String(n||"").trim().split(/\s+/);return((t[0]||"")[0]||"").toUpperCase()+((t.length>1?t[t.length-1]:"")[0]||"").toUpperCase()}
+function wa(tel,text){const z=MK.ziffern(tel);if(!z)return"";const int=z.startsWith("0")?"49"+z.slice(1):z;return"https://wa.me/"+int+(text?"?text="+encodeURIComponent(text):"")}
+const SVG_WA='<svg viewBox="0 0 24 24" stroke="#128C4A"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>',
+  SVG_TEL='<svg viewBox="0 0 24 24" stroke="#1C1C1E"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  SVG_MV='<svg viewBox="0 0 24 24" stroke="#C4161C"><path d="M6 3h9l4 4v14H6z"/><path d="M12 10v6M9 13h6"/></svg>';
+// wie oft und wann (Baran, 31.10.2026: „man sollte sehen, wie oft er gemietet hat, vielleicht sogar wann“)
+function wieOft(e,ohneAuto){if(!e.mieten)return e.anfragen.length?"nur Anfrage, noch keine Miete":"noch keine Miete";
+  const z=e.zuletzt||"",zuk=z>heute;
+  return e.mieten+(e.mieten===1?" Miete":" Mieten")+(z?(zuk?", gebucht für ":", zuletzt ")+de(z):"")+(e.letztesAuto&&!ohneAuto?" ("+e.letztesAuto.replace(/^(Audi|Mercedes-Benz|Mercedes|VW|BMW) /,"")+")":"")}
+function gefiltert(){let l=$("suche").value.trim()?MK.finde($("suche").value,ALLE):ALLE.slice();
   if(FILTER==="stamm")l=l.filter(e=>e.mieten>=2);
   if(FILTER==="lange")l=l.filter(e=>e.mieten&&tageSeit(e.zuletzt)>90);
   if(FILTER==="achtung")l=l.filter(e=>e.warn.length);
@@ -225,86 +246,108 @@ function gefiltert(){let l=MK.finde($("suche").value,ALLE);if(!$("suche").value.
   if(SORT==="zuletzt")l.sort((a,b)=>(b.zuletzt||"")<(a.zuletzt||"")?-1:(b.zuletzt||"")>(a.zuletzt||"")?1:n(a.name).localeCompare(n(b.name)));
   if(SORT==="mieten")l.sort((a,b)=>b.mieten-a.mieten||b.umsatz-a.umsatz||n(a.name).localeCompare(n(b.name)));
   return l}
-function wa(tel,text){const z=MK.ziffern(tel);if(!z)return"";const int=z.startsWith("0")?"49"+z.slice(1):z;return"https://wa.me/"+int+(text?"?text="+encodeURIComponent(text):"")}
-function karte(e){const gb=gebBald(e);
-  const info=[e.telefon,e.alter?e.alter+" Jahre":"",e.ort,e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten")+(e.zuletzt?", zuletzt "+de(e.zuletzt):"")+(e.letztesAuto?", "+e.letztesAuto:""):(e.anfragen.length?"nur Anfrage, noch kein Mietvertrag":"noch kein Mietvertrag")].filter(Boolean).join("  |  ");
-  return'<div class="k'+(AUF===e.name?" auf":"")+'" data-n="'+esc(e.name)+'"><b>'+esc(e.name)
-    +(e.warn.length?'<span class="w">ACHTUNG</span>':"")+(e.mieten>=2?'<span class="s">Stammkunde</span>':"")+(gb!==false?'<span class="s">Geburtstag '+(gb===0?"heute":"in "+gb+" Tagen")+'</span>':"")
-    +(e.keineAngebote?'<span class="g">keine Angebote</span>':"")+(e.gesperrt?'<span class="g">Daten auf Wunsch gelöscht</span>':"")+'</b><div class="i">'+esc(info)+'</div>'
-    +(AUF===e.name?detail(e):"")+'</div>'}
-function detail(e){const V="../mietix-vertrag/";
-  let h='<div class="detail" onclick="event.stopPropagation()">';
-  if(e.warn.length)h+='<div class="rot" style="margin:6px 0">ACHTUNG: '+esc(e.warn.join(". "))+'</div>';
-  h+='<div class="zwei"><a class="knopf klein" href="tel:'+esc(MK.ziffern(e.telefon))+'">Anrufen</a><a class="knopf klein wa" target="_blank" href="'+wa(e.telefon)+'">WhatsApp</a></div>';
-  h+='<a class="knopf klein hell" style="margin-top:8px" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">Neuer Mietvertrag, alles schon drin</a>';
-  h+='<label>Telefon</label><input id="dTel" inputmode="tel" value="'+esc(e.telefon)+'"><label>Anschrift</label><input id="dAnschrift" data-anschrift value="'+esc(e.anschrift)+'">';
-  h+='<div class="zwei"><div><label>Geburtsdatum</label><input id="dGeb" type="date" value="'+esc(e.geb)+'"></div><div><label>Geburtsort</label><input id="dGebort" value="'+esc(e.gebort)+'"></div></div>';
-  h+='<label>E-Mail</label><input id="dEmail" type="email" value="'+esc(e.email)+'"><label>Notiz (nur für uns)</label><textarea id="dNotiz">'+esc(e.notiz)+'</textarea>';
-  h+='<div class="schalter"><span>Keine Angebote mehr schicken</span><div class="chip'+(e.keineAngebote?" an":"")+'" id="dKeine">'+(e.keineAngebote?"An":"Aus")+'</div></div>';
-  h+='<button class="knopf" id="dSpeichern" type="button">Speichern</button>';
-  if(e.vertraege.length){h+='<div class="verlauf"><label>Mietverträge</label>'+e.vertraege.slice().reverse().map(v=>'<div><a href="'+V+'?nr='+esc(v.nr)+'">'+esc(v.nr)+'</a> '+esc(v.auto)+' <i>'+de(v.von)+(v.bis?" bis "+de(v.bis):"")+(v.preis?", "+EUR.format(v.preis):"")+(v.status==="zurück"?", zurück":"")+(v.mieteOffen?'</i> <span class="rot">Miete offen</span><i>':"")+'</i></div>').join("")+'</div>'}
-  if(e.umsatz)h+='<div class="hinweis">Umsatz gesamt: '+EUR.format(e.umsatz)+'</div>';
-  if(e.schaeden.length){h+='<div class="verlauf"><label>Schäden (aus der Excel)</label>'+e.schaeden.map(s=>'<div>'+esc(s.datum||"")+' '+esc(s.auto||"")+' <i>'+esc(s.schaden||"")+(s.kvnr?", KV-Nr "+esc(s.kvnr):"")+(s.kv?", KV "+EUR.format(s.kv):"")+(s.offen?'</i> <span class="rot">offen '+EUR.format(s.offen)+(s.frist?", Frist "+esc(s.frist):"")+'</span><i>':"")+'</i></div>').join("")+'</div>'}
-  if(e.anfragen.length){h+='<div class="verlauf"><label>Anfragen</label>'+e.anfragen.slice().reverse().slice(0,5).map(a=>'<div>'+de(a.tag)+' <i>'+esc(a.auto)+(a.von?", "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+(a.status?", "+esc(a.status):"")+'</i></div>').join("")+'</div>'}
-  if(e.angeschrieben)h+='<div class="hinweis">Zuletzt Angebot geschickt: '+de(e.angeschrieben)+'</div>';
-  h+='<a href="#" id="dLoeschen" class="hinweis" style="display:block;text-align:center;margin-top:12px;color:var(--grau)">Daten auf Kundenwunsch löschen</a>';
-  return h+'</div>'}
+function zeileK(e){const gb=gebBald(e);
+  return'<div class="k" data-n="'+esc(e.name)+'"><div class="av" style="background:'+farbe(e.name)+'">'+esc(ini(e.name))+'</div><div class="t"><b><span class="n">'+esc(e.name)+'</span>'
+    +(e.warn.length?'<span class="tag ach">ACHTUNG</span>':e.mieten>=2?'<span class="tag stamm">STAMM</span>':"")+(gb!==false?'<span class="tag geb">GEBURTSTAG</span>':"")+(e.gesperrt?'<span class="tag grau">GELÖSCHT</span>':"")
+    +'</b><i>'+esc(wieOft(e,true))+'</i>'+(e.ort?'<i class="ort">'+esc(e.ort)+'</i>':'')+'</div>'
+    +(e.telefon&&!e.gesperrt?'<div class="ak"><a class="tel" href="tel:'+esc(MK.ziffern(e.telefon))+'" aria-label="Anrufen">'+SVG_TEL+'</a><a class="wa" target="_blank" href="'+wa(e.telefon)+'" aria-label="WhatsApp">'+SVG_WA+'</a></div>':"")+'</div>'}
 function zeichne(){ALLE=MK.alle();const l=gefiltert();
-  $("zahl").textContent=ALLE.length+" Kunden gespeichert, "+ALLE.filter(e=>e.mieten>=2).length+" Stammkunden"+(l.length!==ALLE.length?", "+l.length+" angezeigt":"");
-  $("liste").innerHTML=l.length?l.map(karte).join(""):'<div class="leer">Niemand gefunden.</div>';
-  [...$("liste").querySelectorAll(".k")].forEach(el=>el.onclick=()=>{AUF=AUF===el.dataset.n?null:el.dataset.n;zeichne();
-    if(AUF){const k=$("liste").querySelector(".k.auf");if(k)k.scrollIntoView({block:"start",behavior:"smooth"})}});
-  if(AUF)detailKnoepfe(l.find(e=>e.name===AUF));
-  if($("fAngebot").classList.contains("auf"))angebotListe()}
-function detailKnoepfe(e){if(!e||!$("dSpeichern"))return;
-  $("dKeine").onclick=()=>{const an=!$("dKeine").classList.contains("an");$("dKeine").classList.toggle("an",an);$("dKeine").textContent=an?"An":"Aus"};
-  $("dSpeichern").onclick=()=>{MK.merken(e.name,{telefon:$("dTel").value.trim(),anschrift:$("dAnschrift").value.trim(),geb:$("dGeb").value,gebort:$("dGebort").value.trim(),
-    email:$("dEmail").value.trim(),notiz:$("dNotiz").value.trim(),keineAngebote:$("dKeine").classList.contains("an")||null});meldung("Gespeichert, auf allen Geräten.");zeichne()};
-  $("dLoeschen").onclick=ev=>{ev.preventDefault();if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+" löschen? Die Mietverträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
-    MK.merken(e.name,{telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true});meldung("Daten gelöscht.");zeichne()}}
-/* Angebot an Stammkunden */
-const AG_STD="Hallo {vorname}, hier ist Mietix. {wann} ist bei uns noch frei: {was}. Wenn du Lust hast, sag kurz Bescheid, dann machen wir dir einen guten Preis.";
-function agLaden(){let a={};try{a=JSON.parse(localStorage.getItem("mietixAngebot")||"{}")||{}}catch(e){}
-  $("agWas").value=a.was||"";$("agWann").value=a.wann||"";$("agText").value=a.text||AG_STD;if(a.nurStamm===false){$("agNurStamm").classList.remove("an");$("agNurStamm").textContent="Aus"}}
-function agMerken(){try{localStorage.setItem("mietixAngebot",JSON.stringify({was:$("agWas").value,wann:$("agWann").value,text:$("agText").value,nurStamm:$("agNurStamm").classList.contains("an")}))}catch(e){}}
-function agNachricht(e){const vn=e.name.trim().split(/\s+/)[0];let w=$("agWann").value.trim();if(w)w=w.charAt(0).toUpperCase()+w.slice(1);
-  return $("agText").value.replace(/\{vorname\}/g,vn).replace(/\{was\}/g,$("agWas").value.trim()||"ein Fahrzeug").replace(/\{wann\}/g,w||"Demnächst")}
-function angebotListe(){const nur=$("agNurStamm").classList.contains("an");
+  const stamm=ALLE.filter(e=>e.mieten>=2).length,mon=heute.slice(0,7),neu=ALLE.filter(e=>e.vertraege.length&&String(e.vertraege[0].von||"").slice(0,7)===mon).length;
+  $("kzAlle").textContent=ALLE.length;$("kzStamm").textContent=stamm;$("kzNeu").textContent=neu?"+"+neu:"0";$("kzNeuT").textContent="neu im "+MON[+mon.slice(5,7)-1];
+  $("nAlle").textContent=ALLE.length;$("nStamm").textContent=stamm;$("nLange").textContent=ALLE.filter(e=>e.mieten&&tageSeit(e.zuletzt)>90).length;
+  $("nAchtung").textContent=ALLE.filter(e=>e.warn.length).length;$("nGeb").textContent=ALLE.filter(e=>gebBald(e)!==false).length;
+  $("zahl").textContent=l.length===ALLE.length?ALLE.length+" Kunden":l.length+" von "+ALLE.length+" Kunden";
+  let h="";
+  if(!l.length)h='<div class="leer">Niemand gefunden.</div>';
+  else if(SORT==="name"&&!$("suche").value.trim()){const gr={};l.forEach(e=>{let b=MK.norm(e.name).charAt(0).toUpperCase();if(!/[A-Z]/.test(b))b="#";(gr[b]=gr[b]||[]).push(e)});
+    h=Object.keys(gr).map(b=>'<div class="buchst">'+b+'</div><div class="liste">'+gr[b].map(zeileK).join("")+'</div>').join("")}
+  else h='<div class="liste" style="margin-top:6px">'+l.map(zeileK).join("")+'</div>';
+  $("liste").innerHTML=h;
+  $("liste").querySelectorAll(".k").forEach(el=>{el.onclick=()=>oeffne(el.dataset.n);el.querySelectorAll(".ak a").forEach(a=>a.onclick=ev=>ev.stopPropagation())});
+  if(AUF&&!BEARB)karte();
+  if($("fAngebot").classList.contains("auf"))agListe()}
+/* Kundenkarte */
+function oeffne(n){AUF=n;BEARB=false;karte();$("karte").classList.add("auf");$("karte").scrollTop=0;history.pushState({kunde:n},"")}
+function zu(){AUF=null;BEARB=false;$("karte").classList.remove("auf")}
+window.mxZurueck=()=>{if(AUF){if(history.state&&history.state.kunde)history.back();else zu();return true}return false};
+window.addEventListener("popstate",()=>{if(AUF)zu()});
+function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="../mietix-vertrag/";
+  const seit=e.vertraege.length?e.vertraege[0].von:"",sMon=seit?MON[+seit.slice(5,7)-1]+" "+seit.slice(0,4):"";
+  const unter=e.mieten>=2?"Stammkunde, "+e.mieten+" Mieten seit "+sMon:e.mieten===1?"1 Miete im "+sMon:e.anfragen.length?"Bisher nur Anfrage":"Noch keine Miete";
+  const tel=MK.ziffern(e.telefon),t=String(e.anschrift||"").match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/),str=t?t[1].replace(/,$/,""):(e.anschrift||""),plzOrt=t?t[2]+" "+t[3]:(e.ort||"");
+  const wert=x=>x?'<b>'+esc(x)+'</b>':'<b class="leer2">nicht eingetragen</b>';
+  let h='<div class="kTop"><a href="#" id="kZu">‹ Kunden</a><button type="button" id="kBearb">'+(BEARB?"Fertig":"Bearbeiten")+'</button></div><div class="blatt">';
+  h+='<div class="kk"><div class="av" style="background:'+farbe(e.name)+'">'+esc(ini(e.name))+'</div><h2>'+esc(e.name)+'</h2><p>'+esc(unter)+(e.umsatz?", Umsatz "+EUR.format(e.umsatz):"")+'</p></div>';
+  if(e.warn.length)h+='<div class="warnung">Achtung: '+esc(e.warn.join(". "))+'</div>';
+  h+='<div class="knoepfe"><a class="gr" target="_blank" href="'+(wa(e.telefon)||"#")+'">'+SVG_WA+'WhatsApp</a><a href="'+(tel?"tel:"+esc(tel):"#")+'">'+SVG_TEL+'Anrufen</a><a class="rt" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">'+SVG_MV+'Mietvertrag</a></div>';
+  if(!BEARB){
+    h+='<div class="ab">Kontakt</div><div class="feld"><div class="zl"><span>Telefon</span>'+wert(e.telefon)+'</div><div class="zl"><span>Straße</span>'+wert(str)+'</div><div class="zl"><span>PLZ, Wohnort</span>'+wert(plzOrt)+'</div>'
+      +'<div class="zl"><span>Geburtstag</span>'+wert(e.geb?de(e.geb)+(e.alter?" ("+e.alter+")":""):"")+'</div><div class="zl"><span>Geburtsort</span>'+wert(e.gebort)+'</div><div class="zl"><span>E-Mail</span>'+wert(e.email)+'</div></div>';
+    h+='<div class="ab">Mietverträge<span>'+(e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten"):"keine")+'</span></div>';
+    h+=e.vertraege.length?'<div class="feld">'+e.vertraege.slice().reverse().map(v=>'<a class="mv" href="'+V+'?nr='+esc(v.nr)+'"><div>'+esc(v.auto)+'<i>'+de(v.von)+(v.bis?" bis "+de(v.bis):"")+", Nr. "+esc(v.nr)+(v.mieteOffen?' <span class="rot">Miete offen</span>':"")+'</i></div><b>'+(v.preis?EUR.format(v.preis):"")+'</b></a>').join("")+'</div>':'<div class="feld"><div class="zl"><span>Noch kein Mietvertrag</span></div></div>';
+    if(e.schaeden.length)h+='<div class="ab">Schäden<span>'+e.schaeden.length+'</span></div><div class="feld">'+e.schaeden.map(s=>'<div class="mv"><div>'+esc(s.auto||"Schaden")+'<i>'+esc([s.datum,s.schaden].filter(Boolean).join(", "))+'</i></div><b>'+(s.offen?'<span class="rot">offen '+EUR.format(s.offen)+'</span>':s.kv?EUR.format(s.kv):"")+'</b></div>').join("")+'</div>';
+    if(e.anfragen.length)h+='<div class="ab">Anfragen<span>'+e.anfragen.length+'</span></div><div class="feld">'+e.anfragen.slice().reverse().slice(0,5).map(a=>'<div class="mv"><div>'+esc(a.auto||"Anfrage")+'<i>'+de(a.tag)+(a.von?", für "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+'</i></div><b style="font-weight:600;color:#8E8E93">'+esc(a.status||"")+'</b></div>').join("")+'</div>';
+    h+='<div class="ab">Notiz</div><div class="notiz">'+(e.notiz?esc(e.notiz):'<span style="color:#8E8E93">Keine Notiz. Unter „Bearbeiten“ eintragen.</span>')+'</div>';
+    if(e.mieten&&tageSeit(e.zuletzt)>90&&!e.keineAngebote)h+='<div class="tipp">Letzte Miete vor '+tageSeit(e.zuletzt)+' Tagen. Gute Gelegenheit für ein Angebot.</div>';
+    if(e.angeschrieben)h+='<p class="mxText" style="margin-top:12px">Zuletzt Angebot geschickt: '+de(e.angeschrieben)+'</p>';
+  }else{
+    h+='<div class="ab">Bearbeiten</div><div class="form"><label>Telefon</label><input id="dTel" inputmode="tel" value="'+esc(e.telefon)+'"><label>Anschrift</label><input id="dAnschrift" data-anschrift value="'+esc(e.anschrift)+'">'
+      +'<div class="zwei"><div><label>Geburtsdatum</label><input id="dGeb" type="date" value="'+esc(e.geb)+'"></div><div><label>Geburtsort</label><input id="dGebort" value="'+esc(e.gebort)+'"></div></div>'
+      +'<label>E-Mail</label><input id="dEmail" type="email" value="'+esc(e.email)+'"><label>Notiz (nur für uns)</label><textarea id="dNotiz">'+esc(e.notiz)+'</textarea>'
+      +'<div class="schalter"><span>Keine Angebote mehr schicken</span><div class="sw'+(e.keineAngebote?" an":"")+'" id="dKeine"></div></div></div>'
+      +'<button class="knopf" id="dSpeichern" type="button">Speichern</button>'
+      +'<a href="#" id="dLoeschen" class="loeschen">Daten auf Kundenwunsch löschen</a>';
+  }
+  $("karte").innerHTML=h+'</div>';
+  $("kZu").onclick=ev=>{ev.preventDefault();window.mxZurueck()};
+  $("kBearb").onclick=()=>{BEARB=!BEARB;karte()};
+  if(BEARB){$("dKeine").onclick=()=>$("dKeine").classList.toggle("an");
+    $("dSpeichern").onclick=()=>{MK.merken(e.name,{telefon:$("dTel").value.trim(),anschrift:$("dAnschrift").value.trim(),geb:$("dGeb").value,gebort:$("dGebort").value.trim(),
+      email:$("dEmail").value.trim(),notiz:$("dNotiz").value.trim(),keineAngebote:$("dKeine").classList.contains("an")||null});BEARB=false;meldung("Gespeichert, auf allen Geräten.");zeichne();karte()};
+    $("dLoeschen").onclick=ev=>{ev.preventDefault();if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+" löschen? Die Mietverträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
+      MK.merken(e.name,{telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true});BEARB=false;meldung("Daten gelöscht.");zeichne();karte()}}}
+/* Angebot verschicken (31.10.2026, Baran: Autos antippen, Übergabe und Rückgabe mit Datum und Uhrzeit, seriös und attraktiv) */
+let FLOTTE=null,AG_AUTOS=new Set();
+fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(p&&p.cars){FLOTTE=p.cars.map(c=>c.anzeige||c.n);if($("fAngebot").classList.contains("auf"))agAutos()}}).catch(()=>{});
+const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const plus=(iso,n)=>{const d=new Date(iso+"T12:00");d.setDate(d.getDate()+n);return isoD(d)};
+const lang=iso=>{const d=new Date(iso+"T12:00");return WT[d.getDay()]+", "+iso.split("-").reverse().join(".")};
+function agBelegt(){const v=$("agVon").value,b=$("agBis").value,s=new Set();if(!v||!b)return s;const ue=(a1,b1)=>a1&&b1&&a1<b&&b1>v;
+  const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+  lies("mietixVorgaenge",[]).forEach(x=>{if(x.status!=="zurück"&&ue(x.vonD,x.bisD))s.add(x.auto)});
+  lies("mietixAnfragen",[]).forEach(a=>{if(a.status==="gebucht"&&ue(a.von,a.bis))s.add(a.auto)});
+  lies("mietixSperren",[]).forEach(x=>{if(!x._weg&&ue(x.von,x.bis))s.add(x.auto)});return s}
+function agAutos(){const autos=FLOTTE||Object.keys((()=>{try{return JSON.parse(localStorage.getItem("mietixAutos")||"{}")}catch(e){return{}}})()),bel=agBelegt();
+  [...AG_AUTOS].forEach(a=>{if(bel.has(a))AG_AUTOS.delete(a)});
+  $("agAutos").innerHTML=autos.map(a=>'<div class="chip'+(bel.has(a)?" belegt":AG_AUTOS.has(a)?" an":"")+'" data-a="'+esc(a)+'">'+esc(a)+'</div>').join("")||'<div class="mxText">Preisdatei wird geladen …</div>';
+  $("agAutos").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{if(c.classList.contains("belegt")){meldung("In dem Zeitraum schon vergeben");return}const a=c.dataset.a;AG_AUTOS.has(a)?AG_AUTOS.delete(a):AG_AUTOS.add(a);agAutos();agListe()})}
+function agText(e){const vn=String(e.name||"").trim().split(/\s+/)[0],v=$("agVon").value,b=$("agBis").value,autos=[...AG_AUTOS];
+  if(!v||!b||!autos.length)return"";
+  return "Hallo "+vn+",\n\nfür Ihren nächsten Ausflug haben wir noch "+(autos.length===1?"ein Fahrzeug":"Fahrzeuge")+" frei:\n\n"+autos.map(a=>"- "+a).join("\n")+
+    "\n\nÜbergabe: "+lang(v)+", "+$("agVonU").value+" Uhr\nRückgabe: "+lang(b)+", "+$("agBisU").value+" Uhr\n\n"+
+    (e.mieten>=2?"Als Stammkunde erhalten Sie bei uns einen besonders guten Preis.":"Wir machen Ihnen gern ein faires Angebot.")+
+    " Möchten Sie "+(autos.length===1?"das Fahrzeug":"eines der Fahrzeuge")+" reservieren? Eine kurze Antwort genügt.\n\nViele Grüße\nIhr Mietix-Team"}
+function agListe(){const nur=$("agNurStamm").classList.contains("an"),bereit=$("agVon").value&&$("agBis").value&&AG_AUTOS.size;
+  $("agVorschau").textContent=bereit?agText({name:"Vorname",mieten:nur?2:1}).replace("Hallo Vorname,","Hallo {Vorname},"):"Zeitraum wählen und mindestens ein Fahrzeug antippen.";
   const l=ALLE.filter(e=>e.telefon&&!e.keineAngebote&&!e.gesperrt&&!e.warn.length&&(nur?e.mieten>=2:e.mieten>=1))
     .map(e=>Object.assign({war:e.angeschrieben&&tageSeit(e.angeschrieben)<14},e))
     .sort((a,b)=>((a.war?1:0)-(b.war?1:0))||(b.mieten-a.mieten)||((b.zuletzt||"")<(a.zuletzt||"")?-1:1));
-  $("agListe").innerHTML=l.length?l.map(e=>'<div class="angebotRow'+(e.war?" war":"")+'" data-n="'+esc(e.name)+'"><div class="t"><b>'+esc(e.name)+'</b><i>'+e.mieten+(e.mieten===1?" Miete":" Mieten")+(e.zuletzt?", zuletzt "+de(e.zuletzt):"")+(e.letztesAuto?", "+esc(e.letztesAuto):"")+(e.war?", angeschrieben "+de(e.angeschrieben):"")+'</i></div><a target="_blank" href="'+wa(e.telefon,agNachricht(e))+'">WhatsApp</a></div>').join("")
-    :'<div class="leer">Noch niemand passt. Schalter „Nur Stammkunden“ ausschalten oder erst Mietverträge anlegen.</div>';
-  [...$("agListe").querySelectorAll("a")].forEach(a=>a.onclick=()=>{const n=a.parentElement.dataset.n;MK.merken(n,{angeschrieben:heute});setTimeout(zeichne,300)})}
-/* Was ist am Wochenende frei? Kommt aus dem Kalender (Mietverträge, gebuchte Anfragen, Sperren), nicht mehr von Hand (30.10.2026) */
-let FLOTTE=null;
-fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(p&&p.cars)FLOTTE=p.cars.map(c=>c.anzeige||c.n)}).catch(()=>{});
-function wochenendeFrei(){const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-  const h=new Date(heute),wt=h.getDay(),fr=new Date(h);fr.setDate(h.getDate()+(wt===6?-1:wt===0?-2:(5-wt)));const so=new Date(fr);so.setDate(fr.getDate()+2);
-  const von=isoD(fr)<heute?heute:isoD(fr),bis=isoD(so),ueber=(a,b)=>a&&b&&a<bis&&b>von;
-  const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
-  const autos=FLOTTE||Object.keys(lies("mietixAutos",{}));if(!autos.length)return null;
-  const belegt=new Set();lies("mietixVorgaenge",[]).forEach(v=>{if(v.status!=="zurück"&&ueber(v.vonD,v.bisD))belegt.add(v.auto)});
-  lies("mietixAnfragen",[]).forEach(a=>{if(a.status==="gebucht"&&ueber(a.von,a.bis))belegt.add(a.auto)});
-  lies("mietixSperren",[]).forEach(x=>{if(ueber(x.von,x.bis))belegt.add(x.auto)});
-  const kurz=n=>String(n).replace(/^(Audi|Mercedes-Benz|Mercedes|VW|BMW) /,m=>m).replace(/ (Chauffeur-Paket|Limousine|performance|Clubsport)/g,"");
-  const frei=autos.filter(n=>!belegt.has(n)).map(kurz),de=d=>String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+".";
-  const was=frei.length>1?frei.slice(0,-1).join(", ")+" und "+frei[frei.length-1]:(frei[0]||"");
-  return{was,wann:"dieses Wochenende, Freitag "+de(fr)+" bis Sonntag "+de(so),anzahl:frei.length}}
-function agVorschlag(){const w=wochenendeFrei();if(!w)return;let a={};try{a=JSON.parse(localStorage.getItem("mietixAngebot")||"{}")||{}}catch(e){}
-  if(!$("agWas").value.trim()||$("agWas").value===a.autoWas)$("agWas").value=w.was;if(!$("agWann").value.trim()||$("agWann").value===a.autoWann)$("agWann").value=w.wann;
-  a.autoWas=w.was;a.autoWann=w.wann;try{localStorage.setItem("mietixAngebot",JSON.stringify(Object.assign(a,{was:$("agWas").value,wann:$("agWann").value})))}catch(e){}
-  $("agFrei").textContent=w.anzahl?"Aus dem Kalender: "+w.anzahl+(w.anzahl===1?" Auto ist":" Autos sind")+" am Wochenende frei. Ändern geht.":"Laut Kalender ist am Wochenende alles vergeben."}
-$("angebotAuf").onclick=()=>{mxAuf("fAngebot");agLaden();agVorschlag();angebotListe()};
-["agWas","agWann","agText"].forEach(id=>$(id).addEventListener("input",()=>{agMerken();angebotListe()}));
-$("agNurStamm").onclick=()=>{const an=!$("agNurStamm").classList.contains("an");$("agNurStamm").classList.toggle("an",an);$("agNurStamm").textContent=an?"An":"Aus";agMerken();angebotListe()};
-/* Suche, Filter, Sortierung */
+  $("agListe").innerHTML=!bereit?"":l.length?'<div class="feld">'+l.map(e=>'<div class="agRow'+(e.war?" war":"")+'" data-n="'+esc(e.name)+'"><div class="t"><b>'+esc(e.name)+'</b><i>'+esc(wieOft(e))+(e.war?", angeschrieben "+de(e.angeschrieben):"")+'</i></div><a target="_blank" href="'+wa(e.telefon,agText(e))+'">WhatsApp</a></div>').join("")+'</div>'
+    :'<div class="leer">Noch niemand passt. „Nur Stammkunden“ ausschalten.</div>';
+  $("agListe").querySelectorAll("a").forEach(a=>a.onclick=()=>{MK.merken(a.parentElement.dataset.n,{angeschrieben:heute});setTimeout(zeichne,300)})}
+function agZeitraum(v,b){$("agVon").value=v;$("agBis").value=b;document.querySelectorAll("#agDauer .chip,#agWe .chip").forEach(c=>c.classList.remove("an"));agAutos();agListe()}
+$("agDauer").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{agZeitraum(heute,plus(heute,+c.dataset.d));c.classList.add("an")});
+$("agWe").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{const [wd,n]=c.dataset.we.split(",").map(Number),w=new Date().getDay(),v=plus(heute,(wd-w+7)%7);agZeitraum(v,plus(v,n));c.classList.add("an")});
+["agVon","agBis","agVonU","agBisU"].forEach(i=>$(i).addEventListener("change",()=>{if(i==="agVon"||i==="agBis")document.querySelectorAll("#agDauer .chip,#agWe .chip").forEach(c=>c.classList.remove("an"));agAutos();agListe()}));
+$("agNurStamm").onclick=()=>{$("agNurStamm").classList.toggle("an");agListe()};
+$("angebotAuf").onclick=()=>{mxAuf("fAngebot");if(!$("agVon").value){const w=new Date().getDay(),v=plus(heute,(5-w+7)%7);agZeitraum(v,plus(v,2));$("agWe").querySelector('[data-we="5,2"]').classList.add("an")}else{agAutos();agListe()}};
+/* Suche, Filter, Sortierung, neuer Kunde */
 $("suche").addEventListener("input",zeichne);
-[...$("filter").children].forEach(c=>c.onclick=()=>{[...$("filter").children].forEach(x=>x.classList.remove("an"));c.classList.add("an");FILTER=c.dataset.f;zeichne()});
-[...$("sortierung").children].forEach(c=>c.onclick=()=>{[...$("sortierung").children].forEach(x=>x.classList.remove("an"));c.classList.add("an");SORT=c.dataset.s;$("sortName").textContent=c.textContent;c.closest("details").open=false;zeichne()});
+$("filter").querySelectorAll("span").forEach(c=>c.onclick=()=>{$("filter").querySelectorAll("span").forEach(x=>x.classList.remove("an"));c.classList.add("an");FILTER=c.dataset.f;zeichne()});
+$("sortierung").onchange=()=>{SORT=$("sortierung").value;zeichne()};
 $("neuLos").onclick=()=>{const n=$("neuName").value.trim();if(n.split(/\s+/).length<2){meldung("Bitte Vor- und Nachname.");return}
-  MK.merken(n,{telefon:$("neuTel").value.trim()});$("neuName").value="";$("neuTel").value="";AUF=n;mxZu();meldung("Angelegt.");zeichne()};
-(()=>{const q=new URLSearchParams(location.search).get("kunde");if(q){AUF=q;$("suche").value=q;history.replaceState(null,"",location.pathname)}})();
+  MK.merken(n,{telefon:$("neuTel").value.trim()});$("neuName").value="";$("neuTel").value="";mxZu();meldung("Angelegt.");zeichne();oeffne(n)};
+(()=>{const q=new URLSearchParams(location.search).get("kunde");if(q){history.replaceState(null,"",location.pathname);setTimeout(()=>{if(MK.alle().some(e=>e.name===q))oeffne(q);else{$("suche").value=q;zeichne()}},0)}})();
 zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)zeichne()});
@@ -458,7 +501,7 @@ function rueckZeigen(text){let el=document.getElementById("mietixRueck");
     el.querySelector("button").onclick=rueckgaengig}
   el.querySelector("span").textContent="✓ Gesichert: "+text;clearTimeout(rueckTimer);
   // nur eine Meldung zur Zeit (31.10.2026): erst wenn die Meldung der Seite weg ist, erscheint „Rückgängig“ unten
-  const andere=()=>{try{return[...document.querySelectorAll("#meldung,#zMeld,#erfolgBox.auf,.bMeld")].some(m=>m.offsetParent!==null&&getComputedStyle(m).display!=="none"&&getComputedStyle(m).opacity!=="0")}catch(e){return false}};
+  const andere=()=>{try{return[...document.querySelectorAll("#meldung,#zMeld,#erfolgBox.auf,.bMeld,.meld.an,#meld.an")].some(m=>m.offsetParent!==null&&getComputedStyle(m).display!=="none"&&getComputedStyle(m).opacity!=="0")}catch(e){return false}};
   let n=0;const los=()=>{if(andere()&&n++<20){rueckTimer=setTimeout(los,200);return}el.classList.add("an");rueckTimer=setTimeout(()=>el.classList.remove("an"),6000)};los()}
 function rueckgaengig(){if(!burst)return;
   if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
