@@ -152,6 +152,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     document.getElementById("heute").innerHTML=out.length?out.map(zeile).join(""):(erl?'<div class="fertig">Alles erledigt ✓<i>'+erl+(erl===1?" Übergabe oder Rückgabe":" Übergaben und Rückgaben")+' heute. Stark!</i></div>':'<div class="fertig" style="color:var(--grau)">Heute ist nichts zu tun ✓<i>Alles im Griff.</i></div>');
     const mt=document.getElementById("morgenTitel");mt.textContent="Morgen, "+WT[m.getDay()]+" "+m.getDate()+"."+(m.getMonth()+1)+".";
     mt.classList.toggle("versteckt",!morgen.length);document.getElementById("morgenK").classList.toggle("versteckt",!morgen.length);
+    morgen.sort((x,y)=>String(x.uhr||"99").localeCompare(String(y.uhr||"99")));   // nach Uhrzeit (31.10.2026)
     document.getElementById("morgen").innerHTML=morgen.map(x=>zeile(Object.assign({},x,{art:"",grau:true}))).join("");
     aktionen(hi);waRunde(alle,anf,hi,mo,WA_NACH);
     document.querySelectorAll("#heute a[data-nf]").forEach(el=>{el.target="_blank";el.addEventListener("click",()=>{const l=lies("mietixAnfragen",[]),x=l.find(y=>y.id===el.dataset.nf);if(x){x.nachgefasst=hi;try{localStorage.setItem("mietixAnfragen",JSON.stringify(l))}catch(e){}}setTimeout(zeichne,800)})});
