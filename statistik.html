@@ -298,7 +298,10 @@ let rueckLaeuft=false,rueckTimer=null;
 function rueckZeigen(text){let el=document.getElementById("mietixRueck");
   if(!el){el=document.createElement("div");el.id="mietixRueck";el.innerHTML='<span></span><button type="button">Rückgängig</button>';document.body.appendChild(el);
     el.querySelector("button").onclick=rueckgaengig}
-  el.querySelector("span").textContent="✓ Gesichert: "+text;el.classList.add("an");clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),8000)}
+  el.querySelector("span").textContent="✓ Gesichert: "+text;clearTimeout(rueckTimer);
+  // nur eine Meldung zur Zeit (31.10.2026): erst wenn die Meldung der Seite weg ist, erscheint „Rückgängig“ unten
+  const andere=()=>{try{return[...document.querySelectorAll("#meldung,#zMeld,#erfolgBox.auf,.bMeld")].some(m=>m.offsetParent!==null&&getComputedStyle(m).display!=="none"&&getComputedStyle(m).opacity!=="0")}catch(e){return false}};
+  let n=0;const los=()=>{if(andere()&&n++<20){rueckTimer=setTimeout(los,200);return}el.classList.add("an");rueckTimer=setTimeout(()=>el.classList.remove("an"),6000)};los()}
 function rueckgaengig(){if(!burst)return;
   if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
@@ -342,6 +345,9 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
         pwSetzen=false;zeigen();abgleichen()}catch(e){f.textContent=e.message}};return}
   const pkt=document.getElementById("abgleichPunkt");
   if(pkt)pkt.style.background=!sitzung?"#B0B0B3":fehler?"#C4161C":"#1B8A4B";
+  // Anmelden nur auf Startseite und Einstellungen (31.10.2026), sonst eine schmale Zeile
+  const haupt=/mietix-zentrale\/(index\.html|einstellungen\.html)?$/.test(location.pathname)||/\/(zentrale|einstellungen)$/.test(location.pathname);
+  if(!sitzung&&!haupt){el.innerHTML='<div class="abgl klein rot"><span><b style="display:inline;margin:0">Nicht angemeldet.</b> Nichts wird gesichert.</span><a href="https://barankohler.github.io/mietix-zentrale/" style="color:#C4161C;font-weight:800;white-space:nowrap">Anmelden ›</a></div>';return}
   if(!sitzung){el.innerHTML='<div class="abgl rot"><b>Nicht angemeldet</b><div class="abgl-text">Einmal anmelden, dann ist alles gesichert.</div>'+
     '<input id="ablMail" type="email" inputmode="email" autocomplete="username" placeholder="E-Mail">'+
     '<input id="ablPw" type="password" autocomplete="current-password" placeholder="Passwort">'+
@@ -358,8 +364,12 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
         if(j.access_token){sichern(j);zeigen();abgleichen()}else f.textContent="Zugang angelegt. Bitte die Mail bestätigen und dann anmelden."}
       catch(e){f.textContent=/not allowed|disabled/i.test(e.message)?"Zugang anlegen ist gerade gesperrt. Baran muss es kurz freigeben.":
         /already/i.test(e.message)?"Für diese E-Mail gibt es schon einen Zugang. Bitte oben anmelden.":e.message}};return}
-  const stand=laeuft?"gleicht ab …":fehler?"nicht abgeglichen: "+fehler:zuletzt?"abgeglichen um "+String(zuletzt.getHours()).padStart(2,"0")+":"+String(zuletzt.getMinutes()).padStart(2,"0"):"wartet auf Internet";
-  el.innerHTML='<div class="abgl klein"><span>Alle Geräte: '+stand+'</span><span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span></div>';
+  // Sync-Status (31.10.2026): grün gesichert, gelb ohne Internet, rot bei Fehler. Passwort und Abmelden nur auf Startseite und Einstellungen.
+  const uhr=zuletzt?String(zuletzt.getHours()).padStart(2,"0")+":"+String(zuletzt.getMinutes()).padStart(2,"0"):"";
+  const art=!navigator.onLine?"gelb":fehler?"rot":"gruen";
+  const stand=!navigator.onLine?"Ohne Internet: alles bleibt auf dem Gerät und wird nachgeholt":fehler?"Nicht gesichert: "+fehler:laeuft&&!zuletzt?"Wird gesichert …":"✓ Alles gesichert"+(uhr?", "+uhr+" Uhr":"");
+  el.innerHTML='<div class="abgl klein status '+art+'"><span>'+stand+'</span>'+(haupt?'<span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span>':'')+'</div>';
+  if(!haupt)return;
   // Angemeldet: neues Passwort setzen geht ohne das alte (für "Passwort vergessen" ohne Mail, 28.10.2026)
   document.getElementById("ablPwNeu").onclick=e=>{e.preventDefault();pwSetzen=true;zeigen()};
   document.getElementById("ablAus").onclick=e=>{e.preventDefault();if(!confirm("Auf diesem Gerät abmelden? Die Daten bleiben hier."))return;
@@ -373,26 +383,92 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   ".abgl-link{display:block;text-align:center;margin-top:10px;font-size:13px;color:#6F6F72}"+
   ".abgl.klein{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:#6F6F72;padding:10px 14px}.abgl.klein a{color:#6F6F72}"+
   ".abgl.rot{border:2px solid #C4161C}.abgl.rot b{color:#C4161C}"+
-  "#mietixRueck{position:fixed;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));transform:translateY(-160%);z-index:9999;background:#2E2E30;color:#fff;"+
+  ".abgl.status{background:none;border:0;padding:2px 4px 8px;margin-bottom:6px;font-weight:700}.abgl.status.gruen span:first-child{color:#1B8A4B}"+
+  ".abgl.status.gelb{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:10px 14px}.abgl.status.rot{background:#FDECEC;color:#C4161C;border-radius:12px;padding:10px 14px}"+
+  "#mietixRueck{position:fixed;left:16px;right:16px;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateY(40px);opacity:0;pointer-events:none;z-index:9999;background:#2E2E30;color:#fff;"+
   "border-radius:999px;padding:8px 8px 8px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 14px Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);"+
   "transition:transform .25s;max-width:560px;margin:0 auto;white-space:nowrap}#mietixRueck span{overflow:hidden;text-overflow:ellipsis;min-width:0}"+
-  "#mietixRueck.an{transform:translateY(0)}#mietixRueck span{flex:1 1 auto}"+
+  "#mietixRueck.an{transform:translateY(0);opacity:1;pointer-events:auto}#mietixRueck{transition:transform .25s,opacity .25s!important;max-width:420px!important}#mietixRueck span{flex:1 1 auto}"+
   "#mietixRueck button{flex:0 0 auto!important;width:auto!important;min-height:0!important;height:auto!important;margin:0!important;box-shadow:none!important;background:#C4161C!important;color:#fff!important;border:0!important;border-radius:999px!important;padding:9px 14px!important;font:800 14px Inter,system-ui,sans-serif!important;cursor:pointer;display:inline-block!important}";
 document.head.appendChild(css);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
-window.addEventListener("online",abgleichen);
+window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
 setInterval(abgleichen,60000);
 zeigen();abgleichen();
 })();
 </script>
 <script>
-/* ‹ Start oben links (31.10.2026) */
-(function(){if(document.querySelector(".mxStart"))return;
-  const ziel=document.querySelector("header h1")||document.querySelector(".topbar");if(!ziel)return;
-  const st=document.createElement("style");st.textContent=".mxStart{display:inline-flex;align-items:center;gap:2px;margin-right:10px;padding:5px 11px 5px 8px;border-radius:999px;border:1.5px solid currentColor;color:inherit;text-decoration:none;font:800 13px/1 -apple-system,Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none;vertical-align:middle;opacity:.8;-webkit-tap-highlight-color:transparent}.mxStart b{font-size:17px;line-height:13px;margin-top:-2px}.mxStart:active{opacity:.5}header h1{white-space:nowrap}header .mxStart,.topbar .mxStart{float:none!important;margin:0 10px 0 0!important;padding:5px 11px 5px 8px!important;font-size:13px!important;color:inherit!important}@media(max-width:360px){header .mxStart,.topbar .mxStart{padding:4px 8px 4px 6px!important;margin-right:6px!important;font-size:12px!important}}@media(max-width:480px){.topbar .brand-sub{display:none}}.topbar{overflow:hidden}";
+/* Mietix App-Gefühl (31.10.2026) */
+(function(){if(window.mxApp)return;window.mxApp=1;
+  const pfad=location.pathname,istStart=/mietix-zentrale\/(index\.html)?$/.test(pfad)||/\/zentrale$/.test(pfad);
+  const art=/anfragen/.test(pfad)?"anfragen":/angebot/.test(pfad)?"angebot":/belegung/.test(pfad)?"kalender":/vertrag/.test(pfad)?"vertrag":
+    /kunden/.test(pfad)?"kunden":/autos/.test(pfad)?"autos":/geld/.test(pfad)?"geld":/schaden/.test(pfad)?"schaeden":/nachrichten/.test(pfad)?"nachrichten":
+    /statistik/.test(pfad)?"zahlen":/story/.test(pfad)?"story":/papierkorb/.test(pfad)?"papierkorb":/einstellungen/.test(pfad)?"einstellungen":"";
+  const SYM={
+ "anfragen":'<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+ "kalender":'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ "angebot":'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 12h3M13 12h3M8 16h3M13 16h3"/>',
+ "vertrag":'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/>',
+ "kunden":'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ "autos":'<path d="M3 13l2-5h14l2 5v5H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/>',
+ "geld":'<rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="12" cy="12" r="2.5"/>',
+ "schaeden":'<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h0"/>',
+ "nachrichten":'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
+ "zahlen":'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+ "story":'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 17l3-4 2 2 3-4"/>',
+ "papierkorb":'<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14"/>',
+ "einstellungen":'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>'
+};
+  const st=document.createElement("style");st.textContent=
+    /* eine Kopfzeile für alle: weiß, roter Strich */
+    (istStart?"":"header{background:#fff!important;color:#1C1C1E!important;border-bottom:3px solid #C4161C!important}header h1{color:#1C1C1E!important;white-space:nowrap}header h1 span{color:#C4161C!important}")+
+    ".topbar{background:#fff!important;color:#1C1C1E!important;border-bottom:3px solid #C4161C!important;overflow:hidden}.topbar .brand{color:#1C1C1E!important}.topbar .brand-sub{color:#8A8A8E!important}"+
+    ".mxStart{display:inline-flex;align-items:center;gap:2px;vertical-align:middle;border-radius:999px;border:1.5px solid currentColor;text-decoration:none;font-weight:800;letter-spacing:0;text-transform:none;opacity:.8;-webkit-tap-highlight-color:transparent;line-height:1}"+
+    "header .mxStart,.topbar .mxStart{float:none!important;margin:0 10px 0 0!important;padding:5px 11px 5px 8px!important;font-size:13px!important;color:inherit!important;font-family:-apple-system,Inter,system-ui,sans-serif!important}"+
+    ".mxStart b{font-size:17px;line-height:13px;margin-top:-2px}.mxStart:active{opacity:.5}"+
+    ".mxSym{display:inline-block;width:19px;height:19px;vertical-align:-4px;margin-right:6px;stroke:#C4161C;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}"+
+    "@media(max-width:360px){header .mxStart,.topbar .mxStart{padding:4px 8px 4px 6px!important;margin-right:6px!important;font-size:12px!important}.mxSym{display:none}}"+
+    "@media(max-width:480px){.topbar .brand-sub{display:none}}"+
+    /* App-Gefühl: nichts markieren, nicht zoomen, kein grauer Tipp-Schatten */
+    "html{-webkit-text-size-adjust:100%;touch-action:manipulation}"+
+    "button,a,.chip,.knopf,.kachel,.mxKnopf,summary,[data-fenster],label,.reiter div,.tag,.minik,.z,.vorgang,.punkt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}"+
+    "input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}"+
+    /* sanftes Überblenden zwischen den Seiten */
+    "@view-transition{navigation:auto}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}"+
+    /* neue Version */
+    "#mxNeu{display:none;background:#1C1C1E;color:#fff;text-align:center;font:700 14px -apple-system,Inter,system-ui,sans-serif;padding:11px 16px;cursor:pointer}#mxNeu.an{display:block}#mxNeu b{color:#FF6B6B}";
   document.head.appendChild(st);
-  const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");
-  ziel.insertBefore(a,ziel.firstChild)})();
+
+  // ‹ Start und Symbol in der Kopfzeile
+  const ziel=document.querySelector("header h1")||document.querySelector(".topbar");
+  if(ziel&&!istStart&&!document.querySelector(".mxStart")){
+    if(SYM[art]){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("class","mxSym");s.innerHTML=SYM[art];ziel.insertBefore(s,ziel.firstChild)}
+    const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");ziel.insertBefore(a,ziel.firstChild)}
+
+  // Wischen vom linken Rand = zurück (nur als App, im Browser macht das Safari)
+  const alsApp=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
+  if(alsApp){let x0=null,y0=0;
+    document.addEventListener("touchstart",e=>{const t=e.touches[0];x0=(t.clientX<=24&&e.touches.length===1&&!e.target.closest("canvas,.pad,#ug,input,textarea,select"))?t.clientX:null;y0=t.clientY},{passive:true});
+    document.addEventListener("touchend",e=>{if(x0===null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=Math.abs(t.clientY-y0);x0=null;if(dx<80||dy>60)return;
+      if(document.querySelector(".mxFenster.auf")&&window.mxZu){mxZu();return}
+      if(typeof window.mxZurueck==="function"&&window.mxZurueck())return;
+      if(istStart)return;
+      if(history.length>1&&document.referrer.indexOf(location.origin)===0)history.back();else location.href="https://barankohler.github.io/mietix-zentrale/"},{passive:true})}
+
+  // Neue Version: die Seite aus dem Netz mit der geladenen vergleichen (ohne Daten, nur der Text der Seite)
+  let alt=null;
+  async function pruefen(){try{const r=await fetch(location.pathname,{cache:"no-store"});if(!r.ok)return;const t=await r.text(),h=t.length+":"+t.slice(-400);
+    if(alt===null){const c=await fetch(location.pathname,{cache:"force-cache"}).then(x=>x.text()).catch(()=>null);alt=c?c.length+":"+c.slice(-400):h}
+    if(h!==alt){let b=document.getElementById("mxNeu");if(!b){b=document.createElement("div");b.id="mxNeu";b.innerHTML="Neue Version da. <b>Tippen zum Aktualisieren</b>";b.onclick=()=>location.reload();
+      const kopf=document.querySelector("header,.topbar");if(kopf)kopf.after(b);else document.body.prepend(b)}b.classList.add("an")}}catch(e){}}
+  setTimeout(pruefen,3000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)pruefen()});
+
+  // Ohne Internet: Seite aus dem Speicher (sw.js liegt im Ordner der Seite)
+  if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+  // Startseite: die meistgenutzten Seiten schon vorladen, dann öffnen sie ohne Wartezeit
+  if(istStart)setTimeout(()=>["mietix-vertrag/","mietix-anfragen/","mietix-belegung/","mietix-autos/"].forEach(p=>{const l=document.createElement("link");l.rel="prefetch";l.href="https://barankohler.github.io/"+p;document.head.appendChild(l)}),2500);
+})();
 </script><script>
 /* Einheit fest im Zahlenfeld (31.10.2026) */
 (function(){if(window.mxEinheit)return;

@@ -48,6 +48,8 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
 .such input:focus{box-shadow:0 0 0 2px var(--rot)}
 .such svg{position:absolute;left:16px;top:50%;width:20px;height:20px;transform:translateY(-50%);stroke:var(--grau);fill:none;stroke-width:2.2;stroke-linecap:round}
 #treffer{background:#fff;border-radius:16px;padding:2px 16px;margin:-4px 0 12px}#treffer:empty{display:none}#treffer .uhr{display:none}
+header .logo{display:block;height:46px;width:auto}header{background:transparent!important;border-bottom:0!important}
+#waK .z .uhr{min-width:0;width:0}.waNext{display:block;width:100%;margin:12px 0 10px;background:#25D366;color:#fff;border:0;border-radius:14px;padding:14px;font:800 16px inherit;font-family:inherit;cursor:pointer}
 .z .akt{border:0;font-family:inherit;cursor:pointer}.wahl{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 14px 60px}
 .wahl b{flex-basis:100%;font-size:13px;color:var(--grau);font-weight:700}
 .wahl span{padding:10px 14px;border-radius:999px;background:var(--bg);font-weight:800;font-size:14px;cursor:pointer}.wahl span.gr{background:var(--gruen);color:#fff}
@@ -58,7 +60,7 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
 body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @media(min-width:700px){.app{max-width:720px}.kacheln{grid-template-columns:repeat(3,1fr)}.kachel:last-child:nth-child(odd){grid-column:auto}}
 </style></head><body><div class="app">
-<header><h1>Mietix<span>.</span></h1><span id="punkt" title="Anmeldung und Stand"></span></header>
+<header><h1><img src="logo.png" alt="Mietix Sportwagenvermietung" class="logo"></h1><span id="punkt" title="Anmeldung und Stand"></span></header>
 <div id="stand"><div id="abgleich"></div><div id="bruecke" class="tipp" style="text-align:left;margin:0 4px 6px"></div></div>
 
 <div id="gruss"></div>
@@ -68,6 +70,8 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 
 <h2 id="heuteTitel">Heute</h2>
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
+<h2 id="waTitel" class="versteckt">WhatsApp heute</h2>
+<div class="k versteckt" id="waK"><button type="button" class="waNext" id="waNext">Nächste senden ›</button><div id="wa"></div></div>
 <h2 id="morgenTitel" class="versteckt">Morgen</h2>
 <div class="k versteckt" id="morgenK"><div id="morgen"></div></div>
 <h2 id="ausTitel" class="versteckt">Ausstieg 30.06.2027</h2>
@@ -116,10 +120,11 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
         const key=x.a+x.w+y.w;if(schon[key])return;schon[key]=1;
         rest.unshift({t:x.a+" doppelt verplant",i:x.w+" und "+y.w+", "+(ab.slice(0,10)<=hi?"heute":"morgen"),k:"Prüfen",art:"rot",href:B+"mietix-belegung/"})}))}
     // Nachfassen: Angebot seit 2 Tagen ohne Antwort, Mietbeginn noch nicht vorbei
+    const WA_NACH=[];
     const nach=anf.filter(a=>a.status==="angebot"&&a.nummer&&!a.nachgefasst&&(!a.von||a.von>=hi)).filter(a=>{const s=tageSeit((a.angebot&&a.angebot.am)||a.tag);return s>=2&&s<=14});
     const waNr=t=>{let n=String(t||"").replace(/\D/g,"");if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="49"+n.slice(1);return n};
     nach.forEach(a=>{const vn=String(a.name||"").trim().split(/\s+/)[0],txt="Hallo"+(vn?" "+vn:"")+",\n\nich wollte kurz nachfragen, ob unser Angebot"+(a.auto?" für den "+a.auto:"")+(a.von?" vom "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+" noch passt. Gerne halte ich Ihnen das Fahrzeug frei.\n\nViele Grüße\nIhr Mietix-Team";
-      rest.push({t:a.name||a.nummer,i:"Angebot ohne Antwort"+(a.auto?", "+a.auto:""),k:"Nachfragen",art:"gelb",href:"https://wa.me/"+waNr(a.nummer)+"?text="+encodeURIComponent(txt),nf:a.id})});
+      WA_NACH.push({t:a.name||a.nummer,i:"Angebot nachfragen"+(a.auto?", "+a.auto:""),tel:a.nummer,text:txt,mark:{anf:a.id}})});
     const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
     anf.filter(a=>a.status==="gebucht"&&a.von&&a.von<=mo&&a.von>=iso(new Date(Date.now()-864e5))&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von))
       .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",uhrM:a.vonU||"",morgen:a.von===mo,t:a.name||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
@@ -140,7 +145,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     const mt=document.getElementById("morgenTitel");mt.textContent="Morgen, "+WT[m.getDay()]+" "+m.getDate()+"."+(m.getMonth()+1)+".";
     mt.classList.toggle("versteckt",!morgen.length);document.getElementById("morgenK").classList.toggle("versteckt",!morgen.length);
     document.getElementById("morgen").innerHTML=morgen.map(zeile).join("");
-    aktionen(hi);
+    aktionen(hi);waRunde(alle,anf,hi,mo,WA_NACH);
     document.querySelectorAll("#heute a[data-nf]").forEach(el=>{el.target="_blank";el.addEventListener("click",()=>{const l=lies("mietixAnfragen",[]),x=l.find(y=>y.id===el.dataset.nf);if(x){x.nachgefasst=hi;try{localStorage.setItem("mietixAnfragen",JSON.stringify(l))}catch(e){}}setTimeout(zeichne,800)})});
     // Gruß und kleiner Erfolg des Monats
     const stu=h.getHours(),gr=stu<11?"Guten Morgen":stu<18?"Guten Tag":"Guten Abend",mon=hi.slice(0,7),MN=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
@@ -168,6 +173,44 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     else{p.className="gruen";text="Angemeldet, alles gesichert."}
     document.getElementById("bruecke").textContent=text;
   }
+  // WhatsApp heute (31.10.2026, Baran: „morgens alle Nachrichten auf einmal“, Verlängerung und km-Paket als Umsatzbringer)
+  let PREISE=null;fetch("https://barankohler.github.io/mietix-preise/preise.json").then(r=>r.json()).then(j=>{PREISE=j;zeichne()}).catch(()=>{});
+  const eur2=n=>{n=+n||0;return n.toLocaleString("de-DE",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})};
+  const waNr2=t=>{let n=String(t||"").replace(/\D/g,"");if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="49"+n.slice(1);return n};
+  const vn=s=>String(s||"").trim().split(/\s+/)[0];
+  let WA_LISTE=[];
+  function waRunde(alle,anf,hi,mo,nach){const L=[],ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,preis=a=>PREISE&&PREISE.cars.find(c=>c.n===a||c.anzeige===a);
+    const frei=(v)=>!alle.some(x=>x.nr!==v.nr&&x.auto===v.auto&&x.status!=="zurück"&&x.vonD&&x.bisD&&ue(hi,mo,x.vonD,x.bisD))
+      &&!anf.some(a=>a.status==="gebucht"&&a.auto===v.auto&&a.von&&a.bis&&ue(hi,mo,a.von,a.bis))&&!lies("mietixSperren",[]).some(s=>s.auto===v.auto&&s.von&&s.bis&&ue(hi,mo,s.von,s.bis));
+    alle.forEach(v=>{if(!v.telefon)return;const z=v.zahlung||{};
+      // Erinnerung an die Abholung morgen
+      if(v.vonD===mo&&!v.ueb&&!v.erinnert)L.push({t:v.name,i:"Erinnerung an die Abholung morgen",tel:v.telefon,mark:{nr:v.nr,feld:"erinnert"},
+        text:"Hallo "+vn(v.name)+",\n\nkurze Erinnerung an Ihre Abholung morgen, "+de(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
+          ((z.kaut||{}).am||v.kautionArt==="fahrzeug"?"":"\n- Kaution "+eur2(zahl((z.kaut||{}).betrag))+" €")+((z.rest||{}).am?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\n\nBis morgen!\nIhr Mietix-Team"});
+      // Verlängerung anbieten: Rückgabe heute, Auto morgen frei
+      if(v.ueb&&v.status!=="zurück"&&v.bisD===hi&&!v.verlAngeboten&&frei(v)){const c=preis(v.auto),tp=c?c.gp:0,vs=tp?Math.max(9,Math.round(tp*0.85/10)*10-1):0;
+        L.push({t:v.name,i:"Verlängerung anbieten, "+v.auto+" ist morgen frei",tel:v.telefon,mark:{nr:v.nr,feld:"verlAngeboten"},
+          text:"*Ihr "+v.auto+" ist morgen noch frei*\n\nDer Wagen ist morgen nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\n\n"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
+            "\n\nEine kurze Antwort genügt, dann verlängern wir bis morgen "+(v.bisU?v.bisU+" Uhr":"")+".\n\nViele Grüße\nIhr Mietix-Team"})}
+      // Kilometerpaket anbieten: Abholung heute oder morgen, noch kein Paket
+      const c=preis(v.auto);
+      if(!v.ueb&&(v.vonD===hi||v.vonD===mo)&&!v.paketKm&&!v.kmAngeboten&&c&&c.km&&c.km.length>1){const st=PREISE.kmStufen||[50,100,150,200,300];
+        L.push({t:v.name,i:"Kilometerpaket anbieten, "+v.auto,tel:v.telefon,mark:{nr:v.nr,feld:"kmAngeboten"},
+          text:"*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\nIhr "+v.auto+", für Ihre ganze Miete:\n"+
+            st.map((k,i)=>"- +"+k.toLocaleString("de-DE")+" km für "+eur2(c.km[i+1])+" € (statt "+eur2(k*c.kmPreis)+" €)").join("\n")+"\n\nWelches Paket darf ich Ihnen dazubuchen?\n\nViele Grüße\nIhr Mietix-Team"})}
+      // Danke nach der Rückgabe heute
+      if(v.status==="zurück"&&String((v.rueck||{}).datum||"").slice(0,10)===hi&&!v.bedankt)L.push({t:v.name,i:"Danke sagen, heute zurückgegeben",tel:v.telefon,mark:{nr:v.nr,feld:"bedankt"},
+        text:"Hallo "+vn(v.name)+",\n\nvielen Dank, dass Sie bei Mietix gemietet haben! Wir hoffen, Sie hatten eine tolle Zeit mit dem "+v.auto+".\n\nWir freuen uns auf das nächste Mal.\n\nViele Grüße\nIhr Mietix-Team"})});
+    L.push(...nach);WA_LISTE=L;
+    const t=document.getElementById("waTitel"),k=document.getElementById("waK");t.classList.toggle("versteckt",!L.length);k.classList.toggle("versteckt",!L.length);
+    t.textContent="WhatsApp heute ("+L.length+")";document.getElementById("waNext").textContent=L.length>1?"Nächste senden ("+L.length+" offen) ›":"Senden ›";
+    document.getElementById("wa").innerHTML=L.map((x,i)=>'<div class="z" data-wa="'+i+'"><span class="uhr"></span><span class="t"><b>'+esc(x.t)+'</b><i>'+esc(x.i)+'</i></span><button type="button" class="chip gruen akt">Senden</button></div>').join("");
+    document.querySelectorAll("#wa [data-wa]").forEach(z=>z.querySelector("button").onclick=()=>waSenden(+z.dataset.wa,hi))}
+  function waSenden(i,hi){const x=WA_LISTE[i];if(!x)return;window.open("https://wa.me/"+waNr2(x.tel)+"?text="+encodeURIComponent(x.text),"_blank");
+    if(x.mark.nr)vAendern(x.mark.nr,v=>{v[x.mark.feld]=hi});
+    if(x.mark.anf){const l=lies("mietixAnfragen",[]),a=l.find(y=>y.id===x.mark.anf);if(a){a.nachgefasst=hi;try{localStorage.setItem("mietixAnfragen",JSON.stringify(l))}catch(e){}}}
+    setTimeout(zeichne,600)}
+  document.getElementById("waNext").onclick=()=>{const hi=iso(new Date());waSenden(0,hi)};
   // Bezahlt und Kaution zurück direkt in der Zeile (31.10.2026)
   const ZA=[["bar","Bar"],["ec","EC-Karte"],["kredit","Kreditkarte"],["ueberweisung","Überweisung"]];
   function vAendern(nr,fn){const l=lies("mietixVorgaenge",[]),v=l.find(x=>x.nr===nr);if(!v)return null;fn(v);try{localStorage.setItem("mietixVorgaenge",JSON.stringify(l))}catch(e){}return v}
@@ -354,7 +397,10 @@ let rueckLaeuft=false,rueckTimer=null;
 function rueckZeigen(text){let el=document.getElementById("mietixRueck");
   if(!el){el=document.createElement("div");el.id="mietixRueck";el.innerHTML='<span></span><button type="button">Rückgängig</button>';document.body.appendChild(el);
     el.querySelector("button").onclick=rueckgaengig}
-  el.querySelector("span").textContent="✓ Gesichert: "+text;el.classList.add("an");clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),8000)}
+  el.querySelector("span").textContent="✓ Gesichert: "+text;clearTimeout(rueckTimer);
+  // nur eine Meldung zur Zeit (31.10.2026): erst wenn die Meldung der Seite weg ist, erscheint „Rückgängig“ unten
+  const andere=()=>{try{return[...document.querySelectorAll("#meldung,#zMeld,#erfolgBox.auf,.bMeld")].some(m=>m.offsetParent!==null&&getComputedStyle(m).display!=="none"&&getComputedStyle(m).opacity!=="0")}catch(e){return false}};
+  let n=0;const los=()=>{if(andere()&&n++<20){rueckTimer=setTimeout(los,200);return}el.classList.add("an");rueckTimer=setTimeout(()=>el.classList.remove("an"),6000)};los()}
 function rueckgaengig(){if(!burst)return;
   if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen (zum Beispiel das Speichern). Was im Formular steht, bleibt stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
@@ -398,6 +444,9 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
         pwSetzen=false;zeigen();abgleichen()}catch(e){f.textContent=e.message}};return}
   const pkt=document.getElementById("abgleichPunkt");
   if(pkt)pkt.style.background=!sitzung?"#B0B0B3":fehler?"#C4161C":"#1B8A4B";
+  // Anmelden nur auf Startseite und Einstellungen (31.10.2026), sonst eine schmale Zeile
+  const haupt=/mietix-zentrale\/(index\.html|einstellungen\.html)?$/.test(location.pathname)||/\/(zentrale|einstellungen)$/.test(location.pathname);
+  if(!sitzung&&!haupt){el.innerHTML='<div class="abgl klein rot"><span><b style="display:inline;margin:0">Nicht angemeldet.</b> Nichts wird gesichert.</span><a href="https://barankohler.github.io/mietix-zentrale/" style="color:#C4161C;font-weight:800;white-space:nowrap">Anmelden ›</a></div>';return}
   if(!sitzung){el.innerHTML='<div class="abgl rot"><b>Nicht angemeldet</b><div class="abgl-text">Einmal anmelden, dann ist alles gesichert.</div>'+
     '<input id="ablMail" type="email" inputmode="email" autocomplete="username" placeholder="E-Mail">'+
     '<input id="ablPw" type="password" autocomplete="current-password" placeholder="Passwort">'+
@@ -414,8 +463,12 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
         if(j.access_token){sichern(j);zeigen();abgleichen()}else f.textContent="Zugang angelegt. Bitte die Mail bestätigen und dann anmelden."}
       catch(e){f.textContent=/not allowed|disabled/i.test(e.message)?"Zugang anlegen ist gerade gesperrt. Baran muss es kurz freigeben.":
         /already/i.test(e.message)?"Für diese E-Mail gibt es schon einen Zugang. Bitte oben anmelden.":e.message}};return}
-  const stand=laeuft?"gleicht ab …":fehler?"nicht abgeglichen: "+fehler:zuletzt?"abgeglichen um "+String(zuletzt.getHours()).padStart(2,"0")+":"+String(zuletzt.getMinutes()).padStart(2,"0"):"wartet auf Internet";
-  el.innerHTML='<div class="abgl klein"><span>Alle Geräte: '+stand+'</span><span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span></div>';
+  // Sync-Status (31.10.2026): grün gesichert, gelb ohne Internet, rot bei Fehler. Passwort und Abmelden nur auf Startseite und Einstellungen.
+  const uhr=zuletzt?String(zuletzt.getHours()).padStart(2,"0")+":"+String(zuletzt.getMinutes()).padStart(2,"0"):"";
+  const art=!navigator.onLine?"gelb":fehler?"rot":"gruen";
+  const stand=!navigator.onLine?"Ohne Internet: alles bleibt auf dem Gerät und wird nachgeholt":fehler?"Nicht gesichert: "+fehler:laeuft&&!zuletzt?"Wird gesichert …":"✓ Alles gesichert"+(uhr?", "+uhr+" Uhr":"");
+  el.innerHTML='<div class="abgl klein status '+art+'"><span>'+stand+'</span>'+(haupt?'<span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span>':'')+'</div>';
+  if(!haupt)return;
   // Angemeldet: neues Passwort setzen geht ohne das alte (für "Passwort vergessen" ohne Mail, 28.10.2026)
   document.getElementById("ablPwNeu").onclick=e=>{e.preventDefault();pwSetzen=true;zeigen()};
   document.getElementById("ablAus").onclick=e=>{e.preventDefault();if(!confirm("Auf diesem Gerät abmelden? Die Daten bleiben hier."))return;
@@ -429,16 +482,121 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   ".abgl-link{display:block;text-align:center;margin-top:10px;font-size:13px;color:#6F6F72}"+
   ".abgl.klein{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:#6F6F72;padding:10px 14px}.abgl.klein a{color:#6F6F72}"+
   ".abgl.rot{border:2px solid #C4161C}.abgl.rot b{color:#C4161C}"+
-  "#mietixRueck{position:fixed;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top));transform:translateY(-160%);z-index:9999;background:#2E2E30;color:#fff;"+
+  ".abgl.status{background:none;border:0;padding:2px 4px 8px;margin-bottom:6px;font-weight:700}.abgl.status.gruen span:first-child{color:#1B8A4B}"+
+  ".abgl.status.gelb{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:10px 14px}.abgl.status.rot{background:#FDECEC;color:#C4161C;border-radius:12px;padding:10px 14px}"+
+  "#mietixRueck{position:fixed;left:16px;right:16px;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateY(40px);opacity:0;pointer-events:none;z-index:9999;background:#2E2E30;color:#fff;"+
   "border-radius:999px;padding:8px 8px 8px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 14px Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);"+
   "transition:transform .25s;max-width:560px;margin:0 auto;white-space:nowrap}#mietixRueck span{overflow:hidden;text-overflow:ellipsis;min-width:0}"+
-  "#mietixRueck.an{transform:translateY(0)}#mietixRueck span{flex:1 1 auto}"+
+  "#mietixRueck.an{transform:translateY(0);opacity:1;pointer-events:auto}#mietixRueck{transition:transform .25s,opacity .25s!important;max-width:420px!important}#mietixRueck span{flex:1 1 auto}"+
   "#mietixRueck button{flex:0 0 auto!important;width:auto!important;min-height:0!important;height:auto!important;margin:0!important;box-shadow:none!important;background:#C4161C!important;color:#fff!important;border:0!important;border-radius:999px!important;padding:9px 14px!important;font:800 14px Inter,system-ui,sans-serif!important;cursor:pointer;display:inline-block!important}";
 document.head.appendChild(css);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
-window.addEventListener("online",abgleichen);
+window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
 setInterval(abgleichen,60000);
 zeigen();abgleichen();
 })();
 </script>
-</body></html>
+<script>
+/* Mietix App-Gefühl (31.10.2026) */
+(function(){if(window.mxApp)return;window.mxApp=1;
+  const pfad=location.pathname,istStart=/mietix-zentrale\/(index\.html)?$/.test(pfad)||/\/zentrale$/.test(pfad);
+  const art=/anfragen/.test(pfad)?"anfragen":/angebot/.test(pfad)?"angebot":/belegung/.test(pfad)?"kalender":/vertrag/.test(pfad)?"vertrag":
+    /kunden/.test(pfad)?"kunden":/autos/.test(pfad)?"autos":/geld/.test(pfad)?"geld":/schaden/.test(pfad)?"schaeden":/nachrichten/.test(pfad)?"nachrichten":
+    /statistik/.test(pfad)?"zahlen":/story/.test(pfad)?"story":/papierkorb/.test(pfad)?"papierkorb":/einstellungen/.test(pfad)?"einstellungen":"";
+  const SYM={
+ "anfragen":'<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+ "kalender":'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ "angebot":'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 12h3M13 12h3M8 16h3M13 16h3"/>',
+ "vertrag":'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/>',
+ "kunden":'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ "autos":'<path d="M3 13l2-5h14l2 5v5H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/>',
+ "geld":'<rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="12" cy="12" r="2.5"/>',
+ "schaeden":'<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h0"/>',
+ "nachrichten":'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
+ "zahlen":'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+ "story":'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 17l3-4 2 2 3-4"/>',
+ "papierkorb":'<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14"/>',
+ "einstellungen":'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>'
+};
+  const st=document.createElement("style");st.textContent=
+    /* eine Kopfzeile für alle: weiß, roter Strich */
+    (istStart?"":"header{background:#fff!important;color:#1C1C1E!important;border-bottom:3px solid #C4161C!important}header h1{color:#1C1C1E!important;white-space:nowrap}header h1 span{color:#C4161C!important}")+
+    ".topbar{background:#fff!important;color:#1C1C1E!important;border-bottom:3px solid #C4161C!important;overflow:hidden}.topbar .brand{color:#1C1C1E!important}.topbar .brand-sub{color:#8A8A8E!important}"+
+    ".mxStart{display:inline-flex;align-items:center;gap:2px;vertical-align:middle;border-radius:999px;border:1.5px solid currentColor;text-decoration:none;font-weight:800;letter-spacing:0;text-transform:none;opacity:.8;-webkit-tap-highlight-color:transparent;line-height:1}"+
+    "header .mxStart,.topbar .mxStart{float:none!important;margin:0 10px 0 0!important;padding:5px 11px 5px 8px!important;font-size:13px!important;color:inherit!important;font-family:-apple-system,Inter,system-ui,sans-serif!important}"+
+    ".mxStart b{font-size:17px;line-height:13px;margin-top:-2px}.mxStart:active{opacity:.5}"+
+    ".mxSym{display:inline-block;width:19px;height:19px;vertical-align:-4px;margin-right:6px;stroke:#C4161C;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}"+
+    "@media(max-width:360px){header .mxStart,.topbar .mxStart{padding:4px 8px 4px 6px!important;margin-right:6px!important;font-size:12px!important}.mxSym{display:none}}"+
+    "@media(max-width:480px){.topbar .brand-sub{display:none}}"+
+    /* App-Gefühl: nichts markieren, nicht zoomen, kein grauer Tipp-Schatten */
+    "html{-webkit-text-size-adjust:100%;touch-action:manipulation}"+
+    "button,a,.chip,.knopf,.kachel,.mxKnopf,summary,[data-fenster],label,.reiter div,.tag,.minik,.z,.vorgang,.punkt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}"+
+    "input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}"+
+    /* sanftes Überblenden zwischen den Seiten */
+    "@view-transition{navigation:auto}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}"+
+    /* neue Version */
+    "#mxNeu{display:none;background:#1C1C1E;color:#fff;text-align:center;font:700 14px -apple-system,Inter,system-ui,sans-serif;padding:11px 16px;cursor:pointer}#mxNeu.an{display:block}#mxNeu b{color:#FF6B6B}";
+  document.head.appendChild(st);
+
+  // ‹ Start und Symbol in der Kopfzeile
+  const ziel=document.querySelector("header h1")||document.querySelector(".topbar");
+  if(ziel&&!istStart&&!document.querySelector(".mxStart")){
+    if(SYM[art]){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("class","mxSym");s.innerHTML=SYM[art];ziel.insertBefore(s,ziel.firstChild)}
+    const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");ziel.insertBefore(a,ziel.firstChild)}
+
+  // Wischen vom linken Rand = zurück (nur als App, im Browser macht das Safari)
+  const alsApp=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
+  if(alsApp){let x0=null,y0=0;
+    document.addEventListener("touchstart",e=>{const t=e.touches[0];x0=(t.clientX<=24&&e.touches.length===1&&!e.target.closest("canvas,.pad,#ug,input,textarea,select"))?t.clientX:null;y0=t.clientY},{passive:true});
+    document.addEventListener("touchend",e=>{if(x0===null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=Math.abs(t.clientY-y0);x0=null;if(dx<80||dy>60)return;
+      if(document.querySelector(".mxFenster.auf")&&window.mxZu){mxZu();return}
+      if(typeof window.mxZurueck==="function"&&window.mxZurueck())return;
+      if(istStart)return;
+      if(history.length>1&&document.referrer.indexOf(location.origin)===0)history.back();else location.href="https://barankohler.github.io/mietix-zentrale/"},{passive:true})}
+
+  // Neue Version: die Seite aus dem Netz mit der geladenen vergleichen (ohne Daten, nur der Text der Seite)
+  let alt=null;
+  async function pruefen(){try{const r=await fetch(location.pathname,{cache:"no-store"});if(!r.ok)return;const t=await r.text(),h=t.length+":"+t.slice(-400);
+    if(alt===null){const c=await fetch(location.pathname,{cache:"force-cache"}).then(x=>x.text()).catch(()=>null);alt=c?c.length+":"+c.slice(-400):h}
+    if(h!==alt){let b=document.getElementById("mxNeu");if(!b){b=document.createElement("div");b.id="mxNeu";b.innerHTML="Neue Version da. <b>Tippen zum Aktualisieren</b>";b.onclick=()=>location.reload();
+      const kopf=document.querySelector("header,.topbar");if(kopf)kopf.after(b);else document.body.prepend(b)}b.classList.add("an")}}catch(e){}}
+  setTimeout(pruefen,3000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)pruefen()});
+
+  // Ohne Internet: Seite aus dem Speicher (sw.js liegt im Ordner der Seite)
+  if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+  // Startseite: die meistgenutzten Seiten schon vorladen, dann öffnen sie ohne Wartezeit
+  if(istStart)setTimeout(()=>["mietix-vertrag/","mietix-anfragen/","mietix-belegung/","mietix-autos/"].forEach(p=>{const l=document.createElement("link");l.rel="prefetch";l.href="https://barankohler.github.io/"+p;document.head.appendChild(l)}),2500);
+})();
+</script><script>
+/* Einheit fest im Zahlenfeld (31.10.2026) */
+(function(){if(window.mxEinheit)return;
+  const REGELN=[[/€|&euro;|\beur\b|betrag|preis|kaution|einbehalt|aufpreis|kosten|wert\b|selbstbeteiligung/i,"€"],
+    [/rabatt|prozent/i,"%"],[/liter/i,"Liter"],[/profiltiefe|\bmm\b/i,"mm"],[/stück|schlüssel/i,"Stück"],[/^\s*alter\b/i,"Jahre"],
+    [/kilometer|\bkm\b|freikm/i,"km"]];
+  const AUS=new Set(["nr"]);   // Mietvertrag-Nummer bleibt ohne Einheit
+  function beschriftung(f){let l=f.id?document.querySelector('label[for="'+f.id+'"]'):null;
+    if(!l){let e=f.previousElementSibling;while(e&&!l){if(e.tagName==="LABEL")l=e;e=e.previousElementSibling}}
+    if(!l&&f.parentElement){const ls=f.parentElement.querySelectorAll("label");if(ls.length===1)l=ls[0]}
+    return l}
+  function einheit(f){if(f.dataset.einheit!==undefined)return f.dataset.einheit;
+    if(/^(VL|VR|HL|HR)$/.test(f.placeholder||""))return"mm";   // Profiltiefe je Rad, eine Beschriftung für vier Felder
+    // Einheit steht schon direkt am Feld (€-Kästchen davor, "km" dahinter): nichts doppelt
+    for(const n of [f.previousElementSibling,f.nextElementSibling])if(n&&n.tagName!=="LABEL"&&n.tagName!=="INPUT"&&/^\s*(€|km|%|prozent|liter|mm)/i.test(n.textContent||""))return"";
+    const l=beschriftung(f),t=((l?l.textContent:"")+" "+(f.placeholder||"")).trim();
+    for(const [re,e] of REGELN)if(re.test(t))return e;return""}
+  function bild(e){const w=Math.round(e.length*10.5+4),
+      svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="22"><text x="'+w+'" y="16" text-anchor="end" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#8A8A8E">'+e+'</text></svg>';
+    return{url:'url("data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)+'")',w}}
+  function setzen(f){if(f.dataset.mxE||AUS.has(f.id)||f.type==="date"||f.type==="time")return;
+    const e=einheit(f);f.dataset.mxE="1";if(!e)return;const b=bild(e),pr=parseFloat(getComputedStyle(f).paddingRight)||12;
+    f.style.backgroundImage=b.url;f.style.backgroundRepeat="no-repeat";f.style.backgroundPosition="right "+Math.max(12,pr)+"px center";
+    f.style.paddingRight=(Math.max(12,pr)+b.w+8)+"px";
+    // dieselbe Einheit am Ende der Beschriftung ist jetzt doppelt
+    const l=beschriftung(f),t=l&&l.lastChild;if(t&&t.nodeType===3){const ende={"€":/\s*€\s*$/,"km":/\s*\(km\)\s*$/,"mm":/\s+in mm\s*$/,"Stück":/\s*\(Stück\)\s*$/}[e];
+      if(ende&&ende.test(t.nodeValue)&&t.nodeValue.replace(ende,"").trim())t.nodeValue=t.nodeValue.replace(ende,"")}}
+  function alle(w){(w||document).querySelectorAll('input[inputmode="decimal"],input[inputmode="numeric"],input[type="number"]').forEach(setzen)}
+  window.mxEinheit=alle;alle();
+  new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input"))setzen(n);else if(n.querySelectorAll)alle(n)}})
+    .observe(document.body,{childList:true,subtree:true})})();
+</script></body></html>
