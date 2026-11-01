@@ -87,10 +87,15 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 .anbZwei{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.anbZwei label{display:block;font-size:13px;font-weight:700;color:var(--grau);margin:0 2px 4px}
 .anbZwei input{width:100%;box-sizing:border-box;border:1.5px solid #E4E4E7;border-radius:12px;padding:12px;font:600 16px inherit;font-family:inherit;background:#fff;color:#1C1C1E;min-height:48px}
 .anbEinheit{position:relative}.anbEinheit input{padding-right:36px}.anbEinheit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--grau)}
-#anbAutos .auto{display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid #E4E4E7;border-radius:14px;margin-bottom:8px;cursor:pointer}
-#anbAutos .auto.an{border-color:var(--gruen);background:#EEF8F2}#anbAutos .auto b{flex:1;min-width:0;font-size:15px}
-#anbAutos .auto i{font-style:normal;font-size:13px;color:var(--grau);font-weight:700;white-space:nowrap}#anbAutos .auto .h{width:22px;height:22px;border-radius:6px;border:2px solid #C7C7CC;flex:0 0 auto;text-align:center;line-height:18px;color:#fff;font-weight:900;font-size:14px}
-#anbAutos .auto.an .h{background:var(--gruen);border-color:var(--gruen)}
+/* Autos im Fenster wie im Angebot (01.11.2026, Baran: professioneller, Preis pro Tag sehen) */
+#anbAutos{background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:0 14px;overflow:hidden}
+#anbAutos .auto{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;margin:0 -14px;border-top:1px solid #EFEFF2;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#anbAutos .auto:first-child{border-top:0}#anbAutos .auto .n{min-width:0}
+#anbAutos .auto b{display:block;font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#anbAutos .auto i{display:block;font-style:normal;font-size:13px;color:var(--grau);font-weight:600;margin-top:1px}
+#anbAutos .auto .p{text-align:right;font-weight:800;font-size:16px;white-space:nowrap}#anbAutos .auto .p i{text-align:right}
+#anbAutos .auto.an{background:#EEF8F2}#anbAutos .auto.an b{color:#1E8E4E}#anbAutos .auto.belegt{opacity:.45;cursor:default}
+#anbAutos .haken{display:inline-flex;width:22px;height:22px;border-radius:50%;background:#1E8E4E;color:#fff;font-size:13px;font-weight:900;align-items:center;justify-content:center;margin-right:8px;vertical-align:-4px}
 #anbKunden .z{padding:11px 0}#anbKunden .z .uhr{display:none}#anbKunden .z .akt{background:#25D366;color:#fff;padding:9px 12px;font-size:14px;border-radius:10px}
 #anbKunden .z.weg .akt{background:#F2F2F7;color:#3A3A3C}#anbKunden .mehr{display:block;text-align:center;padding:12px;font-weight:800;color:var(--rot);cursor:pointer}
 #anbVorschau{white-space:pre-wrap;background:#F2F2F7;border-radius:14px;padding:12px;font-size:14px;line-height:1.45;margin-top:8px}
@@ -364,6 +369,11 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     return lies("mietixVorgaenge",[]).some(x=>!x._weg&&x.status!=="storniert"&&x.status!=="zurück"&&gl(x.auto)&&x.vonD&&x.bisD&&ue(von,bis,x.vonD,x.bisD))
       ||lies("mietixAnfragen",[]).some(a=>!a._weg&&a.status==="gebucht"&&gl(a.auto)&&a.von&&a.bis&&!a.vertrag&&ue(von,bis,a.von,a.bis))
       ||lies("mietixSperren",[]).some(s=>!s._weg&&gl(s.auto)&&s.von&&s.bis&&ue(von,bis,s.von,s.bis<=s.von?plusT(s.von,1):plusT(s.bis,1)))}
+  function belegtBis(auto,von,bis){const ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,n=autoName(auto),gl=a=>autoName(a)===n,L=[];
+    lies("mietixVorgaenge",[]).forEach(x=>{if(!x._weg&&x.status!=="storniert"&&x.status!=="zurück"&&gl(x.auto)&&x.vonD&&x.bisD&&ue(von,bis,x.vonD,x.bisD))L.push(x.bisD)});
+    lies("mietixAnfragen",[]).forEach(a=>{if(!a._weg&&a.status==="gebucht"&&gl(a.auto)&&a.von&&a.bis&&!a.vertrag&&ue(von,bis,a.von,a.bis))L.push(a.bis)});
+    lies("mietixSperren",[]).forEach(z=>{if(!z._weg&&gl(z.auto)&&z.von&&z.bis&&ue(von,bis,z.von,plusT(z.bis,1)))L.push(plusT(z.bis,1))});
+    return L.sort().pop()||""}
   function anbAngebote(){if(!PREISE||!ANB.vonD||!ANB.bisD)return[];const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,r=Math.max(0,Math.min(50,+ANB.rabatt||0));
     return PREISE.cars.map(c=>{const name=c.anzeige||c.n;if(belegt(name,ANB.vonD,ANB.bisD))return null;const L=Math.round(listenMiete(c,start,d));
       let P=r?Math.round(L*(1-r/100)/10)*10:L;if(r&&P>=L)P=L-10;return{name,L,P,km:(PREISE.freiKm||150)*d}}).filter(Boolean)}
@@ -390,8 +400,11 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     $a("anbVonD").value=ANB.vonD;$a("anbVonU").value=ANB.vonU;$a("anbBisD").value=ANB.bisD;$a("anbBisU").value=ANB.bisU;
     const alleA=anbAngebote();if(ANB.autos===null)ANB.autos=alleA.map(a=>a.name);
     const ang=alleA.filter(a=>ANB.autos.includes(a.name)),d=anbTage();
-    $a("anbAutosT").textContent=ANB.vonD&&ANB.bisD?"Frei in diesem Zeitraum ("+d+(d===1?" Tag":" Tage")+")":"Erst den Zeitraum wählen";
-    $a("anbAutos").innerHTML=!ANB.vonD||!ANB.bisD?"":alleA.length?alleA.map(a=>'<div class="auto'+(ANB.autos.includes(a.name)?" an":"")+'" data-a="'+esc(a.name)+'"><span class="h">✓</span><b>'+esc(a.name)+'</b><i>'+(a.P<a.L?eur2(a.P)+" € statt "+eur2(a.L)+" €":eur2(a.L)+" €")+'</i></div>').join(""):'<div class="leer">In diesem Zeitraum ist kein Auto frei.</div>';
+    $a("anbAutosT").textContent=ANB.vonD&&ANB.bisD?(alleA.length?"Autos antippen, "+alleA.length+" frei für "+d+(d===1?" Tag":" Tage"):"Kein Auto frei für "+d+(d===1?" Tag":" Tage")):"Erst den Zeitraum wählen";
+    // alle Autos: freie mit Preis pro Tag und Gesamtpreis, belegte grau mit „wieder frei“ (wie im Angebot)
+    const weg=PREISE.cars.map(c=>c.anzeige||c.n).filter(n=>!alleA.some(a=>a.name===n)).map(n=>({n,bis:belegtBis(n,ANB.vonD,ANB.bisD)})),kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
+    $a("anbAutos").innerHTML=!ANB.vonD||!ANB.bisD?"":alleA.map(a=>{const an=ANB.autos.includes(a.name);return '<div class="auto'+(an?" an":"")+'" data-a="'+esc(a.name)+'"><span class="n"><b>'+(an?'<span class="haken">✓</span>':"")+esc(a.name)+'</b><i>'+eur2(Math.round(a.P/d))+' € pro Tag, '+a.km.toLocaleString("de-DE")+' km inklusive</i></span><span class="p">'+eur2(a.P)+' €'+(a.P<a.L?'<i>statt '+eur2(a.L)+' €</i>':"")+'</span></div>'}).join("")+
+      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>belegt'+(x.bis?", wieder frei "+kz(x.bis):"")+'</i></span><span class="p"></span></div>').join("")||'<div class="leer">Keine Autos</div>';
     document.querySelectorAll("#anbAutos [data-a]").forEach(e=>e.onclick=()=>{const n=e.dataset.a,i=ANB.autos.indexOf(n);if(i<0)ANB.autos.push(n);else ANB.autos.splice(i,1);anbZeichnen()});
     const ks=ang.length?anbKunden(ang.map(a=>a.name)):[],zeig=ANB.alle?ks:ks.slice(0,8),hi=iso(new Date());
     $a("anbKunden").innerHTML=!ang.length?'<div class="leer">Erst ein freies Auto wählen.</div>':!ks.length?'<div class="leer">Keine passenden Kunden mit Telefonnummer.</div>':
