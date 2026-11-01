@@ -198,7 +198,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
   const de=s=>s?String(s).slice(0,10).split("-").reverse().slice(0,2).join(".")+".":"";
   const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
   const B="https://barankohler.github.io/",WT=["So","Mo","Di","Mi","Do","Fr","Sa"];
-  const EUR=n=>(+n||0).toLocaleString("de-DE",{minimumFractionDigits:0,maximumFractionDigits:2})+" €";
+  const EUR=n=>Math.round(+n||0).toLocaleString("de-DE")+" €";   // ganze Euro (01.11.2026, Baran)
   const zahl=v=>{if(v==null)return 0;const s=String(v).trim();if(!s)return 0;return parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""))||0};
   if(window.navigator.standalone)document.getElementById("homeTipp").style.display="none";
   // Zeilen mit Aktion (31.10.2026, Baran: „nebendran eintragen“): Bezahlt und Kaution zurück direkt hier, der Name führt weiter in den Mietvertrag
@@ -340,7 +340,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     document.getElementById("umZ").innerHTML=z.map(x=>'<span><span>'+esc(x[0])+'</span><b class="'+x[2]+'">'+x[1]+'</b></span>').join("")}
   // WhatsApp heute (31.10.2026, Baran: „morgens alle Nachrichten auf einmal“, Verlängerung und km-Paket als Umsatzbringer)
   let PREISE=null;fetch("https://barankohler.github.io/mietix-preise/preise.json").then(r=>r.json()).then(j=>{PREISE=j;zeichne()}).catch(()=>{});
-  const eur2=n=>{n=+n||0;return n.toLocaleString("de-DE",{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})};
+  const eur2=n=>Math.round(+n||0).toLocaleString("de-DE");   // ganze Euro, keine Cent (01.11.2026, Baran)
   const waNr2=t=>{let n=String(t||"").replace(/\D/g,"");if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="49"+n.slice(1);return n};
   const vn=s=>String(s||"").trim().split(/\s+/)[0];
   let WA_LISTE=[];
