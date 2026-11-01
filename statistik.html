@@ -505,9 +505,9 @@ zeigen();abgleichen();auslagernBald();
   addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
 
   // Entwurf: Felder eines Bereichs beim Tippen sichern
-  window.mxEntwurf=function(bereich,schluessel){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
+  window.mxEntwurf=function(bereich,schluessel,nur){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
     const leer={holen(){return false},weg(){},merken(){}};if(!el)return leer;
-    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type));
+    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type)&&(!nur||nur.includes(f.id)));
     let aus=false;
     const merken=()=>{if(aus)return;const d={};let etwas=false;felder().forEach(f=>{const v=f.type==="checkbox"?f.checked:f.value;d[f.id]=v;if(v&&v!==true)etwas=true});
       try{if(etwas)localStorage.setItem(K,JSON.stringify(d));else localStorage.removeItem(K)}catch(e){}};

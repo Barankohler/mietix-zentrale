@@ -145,7 +145,7 @@ main{max-width:640px;margin:0 auto;padding:12px 16px 90px}
    window.mietixKunden.merken(name, werte)  Felder eines Kunden im gemeinsamen Speicher ändern */
 (function(){
 const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
-const schreib=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const schreib=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};   // false: nicht gespeichert, roter Hinweis kommt aus stil/schutz.py
 const norm=s=>String(s||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();   // Çelik findet man auch als celik
 const ziffern=n=>String(n||"").replace(/\D/g,"").replace(/^0049/,"0").replace(/^49/,"0");
 const de=s=>s&&/^\d{4}-\d{2}-\d{2}$/.test(s)?s.split("-").reverse().join("."):String(s||"");
@@ -319,8 +319,10 @@ function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="
   $("kZu").onclick=ev=>{ev.preventDefault();window.mxZurueck()};
   $("kBearb").onclick=()=>{BEARB=!BEARB;karte()};
   if(BEARB){$("dKeine").onclick=()=>$("dKeine").classList.toggle("an");
+    // Angefangene Änderungen kommen wieder (1.11.2026, Regel: nichts verlieren)
+    const KE=window.mxEntwurf?mxEntwurf("#karte","kunde:"+e.name,["dTel","dAnschrift","dGeb","dGebort","dEmail","dNotiz"]):null;if(KE)KE.holen();
     $("dSpeichern").onclick=()=>{MK.merken(e.name,{telefon:$("dTel").value.trim(),anschrift:$("dAnschrift").value.trim(),geb:$("dGeb").value,gebort:$("dGebort").value.trim(),
-      email:$("dEmail").value.trim(),notiz:$("dNotiz").value.trim(),keineAngebote:$("dKeine").classList.contains("an")||null});BEARB=false;meldung("Gespeichert, auf allen Geräten.");zeichne();karte()};
+      email:$("dEmail").value.trim(),notiz:$("dNotiz").value.trim(),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;meldung("Gespeichert, auf allen Geräten.");zeichne();karte()};
     $("dLoeschen").onclick=ev=>{ev.preventDefault();if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+" löschen? Die Mietverträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
       MK.merken(e.name,{telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true});BEARB=false;meldung("Daten gelöscht.");zeichne();karte()}}}
 /* Angebot verschicken (31.10.2026, Baran: Autos antippen, Übergabe und Rückgabe mit Datum und Uhrzeit, seriös und attraktiv) */
@@ -736,9 +738,9 @@ zeigen();abgleichen();auslagernBald();
   addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
 
   // Entwurf: Felder eines Bereichs beim Tippen sichern
-  window.mxEntwurf=function(bereich,schluessel){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
+  window.mxEntwurf=function(bereich,schluessel,nur){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
     const leer={holen(){return false},weg(){},merken(){}};if(!el)return leer;
-    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type));
+    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type)&&(!nur||nur.includes(f.id)));
     let aus=false;
     const merken=()=>{if(aus)return;const d={};let etwas=false;felder().forEach(f=>{const v=f.type==="checkbox"?f.checked:f.value;d[f.id]=v;if(v&&v!==true)etwas=true});
       try{if(etwas)localStorage.setItem(K,JSON.stringify(d));else localStorage.removeItem(K)}catch(e){}};

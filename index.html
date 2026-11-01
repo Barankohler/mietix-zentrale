@@ -206,20 +206,24 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
       bl.forEach((x,i)=>bl.forEach((y,j)=>{if(j<=i||x.a!==y.a||!ue(x.v,x.b,y.v,y.b))return;const ab=x.v>y.v?x.v:y.v;if(ab>bis2||(x.b<hi&&y.b<hi))return;
         const key=x.a+x.w+y.w;if(schon[key])return;schon[key]=1;
         rest.unshift({t:x.a+" doppelt verplant",i:x.w+" und "+y.w+", "+(ab.slice(0,10)<=hi?"heute":"morgen ("+WT[m.getDay()]+" "+de(mo)+")"),k:"Prüfen",art:"rot",href:B+"mietix-belegung/"})}))}
-    // Nachfassen: Angebot seit 2 Tagen ohne Antwort, Mietbeginn noch nicht vorbei
-    const WA_NACH=[];
-    const nach=anf.filter(a=>a.status==="angebot"&&a.nummer&&!a.nachgefasst&&(!a.von||a.von>=hi)).filter(a=>{const s=tageSeit((a.angebot&&a.angebot.am)||a.tag);return s>=2&&s<=14});
+    const WA_NACH=[];   // Nachfassen steht seit 01.11.2026 unter „Zu erledigen“
     const waNr=t=>{let n=String(t||"").replace(/\D/g,"");if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="49"+n.slice(1);return n};
-    nach.forEach(a=>{const vn=String(a.name||"").trim().split(/\s+/)[0],txt="Hallo"+(vn?" "+vn:"")+",\
-\
-ich wollte kurz nachfragen, ob unser Angebot"+(a.auto?" für den "+a.auto:"")+(a.von?" vom "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+" noch passt. Gerne halte ich Ihnen das Fahrzeug frei.\
-\
-Viele Grüße\
-Ihr Mietix-Team";
-      WA_NACH.push({t:a.name||a.nummer,i:"Angebot nachfragen"+(a.auto?", "+a.auto:""),tel:a.nummer,text:txt,mark:{anf:a.id}})});
     const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
     anf.filter(a=>a.status==="gebucht"&&a.von&&a.von<=mo&&a.von>=iso(new Date(Date.now()-864e5))&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von))
       .forEach(a=>out.push({uhr:a.von===hi?(a.vonU||""):"",uhrM:a.vonU||"",morgen:a.von===mo,t:a.name||a.nummer||"ohne Namen",i:(a.auto||"")+", gebucht, noch kein Mietvertrag",k:"Mietvertrag",art:"rot",href:B+"mietix-vertrag/?anfrage="+encodeURIComponent(a.id)}));
+    // Nachfassen (01.11.2026, Baran freigegeben): Angebot älter als 24 Stunden ohne Antwort, Mietbeginn heute oder später,
+    // Auto im Zeitraum noch frei (Mietvertrag, gebuchte Anfrage, Sperre). Ein Tipp öffnet WhatsApp, danach gilt es als nachgefasst.
+    {const ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,sp=lies("mietixSperren",[]),tagNach=d=>{const x=new Date(d+"T12:00");x.setDate(x.getDate()+1);return iso(x)};
+      const kurz=(d,j)=>{const x=new Date(d+"T12:00");return WT[x.getDay()]+" "+pad(x.getDate())+"."+pad(x.getMonth()+1)+"."+(j?x.getFullYear():"")};
+      const frei=(auto,von,bis)=>{const gl=x=>nG(x)===nG(auto),b=bis&&bis>von?bis:tagNach(von);
+        return !alle.some(x=>!x._weg&&x.status!=="zurück"&&x.status!=="storniert"&&gl(x.auto)&&x.vonD&&x.bisD&&ue(von,b,x.vonD,x.bisD))
+          &&!anf.some(y=>!y._weg&&y.status==="gebucht"&&gl(y.auto)&&y.von&&ue(von,b,y.von,y.bis&&y.bis>y.von?y.bis:tagNach(y.von)))
+          &&!sp.some(z=>!z._weg&&gl(z.auto)&&z.von&&z.bis&&ue(von,b,z.von,tagNach(z.bis)))};
+      anf.filter(a=>a.status==="angebot"&&!a._weg&&!a.vertrag&&!a.nachgefasst&&a.nummer&&a.angebot&&a.angebot.am&&a.von&&a.von>=hi&&Date.now()-new Date(a.angebot.am)>864e5&&(!a.auto||frei(a.auto,a.von,a.bis)))
+        .forEach(a=>{const v=String(a.name||"").trim().split(/\s+/)[0],tage=Math.floor((Date.now()-new Date(a.angebot.am))/864e5),zr=kurz(a.von)+" bis "+kurz(a.bis||a.von,true);
+          const txt=(v?"Hallo "+v+",":"Guten Tag,")+"\n\nich wollte kurz nachfragen, ob mein Angebot"+(a.auto?" für den "+a.auto:"")+" von "+zr+" noch passt. Der Wagen ist im Moment noch frei, ich halte ihn gern für Sie bereit.\n\nViele Grüße\nB. Köhler vom Mietix-Team";
+          rest.push({t:a.name||"ohne Namen",i:"Angebot "+(a.auto?a.auto+", ":"")+kurz(a.von)+" bis "+kurz(a.bis||a.von)+", keine Antwort seit "+tage+(tage===1?" Tag":" Tagen"),k:"Nachfassen",art:"gruen",nf:a.id,
+            href:"https://wa.me/"+waNr(a.nummer)+"?text="+encodeURIComponent(txt)})})}
     // alles von morgen in den eigenen Abschnitt, dort mit Uhrzeit statt „morgen“
     for(let i=out.length-1;i>=0;i--){const x=out[i];if(/(Abholung|Rückgabe) morgen \(/.test(x.i)||(x.k==="Mietvertrag"&&x.morgen)){morgen.unshift(Object.assign({},x,{i:x.i.replace(/, (Abholung|Rückgabe) morgen \(.*\)$/,", $1"),uhr:x.uhrM||""}));out.splice(i,1)}}
     zahlenZeichnen(alle,anf,hi);
@@ -317,60 +321,22 @@ Ihr Mietix-Team";
     alle.forEach(v=>{if(!v.telefon)return;const z=v.zahlung||{};
       // Erinnerung an die Abholung morgen
       if(v.vonD===mo&&!v.ueb&&!v.erinnert)L.push({t:v.name,i:"Erinnerung an die Abholung morgen ("+de(mo)+")",tel:v.telefon,mark:{nr:v.nr,feld:"erinnert"},
-        text:"Hallo "+vn(v.name)+",\
-\
-kurze Erinnerung an Ihre Abholung morgen, "+de(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\
-\
-Bitte mitbringen:\
-- Personalausweis\
-- Führerschein"+
-          ((z.kaut||{}).am||v.kautionArt==="fahrzeug"?"":"\
-- Kaution "+eur2(zahl((z.kaut||{}).betrag))+" €")+((z.rest||{}).am?"":"\
-- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\
-\
-Bis morgen!\
-Ihr Mietix-Team"});
+        text:"Hallo "+vn(v.name)+",\n\nkurze Erinnerung an Ihre Abholung morgen, "+de(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
+          ((z.kaut||{}).am||v.kautionArt==="fahrzeug"?"":"\n- Kaution "+eur2(zahl((z.kaut||{}).betrag))+" €")+((z.rest||{}).am?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\n\nBis morgen!\n\nViele Grüße\nB. Köhler vom Mietix-Team"});
       // Verlängerung anbieten: Rückgabe heute, Auto morgen frei
       if(v.ueb&&v.status!=="zurück"&&v.bisD===hi&&!v.verlAngeboten&&frei(v)){const c=preis(v.auto),tp=c?verlTag(c,v):0,vs=tp?Math.min(Math.round(tp)-10,Math.max(9,Math.round(tp*0.85/10)*10-1)):0;   // 1.11.2026 Baran: Normalpreis = was der Folgetag nach den Preisregeln kostet
         L.push({t:v.name,i:"Verlängerung anbieten, "+v.auto+" ist morgen ("+de(mo)+") frei",tel:v.telefon,mark:{nr:v.nr,feld:"verlAngeboten"},
-          text:"*Ihr "+v.auto+" ist morgen noch frei*\
-\
-Der Wagen ist morgen, "+tagLang(mo)+", nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\
-\
-"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
-            "\
-\
-Eine kurze Antwort genügt, dann verlängern wir bis morgen, "+tagLang(mo)+(v.bisU?", "+v.bisU+" Uhr":"")+".\
-\
-Viele Grüße\
-Ihr Mietix-Team"})}
+          text:"Hallo "+vn(v.name)+",\n\n*Ihr "+v.auto+" ist morgen noch frei*\n\nDer Wagen ist morgen, "+tagLang(mo)+", nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\n\n"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
+            "\n\nEine kurze Antwort genügt, dann verlängern wir bis morgen, "+tagLang(mo)+(v.bisU?", "+v.bisU+" Uhr":"")+".\n\nViele Grüße\nB. Köhler vom Mietix-Team"})}
       // Kilometerpaket anbieten: Abholung heute oder morgen, noch kein Paket
       const c=preis(v.auto);
       if(!v.ueb&&(v.vonD===hi||v.vonD===mo)&&!v.paketKm&&!v.kmAngeboten&&c&&c.km&&c.km.length>1){const st=PREISE.kmStufen||[50,100,150,200,300];
         L.push({t:v.name,i:"Kilometerpaket anbieten, "+v.auto,tel:v.telefon,mark:{nr:v.nr,feld:"kmAngeboten"},
-          text:"*Mehr Kilometer, weniger zahlen*\
-\
-Sie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\
-\
-Ihr "+v.auto+", für Ihre ganze Miete:\
-"+
-            st.map((k,i)=>"- +"+k.toLocaleString("de-DE")+" km für "+eur2(c.km[i+1])+" € (statt "+eur2(k*c.kmPreis)+" €)").join("\
-")+"\
-\
-Welches Paket darf ich Ihnen dazubuchen?\
-\
-Viele Grüße\
-Ihr Mietix-Team"})}
+          text:"Hallo "+vn(v.name)+",\n\n*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\nIhr "+v.auto+", für Ihre ganze Miete:\n"+
+            st.map((k,i)=>"- +"+k.toLocaleString("de-DE")+" km für "+eur2(c.km[i+1])+" € (statt "+eur2(k*c.kmPreis)+" €)").join("\n")+"\n\nWelches Paket darf ich Ihnen dazubuchen?\n\nViele Grüße\nB. Köhler vom Mietix-Team"})}
       // Danke nach der Rückgabe heute
       if(v.status==="zurück"&&String((v.rueck||{}).datum||"").slice(0,10)===hi&&!v.bedankt)L.push({t:v.name,i:"Danke sagen, heute zurückgegeben",tel:v.telefon,mark:{nr:v.nr,feld:"bedankt"},
-        text:"Hallo "+vn(v.name)+",\
-\
-vielen Dank, dass Sie bei Mietix gemietet haben! Wir hoffen, Sie hatten eine tolle Zeit mit dem "+v.auto+".\
-\
-Wir freuen uns auf das nächste Mal.\
-\
-Viele Grüße\
-Ihr Mietix-Team"})});
+        text:"Hallo "+vn(v.name)+",\n\nvielen Dank, dass Sie bei Mietix gemietet haben! Wir hoffen, Sie hatten eine tolle Zeit mit dem "+v.auto+".\n\nWir freuen uns auf das nächste Mal.\n\nViele Grüße\nB. Köhler vom Mietix-Team"})});
     L.push(...nach);WA_LISTE=L;
     const t=document.getElementById("waTitel"),k=document.getElementById("waK");t.classList.toggle("versteckt",!L.length);k.classList.toggle("versteckt",!L.length);
     t.textContent="WhatsApp heute ("+L.length+")";document.getElementById("waNext").textContent=L.length>1?"Nächste senden ("+L.length+" offen) ›":"Senden ›";
@@ -874,9 +840,9 @@ zeigen();abgleichen();auslagernBald();
   addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
 
   // Entwurf: Felder eines Bereichs beim Tippen sichern
-  window.mxEntwurf=function(bereich,schluessel){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
+  window.mxEntwurf=function(bereich,schluessel,nur){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
     const leer={holen(){return false},weg(){},merken(){}};if(!el)return leer;
-    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type));
+    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type)&&(!nur||nur.includes(f.id)));
     let aus=false;
     const merken=()=>{if(aus)return;const d={};let etwas=false;felder().forEach(f=>{const v=f.type==="checkbox"?f.checked:f.value;d[f.id]=v;if(v&&v!==true)etwas=true});
       try{if(etwas)localStorage.setItem(K,JSON.stringify(d));else localStorage.removeItem(K)}catch(e){}};

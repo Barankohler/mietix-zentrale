@@ -257,10 +257,11 @@ document.querySelectorAll(".miete").forEach(i=>{i.onclick=e=>e.stopPropagation()
 function speichereEigene(k,wert){const st=lies("mietixStand",{});const n=Object.assign({},st.nachrichten||{});if(wert===null)delete n[k];else n[k]=wert;st.nachrichten=n;
   try{localStorage.setItem("mietixStand",JSON.stringify(st))}catch(e){}}
 document.querySelectorAll(".aend").forEach(a=>a.onclick=ev=>{ev.preventDefault();const el=a.closest(".n"),k=el.dataset.k;if(el.querySelector("textarea"))return;
-  const ta=document.createElement("textarea");ta.value=eigene()[k]||BASIS[k];el.querySelector("pre").style.display="none";el.querySelector(".k").style.display="none";a.style.display="none";
+  const ta=document.createElement("textarea"),TK="mietixFeld:nachricht:"+k;let ent=null;try{ent=localStorage.getItem(TK)}catch(e){}
+  ta.value=ent||eigene()[k]||BASIS[k];ta.addEventListener("input",()=>{try{localStorage.setItem(TK,ta.value)}catch(e){}});   // Entwurf beim Tippen (1.11.2026)el.querySelector("pre").style.display="none";el.querySelector(".k").style.display="none";a.style.display="none";
   const kn=document.createElement("div");kn.className="k";kn.innerHTML='<div class="kop">Speichern</div><div class="hell">Original</div><div class="hell">Abbrechen</div>';
   ta.after(kn);el.querySelector("pre").after(ta);ta.after(kn);
-  const fertig=()=>{ta.remove();kn.remove();el.querySelector("pre").style.display="";el.querySelector(".k").style.display="";a.style.display="";zeige(el)};
+  const fertig=()=>{try{localStorage.removeItem(TK)}catch(e){}ta.remove();kn.remove();el.querySelector("pre").style.display="";el.querySelector(".k").style.display="";a.style.display="";zeige(el)};
   kn.children[0].onclick=()=>{speichereEigene(k,ta.value.trim()===BASIS[k].trim()?null:ta.value);fertig();meldung("Gespeichert, auf allen Geräten")};
   kn.children[1].onclick=()=>{if(!confirm("Euren ursprünglichen Text wiederherstellen?"))return;speichereEigene(k,null);fertig();meldung("Original wiederhergestellt")};
   kn.children[2].onclick=fertig});
@@ -645,9 +646,9 @@ zeigen();abgleichen();auslagernBald();
   addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
 
   // Entwurf: Felder eines Bereichs beim Tippen sichern
-  window.mxEntwurf=function(bereich,schluessel){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
+  window.mxEntwurf=function(bereich,schluessel,nur){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
     const leer={holen(){return false},weg(){},merken(){}};if(!el)return leer;
-    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type));
+    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type)&&(!nur||nur.includes(f.id)));
     let aus=false;
     const merken=()=>{if(aus)return;const d={};let etwas=false;felder().forEach(f=>{const v=f.type==="checkbox"?f.checked:f.value;d[f.id]=v;if(v&&v!==true)etwas=true});
       try{if(etwas)localStorage.setItem(K,JSON.stringify(d));else localStorage.removeItem(K)}catch(e){}};
