@@ -144,6 +144,59 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 .mxKlein{margin-top:8px}.mxKlein>summary{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:14px;font-weight:800;color:#1C1C1E;background:#F2F2F4;border-radius:999px;padding:9px 14px;min-height:40px;box-sizing:border-box}
 .mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
 .mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
+</style><style>/* App-Design klar (01.11.2026) */
+body{background:#F2F2F7!important}
+/* Kopfzeile wie in iOS: „‹ Start“ als rote Schrift statt Pille */
+html body header .mxStart,html body .topbar .mxStart{border:0!important;padding:4px 0!important;color:#C4161C!important;opacity:1!important;font-size:17px!important;font-weight:600!important;gap:3px!important}
+html body .mxStart b{font-size:26px!important;font-weight:400!important;line-height:17px!important;margin-top:-3px!important}
+/* Karten = gruppierte Liste: weiß, rund, ohne Rand */
+.karte{border:0!important;border-radius:14px!important}
+.liste,.notiz,.n,.zeitraumF{border-radius:14px!important}
+/* Überschrift in der Karte: klein, grau, groß geschrieben (wie iOS-Einstellungen) */
+html body main .karte>h2,html body .karte>h2{font-size:13px!important;letter-spacing:.3px!important;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase!important;margin-bottom:9px}
+/* Eingabefelder: grau gefüllt, ohne Rand. Antippen: weiß mit rotem Rand */
+input:not([type=checkbox]):not([type=radio]):not([type=search]):not([type=range]):not([type=file]),select,textarea{background-color:#F2F2F7!important;border:1.5px solid transparent!important;border-radius:10px!important}
+input:not([type=checkbox]):not([type=radio]):focus,select:focus,textarea:focus{background-color:#fff!important;border-color:#C4161C!important;outline:0!important}
+input::placeholder,textarea::placeholder{color:#AEAEB2}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%238A8A8E' stroke-width='2' fill='none'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;padding-right:34px!important}
+input.fehlt,select.fehlt,textarea.fehlt,.fehlt>input,input.rotRand{background-color:#FDE8E8!important;border-color:#FF3B30!important}
+/* Auswahl-Leiste: grau, die gewählte weiß (Reiter, Zeitraum-Knöpfe, Filter) */
+.reiter,.schnell,.chips,.tChips{background:#E3E3E8!important;border-radius:10px!important;padding:2px!important;gap:2px!important;display:flex!important;flex-wrap:wrap}
+.reiter{margin-left:0!important;margin-right:0!important;flex-wrap:nowrap!important}
+.reiter div,.schnell .c,.chips .c,.chips .chip,.tChips .chip{flex:1 1 auto!important;background:transparent!important;border:0!important;border-radius:8px!important;color:#1C1C1E!important;font-weight:600!important;font-size:14px!important;padding:8px 10px!important;text-align:center;min-height:0!important;line-height:1.25}
+.reiter div.an,.schnell .c.an,.chips .c.an,.chips .chip.an,.tChips .chip.an{background:#fff!important;color:#1C1C1E!important;outline:.5px solid rgba(0,0,0,.08)}
+.chip b,.chip em{color:inherit}
+.filter,.tage{background:#E3E3E8!important;border-radius:10px!important;padding:2px!important;gap:2px!important;display:flex!important}
+.filter span,.tage .tag{flex:1 0 auto!important;background:transparent!important;border:0!important;border-radius:8px!important;color:#1C1C1E!important;font-weight:600!important;font-size:14px!important;padding:8px 10px!important;text-align:center;box-shadow:none!important}
+.filter span.an,.tage .tag.an{background:#fff!important;color:#1C1C1E!important;outline:.5px solid rgba(0,0,0,.08)}
+.filter span.an b{color:#C4161C!important}
+.ereihe:has(.minik[data-s]){background:#E3E3E8;border-radius:10px;padding:2px;gap:2px!important}
+.ereihe .minik[data-s]{background:transparent!important;border:0!important;border-radius:8px!important;color:#1C1C1E!important;font-weight:600!important;padding:9px 3px!important}
+.ereihe .minik[data-s].an{background:#fff!important;outline:.5px solid rgba(0,0,0,.08)}
+/* Löschen = rote Schrift ohne Kasten, Nebenaktion = roter Rand */
+.minik.weg{background:transparent!important;border-color:transparent!important;color:#FF3B30!important;font-weight:600!important}
+.minik.angebot,.minik.wa,.minik.vertragk{text-decoration:none!important}
+.fsAuf{background:#fff!important;color:#C4161C!important;border:1.5px solid #C4161C!important}
+/* Überschriften über einer Liste: klein, grau, groß geschrieben, wie im Entwurf */
+html body h2.hT,html body p.feldname,html body main h2.gruppe,html body .app>h2,html body main>h2,html body h2.thema,html body .bereich>.kopf>b{font-size:13px!important;letter-spacing:.3px!important;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase!important}
+html body h2.hT{margin:20px 16px 7px!important}
+html body .app>h2,html body main>h2{margin-left:16px!important;margin-right:16px!important}
+/* Zeile öffnet etwas: grauer Pfeil rechts */
+.vpfeil{color:#C7C7CC!important;font-weight:400!important;font-size:22px!important}
+.hListe .heute:after{content:"";flex:0 0 8px;width:8px;height:14px;margin-left:8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Cpath d='M1.5 1.5l5 5.5-5 5.5' stroke='%23C7C7CC' stroke-width='2.4' fill='none'/%3E%3C/svg%3E") no-repeat center}
+/* Ja / Nein: Haken und Kreuz. Bei Rückgabe-Fragen Ja grün, Nein rot (Entwurf app_2) */
+.chips [data-jn].an:before{font-weight:800;margin-right:5px}
+.chips [data-jn=ja].an:before{content:"✓"}.chips [data-jn=nein].an:before{content:"✕"}
+.frage .chips [data-jn=ja].an{background:#34C759!important;color:#fff!important;outline:0}
+.frage .chips [data-jn=nein].an{background:#FF3B30!important;color:#fff!important;outline:0}
+/* Kreise mit Anfangsbuchstaben: grau statt bunt (Baran: „viel zu bunt“) */
+.av,.vav{background:#C7C7CC!important;color:#fff!important}
+.leiste button{border-radius:13px!important}
+/* PC und Mac (Test 01.11.2026): Kopfzeile und Inhalt in derselben 680-px-Spalte, auf allen Seiten gleich */
+@media(min-width:760px){header,.topbar,.kTop{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}
+  main,.app{max-width:680px!important;margin-left:auto!important;margin-right:auto!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}
+#sortierung{font-size:16px!important}   /* sonst zoomt das iPhone beim Antippen */
+input[type=date],input[type=time]{min-width:0;max-width:100%}
 </style></head><body><div class="app">
 <header><h1><img src="logo.png" alt="Mietix Sportwagenvermietung" class="logo"></h1><span id="punkt" title="Anmeldung und Stand"></span></header>
 <div id="stand"><div id="abgleich"></div><div id="bruecke" class="tipp" style="text-align:left;margin:0 4px 6px"></div></div>
