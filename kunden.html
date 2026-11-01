@@ -79,6 +79,20 @@ main{max-width:640px;margin:0 auto;padding:12px 16px 90px}
 .agRow.war a{background:#F2F2F7;color:var(--grau)}
 .meld{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1C1C1E;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
 .meld.an{opacity:1}
+/* Mieten des Kunden (1.11.2026): gruppierte Liste, Zeile öffnet die Mappe */
+.knoepfe{grid-template-columns:repeat(2,1fr)}
+.neuMv{display:block;text-align:center;background:#C4161C;color:#fff;text-decoration:none;border-radius:12px;padding:14px;font-weight:600;font-size:17px;margin:0 0 4px;min-height:50px}
+.mzListe{background:#fff;border-radius:12px;overflow:hidden}
+.mz{display:flex;align-items:center;gap:10px;min-height:50px;padding:9px 12px 9px 16px;color:#1C1C1E;text-decoration:none;position:relative}
+.mz+.mz:before{content:"";position:absolute;left:16px;right:0;top:0;border-top:.5px solid #D1D1D6}
+a.mz:active{background:#F2F2F7}
+.mzT{flex:1;min-width:0}.mzT b{display:block;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mzT i{display:block;font-style:normal;font-size:14px;color:#8A8A8E;margin-top:2px}
+.mzR{flex:0 0 auto;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}.mzR b{font-size:17px;font-weight:600;white-space:nowrap}
+.schilder{display:flex;gap:4px}
+.schild{font-size:12px;font-weight:600;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.schild.gruen{background:#E3F4EA;color:#1E8E4E}.schild.rot{background:#FDE8E8;color:#C4161C}.schild.gelb{background:#FFF1DC;color:#9A6400}.schild.grau{color:#8A8A8E;padding-right:0}
+.mzP{flex:0 0 auto;font-style:normal;color:#C7C7CC;font-size:22px;line-height:1}
 .versteckt{display:none!important}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
@@ -146,6 +160,10 @@ html body .app>h2,html body main>h2{margin-left:16px!important;margin-right:16px
 .chips [data-jn=ja].an:before{content:"✓"}.chips [data-jn=nein].an:before{content:"✕"}
 .frage .chips [data-jn=ja].an{background:#34C759!important;color:#fff!important;outline:0}
 .frage .chips [data-jn=nein].an{background:#FF3B30!important;color:#fff!important;outline:0}
+/* Kunden: „‹ Kunden“ wie „‹ Start“ als rote Schrift, Überschriften klein und grau */
+html body .kTop #kZu{border:0!important;background:none!important;padding:4px 0!important;color:#C4161C!important;font-size:17px!important;font-weight:600!important}
+html body .ab{font-size:13px!important;letter-spacing:.3px;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase;margin:20px 16px 7px!important}
+html body .ab span{text-transform:none;letter-spacing:0}
 /* Kreise mit Anfangsbuchstaben: grau statt bunt (Baran: „viel zu bunt“) */
 .av,.vav{background:#C7C7CC!important;color:#fff!important}
 .leiste button{border-radius:13px!important}
@@ -339,6 +357,13 @@ function oeffne(n){AUF=n;BEARB=false;karte();$("karte").classList.add("auf");$("
 function zu(){AUF=null;BEARB=false;$("karte").classList.remove("auf")}
 window.mxZurueck=()=>{if(AUF){if(history.state&&history.state.kunde)history.back();else zu();return true}return false};
 window.addEventListener("popstate",()=>{if(AUF)zu()});
+function mieteZeile(v){const V="../mietix-vertrag/",preis='<b>'+(v.preis?EUR.format(v.preis):"")+'</b>';
+  if(v.alt)return'<div class="mz"><div class="mzT"><b>'+esc(v.auto||"Miete")+'</b><i>'+de(v.von)+', aus der Excel</i></div><div class="mzR">'+preis+'</div></div>';
+  // Stand wie in der Mappe: zurück, unterwegs (Übergabe gemacht), sonst gebucht (Übergabe offen)
+  const vg=(()=>{try{return(JSON.parse(localStorage.getItem("mietixVorgaenge")||"[]")||[]).find(x=>x&&x.nr===v.nr)||{}}catch(_){return{}}})();
+  const schild=(v.status==="zurück"?'<span class="schild gruen">zurück</span>':vg.ueb?'<span class="schild rot">unterwegs</span>':'<span class="schild grau">gebucht</span>')+(v.mieteOffen?'<span class="schild gelb">offen</span>':"");
+  return'<a class="mz" href="'+V+'?nr='+encodeURIComponent(v.nr)+'&amp;zeige=mappe" data-nr="'+esc(v.nr)+'"><div class="mzT"><b>'+esc(v.auto||"Miete")+'</b><i>'+de(v.von)+(v.bis&&v.bis!==v.von?" bis "+de(v.bis):"")+", Nr. "+esc(v.nr)+'</i></div>'
+    +'<div class="mzR">'+preis+(schild?'<span class="schilder">'+schild+'</span>':"")+'</div><em class="mzP">›</em></a>'}
 function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="../mietix-vertrag/";
   const seit=e.vertraege.length?e.vertraege[0].von:"",sMon=seit?MON[+seit.slice(5,7)-1]+" "+seit.slice(0,4):"";
   const unter=e.mieten>=2?"Stammkunde, "+e.mieten+" Mieten seit "+sMon:e.mieten===1?"1 Miete im "+sMon:e.anfragen.length?"Bisher nur Anfrage":"Noch keine Miete";
@@ -349,12 +374,15 @@ function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="
   if(e.warn.length)h+='<div class="warnung">Achtung: '+esc(e.warn.join(". "))+'</div>';
   // ohne Telefonnummer grau und nicht antippbar (31.10.2026, Prüfung: tat sonst einfach nichts)
   const aus=' style="opacity:.35;pointer-events:none" aria-disabled="true"';
-  h+='<div class="knoepfe"><a class="gr" target="_blank" href="'+(wa(e.telefon)||"#")+'"'+(wa(e.telefon)?"":aus)+'>'+SVG_WA+'WhatsApp</a><a href="'+(tel?"tel:"+esc(tel):"#")+'"'+(tel?"":aus)+'>'+SVG_TEL+'Anrufen</a><a class="rt" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">'+SVG_MV+'Mietvertrag</a></div>';
+  h+='<div class="knoepfe"><a class="gr" target="_blank" href="'+(wa(e.telefon)||"#")+'"'+(wa(e.telefon)?"":aus)+'>'+SVG_WA+'WhatsApp</a><a href="'+(tel?"tel:"+esc(tel):"#")+'"'+(tel?"":aus)+'>'+SVG_TEL+'Anrufen</a></div>';
+  // Neuer Mietvertrag mit vorgefülltem Kunden: derselbe Link wie bisher (?kunde=), jetzt als roter Knopf (1.11.2026, „Es muss alles verbunden sein“)
+  h+='<a class="neuMv" id="kNeuMv" href="'+V+'?kunde='+encodeURIComponent(e.name)+'">Neuer Mietvertrag für '+esc(String(e.name||"").trim().split(/\s+/)[0])+'</a>';
   if(!BEARB){
     h+='<div class="ab">Kontakt</div><div class="feld"><div class="zl"><span>Telefon</span>'+wert(e.telefon)+'</div><div class="zl"><span>Straße</span>'+wert(str)+'</div><div class="zl"><span>PLZ, Wohnort</span>'+wert(plzOrt)+'</div>'
       +'<div class="zl"><span>Geburtstag</span>'+wert(e.geb?de(e.geb)+(e.alter?" ("+e.alter+")":""):"")+'</div><div class="zl"><span>Geburtsort</span>'+wert(e.gebort)+'</div><div class="zl"><span>E-Mail</span>'+wert(e.email)+'</div></div>';
-    h+='<div class="ab">Mietverträge<span>'+(e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten"):"keine")+'</span></div>';
-    h+=e.vertraege.length?'<div class="feld">'+e.vertraege.slice().reverse().map(v=>v.alt?'<div class="mv"><div>'+esc(v.auto||"Miete")+'<i>'+de(v.von)+', aus der Excel</i></div><b>'+(v.preis?EUR.format(v.preis):"")+'</b></div>':'<a class="mv" href="'+V+'?nr='+esc(v.nr)+'"><div>'+esc(v.auto)+'<i>'+de(v.von)+(v.bis?" bis "+de(v.bis):"")+", Nr. "+esc(v.nr)+(v.mieteOffen?' <span class="rot">Miete offen</span>':"")+'</i></div><b>'+(v.preis?EUR.format(v.preis):"")+'</b></a>').join("")+'</div>':'<div class="feld"><div class="zl"><span>Noch kein Mietvertrag</span></div></div>';
+    // Mieten als gruppierte Liste: Antippen öffnet die Mappe des Mietvertrags (1.11.2026)
+    h+='<div class="ab">Mieten<span>'+(e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten"):"keine")+'</span></div>';
+    h+=e.vertraege.length?'<div class="mzListe">'+e.vertraege.slice().reverse().map(mieteZeile).join("")+'</div>':'<div class="feld"><div class="zl"><span>Noch kein Mietvertrag</span></div></div>';
     if(e.schaeden.length)h+='<div class="ab">Schäden<span>'+e.schaeden.length+'</span></div><div class="feld">'+e.schaeden.map(s=>'<div class="mv"><div>'+esc(s.auto||"Schaden")+'<i>'+esc([s.datum,s.schaden].filter(Boolean).join(", "))+'</i></div><b>'+(s.offen?'<span class="rot">offen '+EUR.format(s.offen)+'</span>':s.kv?EUR.format(s.kv):"")+'</b></div>').join("")+'</div>';
     if(e.anfragen.length)h+='<div class="ab">Anfragen<span>'+e.anfragen.length+'</span></div><div class="feld">'+e.anfragen.slice().reverse().slice(0,5).map(a=>'<div class="mv"><div>'+esc(a.auto||"Anfrage")+'<i>'+de(a.tag)+(a.von?", für "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+'</i></div><b style="font-weight:600;color:#8E8E93">'+esc(a.status||"")+'</b></div>').join("")+'</div>';
     h+='<div class="ab">Notiz</div><div class="notiz">'+(e.notiz?esc(e.notiz):'<span style="color:#8E8E93">Keine Notiz. Unter „Bearbeiten“ eintragen.</span>')+'</div>';

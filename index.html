@@ -144,7 +144,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 .mxKlein{margin-top:8px}.mxKlein>summary{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:14px;font-weight:800;color:#1C1C1E;background:#F2F2F4;border-radius:999px;padding:9px 14px;min-height:40px;box-sizing:border-box}
 .mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
 .mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
-</style><style>/* App-Design klar (01.11.2026) */
+a.z:not([href^="https://wa.me"]):after{content:"";flex:0 0 8px;width:8px;height:14px;margin-left:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Cpath d='M1.5 1.5l5 5.5-5 5.5' stroke='%23C7C7CC' stroke-width='2.4' fill='none'/%3E%3C/svg%3E") no-repeat center}</style><style>/* App-Design klar (01.11.2026) */
 body{background:#F2F2F7!important}
 /* Kopfzeile wie in iOS: „‹ Start“ als rote Schrift statt Pille */
 html body header .mxStart,html body .topbar .mxStart{border:0!important;padding:4px 0!important;color:#C4161C!important;opacity:1!important;font-size:17px!important;font-weight:600!important;gap:3px!important}
@@ -189,6 +189,10 @@ html body .app>h2,html body main>h2{margin-left:16px!important;margin-right:16px
 .chips [data-jn=ja].an:before{content:"✓"}.chips [data-jn=nein].an:before{content:"✕"}
 .frage .chips [data-jn=ja].an{background:#34C759!important;color:#fff!important;outline:0}
 .frage .chips [data-jn=nein].an{background:#FF3B30!important;color:#fff!important;outline:0}
+/* Kunden: „‹ Kunden“ wie „‹ Start“ als rote Schrift, Überschriften klein und grau */
+html body .kTop #kZu{border:0!important;background:none!important;padding:4px 0!important;color:#C4161C!important;font-size:17px!important;font-weight:600!important}
+html body .ab{font-size:13px!important;letter-spacing:.3px;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase;margin:20px 16px 7px!important}
+html body .ab span{text-transform:none;letter-spacing:0}
 /* Kreise mit Anfangsbuchstaben: grau statt bunt (Baran: „viel zu bunt“) */
 .av,.vav{background:#C7C7CC!important;color:#fff!important}
 .leiste button{border-radius:13px!important}
@@ -269,14 +273,14 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     const rest=[],tageSeit=d=>Math.round((new Date(hi)-new Date(String(d).slice(0,10)))/864e5);
     // Warnung, bevor es Geld kostet (31.10.2026): Kaution über 7 Tage, Miete über 3 Tage offen
     alle.filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&!x.kautionRueck).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD),lang=s>7;
-      rest.push({t:x.name,i:"Kaution "+EUR(zahl(x.zahlung.kaut.betrag))+" zurückgeben"+(lang?", schon "+s+" Tage!":""),k:"Kaution",art:lang?"rot":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"kaution",nr:x.nr})});
+      rest.push({t:x.name,i:"Kaution "+EUR(zahl(x.zahlung.kaut.betrag))+" zurückgeben"+(lang?", schon "+s+" Tage!":""),k:"Kaution",art:lang?"rot":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe",akt:"kaution",nr:x.nr})});
     // Miete offen schon am Tag der Übergabe (31.10.2026, Prüfbericht: vorher erst ab dem nächsten Tag sichtbar)
-    if(false)alle.filter(x=>x.vonD&&x.vonD<=hi&&x.ueb&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"bezahlt",nr:x.nr})});
+    if(false)alle.filter(x=>x.vonD&&x.vonD<=hi&&x.ueb&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe",akt:"bezahlt",nr:x.nr})});
     // Endabrechnung offen: Zusatzkosten nach der Rückgabe, die keine Kaution deckt (31.10.2026, Prüfbericht)
     const endOffen=x=>{const e=x.endabrechnung||{},k=(x.zahlung||{}).kaut||{};if(x.status!=="zurück"||!(+e.summe>0)||e.bezahlt)return 0;
       if(k.am&&!x.kautionRueck)return 0;   // Kaution liegt noch da: wird beim Zurückgeben verrechnet
       return Math.max(0,Math.round((+e.summe-(+(x.kautionRueck||{}).einbehalt||0))*100)/100)};
-    alle.filter(x=>endOffen(x)>0).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD);rest.push({t:x.name,i:"Endabrechnung "+eur2(endOffen(x))+" € noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"endbezahlt",nr:x.nr})});
+    alle.filter(x=>endOffen(x)>0).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD);rest.push({t:x.name,i:"Endabrechnung "+eur2(endOffen(x))+" € noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe",akt:"endbezahlt",nr:x.nr})});
     // Doppelt verplant heute oder morgen: zwei Mieten, Buchungen oder Sperren mit demselben Auto zur selben Zeit
     {const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,""),ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,bl=[];
       alle.filter(x=>x.status!=="zurück"&&x.auto&&x.vonD&&x.bisD).forEach(x=>bl.push({a:x.auto,v:x.vonD+"T"+(x.vonU||"10:00"),b:x.bisD+"T"+(x.bisU||"10:00"),w:x.name}));
@@ -313,9 +317,9 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     morgen.length=0;
     out.push(...rest);
     const autoPunkte=[];auf.filter(a=>!a.erledigt&&!a._weg&&a.aufgabe&&a.bis&&a.bis<=hi).forEach(a=>autoPunkte.push({t:a.aufgabe,i:a.bis<hi?"überfällig seit "+de(a.bis):"heute fällig",k:"Aufgabe",art:"gelb",href:B+"mietix-autos/?zeige=aufgaben"}));
-    zust.filter(z=>!z.erledigt&&z.auto).forEach(z=>autoPunkte.push({t:z.auto,i:z.text+(z.datum?", seit "+de(z.datum):""),k:"Zustand",art:"gelb",href:B+"mietix-autos/"}));
+    zust.filter(z=>!z.erledigt&&z.auto).forEach(z=>autoPunkte.push({t:z.auto,i:z.text+(z.datum?", seit "+de(z.datum):""),k:"Zustand",art:"gelb",href:B+"mietix-autos/?auto="+encodeURIComponent(z.auto)}));
     const sta=lies("mietixAutos",{});Object.keys(sta).forEach(n=>[["tuev","TÜV"],["service","Service"],["reifen","Reifen"],["garantie","Garantie"]].forEach(([k,t])=>{const d=sta[n][k];if(!d)return;const tage=Math.round((new Date(String(d).slice(0,10))-new Date(hi))/864e5);
-      if(tage<=14)autoPunkte.push({t:n,i:t+(tage<0?" überfällig":tage===0?" heute":" in "+tage+" Tagen"),k:t,art:tage<=7?"rot":"gelb",href:B+"mietix-autos/"})}));
+      if(tage<=14)autoPunkte.push({t:n,i:t+(tage<0?" überfällig":tage===0?" heute":" in "+tage+" Tagen"),k:t,art:tage<=7?"rot":"gelb",href:B+"mietix-autos/?auto="+encodeURIComponent(n)})}));
     out.push(...autoPunkte.filter(a=>a.k==="Aufgabe"||a.art==="rot"));   // fällige Auto-Aufgaben und TÜV/Service in 7 Tagen
     // Reihenfolge: Überfälliges zuerst, dann Übergaben und Rückgaben nach Uhrzeit, dann der Rest
     {const rang=x=>["Übergabe","Rückgabe","Mietvertrag"].includes(x.k)?(x.uhr?1:0):2;out.sort((a,b)=>rang(a)-rang(b)||(rang(a)===1?String(a.uhr).localeCompare(String(b.uhr)):0))}
@@ -342,7 +346,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     // Ausstieg (Liste Punkt 23): ab März 2027 eine kleine Liste, was bis zum 30.06.2027 erledigt sein muss
     const AUS="2027-06-30",ausL=[];
     if(hi>="2027-03-01"){
-      alle.filter(x=>x.bisD&&x.bisD>AUS&&x.status!=="zurück").forEach(x=>ausL.push({t:x.name,i:x.auto+", Mietvertrag läuft bis "+de(x.bisD),k:"Nach Ausstieg",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)}));
+      alle.filter(x=>x.bisD&&x.bisD>AUS&&x.status!=="zurück").forEach(x=>ausL.push({t:x.name,i:x.auto+", Mietvertrag läuft bis "+de(x.bisD),k:"Nach Ausstieg",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"}));
       anf.filter(a=>a.status==="gebucht"&&a.bis&&a.bis>AUS).forEach(a=>ausL.push({t:a.name||"ohne Namen",i:(a.auto||"")+", gebucht bis "+de(a.bis),k:"Nach Ausstieg",art:"rot",href:B+"mietix-anfragen/?zeige="+encodeURIComponent(a.id)}));
       Object.keys(kunden0).forEach(n=>{if(kunden0[n]&&kunden0[n].schadenOffen&&!kunden0[n]._weg)ausL.push({t:n,i:"Schaden "+EUR(kunden0[n].schadenOffen)+" noch offen",k:"Schaden",art:"gelb",href:B+"mietix-schadensabrechnung/"})});
       const tageBis=Math.ceil((new Date(AUS)-new Date(hi))/864e5);
@@ -557,7 +561,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     const t=[],alle=lies("mietixVorgaenge",[]).slice().sort((a,b)=>String(b.vonD||"").localeCompare(String(a.vonD||"")));
     alle.forEach(x=>{const tel=String(x.telefon||"").replace(/\D/g,"");
       if(nrm(x.name).includes(q)||nrm(x.auto).includes(q)||nrm(x.kz).replace(/[\s-]/g,"").includes(q.replace(/[\s-]/g,""))||String(x.nr||"").includes(q)||(zi.length>=4&&tel.includes(zi)))
-        t.push({uhr:"",t:x.name,i:"Mietvertrag "+x.nr+", "+x.auto+", "+de(x.vonD)+" bis "+de(x.bisD),k:x.status==="zurück"?"Zurück":x.ueb?"Unterwegs":"Gebucht",art:x.status==="zurück"?"":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)})});
+        t.push({uhr:"",t:x.name,i:"Mietvertrag "+x.nr+", "+x.auto+", "+de(x.vonD)+" bis "+de(x.bisD),k:x.status==="zurück"?"Zurück":x.ueb?"Unterwegs":"Gebucht",art:x.status==="zurück"?"":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"})});
     const kb=lies("mietixKunden",{}),schon=new Set(t.map(x=>nrm(x.t)));
     Object.keys(kb).forEach(n=>{const k=kb[n]||{};if(k._weg||schon.has(nrm(n)))return;const tel=String(k.telefon||"").replace(/\D/g,"");
       if(nrm(n).includes(q)||(zi.length>=4&&tel.includes(zi)))t.push({uhr:"",t:n,i:k.telefon||"Kunde",k:"Kunde",art:"",href:B+"mietix-zentrale/kunden.html?kunde="+encodeURIComponent(n)})});
