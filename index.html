@@ -938,6 +938,10 @@ zeigen();abgleichen();auslagernBald();
     "body{background:#F2F2F7!important;color:#1C1C1E}"+
     "*:not(.mxFenster):not(#mietixRueck):not(#erfolgBox){box-shadow:none!important}"+
     "input:focus,textarea:focus,select:focus{outline:2px solid #C4161C!important;outline-offset:-2px}"+
+    /* PC und Mac (1.11.2026, Baran: auf allen Geräten gleich): Kopfzeile und Inhalt in einer Spalte in der Mitte, nicht Titel links und Inhalt mittig */
+    (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}"+
+      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}")+
+    "input[type=date],input[type=time]{min-width:0;max-width:100%}"+   /* Datumsfelder laufen auf dem iPhone sonst über den Rand */
     "h2,.karte h2,h2.gruppe,.feldname,.sTitel{text-transform:none!important;letter-spacing:-.2px!important;font-size:17px!important;font-weight:700!important;color:#1C1C1E!important}"+
     (istStart?"":"header{display:block!important;padding-left:16px!important;padding-right:16px!important}header h1,.topbar h1{margin:0!important;padding:0!important}"+
       ".mxTop{display:flex;align-items:center;justify-content:space-between;min-height:34px;margin-bottom:4px}"+
