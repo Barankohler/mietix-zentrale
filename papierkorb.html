@@ -495,9 +495,6 @@ zeigen();abgleichen();auslagernBald();
     "body{background:#F2F2F7!important;color:#1C1C1E}"+
     "*:not(.mxFenster):not(#mietixRueck):not(#erfolgBox){box-shadow:none!important}"+
     "input:focus,textarea:focus,select:focus{outline:2px solid #C4161C!important;outline-offset:-2px}"+
-    /* PC und Mac (1.11.2026, Baran: auf allen Geräten gleich): Kopfzeile und Inhalt in einer Spalte in der Mitte, nicht Titel links und Inhalt mittig */
-    (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}"+
-      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}")+
     "input[type=date],input[type=time]{min-width:0;max-width:100%}"+   /* Datumsfelder laufen auf dem iPhone sonst über den Rand */
     "h2,.karte h2,h2.gruppe,.feldname,.sTitel{text-transform:none!important;letter-spacing:-.2px!important;font-size:17px!important;font-weight:700!important;color:#1C1C1E!important}"+
     (istStart?"":"header{display:block!important;padding-left:16px!important;padding-right:16px!important}header h1,.topbar h1{margin:0!important;padding:0!important}"+
@@ -512,7 +509,11 @@ zeigen();abgleichen();auslagernBald();
     /* sanftes Überblenden zwischen den Seiten */
     "@view-transition{navigation:auto}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}"+
     /* neue Version */
-    "#mxNeu{display:none;background:#1C1C1E;color:#fff;text-align:center;font:700 14px -apple-system,Inter,system-ui,sans-serif;padding:11px 16px;cursor:pointer}#mxNeu.an{display:block}#mxNeu b{color:#FF6B6B}";
+    "#mxNeu{display:none;background:#1C1C1E;color:#fff;text-align:center;font:700 14px -apple-system,Inter,system-ui,sans-serif;padding:11px 16px;cursor:pointer}#mxNeu.an{display:block}#mxNeu b{color:#FF6B6B}"+
+    /* PC und Mac (1.11.2026, Baran: auf allen Geräten gleich): Kopfzeile und Inhalt in einer 680-px-Spalte in der Mitte.
+       Muss ganz am Ende stehen: header{padding-left:16px!important} weiter oben (und look.py davor im head) würde sonst gewinnen */
+    (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}"+
+      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}");
   document.head.appendChild(st);
 
   // ‹ Start und Symbol in der Kopfzeile
