@@ -243,6 +243,12 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
   const vn=s=>String(s||"").trim().split(/\s+/)[0];
   let WA_LISTE=[];
   const TAGE=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"],tagLang=d=>{const x=new Date(d+"T12:00");return TAGE[x.getDay()]+", "+d.split("-").reverse().join(".")};
+  // Was ein weiterer Tag nach den Preisregeln kostet: Miete für Tage+1 minus Miete für Tage, gleicher Mietbeginn, mit Mengenrabatt (wie Preisrechner)
+  function listenMiete(c,start,d){const P=PREISE,W=P.faktor.reduce((a,b)=>a+b,0);let g;
+    if(d===1&&start>=4)g=c.frSa||c.gp*P.faktor[start];else{let x=Math.floor(d/7)*W;for(let k=0;k<d%7;k++)x+=P.faktor[(start+k)%7];g=c.gp*x}
+    return g*(1-P.rabatt[Math.min(d,P.days||P.rabatt.length)-1])}
+  function verlTag(c,v){const t=Math.max(1,Math.round((new Date(v.bisD+"T12:00")-new Date(v.vonD+"T12:00"))/86400000)),start=(new Date(v.vonD+"T12:00").getDay()+6)%7;
+    return Math.round(listenMiete(c,start,t+1)-listenMiete(c,start,t))}   // ganze Euro
   function waRunde(alle,anf,hi,mo,nach){const L=[],ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,preis=a=>PREISE&&PREISE.cars.find(c=>c.n===a||c.anzeige===a);
     const frei=(v)=>!alle.some(x=>x.nr!==v.nr&&x.auto===v.auto&&x.status!=="zurück"&&x.vonD&&x.bisD&&ue(hi,mo,x.vonD,x.bisD))
       &&!anf.some(a=>a.status==="gebucht"&&a.auto===v.auto&&a.von&&a.bis&&ue(hi,mo,a.von,a.bis))&&!lies("mietixSperren",[]).some(s=>s.auto===v.auto&&s.von&&s.bis&&ue(hi,mo,s.von,s.bis));
@@ -252,7 +258,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
         text:"Hallo "+vn(v.name)+",\n\nkurze Erinnerung an Ihre Abholung morgen, "+de(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
           ((z.kaut||{}).am||v.kautionArt==="fahrzeug"?"":"\n- Kaution "+eur2(zahl((z.kaut||{}).betrag))+" €")+((z.rest||{}).am?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\n\nBis morgen!\nIhr Mietix-Team"});
       // Verlängerung anbieten: Rückgabe heute, Auto morgen frei
-      if(v.ueb&&v.status!=="zurück"&&v.bisD===hi&&!v.verlAngeboten&&frei(v)){const c=preis(v.auto),tp=c?c.gp:0,vs=tp?Math.max(9,Math.round(tp*0.85/10)*10-1):0;
+      if(v.ueb&&v.status!=="zurück"&&v.bisD===hi&&!v.verlAngeboten&&frei(v)){const c=preis(v.auto),tp=c?verlTag(c,v):0,vs=tp?Math.min(Math.round(tp)-10,Math.max(9,Math.round(tp*0.85/10)*10-1)):0;   // 1.11.2026 Baran: Normalpreis = was der Folgetag nach den Preisregeln kostet
         L.push({t:v.name,i:"Verlängerung anbieten, "+v.auto+" ist morgen ("+de(mo)+") frei",tel:v.telefon,mark:{nr:v.nr,feld:"verlAngeboten"},
           text:"*Ihr "+v.auto+" ist morgen noch frei*\n\nDer Wagen ist morgen, "+tagLang(mo)+", nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\n\n"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
             "\n\nEine kurze Antwort genügt, dann verlängern wir bis morgen, "+tagLang(mo)+(v.bisU?", "+v.bisU+" Uhr":"")+".\n\nViele Grüße\nIhr Mietix-Team"})}
