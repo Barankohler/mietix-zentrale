@@ -82,6 +82,16 @@ header .logo{display:block;height:46px;width:auto}header{background:transparent!
 body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 /* Freie Autos anbieten (01.11.2026, Baran: echter Umsatzbringer, Zeitraum selbst wählen) */
 .anbAb{font-size:13px;font-weight:800;color:var(--grau);margin:14px 2px 6px}
+/* Wie die Seite Angebot (01.11.2026, Baran: dieses Design gefällt mir sehr) */
+.anbKarte{padding:13px 16px}.anbLbl{font-size:11.5px;font-weight:800;color:var(--grau);text-transform:uppercase;letter-spacing:.6px;margin:0 0 8px}
+.anbZr{display:flex;gap:7px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -16px 9px;padding:0 16px}.anbZr::-webkit-scrollbar{display:none}
+.anbZr span{flex:0 0 auto;padding:9px 13px;border-radius:999px;background:#F2F2F4;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap}.anbZr span.an{background:#1C1C1E;color:#fff}
+.anbZt{font-size:15px;font-weight:800;cursor:pointer}.anbZt small{font-weight:700;color:var(--grau);font-size:13px;white-space:nowrap}.anbZt u{color:var(--rot);text-decoration:none;font-size:13px;white-space:nowrap}
+.anbFertig{display:block;width:100%;border:0;border-radius:14px;padding:14px;font-weight:800;font-size:16px;font-family:inherit;background:#1C1C1E;color:#fff;margin-top:14px;cursor:pointer}
+#anbFrei .auto{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 16px;margin:0 -16px;border-top:1px solid #EFEFF2;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#anbFrei .auto:first-child{border-top:0}#anbFrei .auto .n{min-width:0}#anbFrei .auto b{display:block;font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#anbFrei .auto i{display:block;font-style:normal;font-size:13px;color:var(--grau);font-weight:600;margin-top:1px}#anbFrei .auto .p{text-align:right;font-weight:800;font-size:16px;white-space:nowrap}
+#anbFrei .auto.belegt{opacity:.45;cursor:default}#anbFrei .auto:active{background:#F6F6F7}
 .anbChips{display:flex;flex-wrap:wrap;gap:8px}.anbChips span{padding:10px 14px;border-radius:999px;background:#F2F2F7;font-weight:800;font-size:14px;cursor:pointer;color:#1C1C1E}
 .anbChips span.an{background:var(--rot);color:#fff}
 .anbZwei{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.anbZwei label{display:block;font-size:13px;font-weight:700;color:var(--grau);margin:0 2px 4px}
@@ -140,20 +150,21 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 <h2 id="waTitel" class="versteckt">WhatsApp heute</h2>
 <div class="k versteckt" id="waK"><button type="button" class="waNext" id="waNext">Nächste senden ›</button><div id="wa"></div></div>
 <h2>Freie Autos anbieten</h2>
-<div class="k anbKarte"><div class="anbKopf" id="anbKopf">Frei in den nächsten 7 Tagen. Auto antippen, Kunden wählen, per WhatsApp anbieten.</div>
-  <div id="anbFrei"></div>
-  <a class="z anbAndere" id="anbKnopf" href="#"><span class="uhr"></span><span class="t"><b>Anderen Zeitraum wählen</b><i>Ab heute, Wochenende oder eigenes Datum</i></span><em>›</em></a></div>
-<div class="mxFenster" id="fAnb" role="dialog" aria-label="Freie Autos anbieten"><div class="mxKopf"><h3>Freie Autos anbieten</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
-  <div class="anbAb">Ab heute:</div>
-  <div class="anbChips" id="anbDauer"><span data-d="1">1 Tag</span><span data-d="2">2 Tage</span><span data-d="3">3 Tage</span><span data-d="7">1 Woche</span></div>
-  <div class="anbAb">Wochenende (nächstes):</div>
-  <div class="anbChips" id="anbWe"><span data-we="5,1">Fr bis Sa</span><span data-we="5,2">Fr bis So</span><span data-we="6,2">Sa bis Mo</span><span data-we="5,3">Fr bis Mo</span></div>
-  <div class="anbZwei"><div><label for="anbVonD">von</label><input id="anbVonD" type="date"></div><div><label for="anbVonU">Uhr</label><input id="anbVonU" type="time" value="10:00"></div></div>
-  <div class="anbZwei"><div><label for="anbBisD">bis</label><input id="anbBisD" type="date"></div><div><label for="anbBisU">Uhr</label><input id="anbBisU" type="time" value="10:00"></div></div>
-  <div class="anbAb" id="anbAutosT">Frei in diesem Zeitraum</div>
+<div class="k anbKarte"><div class="anbLbl">Zeitraum</div>
+  <div class="anbZr" id="anbKZr"><span data-d="1">1 Tag</span><span data-d="2">2 Tage</span><span data-d="3">3 Tage</span><span data-d="7">1 Woche</span><span data-we="5,1">Fr bis Sa</span><span data-we="5,2">Fr bis So</span><span data-we="6,2">Sa bis Mo</span><span data-we="5,3">Fr bis Mo</span></div>
+  <div class="anbZt" id="anbKZt"></div></div>
+<div class="k anbKarte"><div class="anbLbl" id="anbKT">Auto antippen</div><div id="anbFrei"></div></div>
+<div class="mxFenster" id="fAnbZr" role="dialog" aria-label="Zeitraum"><div class="mxKopf"><h3>Zeitraum</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <div class="anbZwei"><div><label for="anbVonD">Von</label><input id="anbVonD" type="date"></div><div><label for="anbVonU">Uhrzeit</label><input id="anbVonU" type="time" value="10:00"></div></div>
+  <div class="anbZwei"><div><label for="anbBisD">Bis</label><input id="anbBisD" type="date"></div><div><label for="anbBisU">Uhrzeit</label><input id="anbBisU" type="time" value="10:00"></div></div>
+  <button class="anbFertig" type="button" id="anbZrFertig">Fertig</button>
+</div>
+<div class="mxFenster" id="fAnb" role="dialog" aria-label="Freie Autos anbieten"><div class="mxKopf"><h3>Kunden anschreiben</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <div class="anbZt" id="anbFZt" style="margin-bottom:12px"></div>
+  <div class="anbLbl" id="anbAutosT">Auto antippen</div>
   <div id="anbAutos"></div>
   <div class="anbZwei"><div><label for="anbRabatt">Rabatt für den Kunden</label><div class="anbEinheit"><input id="anbRabatt" inputmode="numeric" value="10"><span>%</span></div></div><div></div></div>
-  <div class="anbAb">Kunden</div>
+  <div class="anbLbl" style="margin-top:16px">Kunden</div>
   <div id="anbKunden"></div>
   <details class="mxKlein" id="anbVorschauK"><summary>Text ansehen <em>›</em></summary><div id="anbVorschau"></div></details>
 </div>
@@ -396,8 +407,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
       "\n\n"+(eins?"Sagen Sie uns einfach Bescheid, dann reservieren wir das Fahrzeug für Sie.":"Sagen Sie uns einfach, welches Fahrzeug Sie reizt, dann reservieren wir es für Sie.")+
       "\n\nDas gilt nur, solange "+(eins?"das Fahrzeug frei ist.":"die Fahrzeuge frei sind.")+"\n\nViele Grüße\nB. Köhler vom Mietix-Team"}
   function anbZeichnen(){if(!$a("fAnb"))return;
-    [...document.querySelectorAll("#anbDauer span,#anbWe span")].forEach(c=>c.classList.toggle("an",c.dataset.von===ANB.vonD&&c.dataset.bis===ANB.bisD));
-    $a("anbVonD").value=ANB.vonD;$a("anbVonU").value=ANB.vonU;$a("anbBisD").value=ANB.bisD;$a("anbBisU").value=ANB.bisU;
+    anbZeitraum();
     const alleA=anbAngebote();if(ANB.autos===null)ANB.autos=alleA.map(a=>a.name);
     const ang=alleA.filter(a=>ANB.autos.includes(a.name)),d=anbTage();
     $a("anbAutosT").textContent=ANB.vonD&&ANB.bisD?(alleA.length?"Autos antippen, "+alleA.length+" frei für "+d+(d===1?" Tag":" Tage"):"Kein Auto frei für "+d+(d===1?" Tag":" Tage")):"Erst den Zeitraum wählen";
@@ -421,27 +431,32 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
   function anbOeffnen(von,bis,auto){if(!PREISE){hinweis("Preise werden geladen …");return}
     if(von){ANB.vonD=von;ANB.bisD=bis}else if(!ANB.vonD){const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,1)}
     ANB.autos=auto?[auto]:null;ANB.alle=false;mxAuf("fAnb");anbZeichnen()}
-  $a("anbKnopf").onclick=e=>{e.preventDefault();anbOeffnen()};
-  [...$a("anbDauer").children].forEach(c=>c.onclick=()=>{const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,+c.dataset.d);c.dataset.von=ANB.vonD;c.dataset.bis=ANB.bisD;ANB.autos=null;anbZeichnen()});
-  [...$a("anbWe").children].forEach(c=>c.onclick=()=>{const[wd,n]=c.dataset.we.split(",").map(Number),h=iso(new Date()),v=plusT(h,(wd-new Date().getDay()+7)%7);
-    ANB.vonD=v;ANB.bisD=plusT(v,n);c.dataset.von=v;c.dataset.bis=ANB.bisD;ANB.autos=null;anbZeichnen()});
+  // Zeitraum steht oben auf der Karte (01.11.2026, Baran: „woran machst du den Zeitraum fest?“), wie im Angebot
+  const anbZtText=()=>{if(!ANB.vonD||!ANB.bisD)return"";const d=anbTage(),kt=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
+    return kt(ANB.vonD)+" "+uhrT(ANB.vonU)+" bis "+kt(ANB.bisD)+" "+uhrT(ANB.bisU)+' <small>'+d+(d===1?" Tag":" Tage")+',</small> <u>ändern</u>'};
+  function anbZeitraum(){[...document.querySelectorAll("#anbKZr span")].forEach(c=>c.classList.toggle("an",c.dataset.von===ANB.vonD&&c.dataset.bis===ANB.bisD));
+    $a("anbKZt").innerHTML=anbZtText();$a("anbFZt").innerHTML=anbZtText();
+    $a("anbVonD").value=ANB.vonD;$a("anbVonU").value=ANB.vonU;$a("anbBisD").value=ANB.bisD;$a("anbBisU").value=ANB.bisU}
+  const anbNeu=()=>{ANB.autos=null;anbZeitraum();anbFrei();if($a("fAnb").classList.contains("auf"))anbZeichnen()};
+  [...$a("anbKZr").children].forEach(c=>c.onclick=()=>{const h=iso(new Date());
+    if(c.dataset.d){ANB.vonD=h;ANB.bisD=plusT(h,+c.dataset.d)}else{const[wd,n]=c.dataset.we.split(",").map(Number),v=plusT(h,(wd-new Date().getDay()+7)%7);ANB.vonD=v;ANB.bisD=plusT(v,n)}
+    c.dataset.von=ANB.vonD;c.dataset.bis=ANB.bisD;anbNeu()});
   [["anbVonD","vonD"],["anbVonU","vonU"],["anbBisD","bisD"],["anbBisU","bisU"]].forEach(([id,f])=>$a(id).addEventListener("change",()=>{ANB[f]=$a(id).value;
-    if(f==="vonD"&&ANB.bisD<=ANB.vonD)ANB.bisD=plusT(ANB.vonD,1);ANB.autos=null;anbZeichnen()}));
+    if(f==="vonD"&&ANB.bisD<=ANB.vonD)ANB.bisD=plusT(ANB.vonD,1);anbNeu()}));
+  // „ändern“ im Kunden-Fenster: nach „Fertig“ geht es dorthin zurück
+  let ANB_ZURUECK=false;
+  $a("anbKZt").onclick=()=>{ANB_ZURUECK=false;mxAuf("fAnbZr")};$a("anbFZt").onclick=()=>{ANB_ZURUECK=true;mxAuf("fAnbZr")};
+  $a("anbZrFertig").onclick=()=>{mxZu();if(ANB_ZURUECK){ANB_ZURUECK=false;mxAuf("fAnb");anbZeichnen()}};
   $a("anbRabatt").addEventListener("input",()=>{ANB.rabatt=+String($a("anbRabatt").value).replace(",",".")||0;anbZeichnen()});
-  // Erinnerung: in den nächsten 7 Tagen 2 oder mehr Tage am Stück frei
-  // Alle Autos (01.11.2026, Baran: „nicht halb“): je Auto die erste freie Lücke in den nächsten 7 Tagen, ab 1 Tag. Ganz verplante Autos stehen darunter.
-  function anbFrei(){const el=$a("anbFrei");if(!el||!PREISE)return;const hi=iso(new Date()),L=[],voll=[],ende=plusT(hi,7);
-    PREISE.cars.forEach(c=>{const n=c.anzeige||c.n;let a=null,x=null;
-      for(let i=0;i<=7&&!x;i++){const d=plusT(hi,i),frei=i<7&&!belegt(n,d,plusT(d,1));if(frei&&a===null)a=d;
-        if(!frei&&a!==null)x={n,von:a,bis:d,t:Math.round((new Date(d)-new Date(a))/864e5)}}
-      if(x)L.push(x);else voll.push(n)});
-    L.sort((x,y)=>x.von.localeCompare(y.von)||y.t-x.t||x.n.localeCompare(y.n));
-    const tg=d=>WT[new Date(d+"T12:00").getDay()]+" "+de(d),
-      text=x=>x.von===hi&&x.bis>=ende?"die ganze Woche frei, ab heute":"frei "+(x.von===hi?"ab heute":"ab "+tg(x.von))+(x.bis>=ende?", mindestens bis "+tg(x.bis):" bis "+tg(x.bis))+" ("+(x.t===1?"1 Tag":x.t+(x.bis>=ende?"+":"")+" Tage")+")";
-    el.innerHTML=(L.length?L.map((x,i)=>'<div class="z" data-f="'+i+'"><span class="uhr"></span><span class="t"><b>'+esc(x.n)+'</b><i>'+text(x)+'</i></span><span class="chip gruen">Anbieten ›</span></div>').join(""):'<div class="leer">In den nächsten 7 Tagen ist kein Auto frei.</div>')+
-      (voll.length?'<div class="anbVerplant">Die ganze Woche verplant: '+voll.map(esc).join(", ")+'</div>':"");
-    el.querySelectorAll("[data-f]").forEach(z=>z.onclick=()=>{const x=L[+z.dataset.f];anbOeffnen(x.von,x.bis,x.n)})}
-  {const t=setInterval(()=>{if(PREISE){clearInterval(t);anbFrei()}},200)}
+  // Karte: alle Autos für den gewählten Zeitraum (01.11.2026, wie im Angebot): frei mit Preis pro Tag und Gesamtpreis, belegt grau mit „wieder frei“
+  function anbFrei(){const el=$a("anbFrei");if(!el||!PREISE)return;if(!ANB.vonD){const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,3);anbZeitraum()}
+    const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x),frei=[],weg=[];
+    PREISE.cars.forEach(c=>{const n=c.anzeige||c.n;if(belegt(n,ANB.vonD,ANB.bisD))weg.push({n,bis:belegtBis(n,ANB.vonD,ANB.bisD)});else frei.push({n,L:Math.round(listenMiete(c,start,d))})});
+    $a("anbKT").textContent=frei.length?"Auto antippen, "+frei.length+" frei":"Kein Auto frei";
+    el.innerHTML=frei.map(x=>'<div class="auto" data-a="'+esc(x.n)+'"><span class="n"><b>'+esc(x.n)+'</b><i>'+eur2(Math.round(x.L/d))+' € pro Tag</i></span><span class="p">'+eur2(x.L)+' €</span></div>').join("")+
+      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>belegt'+(x.bis?", wieder frei "+kz(x.bis):"")+'</i></span><span class="p"></span></div>').join("");
+    el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a))}
+  {const t=setInterval(()=>{if(PREISE){clearInterval(t);anbFrei();anbZeitraum()}},200)}
   window.addEventListener("mietix-abgleich",()=>{anbFrei();if($a("fAnb").classList.contains("auf"))anbZeichnen()});
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)anbFrei()});
   // Bezahlt und Kaution zurück direkt in der Zeile (31.10.2026)
@@ -847,7 +862,7 @@ zeigen();abgleichen();auslagernBald();
 
   // Unerwartete Fehler: lieber sagen als still hängen
   let zuletzt="";
-  const melde=m=>{m=String(m||"").trim();if(!m||m===zuletzt||/ResizeObserver|^Script error|AbortError|NotAllowedError|share|Load failed|Failed to fetch|NetworkError/i.test(m))return;
+  const melde=m=>{m=String(m||"").trim();if(!m||m===zuletzt||/ResizeObserver|^Script error|AbortError|NotAllowedError|share|Load failed|Failed to fetch|NetworkError|Transition|view transition|InvalidStateError/i.test(m))return;
     zuletzt=m;mxFehler("Da hat etwas nicht geklappt ("+m.slice(0,120)+"). Bitte die Seite neu laden.",15000)};
   addEventListener("error",e=>{if(e.message)melde(e.message)});
   addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));

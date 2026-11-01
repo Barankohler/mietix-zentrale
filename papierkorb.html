@@ -426,7 +426,7 @@ zeigen();abgleichen();auslagernBald();
 
   // Unerwartete Fehler: lieber sagen als still hängen
   let zuletzt="";
-  const melde=m=>{m=String(m||"").trim();if(!m||m===zuletzt||/ResizeObserver|^Script error|AbortError|NotAllowedError|share|Load failed|Failed to fetch|NetworkError/i.test(m))return;
+  const melde=m=>{m=String(m||"").trim();if(!m||m===zuletzt||/ResizeObserver|^Script error|AbortError|NotAllowedError|share|Load failed|Failed to fetch|NetworkError|Transition|view transition|InvalidStateError/i.test(m))return;
     zuletzt=m;mxFehler("Da hat etwas nicht geklappt ("+m.slice(0,120)+"). Bitte die Seite neu laden.",15000)};
   addEventListener("error",e=>{if(e.message)melde(e.message)});
   addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
