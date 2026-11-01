@@ -522,10 +522,11 @@ async function abgleichen(){
       const zeilen=await api(c.tab+"?select="+c.pk+",daten,geaendert&order=geaendert.asc"+seit,{method:"GET"})||[];
       let anders=false;const m2=alsMap(k,lies(k,c.liste?[]:{}));
       zeilen.forEach(z=>{const p=String(z[c.pk]);if(z.geaendert>h.zeit)h.zeit=z.geaendert;
-        const vorher=p in m2?JSON.stringify(m2[p]):undefined;
+        const gleichB=x=>x===undefined?undefined:JSON.stringify(durch(x,y=>istBild(y)?marke(y):y));   // Bild und sein Verweis "bild:…" gelten als gleich (1.11.2026: sonst Dauerschleife, Seite sprang)
+        const vorher=p in m2?gleichB(m2[p]):undefined;
         const ergebnis=zusammen(k,p,m2[p],z.daten,h.hash[p],h.felder[p]);
         if(ergebnis===undefined){if(p in m2){delete m2[p];anders=true}}
-        else if(JSON.stringify(ergebnis)!==vorher){m2[p]=ergebnis;anders=true}
+        else if(gleichB(ergebnis)!==vorher){m2[p]=ergebnis;anders=true}
         // Grundlage für das nächste Mal ist jetzt der gemeinsame Stand
         if(z.daten&&z.daten._weg){h.hash[p]="weg";delete h.felder[p]}
         else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
@@ -653,7 +654,8 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
   const uhr=zuletzt?String(zuletzt.getHours()).padStart(2,"0")+":"+String(zuletzt.getMinutes()).padStart(2,"0"):"";
   const art=!navigator.onLine?"gelb":fehler?"rot":"gruen";
   const stand=!navigator.onLine?"Ohne Internet: alles bleibt auf dem Gerät und wird nachgeholt":fehler?"Nicht gesichert: "+fehler:laeuft&&!zuletzt?"Wird gesichert …":"✓ Alles gesichert"+(uhr?", "+uhr+" Uhr":"");
-  el.innerHTML='<div class="abgl klein status '+art+'"><span>'+stand+'</span>'+(haupt?'<span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span>':'')+'</div>';
+  const neuH='<div class="abgl klein status '+art+'"><span>'+stand+'</span>'+(haupt?'<span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span>':'')+'</div>';
+  if(el.__mxH===neuH&&el.firstChild)return;el.__mxH=neuH;el.innerHTML=neuH;   // gleicher Text: nicht neu aufbauen (1.11.2026, Seite sprang)
   if(!haupt)return;
   // Angemeldet: neues Passwort setzen geht ohne das alte (für "Passwort vergessen" ohne Mail, 28.10.2026)
   document.getElementById("ablPwNeu").onclick=e=>{e.preventDefault();pwSetzen=true;zeigen()};
