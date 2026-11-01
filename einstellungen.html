@@ -77,6 +77,13 @@ html body .ab span{text-transform:none;letter-spacing:0}
 /* Kreise mit Anfangsbuchstaben: grau statt bunt (Baran: „viel zu bunt“) */
 .av,.vav{background:#C7C7CC!important;color:#fff!important}
 .leiste button{border-radius:13px!important}
+/* Tippflächen mindestens 44 px (Prüfbericht 01.11.2026). Kleine Knöpfe bleiben optisch klein, die Fläche zum Antippen wird größer */
+html body header .mxStart,html body .topbar .mxStart,html body .kTop #kZu{min-height:44px!important;display:inline-flex!important;align-items:center!important}
+.z button.chip,.z .chip.akt,#ablPwNeu,#ablAus{position:relative}
+.z button.chip:after,.z .chip.akt:after,#ablPwNeu:after,#ablAus:after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:44px;transform:translateY(-50%)}
+#ablPwNeu,#ablAus{display:inline-block;padding:6px 2px}
+/* Nichts abschneiden am Handy: lange Namen und Autos dürfen in die zweite Zeile */
+.k .t b span.n,.t b span.n{white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
 /* PC und Mac (Test 01.11.2026): Kopfzeile und Inhalt in derselben 680-px-Spalte, auf allen Seiten gleich */
 @media(min-width:760px){header,.topbar,.kTop{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}
   main,.app{max-width:680px!important;margin-left:auto!important;margin-right:auto!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}

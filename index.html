@@ -216,6 +216,13 @@ html body .ab span{text-transform:none;letter-spacing:0}
 /* Kreise mit Anfangsbuchstaben: grau statt bunt (Baran: „viel zu bunt“) */
 .av,.vav{background:#C7C7CC!important;color:#fff!important}
 .leiste button{border-radius:13px!important}
+/* Tippflächen mindestens 44 px (Prüfbericht 01.11.2026). Kleine Knöpfe bleiben optisch klein, die Fläche zum Antippen wird größer */
+html body header .mxStart,html body .topbar .mxStart,html body .kTop #kZu{min-height:44px!important;display:inline-flex!important;align-items:center!important}
+.z button.chip,.z .chip.akt,#ablPwNeu,#ablAus{position:relative}
+.z button.chip:after,.z .chip.akt:after,#ablPwNeu:after,#ablAus:after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:44px;transform:translateY(-50%)}
+#ablPwNeu,#ablAus{display:inline-block;padding:6px 2px}
+/* Nichts abschneiden am Handy: lange Namen und Autos dürfen in die zweite Zeile */
+.k .t b span.n,.t b span.n{white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
 /* PC und Mac (Test 01.11.2026): Kopfzeile und Inhalt in derselben 680-px-Spalte, auf allen Seiten gleich */
 @media(min-width:760px){header,.topbar,.kTop{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}
   main,.app{max-width:680px!important;margin-left:auto!important;margin-right:auto!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}
@@ -441,7 +448,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     alle.forEach(v=>{if(!v.telefon)return;const z=v.zahlung||{};
       // Erinnerung an die Abholung morgen
       if(v.vonD===mo&&!v.ueb&&!v.erinnert)L.push({t:v.name,i:"Erinnerung an die Abholung morgen ("+de(mo)+")",tel:v.telefon,mark:{nr:v.nr,feld:"erinnert"},
-        text:"Hallo "+vn(v.name)+",\n\nkurze Erinnerung an Ihre Abholung morgen, "+de(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
+        text:"Hallo "+vn(v.name)+",\n\nkurze Erinnerung an Ihre Abholung morgen, "+tagLang(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
           ((z.kaut||{}).am||v.kautionArt==="fahrzeug"?"":"\n- Kaution "+eur2(zahl((z.kaut||{}).betrag))+" €")+((z.rest||{}).am?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\n\nBis morgen!\n\nViele Grüße\nB. Köhler vom Mietix-Team"});
       // Verlängerung anbieten: Rückgabe heute, Auto morgen frei
       if(v.ueb&&v.status!=="zurück"&&v.bisD===hi&&!v.verlAngeboten&&frei(v)){const c=preis(v.auto),tp=c?verlTag(c,v):0,vs=tp?Math.min(Math.round(tp)-10,Math.max(9,Math.round(tp*0.85/10)*10-1)):0;   // 1.11.2026 Baran: Normalpreis = was der Folgetag nach den Preisregeln kostet
