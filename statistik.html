@@ -642,7 +642,7 @@ zeigen();abgleichen();auslagernBald();
 
   // ‹ Start und Symbol in der Kopfzeile
   const ziel=document.querySelector("header h1")||document.querySelector(".topbar");
-  const TITEL={anfragen:"Anfragen",angebot:"Angebot",kalender:"Kalender",vertrag:"Mietverträge",kunden:"Kunden",autos:"Autos",geld:"Geld",
+  const TITEL={anfragen:"Anfragen",angebot:"Angebot",kalender:"Kalender",vertrag:"Buchungen",kunden:"Kunden",autos:"Autos",geld:"Geld",
     schaeden:/schadensformular/.test(pfad)?"Schadensmeldung":/schadensklaerung/.test(pfad)?"Schadensklärung":"Schäden",nachrichten:"Nachrichten",zahlen:"Zahlen",story:"Story",papierkorb:"Papierkorb",einstellungen:"Einstellungen"};
   if(ziel&&!istStart&&!document.querySelector(".mxStart")){
     const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");
