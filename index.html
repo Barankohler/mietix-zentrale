@@ -121,6 +121,26 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 #anbFrei .z{cursor:pointer}#anbFrei .z .uhr,.anbAndere .uhr{display:none}
 .anbKopf{font-size:14px;color:var(--grau);font-weight:600;padding:12px 0 10px;line-height:1.4}
 .anbKarte .z .chip{flex:0 0 auto}.anbAndere{cursor:pointer}.anbAndere em{font-style:normal;font-size:28px;color:var(--rot);font-weight:700;line-height:1}
+/* Ein Kasten in 3 Schritten, Fenster in 2 Schritten (01.11.2026, Baran: Zeitraum und Autos sollen sichtbar zusammengehören) */
+.anbS{display:flex;align-items:center;gap:9px;margin:0 0 9px}.anbS b{font-size:15px;font-weight:800}
+.anbNr{width:24px;height:24px;border-radius:50%;background:#1C1C1E;color:#fff;font-size:13px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.anbZahl{margin-left:auto;font-size:26px;font-weight:900;color:#1E8E4E;line-height:1}.anbZahl.null{color:var(--rot)}
+.anbLinie{border-top:1px solid #EFEFF2;margin:14px -16px 12px}
+.anbSchilder{display:flex;flex-wrap:wrap;gap:6px}
+.anbSchilder span{font-size:13.5px;font-weight:800;border-radius:999px;padding:7px 11px;background:#E3F4EA;color:#1E8E4E;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.anbSchilder span.weg{background:#F2F2F4;color:#AEAEB2;text-decoration:line-through;cursor:default}
+.anbHin{font-size:13px;color:var(--grau);font-weight:600;margin:7px 2px 0;line-height:1.35}
+.anbGruen{display:block;width:100%;border:0;border-radius:14px;padding:15px;font-weight:800;font-size:16px;font-family:inherit;background:#25D366;color:#fff;margin-top:12px;cursor:pointer}
+.anbGruen:disabled{background:#BDBDC2}
+.anbLeiste{display:flex;gap:6px;margin:0 0 12px}.anbLeiste i{flex:1;height:4px;border-radius:2px;background:#E5E5EA}.anbLeiste i.an{background:#1C1C1E}.anbLeiste i.ok{background:#1E8E4E}
+.anbZus{background:#F2F2F7;border-radius:14px;padding:10px 12px;font-size:14px;font-weight:700;color:#3A3A3C;margin-bottom:12px;line-height:1.45}
+.anbZus .anbZt{font-size:14px}
+.anbRab{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin:2px 0 0;padding-bottom:2px}.anbRab::-webkit-scrollbar{display:none}
+.anbRab span{flex:0 0 auto;padding:9px 13px;border-radius:999px;background:#F2F2F4;font-weight:800;font-size:14px;cursor:pointer}.anbRab span.an{background:#1C1C1E;color:#fff}
+.anbFuss{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom));background:#fff;margin:0 -16px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid #EFEFF2;z-index:2}
+@media(min-width:700px){.anbFuss{bottom:-20px;margin:0 -20px;padding:12px 20px 16px}}
+.anbZurueck{display:inline-block;font-size:14px;font-weight:800;color:var(--rot);margin:0 2px 8px;cursor:pointer}
+#anbKunden .z .akt.ok{background:#F2F2F7!important;color:#1E8E4E!important}
 .anbVerplant{font-size:13px;color:var(--grau);font-weight:600;padding:10px 0 12px;border-top:1px solid var(--linie)}#anbFrei .k{margin-bottom:10px}
 @media(min-width:700px){.app{max-width:720px}.kacheln{grid-template-columns:repeat(3,1fr)}.kachel:last-child:nth-child(odd){grid-column:auto}}
 
@@ -216,23 +236,34 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 <h2 id="waTitel" class="versteckt">WhatsApp heute</h2>
 <div class="k versteckt" id="waK"><button type="button" class="waNext" id="waNext">Nächste senden ›</button><div id="wa"></div></div>
 <h2>Freie Autos anbieten</h2>
-<div class="k anbKarte"><div class="anbLbl">Zeitraum</div>
+<div class="k anbKarte"><div class="anbS"><span class="anbNr">1</span><b>Wann?</b></div>
   <div class="anbZr" id="anbKZr"><span data-d="1">1 Tag</span><span data-d="2">2 Tage</span><span data-d="3">3 Tage</span><span data-d="7">1 Woche</span><span data-we="5,1">Fr bis Sa</span><span data-we="5,2">Fr bis So</span><span data-we="6,2">Sa bis Mo</span><span data-we="5,3">Fr bis Mo</span></div>
-  <div class="anbZt" id="anbKZt"></div></div>
-<div class="k anbKarte"><div class="anbLbl" id="anbKT">Auto antippen</div><div id="anbFrei"></div></div>
+  <div class="anbZt" id="anbKZt"></div>
+  <div class="anbLinie"></div>
+  <div class="anbS"><span class="anbNr">2</span><b>Frei in dieser Zeit</b><span class="anbZahl" id="anbKT"></span></div>
+  <div id="anbFrei" class="anbSchilder"></div>
+  <div class="anbHin">Durchgestrichen = schon vermietet. Ein Auto antippen = nur dieses anbieten.</div>
+  <div class="anbLinie"></div>
+  <div class="anbS"><span class="anbNr">3</span><b>Kunden anschreiben</b></div>
+  <div class="anbHin" id="anbKZahl" style="margin-top:-4px"></div>
+  <button class="anbGruen" type="button" id="anbStart">Freie Autos an Kunden schicken ›</button></div>
 <div class="mxFenster" id="fAnbZr" role="dialog" aria-label="Zeitraum"><div class="mxKopf"><h3>Zeitraum</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
   <div class="anbZwei"><div><label for="anbVonD">Von</label><input id="anbVonD" type="date"></div><div><label for="anbVonU">Uhrzeit</label><input id="anbVonU" type="time" value="10:00"></div></div>
   <div class="anbZwei"><div><label for="anbBisD">Bis</label><input id="anbBisD" type="date"></div><div><label for="anbBisU">Uhrzeit</label><input id="anbBisU" type="time" value="10:00"></div></div>
   <button class="anbFertig" type="button" id="anbZrFertig">Fertig</button>
 </div>
-<div class="mxFenster" id="fAnb" role="dialog" aria-label="Freie Autos anbieten"><div class="mxKopf"><h3>Kunden anschreiben</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
-  <div class="anbZt" id="anbFZt" style="margin-bottom:12px"></div>
+<div class="mxFenster" id="fAnb" role="dialog" aria-label="Freie Autos anbieten"><div class="mxKopf"><h3>Angebot an Kunden</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <div class="anbLeiste"><i id="anbL1"></i><i id="anbL2"></i></div>
+  <div class="anbZus"><div class="anbZt" id="anbFZt"></div><div id="anbSchrittT"></div></div>
+  <div id="anbS1">
   <div class="anbLbl" id="anbAutosT">Auto antippen</div>
   <div id="anbAutos"></div>
-  <div class="anbZwei"><div><label for="anbRabatt">Rabatt für den Kunden</label><div class="anbEinheit"><input id="anbRabatt" inputmode="numeric" value="10"><span>%</span></div></div><div></div></div>
-  <div class="anbLbl" style="margin-top:16px">Kunden</div>
+  <div class="anbFuss"><div class="anbLbl" style="margin-top:4px">Rabatt für den Kunden</div>
+  <div class="anbRab" id="anbRabWahl"></div><input id="anbRabatt" type="hidden" value="10">
+  <button class="anbGruen" type="button" id="anbWeiter" style="background:#1C1C1E">Weiter zu den Kunden ›</button></div></div>
+  <div id="anbS2" class="versteckt"><span class="anbZurueck" id="anbZur">‹ Autos ändern</span>
   <div id="anbKunden"></div>
-  <details class="mxKlein" id="anbVorschauK"><summary>Text ansehen <em>›</em></summary><div id="anbVorschau"></div></details>
+  <details class="mxKlein" id="anbVorschauK"><summary>Text ansehen <em>›</em></summary><div id="anbVorschau"></div></details></div>
 </div>
 <h2 id="morgenTitel" class="versteckt">Morgen</h2>
 <div class="k versteckt" id="morgenK"><div id="morgen"></div></div>
@@ -445,7 +476,8 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
   const uhrT=u=>u?(u.endsWith(":00")?String(+u.slice(0,2)):u)+" Uhr":"";
   const nG2=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
   const autoName=a=>{const c=PREISE&&PREISE.cars.find(c=>c.n===a||c.anzeige===a||nG2(c.anzeige)===nG2(a)||nG2(c.n)===nG2(a));return c?(c.anzeige||c.n):a};
-  let ANB={vonD:"",vonU:"10:00",bisD:"",bisU:"10:00",autos:null,rabatt:10,alle:false};
+  let ANB={vonD:"",vonU:"10:00",bisD:"",bisU:"10:00",autos:null,rabatt:10,alle:false,schritt:1};
+  const kurzA=n=>String(n).replace("Mercedes-Benz ","").replace(" Chauffeur-Paket","").replace(" Limousine","").replace(" performance","").replace("Mercedes ","").replace("VW ","").replace(" Clubsport","").replace(" 2.0 Diesel"," Diesel").replace(" S AMG","").replace(" AMG","").replace("Audi ","").replace("BMW ","").replace("Golf 8 ","Golf ");
   const $a=id=>document.getElementById(id);
   function anbTage(){const v=new Date(ANB.vonD+"T"+(ANB.vonU||"10:00")),b=new Date(ANB.bisD+"T"+(ANB.bisU||"10:00"));return Math.max(1,Math.ceil((b-v)/864e5-0.02))}
   // Belegt im Zeitraum: Mietvertrag (nicht zurück), gebuchte Anfrage oder Sperre
@@ -481,6 +513,11 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
       "\n\nDas gilt nur, solange "+(eins?"das Fahrzeug frei ist.":"die Fahrzeuge frei sind.")+"\n\nViele Grüße\nB. Köhler vom Mietix-Team"}
   function anbZeichnen(){if(!$a("fAnb"))return;
     anbZeitraum();
+    // Schritt 1 Autos und Rabatt, Schritt 2 Kunden (01.11.2026)
+    const s2=ANB.schritt===2;$a("anbS1").classList.toggle("versteckt",s2);$a("anbS2").classList.toggle("versteckt",!s2);
+    $a("anbL1").className=s2?"ok":"an";$a("anbL2").className=s2?"an":"";
+    $a("anbRabWahl").innerHTML=[0,5,10,15,20,25,30,35,40].map(r=>'<span data-r="'+r+'" class="'+((+ANB.rabatt||0)===r?"an":"")+'">'+(r?r+" %":"kein Rabatt")+'</span>').join("");
+    document.querySelectorAll("#anbRabWahl [data-r]").forEach(c=>c.onclick=()=>{ANB.rabatt=+c.dataset.r;$a("anbRabatt").value=ANB.rabatt;anbZeichnen()});
     const alleA=anbAngebote();if(ANB.autos===null)ANB.autos=alleA.map(a=>a.name);
     const ang=alleA.filter(a=>ANB.autos.includes(a.name)),d=anbTage();
     $a("anbAutosT").textContent=ANB.vonD&&ANB.bisD?(alleA.length?"Autos antippen, "+alleA.length+" frei für "+d+(d===1?" Tag":" Tage"):"Kein Auto frei für "+d+(d===1?" Tag":" Tage")):"Erst den Zeitraum wählen";
@@ -490,9 +527,11 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
       weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>belegt'+(x.bis?", wieder frei "+kz(x.bis):"")+'</i></span><span class="p"></span></div>').join("")||'<div class="leer">Keine Autos</div>';
     document.querySelectorAll("#anbAutos [data-a]").forEach(e=>e.onclick=()=>{const n=e.dataset.a,i=ANB.autos.indexOf(n);if(i<0)ANB.autos.push(n);else ANB.autos.splice(i,1);anbZeichnen()});
     const ks=ang.length?anbKunden(ang.map(a=>a.name)):[],zeig=ANB.alle?ks:ks.slice(0,8),hi=iso(new Date());
+    $a("anbWeiter").disabled=!ang.length;$a("anbWeiter").textContent=ang.length?"Weiter zu den Kunden ›":"Erst ein Auto antippen";
+    $a("anbSchrittT").textContent=s2?ang.length+(ang.length===1?" Auto":" Autos")+((+ANB.rabatt||0)?", "+ANB.rabatt+" % Rabatt":", kein Rabatt")+". Schritt 2 von 2: Wen anschreiben?":"Schritt 1 von 2: Welche Autos sollen rein?";
     $a("anbKunden").innerHTML=!ang.length?'<div class="leer">Erst ein freies Auto wählen.</div>':!ks.length?'<div class="leer">Keine passenden Kunden mit Telefonnummer.</div>':
       zeig.map((m,i)=>{const l=m.letzt,info=[m.mieten+(m.mieten===1?" Miete":" Mieten")+(m.mieten>=2?", Stammkunde":""),l&&l.auto?"zuletzt "+autoName(l.auto)+(l.vonD?" im "+MON[+String(l.vonD).slice(5,7)-1]:""):"",m.am?"angeschrieben am "+de(m.am):""].filter(Boolean).join(", ");
-        return '<div class="z'+(m.am?" weg":"")+'" data-k="'+i+'"><span class="uhr"></span><span class="t"><b>'+esc(m.name)+'</b><i>'+esc(info)+'</i></span><button type="button" class="chip akt">'+(m.am?"Nochmal":"Senden")+'</button></div>'}).join("")+
+        return '<div class="z'+(m.am?" weg":"")+'" data-k="'+i+'"><span class="uhr"></span><span class="t"><b>'+esc(m.name)+'</b><i>'+esc(info)+'</i></span><button type="button" class="chip akt'+(m.am===hi?" ok":"")+'">'+(m.am===hi?"✓ gesendet":m.am?"Nochmal":"Senden")+'</button></div>'}).join("")+
       (!ANB.alle&&ks.length>8?'<a class="mehr" id="anbMehr">Alle '+ks.length+' Kunden zeigen</a>':"");
     const me=$a("anbMehr");if(me)me.onclick=()=>{ANB.alle=true;anbZeichnen()};
     document.querySelectorAll("#anbKunden [data-k]").forEach(z=>z.querySelector("button").onclick=()=>{const m=zeig[+z.dataset.k];
@@ -503,7 +542,9 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     $a("anbVorschau").textContent=ang.length&&ks.length?anbText(ks[0],ang):"Erst Zeitraum, Auto und Kunden wählen."}
   function anbOeffnen(von,bis,auto){if(!PREISE){hinweis("Preise werden geladen …");return}
     if(von){ANB.vonD=von;ANB.bisD=bis}else if(!ANB.vonD){const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,1)}
-    ANB.autos=auto?[auto]:null;ANB.alle=false;mxAuf("fAnb");anbZeichnen()}
+    ANB.autos=auto?[auto]:null;ANB.alle=false;ANB.schritt=1;mxAuf("fAnb");anbZeichnen()}
+  $a("anbWeiter").onclick=()=>{ANB.schritt=2;anbZeichnen();$a("fAnb").scrollTop=0};$a("anbZur").onclick=()=>{ANB.schritt=1;anbZeichnen()};
+  $a("anbStart").onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,null);
   // Zeitraum steht oben auf der Karte (01.11.2026, Baran: „woran machst du den Zeitraum fest?“), wie im Angebot
   const anbZtText=()=>{if(!ANB.vonD||!ANB.bisD)return"";const d=anbTage(),kt=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
     return kt(ANB.vonD)+" "+uhrT(ANB.vonU)+" bis "+kt(ANB.bisD)+" "+uhrT(ANB.bisU)+' <small>'+d+(d===1?" Tag":" Tage")+',</small> <u>ändern</u>'};
@@ -525,7 +566,13 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
   function anbFrei(){const el=$a("anbFrei");if(!el||!PREISE)return;if(!ANB.vonD){const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,3);anbZeitraum()}
     const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x),frei=[],weg=[];
     PREISE.cars.forEach(c=>{const n=c.anzeige||c.n;if(belegt(n,ANB.vonD,ANB.bisD))weg.push({n,bis:belegtBis(n,ANB.vonD,ANB.bisD)});else frei.push({n,L:Math.round(listenMiete(c,start,d))})});
-    $a("anbKT").textContent=frei.length?"Auto antippen, "+frei.length+" frei":"Kein Auto frei";
+    $a("anbKT").textContent=frei.length;$a("anbKT").classList.toggle("null",!frei.length);
+    const kn=frei.length?anbKunden(frei.map(x=>x.n)).length:0;
+    $a("anbKZahl").textContent=!frei.length?"In dieser Zeit ist kein Auto frei.":kn?kn+(kn===1?" früherer Kunde passt":" frühere Kunden passen")+", Stammkunden zuerst":"Noch keine früheren Kunden mit Telefonnummer.";
+    $a("anbStart").disabled=!frei.length||!kn;
+    el.innerHTML=frei.map(x=>'<span data-a="'+esc(x.n)+'" title="'+esc(x.n)+', '+eur2(x.L)+' €">'+esc(kurzA(x.n))+'</span>').join("")+
+      weg.map(x=>'<span class="weg" title="'+esc(x.n)+(x.bis?", wieder frei "+kz(x.bis):"")+'">'+esc(kurzA(x.n))+'</span>').join("");
+    el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a));return;
     el.innerHTML=frei.map(x=>'<div class="auto" data-a="'+esc(x.n)+'"><span class="n"><b>'+esc(x.n)+'</b><i>'+eur2(Math.round(x.L/d))+' € pro Tag</i></span><span class="p">'+eur2(x.L)+' €</span></div>').join("")+
       weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>belegt'+(x.bis?", wieder frei "+kz(x.bis):"")+'</i></span><span class="p"></span></div>').join("");
     el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a))}
