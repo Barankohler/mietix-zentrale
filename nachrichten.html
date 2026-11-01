@@ -248,7 +248,7 @@ Sie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als 
 
 Fahrzeug:
 
-Welches Paket darf ich Ihnen dazubuchen?</pre><div class="k nkK"><span class="nkPaar"><button type="button" class="nkWa" data-nk="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>WhatsApp</button><button type="button" class="nkKo" data-nk="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>Kopieren</button></span></div></div></section><section id="t5"><h2 class="thema">Abholung und Rückgabe <span>3</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>*Morgen ist es so weit*
+Soll ich Ihnen eines davon dazubuchen? Geben Sie mir einfach kurz Bescheid.</pre><div class="k nkK"><span class="nkPaar"><button type="button" class="nkWa" data-nk="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>WhatsApp</button><button type="button" class="nkKo" data-nk="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>Kopieren</button></span></div></div></section><section id="t5"><h2 class="thema">Abholung und Rückgabe <span>3</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>*Morgen ist es so weit*
 
 Hallo, Ihr Fahrzeug steht morgen für Sie bereit:
 
@@ -345,7 +345,7 @@ function kmPaketText(name){const c=PREISE&&PREISE.cars.find(x=>(x.anzeige||x.n)=
   const st=PREISE.kmStufen||[50,100,150,200,300];
   return "*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\n"+
     "Ihr "+name.replace(" performance"," Performance")+", für Ihre ganze Miete:\n"+st.map((k,i)=>"• +"+k.toLocaleString("de-DE")+" km für "+eur(c.km[i+1])+" € (statt "+eur(k*c.kmPreis)+" €)").join("\n")+
-    "\n\nOhne Paket kostet jeder Mehrkilometer "+eur(c.kmPreis)+" €. Mit dem großen Paket sparen Sie "+eur(st[st.length-1]*c.kmPreis-c.km[st.length])+" €.\n\nWelches Paket darf ich Ihnen dazubuchen?"}
+    "\n\nOhne Paket kostet jeder Mehrkilometer "+eur(c.kmPreis)+" €. Mit dem großen Paket sparen Sie "+eur(st[st.length-1]*c.kmPreis-c.km[st.length])+" €.\n\nSoll ich Ihnen eines davon dazubuchen? Geben Sie mir einfach kurz Bescheid."}
 // „morgen“ und „übermorgen“ bekommen immer das Datum dazu (31.10.2026, Baran: „damit wir auf der sicheren Seite sind“).
 // Überschriften (*…*) bleiben, steht schon ein Datum dahinter, passiert nichts.
 const WTAG=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
