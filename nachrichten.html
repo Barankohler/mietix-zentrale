@@ -613,6 +613,52 @@ zeigen();abgleichen();auslagernBald();
 })();
 </script>
 <script>
+/* Schutz (1.11.2026, Baran: geht etwas nicht, roter Hinweis mit Grund; alles sofort speichern) */
+(function(){if(window.mxFehler)return;
+  const css=document.createElement("style");css.textContent=
+    "#mxFehler{position:fixed;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:9999;max-width:560px;margin:0 auto;background:#C4161C;color:#fff;"+
+    "border-radius:14px;padding:13px 46px 13px 16px;font:700 15px/1.35 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25)!important;display:none;cursor:pointer}"+
+    "#mxFehler.an{display:block;animation:mxFehlerAuf .2s ease-out}#mxFehler i{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-style:normal;font-size:19px;opacity:.85}"+
+    "@keyframes mxFehlerAuf{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}";
+  document.head.appendChild(css);
+  let box=null,uhr=null;
+  window.mxFehler=function(text,ms){if(!document.body)return;
+    if(!box){box=document.createElement("div");box.id="mxFehler";box.setAttribute("role","alert");box.onclick=()=>box.classList.remove("an");document.body.appendChild(box)}
+    box.textContent=String(text||"");const x=document.createElement("i");x.textContent="✕";box.appendChild(x);box.classList.add("an");
+    clearTimeout(uhr);if(ms)uhr=setTimeout(()=>box.classList.remove("an"),ms)};
+
+  // Speichern auf dem Gerät scheitert: jede Seite meldet es rot, auch wenn sie den Fehler selbst verschluckt
+  try{const orig=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(k,v){try{return orig.call(this,k,v)}catch(e){
+      mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll oder gesperrt. Seite offen lassen, sonst geht das Getippte verloren.");throw e}}}catch(e){}
+
+  // Preise nicht geladen (nur Seiten, die Preise brauchen)
+  if(document.documentElement.innerHTML.indexOf("mietix-preise/preise.json")>=0)setTimeout(()=>{
+    fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status)})
+      .catch(()=>mxFehler((navigator.onLine?"Die Preise konnten nicht geladen werden.":"Kein Internet: Die Preise konnten nicht geladen werden.")+" Preise und Kaution erst nach dem Neuladen verwenden."))},5000);
+
+  // Unerwartete Fehler: lieber sagen als still hängen
+  let zuletzt="";
+  const melde=m=>{m=String(m||"").trim();if(!m||m===zuletzt||/ResizeObserver|^Script error|AbortError|NotAllowedError|share|Load failed|Failed to fetch|NetworkError/i.test(m))return;
+    zuletzt=m;mxFehler("Da hat etwas nicht geklappt ("+m.slice(0,120)+"). Bitte die Seite neu laden.",15000)};
+  addEventListener("error",e=>{if(e.message)melde(e.message)});
+  addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
+
+  // Entwurf: Felder eines Bereichs beim Tippen sichern
+  window.mxEntwurf=function(bereich,schluessel){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
+    const leer={holen(){return false},weg(){},merken(){}};if(!el)return leer;
+    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type));
+    let aus=false;
+    const merken=()=>{if(aus)return;const d={};let etwas=false;felder().forEach(f=>{const v=f.type==="checkbox"?f.checked:f.value;d[f.id]=v;if(v&&v!==true)etwas=true});
+      try{if(etwas)localStorage.setItem(K,JSON.stringify(d));else localStorage.removeItem(K)}catch(e){}};
+    el.addEventListener("input",merken);el.addEventListener("change",merken);
+    return{merken,
+      holen(){let d=null;try{d=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}if(!d)return false;let n=0;aus=true;
+        felder().forEach(f=>{if(!(f.id in d))return;const v=d[f.id];if(f.type==="checkbox"){if(f.checked!==!!v){f.checked=!!v;n++}}else if(v!=null&&String(v)!==""&&f.value!==v){f.value=v;n++}else return;
+          f.dispatchEvent(new Event("input",{bubbles:true}));f.dispatchEvent(new Event("change",{bubbles:true}))});aus=false;return n>0},
+      weg(){try{localStorage.removeItem(K)}catch(e){}}}};
+})();
+</script><script>
 /* Mietix App-Gefühl (31.10.2026) */
 (function(){if(window.mxApp)return;window.mxApp=1;
   const pfad=location.pathname,istStart=/mietix-zentrale\/(index\.html)?$/.test(pfad)||/\/zentrale$/.test(pfad);
