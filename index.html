@@ -70,6 +70,20 @@ h2{font-size:13px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;c
 .such input:focus{box-shadow:0 0 0 2px var(--rot)}
 .such svg{position:absolute;left:16px;top:50%;width:20px;height:20px;transform:translateY(-50%);stroke:var(--grau);fill:none;stroke-width:2.2;stroke-linecap:round}
 #treffer{background:#fff;border-radius:16px;padding:2px 16px;margin:-4px 0 12px}#treffer:empty{display:none}#treffer .uhr{display:none}
+/* ===== Design wie die Seite Angebot (01.11.2026, Baran: Muster Fassung 2 freigegeben, nur Aussehen) ===== */
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;background:#F2F2F7;-webkit-font-smoothing:antialiased}
+.k{border-radius:18px;padding:2px 16px}h2{font-size:11.5px;letter-spacing:.6px;margin:18px 6px 8px}
+.z{padding:12px 0}.z b{font-size:16px;font-weight:800}.z i{font-size:13px;font-weight:600}.z .t i{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.z .uhr{min-width:46px}.sym{display:inline-flex;width:30px;height:30px;border-radius:9px;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900;line-height:1}
+.chip{border-radius:999px;padding:5px 10px;font-weight:800}
+.chip.rot{background:#FDE8E8;color:#C4161C}.chip.gruen{background:#E3F4EA;color:#1E8E4E}.chip.gelb{background:#FFF1DC;color:#9A6400}
+.zk a{border-radius:16px}.um{border-radius:18px}
+.kacheln{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kachel{border-radius:16px;padding:12px 2px 10px;font-size:11.5px;font-weight:800;line-height:1.15}
+.kachel svg{width:26px;height:26px;margin:0 auto 5px;stroke-width:2}.kachel .zahl{top:5px;right:6px;font-size:11px;padding:1px 6px}
+.kachel:last-child:nth-child(odd){grid-column:auto}
+#fort{padding:12px 0 6px}#fort .bal{height:10px}
+@media(min-width:700px){.app .kacheln{grid-template-columns:repeat(5,1fr)}.app .kachel{font-size:13px;padding:14px 4px 12px}.app .kachel svg{width:30px;height:30px}.app .kachel:last-child:nth-child(odd){grid-column:auto}}
 header .logo{display:block;height:46px;width:auto}header{background:transparent!important;border-bottom:0!important}
 #waK .z .uhr{min-width:0;width:0}.waNext{display:block;width:100%;margin:12px 0 10px;background:#25D366;color:#fff;border:0;border-radius:14px;padding:14px;font:800 16px inherit;font-family:inherit;cursor:pointer}
 .z .akt{border:0;font-family:inherit;cursor:pointer}.wahl{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 14px 60px}
@@ -191,6 +205,9 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
   function zeile(a){if(!a.grau&&!a.akt){if(a.k==="Übergabe"&&a.art!=="rot")a=Object.assign({},a,{art:"gruen"});if(a.k==="Rückgabe")a=Object.assign({},a,{art:"rot"})}
     if(a.akt)return '<div class="z" data-akt="'+a.akt+'" data-nr="'+esc(a.nr)+'"><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><a class="t" href="'+a.href+'" style="color:inherit;text-decoration:none"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></a><button type="button" class="chip akt'+(a.art?" "+a.art:"")+'">'+(a.akt==="kaution"?"Zurück?":"Bezahlt?")+'</button></div>';
     return '<a class="z" href="'+a.href+'"'+(a.nf?' data-nf="'+esc(a.nf)+'"':"")+'><span class="uhr">'+(a.uhr||"&nbsp;")+'</span><span class="t"><b>'+esc(a.t)+'</b><i>'+esc(a.i)+'</i></span><span class="chip'+(a.art?" "+a.art:"")+'">'+a.k+'</span></a>'}
+  // Zeilen ohne Uhrzeit bekommen ein kleines Zeichen statt einer Lücke (Design 01.11.2026)
+  function symbol(k,art){const f={Nachfassen:"#25D366",Kaution:"#1E8E4E",Offen:"#E8A200",Prüfen:"#C4161C",Aufgabe:"#E8A200",Zustand:"#E8A200"}[k]||(art==="rot"?"#C4161C":"#E8A200");
+    const z={Nachfassen:"✉",Kaution:"€",Offen:"€",Prüfen:"!"}[k]||"!";return '<span class="sym" style="background:'+f+'">'+z+'</span>'}
   function zeichne(){
     const h=new Date(),hi=iso(h),m=new Date();m.setDate(m.getDate()+1);const mo=iso(m);
     const kunden0=lies("mietixKunden",{}),alle=lies("mietixVorgaenge",[]),v=alle.filter(x=>x.status!=="zurück"),anf=lies("mietixAnfragen",[]),auf=lies("mietixAufgaben",[]),zust=lies("mietixZustand",[]);
@@ -206,7 +223,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     alle.filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&!x.kautionRueck).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD),lang=s>7;
       rest.push({t:x.name,i:"Kaution "+EUR(zahl(x.zahlung.kaut.betrag))+" zurückgeben"+(lang?", schon "+s+" Tage!":""),k:"Kaution",art:lang?"rot":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"kaution",nr:x.nr})});
     // Miete offen schon am Tag der Übergabe (31.10.2026, Prüfbericht: vorher erst ab dem nächsten Tag sichtbar)
-    alle.filter(x=>x.vonD&&x.vonD<=hi&&x.ueb&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"bezahlt",nr:x.nr})});
+    if(false)alle.filter(x=>x.vonD&&x.vonD<=hi&&x.ueb&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr),akt:"bezahlt",nr:x.nr})});
     // Endabrechnung offen: Zusatzkosten nach der Rückgabe, die keine Kaution deckt (31.10.2026, Prüfbericht)
     const endOffen=x=>{const e=x.endabrechnung||{},k=(x.zahlung||{}).kaut||{};if(x.status!=="zurück"||!(+e.summe>0)||e.bezahlt)return 0;
       if(k.am&&!x.kautionRueck)return 0;   // Kaution liegt noch da: wird beim Zurückgeben verrechnet
@@ -243,21 +260,24 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     // alles von morgen in den eigenen Abschnitt, dort mit Uhrzeit statt „morgen“
     for(let i=out.length-1;i>=0;i--){const x=out[i];if(/(Abholung|Rückgabe) morgen \(/.test(x.i)||(x.k==="Mietvertrag"&&x.morgen)){morgen.unshift(Object.assign({},x,{i:x.i.replace(/, (Abholung|Rückgabe) morgen \(.*\)$/,", $1"),uhr:x.uhrM||""}));out.splice(i,1)}}
     zahlenZeichnen(alle,anf,hi);
-    for(let i=out.length-1;i>=0;i--)if(["Übergabe","Rückgabe","Mietvertrag"].includes(out[i].k))out.splice(i,1);
+    // Übergaben, Rückgaben und „gebucht, noch kein Mietvertrag“ von heute bleiben hier stehen (01.11.2026, Baran: die Aufgaben von heute)
     morgen.length=0;
     out.push(...rest);
     const autoPunkte=[];auf.filter(a=>!a.erledigt&&!a._weg&&a.aufgabe&&a.bis&&a.bis<=hi).forEach(a=>autoPunkte.push({t:a.aufgabe,i:a.bis<hi?"überfällig seit "+de(a.bis):"heute fällig",k:"Aufgabe",art:"gelb",href:B+"mietix-autos/?zeige=aufgaben"}));
     zust.filter(z=>!z.erledigt&&z.auto).forEach(z=>autoPunkte.push({t:z.auto,i:z.text+(z.datum?", seit "+de(z.datum):""),k:"Zustand",art:"gelb",href:B+"mietix-autos/"}));
     const sta=lies("mietixAutos",{});Object.keys(sta).forEach(n=>[["tuev","TÜV"],["service","Service"],["reifen","Reifen"],["garantie","Garantie"]].forEach(([k,t])=>{const d=sta[n][k];if(!d)return;const tage=Math.round((new Date(String(d).slice(0,10))-new Date(hi))/864e5);
       if(tage<=14)autoPunkte.push({t:n,i:t+(tage<0?" überfällig":tage===0?" heute":" in "+tage+" Tagen"),k:t,art:tage<=7?"rot":"gelb",href:B+"mietix-autos/"})}));
+    out.push(...autoPunkte.filter(a=>a.k==="Aufgabe"||a.art==="rot"));   // fällige Auto-Aufgaben und TÜV/Service in 7 Tagen
+    // Reihenfolge: Überfälliges zuerst, dann Übergaben und Rückgaben nach Uhrzeit, dann der Rest
+    {const rang=x=>["Übergabe","Rückgabe","Mietvertrag"].includes(x.k)?(x.uhr?1:0):2;out.sort((a,b)=>rang(a)-rang(b)||(rang(a)===1?String(a.uhr).localeCompare(String(b.uhr)):0))}
     const offen=anf.filter(a=>a.status==="offen").length;
     // Fortschritt heute: erledigte Übergaben und Rückgaben von heute gegen alles, was heute ansteht (31.10.2026)
     const erl=alle.filter(x=>x.ueb&&String(x.ueb.datum||"").slice(0,10)===hi).length+alle.filter(x=>x.rueck&&String(x.rueck.datum||"").slice(0,10)===hi).length;
     const offenHeute=out.filter(x=>x.k==="Übergabe"||x.k==="Rückgabe").length,ges=erl+offenHeute;
-    const fo=document.getElementById("fort");fo.classList.add("versteckt");
+    const fo=document.getElementById("fort");fo.classList.toggle("versteckt",!ges);
     if(ges){fo.querySelector("i").style.width=Math.round(erl/ges*100)+"%";fo.querySelector("span").textContent=erl+" von "+ges+" erledigt"}
     document.getElementById("heuteTitel").classList.toggle("versteckt",!out.length);document.getElementById("heuteK").classList.toggle("versteckt",!out.length);
-    document.getElementById("heute").innerHTML=out.length?out.map(zeile).join(""):(erl?'<div class="fertig">Alles erledigt ✓<i>'+erl+(erl===1?" Übergabe oder Rückgabe":" Übergaben und Rückgaben")+' heute. Stark!</i></div>':'<div class="fertig" style="color:var(--grau)">Heute ist nichts zu tun ✓<i>Alles im Griff.</i></div>');
+    document.getElementById("heute").innerHTML=out.length?out.map(x=>zeile(x.uhr?x:Object.assign({},x,{uhr:symbol(x.k,x.art)}))).join(""):(erl?'<div class="fertig">Alles erledigt ✓<i>'+erl+(erl===1?" Übergabe oder Rückgabe":" Übergaben und Rückgaben")+' heute. Stark!</i></div>':'<div class="fertig" style="color:var(--grau)">Heute ist nichts zu tun ✓<i>Alles im Griff.</i></div>');
     const mt=document.getElementById("morgenTitel");mt.textContent="Morgen, "+WT[m.getDay()]+" "+m.getDate()+"."+(m.getMonth()+1)+".";
     mt.classList.toggle("versteckt",!morgen.length);document.getElementById("morgenK").classList.toggle("versteckt",!morgen.length);
     morgen.sort((x,y)=>String(x.uhr||"99").localeCompare(String(y.uhr||"99")));   // nach Uhrzeit (31.10.2026)
