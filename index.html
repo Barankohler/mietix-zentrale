@@ -78,12 +78,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue"
 .chip{border-radius:999px;padding:5px 10px;font-weight:800}
 .chip.rot{background:#FDE8E8;color:#C4161C}.chip.gruen{background:#E3F4EA;color:#1E8E4E}.chip.gelb{background:#FFF1DC;color:#9A6400}
 .zk a{border-radius:16px}.um{border-radius:18px}
-.kacheln{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.kachel{border-radius:16px;padding:12px 2px 10px;font-size:11.5px;font-weight:800;line-height:1.15}
-.kachel svg{width:26px;height:26px;margin:0 auto 5px;stroke-width:2}.kachel .zahl{top:5px;right:6px;font-size:11px;padding:1px 6px}
-.kachel:last-child:nth-child(odd){grid-column:auto}
 #fort{padding:12px 0 6px}#fort .bal{height:10px}
-@media(min-width:700px){.app .kacheln{grid-template-columns:repeat(5,1fr)}.app .kachel{font-size:13px;padding:14px 4px 12px}.app .kachel svg{width:30px;height:30px}.app .kachel:last-child:nth-child(odd){grid-column:auto}}
 header .logo{display:block;height:46px;width:auto}header{background:transparent!important;border-bottom:0!important}
 #waK .z .uhr{min-width:0;width:0}.waNext{display:block;width:100%;margin:12px 0 10px;background:#25D366;color:#fff;border:0;border-radius:14px;padding:14px;font:800 16px inherit;font-family:inherit;cursor:pointer}
 .z .akt{border:0;font-family:inherit;cursor:pointer}.wahl{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 14px 60px}
@@ -260,7 +255,8 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     // alles von morgen in den eigenen Abschnitt, dort mit Uhrzeit statt „morgen“
     for(let i=out.length-1;i>=0;i--){const x=out[i];if(/(Abholung|Rückgabe) morgen \(/.test(x.i)||(x.k==="Mietvertrag"&&x.morgen)){morgen.unshift(Object.assign({},x,{i:x.i.replace(/, (Abholung|Rückgabe) morgen \(.*\)$/,", $1"),uhr:x.uhrM||""}));out.splice(i,1)}}
     zahlenZeichnen(alle,anf,hi);
-    // Übergaben, Rückgaben und „gebucht, noch kein Mietvertrag“ von heute bleiben hier stehen (01.11.2026, Baran: die Aufgaben von heute)
+    // Übergaben und Rückgaben stehen nicht auf der Startseite (01.11.2026 11:36, Baran: frisst Platz), sie stehen unter Mietverträge
+    for(let i=out.length-1;i>=0;i--)if(["Übergabe","Rückgabe","Mietvertrag"].includes(out[i].k))out.splice(i,1);
     morgen.length=0;
     out.push(...rest);
     const autoPunkte=[];auf.filter(a=>!a.erledigt&&!a._weg&&a.aufgabe&&a.bis&&a.bis<=hi).forEach(a=>autoPunkte.push({t:a.aufgabe,i:a.bis<hi?"überfällig seit "+de(a.bis):"heute fällig",k:"Aufgabe",art:"gelb",href:B+"mietix-autos/?zeige=aufgaben"}));
@@ -274,7 +270,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     // Fortschritt heute: erledigte Übergaben und Rückgaben von heute gegen alles, was heute ansteht (31.10.2026)
     const erl=alle.filter(x=>x.ueb&&String(x.ueb.datum||"").slice(0,10)===hi).length+alle.filter(x=>x.rueck&&String(x.rueck.datum||"").slice(0,10)===hi).length;
     const offenHeute=out.filter(x=>x.k==="Übergabe"||x.k==="Rückgabe").length,ges=erl+offenHeute;
-    const fo=document.getElementById("fort");fo.classList.toggle("versteckt",!ges);
+    const fo=document.getElementById("fort");fo.classList.add("versteckt");
     if(ges){fo.querySelector("i").style.width=Math.round(erl/ges*100)+"%";fo.querySelector("span").textContent=erl+" von "+ges+" erledigt"}
     document.getElementById("heuteTitel").classList.toggle("versteckt",!out.length);document.getElementById("heuteK").classList.toggle("versteckt",!out.length);
     document.getElementById("heute").innerHTML=out.length?out.map(x=>zeile(x.uhr?x:Object.assign({},x,{uhr:symbol(x.k,x.art)}))).join(""):(erl?'<div class="fertig">Alles erledigt ✓<i>'+erl+(erl===1?" Übergabe oder Rückgabe":" Übergaben und Rückgaben")+' heute. Stark!</i></div>':'<div class="fertig" style="color:var(--grau)">Heute ist nichts zu tun ✓<i>Alles im Griff.</i></div>');
