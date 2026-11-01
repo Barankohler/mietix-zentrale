@@ -136,12 +136,12 @@ const pz=(a,b)=>b?Math.round((a-b)/Math.abs(b)*100):null;
 function zeichne(){const S=(lies("mietixStand",{})||{}).statistik;
   if(!S||!S.monate||!S.monate.length){$("inhalt").innerHTML='<div class="karte leer">Noch keine Zahlen da.<br><br>Sie kommen aus der Excel, sobald der Mac im Büro läuft und du hier angemeldet bist.</div>';return}
   const M=S.monate,jetzt=M[M.length-1],vor=M.length>1?M[M.length-2]:null,h=new Date();
-  const tageMonat=new Date(h.getFullYear(),h.getMonth()+1,0).getDate(),tag=jetzt.m===h.toISOString().slice(0,7)?h.getDate():tageMonat;
+  const tageMonat=new Date(h.getFullYear(),h.getMonth()+1,0).getDate(),tag=jetzt.m===new Date(h.getTime()-h.getTimezoneOffset()*6e4).toISOString().slice(0,7)?h.getDate():tageMonat;
   const gewinn=jetzt.rein-jetzt.raus,hoch=Math.round(jetzt.rein/tag*tageMonat);
   // Vergleich mit demselben Zeitraum im Vormonat (1. bis heute), sonst erschreckt am Monatsanfang ein großes Minus
   const V=S.vergleich,fair=V&&vor&&V.vormonat===vor.name&&tag<tageMonat;
   const d=pz(jetzt.rein,fair?V.vormonatBisTag:(vor&&vor.rein));
-  const unterwegs=lies("mietixVorgaenge",[]).filter(v=>v.status!=="zurück"&&v.vonD&&v.bisD&&v.vonD<=h.toISOString().slice(0,10)&&v.bisD>=h.toISOString().slice(0,10)).length;
+  const unterwegs=lies("mietixVorgaenge",[]).filter(v=>v.status!=="zurück"&&v.vonD&&v.bisD&&v.vonD<=new Date(h.getTime()-h.getTimezoneOffset()*6e4).toISOString().slice(0,10)&&v.bisD>=new Date(h.getTime()-h.getTimezoneOffset()*6e4).toISOString().slice(0,10)).length;
   let html="";
 
   // 1. Der Monat in einer Zahl
@@ -222,7 +222,7 @@ const SPEICHER={mietixVorgaenge:{tab:"vorgaenge",pk:"nr",liste:true},mietixAnfra
   mietixAufgaben:{tab:"aufgaben",pk:"id",liste:true},mietixZustand:{tab:"zustand",pk:"id",liste:true},mietixAutos:{tab:"autos",pk:"name",liste:false},mietixStand:{tab:"stand",pk:"id",liste:false},mietixPapierkorb:{tab:"papierkorb",pk:"id",liste:true}};
 const roh=Storage.prototype.setItem;
 const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
-const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v));return true}catch(e){return false}};
+const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v));return true}catch(e){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll. Seite offen lassen, sonst geht etwas verloren.");return false}};   // Hinweis auch hier (1.11.2026)
 // Jede Anfrage an den Speicher höchstens 20 Sekunden (31.10.2026): sonst hing der Abgleich bei schlechtem Netz für immer
 const holeMit=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);return fetch(u,Object.assign({},o,{signal:c.signal})).finally(()=>clearTimeout(t))};
 const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)};
@@ -410,7 +410,7 @@ Storage.prototype.setItem=function(k,v){const alt=(this===localStorage&&SPEICHER
 const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
 const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
-  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?String(x.betrag).replace(".",",")+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
+  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
 let burst=null,burstZeit=null;

@@ -123,7 +123,7 @@ function zeichne(){
   $("nZustand").textContent=z.length;$("nZustand").className=z.length?"":"null";
   $("zustand").innerHTML=z.length?z.map(x=>'<div class="z"><div class="t"><b>'+esc(x.auto)+': '+esc(x.text)+'</b><i>erledigt '+de(x.erledigtAm||x.datum)+'</i></div><button class="hell" data-z="'+esc(x.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
   [...$("zustand").querySelectorAll("button[data-z]")].forEach(b=>b.onclick=()=>{const l=lies("mietixZustand",[]),x=l.find(y=>y.id===b.dataset.z);if(x){x.erledigt=false;delete x.erledigtAm;schreib("mietixZustand",l);meldung("Wiederhergestellt.");zeichne()}});
-  const grenze=new Date(Date.now()-60*864e5).toISOString().slice(0,10);
+  const g0=new Date(Date.now()-60*864e5),grenze=new Date(g0.getTime()-g0.getTimezoneOffset()*6e4).toISOString().slice(0,10);   // Ortszeit (1.11.2026)
   const a=lies("mietixAufgaben",[]).filter(x=>x.erledigt&&!x._weg&&String(x.erledigt)>=grenze).sort((p,q)=>String(q.erledigt).localeCompare(String(p.erledigt)));
   $("nAufgaben").textContent=a.length;$("nAufgaben").className=a.length?"":"null";
   $("aufgaben").innerHTML=a.length?a.map(x=>'<div class="z"><div class="t"><b>'+esc(x.aufgabe)+'</b><i>erledigt '+de(x.erledigt)+'</i></div><button class="hell" data-a="'+esc(x.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
@@ -149,7 +149,7 @@ const SPEICHER={mietixVorgaenge:{tab:"vorgaenge",pk:"nr",liste:true},mietixAnfra
   mietixAufgaben:{tab:"aufgaben",pk:"id",liste:true},mietixZustand:{tab:"zustand",pk:"id",liste:true},mietixAutos:{tab:"autos",pk:"name",liste:false},mietixStand:{tab:"stand",pk:"id",liste:false},mietixPapierkorb:{tab:"papierkorb",pk:"id",liste:true}};
 const roh=Storage.prototype.setItem;
 const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
-const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v));return true}catch(e){return false}};
+const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v));return true}catch(e){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll. Seite offen lassen, sonst geht etwas verloren.");return false}};   // Hinweis auch hier (1.11.2026)
 // Jede Anfrage an den Speicher höchstens 20 Sekunden (31.10.2026): sonst hing der Abgleich bei schlechtem Netz für immer
 const holeMit=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);return fetch(u,Object.assign({},o,{signal:c.signal})).finally(()=>clearTimeout(t))};
 const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)};
@@ -337,7 +337,7 @@ Storage.prototype.setItem=function(k,v){const alt=(this===localStorage&&SPEICHER
 const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
 const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
-  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?String(x.betrag).replace(".",",")+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
+  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
 let burst=null,burstZeit=null;
