@@ -80,7 +80,43 @@ header .logo{display:block;height:46px;width:auto}header{background:transparent!
 #fort .bal{flex:1;height:8px;border-radius:99px;background:var(--linie);overflow:hidden}#fort .bal i{display:block;height:100%;background:var(--gruen);border-radius:99px;transition:width .5s ease}
 .fertig{padding:22px 0;text-align:center;color:var(--gruen);font-weight:800;font-size:18px}.fertig i{display:block;font-style:normal;font-size:14px;color:var(--grau);font-weight:600;margin-top:4px}
 body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* Freie Autos anbieten (01.11.2026, Baran: echter Umsatzbringer, Zeitraum selbst wählen) */
+.anbAb{font-size:13px;font-weight:800;color:var(--grau);margin:14px 2px 6px}
+.anbChips{display:flex;flex-wrap:wrap;gap:8px}.anbChips span{padding:10px 14px;border-radius:999px;background:#F2F2F7;font-weight:800;font-size:14px;cursor:pointer;color:#1C1C1E}
+.anbChips span.an{background:var(--rot);color:#fff}
+.anbZwei{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.anbZwei label{display:block;font-size:13px;font-weight:700;color:var(--grau);margin:0 2px 4px}
+.anbZwei input{width:100%;box-sizing:border-box;border:1.5px solid #E4E4E7;border-radius:12px;padding:12px;font:600 16px inherit;font-family:inherit;background:#fff;color:#1C1C1E;min-height:48px}
+.anbEinheit{position:relative}.anbEinheit input{padding-right:36px}.anbEinheit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--grau)}
+#anbAutos .auto{display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid #E4E4E7;border-radius:14px;margin-bottom:8px;cursor:pointer}
+#anbAutos .auto.an{border-color:var(--gruen);background:#EEF8F2}#anbAutos .auto b{flex:1;min-width:0;font-size:15px}
+#anbAutos .auto i{font-style:normal;font-size:13px;color:var(--grau);font-weight:700;white-space:nowrap}#anbAutos .auto .h{width:22px;height:22px;border-radius:6px;border:2px solid #C7C7CC;flex:0 0 auto;text-align:center;line-height:18px;color:#fff;font-weight:900;font-size:14px}
+#anbAutos .auto.an .h{background:var(--gruen);border-color:var(--gruen)}
+#anbKunden .z{padding:11px 0}#anbKunden .z .uhr{display:none}#anbKunden .z .akt{background:#25D366;color:#fff;padding:9px 12px;font-size:14px;border-radius:10px}
+#anbKunden .z.weg .akt{background:#F2F2F7;color:#3A3A3C}#anbKunden .mehr{display:block;text-align:center;padding:12px;font-weight:800;color:var(--rot);cursor:pointer}
+#anbVorschau{white-space:pre-wrap;background:#F2F2F7;border-radius:14px;padding:12px;font-size:14px;line-height:1.45;margin-top:8px}
+#anbFrei .z{cursor:pointer}#anbFrei .z .uhr{display:none}#anbFrei .k{margin-bottom:10px}
 @media(min-width:700px){.app{max-width:720px}.kacheln{grid-template-columns:repeat(3,1fr)}.kachel:last-child:nth-child(odd){grid-column:auto}}
+
+.mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
+.mxKnopf span,.mxKlapp>summary span{flex:1;min-width:0}
+.mxKnopf b,.mxKlapp>summary b{display:block;font-size:16px;font-weight:800;color:#1C1C1E}
+.mxKnopf i,.mxKlapp>summary i{display:block;font-style:normal;font-size:13px;color:#8A8A8E;margin-top:2px;font-weight:600}
+.mxKnopf em,.mxKlapp>summary em{flex:0 0 auto;font-style:normal;font-size:28px;color:#C4161C;font-weight:700;line-height:1;transition:transform .15s}
+.mxKnopf:active,.mxKlapp>summary:active{background:#F6F6F7}
+.mxKlapp>summary{list-style:none}.mxKlapp>summary::-webkit-details-marker{display:none}
+.mxKlapp[open]>summary{margin-bottom:10px}.mxKlapp[open]>summary em{transform:rotate(90deg)}
+.mxBg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;display:none}.mxBg.auf{display:block}
+.mxFenster{position:fixed;left:0;right:0;bottom:0;z-index:91;background:#fff;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:none;box-shadow:0 -10px 30px rgba(0,0,0,.18);margin:0 auto;max-width:560px;box-sizing:border-box;text-align:left}
+.mxFenster.auf{display:block;animation:mxHoch .22s ease-out}.mxBg.auf{animation:mxBlende .2s ease-out}
+@keyframes mxHoch{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}@keyframes mxBlende{from{opacity:0}to{opacity:1}}
+@media(min-width:700px){.mxFenster{top:50%;bottom:auto;transform:translateY(-50%);border-radius:22px;width:calc(100% - 48px);padding:20px}.mxFenster.auf{animation:mxMitte .2s ease-out}}
+@keyframes mxMitte{from{transform:translateY(-46%);opacity:0}to{transform:translateY(-50%);opacity:1}}
+.mxKopf{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.mxKopf h3{font-size:19px;font-weight:900;margin:0;color:#1C1C1E}
+.mxZu{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:0;background:#F2F2F4;font-size:17px;font-weight:800;cursor:pointer;color:#1C1C1E;font-family:inherit}
+.mxKlein{margin-top:8px}.mxKlein>summary{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:14px;font-weight:800;color:#1C1C1E;background:#F2F2F4;border-radius:999px;padding:9px 14px;min-height:40px;box-sizing:border-box}
+.mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
+.mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
 </style></head><body><div class="app">
 <header><h1><img src="logo.png" alt="Mietix Sportwagenvermietung" class="logo"></h1><span id="punkt" title="Anmeldung und Stand"></span></header>
 <div id="stand"><div id="abgleich"></div><div id="bruecke" class="tipp" style="text-align:left;margin:0 4px 6px"></div></div>
@@ -95,6 +131,23 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
 <h2 id="waTitel" class="versteckt">WhatsApp heute</h2>
 <div class="k versteckt" id="waK"><button type="button" class="waNext" id="waNext">Nächste senden ›</button><div id="wa"></div></div>
+<h2>Freie Autos anbieten</h2>
+<div id="anbFrei"></div>
+<button class="mxKnopf" type="button" id="anbKnopf"><span><b>Kunden anschreiben</b><i>Zeitraum wählen, freie Autos per WhatsApp anbieten</i></span><em>›</em></button>
+<div class="mxFenster" id="fAnb" role="dialog" aria-label="Freie Autos anbieten"><div class="mxKopf"><h3>Freie Autos anbieten</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <div class="anbAb">Ab heute:</div>
+  <div class="anbChips" id="anbDauer"><span data-d="1">1 Tag</span><span data-d="2">2 Tage</span><span data-d="3">3 Tage</span><span data-d="7">1 Woche</span></div>
+  <div class="anbAb">Wochenende (nächstes):</div>
+  <div class="anbChips" id="anbWe"><span data-we="5,1">Fr bis Sa</span><span data-we="5,2">Fr bis So</span><span data-we="6,2">Sa bis Mo</span><span data-we="5,3">Fr bis Mo</span></div>
+  <div class="anbZwei"><div><label for="anbVonD">von</label><input id="anbVonD" type="date"></div><div><label for="anbVonU">Uhr</label><input id="anbVonU" type="time" value="10:00"></div></div>
+  <div class="anbZwei"><div><label for="anbBisD">bis</label><input id="anbBisD" type="date"></div><div><label for="anbBisU">Uhr</label><input id="anbBisU" type="time" value="10:00"></div></div>
+  <div class="anbAb" id="anbAutosT">Frei in diesem Zeitraum</div>
+  <div id="anbAutos"></div>
+  <div class="anbZwei"><div><label for="anbRabatt">Rabatt für den Kunden</label><div class="anbEinheit"><input id="anbRabatt" inputmode="numeric" value="10"><span>%</span></div></div><div></div></div>
+  <div class="anbAb">Kunden</div>
+  <div id="anbKunden"></div>
+  <details class="mxKlein" id="anbVorschauK"><summary>Text ansehen <em>›</em></summary><div id="anbVorschau"></div></details>
+</div>
 <h2 id="morgenTitel" class="versteckt">Morgen</h2>
 <div class="k versteckt" id="morgenK"><div id="morgen"></div></div>
 <h2 id="ausTitel" class="versteckt">Ausstieg 30.06.2027</h2>
@@ -153,7 +206,12 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     const WA_NACH=[];
     const nach=anf.filter(a=>a.status==="angebot"&&a.nummer&&!a.nachgefasst&&(!a.von||a.von>=hi)).filter(a=>{const s=tageSeit((a.angebot&&a.angebot.am)||a.tag);return s>=2&&s<=14});
     const waNr=t=>{let n=String(t||"").replace(/\D/g,"");if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="49"+n.slice(1);return n};
-    nach.forEach(a=>{const vn=String(a.name||"").trim().split(/\s+/)[0],txt="Hallo"+(vn?" "+vn:"")+",\n\nich wollte kurz nachfragen, ob unser Angebot"+(a.auto?" für den "+a.auto:"")+(a.von?" vom "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+" noch passt. Gerne halte ich Ihnen das Fahrzeug frei.\n\nViele Grüße\nIhr Mietix-Team";
+    nach.forEach(a=>{const vn=String(a.name||"").trim().split(/\s+/)[0],txt="Hallo"+(vn?" "+vn:"")+",\
+\
+ich wollte kurz nachfragen, ob unser Angebot"+(a.auto?" für den "+a.auto:"")+(a.von?" vom "+de(a.von)+(a.bis?" bis "+de(a.bis):""):"")+" noch passt. Gerne halte ich Ihnen das Fahrzeug frei.\
+\
+Viele Grüße\
+Ihr Mietix-Team";
       WA_NACH.push({t:a.name||a.nummer,i:"Angebot nachfragen"+(a.auto?", "+a.auto:""),tel:a.nummer,text:txt,mark:{anf:a.id}})});
     const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
     anf.filter(a=>a.status==="gebucht"&&a.von&&a.von<=mo&&a.von>=iso(new Date(Date.now()-864e5))&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von))
@@ -255,22 +313,60 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     alle.forEach(v=>{if(!v.telefon)return;const z=v.zahlung||{};
       // Erinnerung an die Abholung morgen
       if(v.vonD===mo&&!v.ueb&&!v.erinnert)L.push({t:v.name,i:"Erinnerung an die Abholung morgen ("+de(mo)+")",tel:v.telefon,mark:{nr:v.nr,feld:"erinnert"},
-        text:"Hallo "+vn(v.name)+",\n\nkurze Erinnerung an Ihre Abholung morgen, "+de(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
-          ((z.kaut||{}).am||v.kautionArt==="fahrzeug"?"":"\n- Kaution "+eur2(zahl((z.kaut||{}).betrag))+" €")+((z.rest||{}).am?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\n\nBis morgen!\nIhr Mietix-Team"});
+        text:"Hallo "+vn(v.name)+",\
+\
+kurze Erinnerung an Ihre Abholung morgen, "+de(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\
+\
+Bitte mitbringen:\
+- Personalausweis\
+- Führerschein"+
+          ((z.kaut||{}).am||v.kautionArt==="fahrzeug"?"":"\
+- Kaution "+eur2(zahl((z.kaut||{}).betrag))+" €")+((z.rest||{}).am?"":"\
+- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\
+\
+Bis morgen!\
+Ihr Mietix-Team"});
       // Verlängerung anbieten: Rückgabe heute, Auto morgen frei
       if(v.ueb&&v.status!=="zurück"&&v.bisD===hi&&!v.verlAngeboten&&frei(v)){const c=preis(v.auto),tp=c?verlTag(c,v):0,vs=tp?Math.min(Math.round(tp)-10,Math.max(9,Math.round(tp*0.85/10)*10-1)):0;   // 1.11.2026 Baran: Normalpreis = was der Folgetag nach den Preisregeln kostet
         L.push({t:v.name,i:"Verlängerung anbieten, "+v.auto+" ist morgen ("+de(mo)+") frei",tel:v.telefon,mark:{nr:v.nr,feld:"verlAngeboten"},
-          text:"*Ihr "+v.auto+" ist morgen noch frei*\n\nDer Wagen ist morgen, "+tagLang(mo)+", nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\n\n"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
-            "\n\nEine kurze Antwort genügt, dann verlängern wir bis morgen, "+tagLang(mo)+(v.bisU?", "+v.bisU+" Uhr":"")+".\n\nViele Grüße\nIhr Mietix-Team"})}
+          text:"*Ihr "+v.auto+" ist morgen noch frei*\
+\
+Der Wagen ist morgen, "+tagLang(mo)+", nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\
+\
+"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
+            "\
+\
+Eine kurze Antwort genügt, dann verlängern wir bis morgen, "+tagLang(mo)+(v.bisU?", "+v.bisU+" Uhr":"")+".\
+\
+Viele Grüße\
+Ihr Mietix-Team"})}
       // Kilometerpaket anbieten: Abholung heute oder morgen, noch kein Paket
       const c=preis(v.auto);
       if(!v.ueb&&(v.vonD===hi||v.vonD===mo)&&!v.paketKm&&!v.kmAngeboten&&c&&c.km&&c.km.length>1){const st=PREISE.kmStufen||[50,100,150,200,300];
         L.push({t:v.name,i:"Kilometerpaket anbieten, "+v.auto,tel:v.telefon,mark:{nr:v.nr,feld:"kmAngeboten"},
-          text:"*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\nIhr "+v.auto+", für Ihre ganze Miete:\n"+
-            st.map((k,i)=>"- +"+k.toLocaleString("de-DE")+" km für "+eur2(c.km[i+1])+" € (statt "+eur2(k*c.kmPreis)+" €)").join("\n")+"\n\nWelches Paket darf ich Ihnen dazubuchen?\n\nViele Grüße\nIhr Mietix-Team"})}
+          text:"*Mehr Kilometer, weniger zahlen*\
+\
+Sie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\
+\
+Ihr "+v.auto+", für Ihre ganze Miete:\
+"+
+            st.map((k,i)=>"- +"+k.toLocaleString("de-DE")+" km für "+eur2(c.km[i+1])+" € (statt "+eur2(k*c.kmPreis)+" €)").join("\
+")+"\
+\
+Welches Paket darf ich Ihnen dazubuchen?\
+\
+Viele Grüße\
+Ihr Mietix-Team"})}
       // Danke nach der Rückgabe heute
       if(v.status==="zurück"&&String((v.rueck||{}).datum||"").slice(0,10)===hi&&!v.bedankt)L.push({t:v.name,i:"Danke sagen, heute zurückgegeben",tel:v.telefon,mark:{nr:v.nr,feld:"bedankt"},
-        text:"Hallo "+vn(v.name)+",\n\nvielen Dank, dass Sie bei Mietix gemietet haben! Wir hoffen, Sie hatten eine tolle Zeit mit dem "+v.auto+".\n\nWir freuen uns auf das nächste Mal.\n\nViele Grüße\nIhr Mietix-Team"})});
+        text:"Hallo "+vn(v.name)+",\
+\
+vielen Dank, dass Sie bei Mietix gemietet haben! Wir hoffen, Sie hatten eine tolle Zeit mit dem "+v.auto+".\
+\
+Wir freuen uns auf das nächste Mal.\
+\
+Viele Grüße\
+Ihr Mietix-Team"})});
     L.push(...nach);WA_LISTE=L;
     const t=document.getElementById("waTitel"),k=document.getElementById("waK");t.classList.toggle("versteckt",!L.length);k.classList.toggle("versteckt",!L.length);
     t.textContent="WhatsApp heute ("+L.length+")";document.getElementById("waNext").textContent=L.length>1?"Nächste senden ("+L.length+" offen) ›":"Senden ›";
@@ -281,6 +377,84 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
     if(x.mark.anf){const l=lies("mietixAnfragen",[]),a=l.find(y=>y.id===x.mark.anf);if(a){a.nachgefasst=hi;try{localStorage.setItem("mietixAnfragen",JSON.stringify(l))}catch(e){}}}
     setTimeout(zeichne,600)}
   document.getElementById("waNext").onclick=()=>{const hi=iso(new Date());waSenden(0,hi)};
+  /* Freie Autos anbieten (01.11.2026, Baran: „ein wahrer Umsatzbringer“, Zeitraum selbst wählen, nicht nur Wochenende)
+     Zeitraum wählen, freie Autos mit Preis nach den Preisregeln, darunter frühere Kunden. Ein Tipp öffnet WhatsApp mit dem
+     freigegebenen Angebotstext (31.10.2026), Absender „Ihr Mietix-Team“. Danach steht beim Kunden „angeschrieben am …“. */
+  const plusT=(d,n)=>{const x=new Date(d+"T12:00");x.setDate(x.getDate()+n);return iso(x)};
+  const TAGL=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"],MON=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+  const tagT=d=>{const x=new Date(d+"T12:00");return TAGL[x.getDay()]+", "+x.getDate()+"."+(x.getMonth()+1)+"."};
+  const uhrT=u=>u?(u.endsWith(":00")?String(+u.slice(0,2)):u)+" Uhr":"";
+  const nG2=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
+  const autoName=a=>{const c=PREISE&&PREISE.cars.find(c=>c.n===a||c.anzeige===a||nG2(c.anzeige)===nG2(a)||nG2(c.n)===nG2(a));return c?(c.anzeige||c.n):a};
+  let ANB={vonD:"",vonU:"10:00",bisD:"",bisU:"10:00",autos:null,rabatt:10,alle:false};
+  const $a=id=>document.getElementById(id);
+  function anbTage(){const v=new Date(ANB.vonD+"T"+(ANB.vonU||"10:00")),b=new Date(ANB.bisD+"T"+(ANB.bisU||"10:00"));return Math.max(1,Math.ceil((b-v)/864e5-0.02))}
+  // Belegt im Zeitraum: Mietvertrag (nicht zurück), gebuchte Anfrage oder Sperre
+  function belegt(auto,von,bis){const ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,n=autoName(auto),gl=a=>autoName(a)===n;
+    return lies("mietixVorgaenge",[]).some(x=>!x._weg&&x.status!=="storniert"&&x.status!=="zurück"&&gl(x.auto)&&x.vonD&&x.bisD&&ue(von,bis,x.vonD,x.bisD))
+      ||lies("mietixAnfragen",[]).some(a=>!a._weg&&a.status==="gebucht"&&gl(a.auto)&&a.von&&a.bis&&!a.vertrag&&ue(von,bis,a.von,a.bis))
+      ||lies("mietixSperren",[]).some(s=>!s._weg&&gl(s.auto)&&s.von&&s.bis&&ue(von,bis,s.von,s.bis<=s.von?plusT(s.von,1):plusT(s.bis,1)))}
+  function anbAngebote(){if(!PREISE||!ANB.vonD||!ANB.bisD)return[];const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,r=Math.max(0,Math.min(50,+ANB.rabatt||0));
+    return PREISE.cars.map(c=>{const name=c.anzeige||c.n;if(belegt(name,ANB.vonD,ANB.bisD))return null;const L=Math.round(listenMiete(c,start,d));
+      let P=r?Math.round(L*(1-r/100)/10)*10:L;if(r&&P>=L)P=L-10;return{name,L,P,km:(PREISE.freiKm||150)*d}}).filter(Boolean)}
+  // Frühere Kunden: je Name die Mieten, das letzte Auto und den Monat; wer gerade mietet oder bald abholt, fällt raus
+  function anbKunden(gewaehlt){const hi=iso(new Date()),k=lies("mietixKunden",{}),M={};
+    lies("mietixVorgaenge",[]).filter(x=>!x._weg&&x.status!=="storniert"&&x.name).forEach(x=>{const n=nG2(x.name),m=M[n]=M[n]||{name:x.name,mieten:0,letzt:null,tel:"",bald:false,autos:new Set()};
+      m.mieten++;m.autos.add(autoName(x.auto));if(x.telefon)m.tel=x.telefon;if(!m.letzt||String(x.vonD)>String(m.letzt.vonD))m.letzt=x;if(x.status!=="zurück"&&String(x.bisD||"")>=hi)m.bald=true});
+    const kk=n=>Object.keys(k).find(x=>nG2(x)===n);
+    return Object.keys(M).map(n=>{const m=M[n],key=kk(n),e=key?k[key]:{};if(!m.tel&&e&&e.telefon)m.tel=e.telefon;m.key=key||m.name;m.am=(e&&e.angebotAm)||"";
+        m.passt=gewaehlt.some(a=>m.autos.has(a));return m})
+      .filter(m=>m.tel&&!m.bald&&!(k[m.key]||{})._weg)
+      .sort((a,b)=>(!!a.am-!!b.am)||(b.passt-a.passt)||((b.mieten>=2)-(a.mieten>=2))||String(b.letzt.vonD).localeCompare(String(a.letzt.vonD)))}
+  function anbText(m,ang){const we=(()=>{const v=new Date(ANB.vonD+"T12:00").getDay();return(v===5||v===6)&&anbTage()<=3&&[0,1,6].includes(new Date(ANB.bisD+"T12:00").getDay())})();
+    const eins=ang.length===1,r=+ANB.rabatt||0,l=m.letzt,mon=l&&l.vonD?MON[+String(l.vonD).slice(5,7)-1]:"";
+    const zeit=we?"am kommenden Wochenende":"von "+tagT(ANB.vonD)+", bis "+tagT(ANB.bisD)+",";
+    return "Hallo "+vn(m.name)+",\n\nwir melden uns persönlich bei Ihnen, "+zeit+" "+(eins?"ist bei uns noch ein Fahrzeug frei":"sind bei uns noch ein paar Fahrzeuge frei")+(r?", und deshalb haben wir gerade mehr Spielraum beim Preis.":".")+
+      "\n\nDieses Angebot geht nur an eine kleine Auswahl unserer Kunden, und Sie gehören dazu."+(l&&l.auto&&mon?" Nach Ihrer Fahrt im "+autoName(l.auto)+" im "+mon+" haben wir direkt an Sie gedacht.":"")+
+      "\n\nFrei von "+tagT(ANB.vonD)+(ANB.vonU?", "+uhrT(ANB.vonU):"")+" bis "+tagT(ANB.bisD)+(ANB.bisU?", "+uhrT(ANB.bisU):"")+":\n"+
+      ang.map(a=>"• "+a.name+": "+(a.P<a.L?"statt "+eur2(a.L)+" € für Sie "+eur2(a.P)+" €":eur2(a.L)+" €")+", "+a.km.toLocaleString("de-DE")+" km inklusive").join("\n")+
+      "\n\n"+(eins?"Sagen Sie uns einfach Bescheid, dann reservieren wir das Fahrzeug für Sie.":"Sagen Sie uns einfach, welches Fahrzeug Sie reizt, dann reservieren wir es für Sie.")+
+      "\n\nDas gilt nur, solange "+(eins?"das Fahrzeug frei ist.":"die Fahrzeuge frei sind.")+"\n\nViele Grüße\nIhr Mietix-Team"}
+  function anbZeichnen(){if(!$a("fAnb"))return;
+    [...document.querySelectorAll("#anbDauer span,#anbWe span")].forEach(c=>c.classList.toggle("an",c.dataset.von===ANB.vonD&&c.dataset.bis===ANB.bisD));
+    $a("anbVonD").value=ANB.vonD;$a("anbVonU").value=ANB.vonU;$a("anbBisD").value=ANB.bisD;$a("anbBisU").value=ANB.bisU;
+    const alleA=anbAngebote();if(ANB.autos===null)ANB.autos=alleA.map(a=>a.name);
+    const ang=alleA.filter(a=>ANB.autos.includes(a.name)),d=anbTage();
+    $a("anbAutosT").textContent=ANB.vonD&&ANB.bisD?"Frei in diesem Zeitraum ("+d+(d===1?" Tag":" Tage")+")":"Erst den Zeitraum wählen";
+    $a("anbAutos").innerHTML=!ANB.vonD||!ANB.bisD?"":alleA.length?alleA.map(a=>'<div class="auto'+(ANB.autos.includes(a.name)?" an":"")+'" data-a="'+esc(a.name)+'"><span class="h">✓</span><b>'+esc(a.name)+'</b><i>'+(a.P<a.L?eur2(a.P)+" € statt "+eur2(a.L)+" €":eur2(a.L)+" €")+'</i></div>').join(""):'<div class="leer">In diesem Zeitraum ist kein Auto frei.</div>';
+    document.querySelectorAll("#anbAutos [data-a]").forEach(e=>e.onclick=()=>{const n=e.dataset.a,i=ANB.autos.indexOf(n);if(i<0)ANB.autos.push(n);else ANB.autos.splice(i,1);anbZeichnen()});
+    const ks=ang.length?anbKunden(ang.map(a=>a.name)):[],zeig=ANB.alle?ks:ks.slice(0,8),hi=iso(new Date());
+    $a("anbKunden").innerHTML=!ang.length?'<div class="leer">Erst ein freies Auto wählen.</div>':!ks.length?'<div class="leer">Keine passenden Kunden mit Telefonnummer.</div>':
+      zeig.map((m,i)=>{const l=m.letzt,info=[m.mieten+(m.mieten===1?" Miete":" Mieten")+(m.mieten>=2?", Stammkunde":""),l&&l.auto?"zuletzt "+autoName(l.auto)+(l.vonD?" im "+MON[+String(l.vonD).slice(5,7)-1]:""):"",m.am?"angeschrieben am "+de(m.am):""].filter(Boolean).join(", ");
+        return '<div class="z'+(m.am?" weg":"")+'" data-k="'+i+'"><span class="uhr"></span><span class="t"><b>'+esc(m.name)+'</b><i>'+esc(info)+'</i></span><button type="button" class="chip akt">'+(m.am?"Nochmal":"Senden")+'</button></div>'}).join("")+
+      (!ANB.alle&&ks.length>8?'<a class="mehr" id="anbMehr">Alle '+ks.length+' Kunden zeigen</a>':"");
+    const me=$a("anbMehr");if(me)me.onclick=()=>{ANB.alle=true;anbZeichnen()};
+    document.querySelectorAll("#anbKunden [data-k]").forEach(z=>z.querySelector("button").onclick=()=>{const m=zeig[+z.dataset.k];
+      if(m.am&&!confirm(m.name+" wurde am "+de(m.am)+" schon angeschrieben. Trotzdem noch einmal senden?"))return;
+      window.open("https://wa.me/"+waNr2(m.tel)+"?text="+encodeURIComponent(anbText(m,ang)),"_blank");
+      const k=lies("mietixKunden",{});k[m.key]=Object.assign({},k[m.key]||{telefon:m.tel},{angebotAm:hi});try{localStorage.setItem("mietixKunden",JSON.stringify(k))}catch(e){}
+      hinweis("WhatsApp an "+vn(m.name)+" geöffnet");setTimeout(anbZeichnen,400)});
+    $a("anbVorschau").textContent=ang.length&&ks.length?anbText(ks[0],ang):"Erst Zeitraum, Auto und Kunden wählen."}
+  function anbOeffnen(von,bis,auto){if(!PREISE){hinweis("Preise werden geladen …");return}
+    if(von){ANB.vonD=von;ANB.bisD=bis}else if(!ANB.vonD){const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,1)}
+    ANB.autos=auto?[auto]:null;ANB.alle=false;mxAuf("fAnb");anbZeichnen()}
+  $a("anbKnopf").onclick=()=>anbOeffnen();
+  [...$a("anbDauer").children].forEach(c=>c.onclick=()=>{const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,+c.dataset.d);c.dataset.von=ANB.vonD;c.dataset.bis=ANB.bisD;ANB.autos=null;anbZeichnen()});
+  [...$a("anbWe").children].forEach(c=>c.onclick=()=>{const[wd,n]=c.dataset.we.split(",").map(Number),h=iso(new Date()),v=plusT(h,(wd-new Date().getDay()+7)%7);
+    ANB.vonD=v;ANB.bisD=plusT(v,n);c.dataset.von=v;c.dataset.bis=ANB.bisD;ANB.autos=null;anbZeichnen()});
+  [["anbVonD","vonD"],["anbVonU","vonU"],["anbBisD","bisD"],["anbBisU","bisU"]].forEach(([id,f])=>$a(id).addEventListener("change",()=>{ANB[f]=$a(id).value;
+    if(f==="vonD"&&ANB.bisD<=ANB.vonD)ANB.bisD=plusT(ANB.vonD,1);ANB.autos=null;anbZeichnen()}));
+  $a("anbRabatt").addEventListener("input",()=>{ANB.rabatt=+String($a("anbRabatt").value).replace(",",".")||0;anbZeichnen()});
+  // Erinnerung: in den nächsten 7 Tagen 2 oder mehr Tage am Stück frei
+  function anbFrei(){const el=$a("anbFrei");if(!el||!PREISE)return;const hi=iso(new Date()),L=[];
+    PREISE.cars.forEach(c=>{const n=c.anzeige||c.n;let a=null;for(let i=0;i<=7;i++){const d=plusT(hi,i),frei=i<7&&!belegt(n,d,plusT(d,1));
+      if(frei&&a===null)a=d;if(!frei&&a!==null){const t=Math.round((new Date(d)-new Date(a))/864e5);if(t>=2)L.push({n,von:a,bis:d,t});a=null}}});
+    L.sort((x,y)=>x.von.localeCompare(y.von)||y.t-x.t);
+    el.innerHTML=L.length?'<div class="k">'+L.slice(0,4).map((x,i)=>'<div class="z" data-f="'+i+'"><span class="uhr"></span><span class="t"><b>'+esc(x.n)+'</b><i>frei '+(x.von===hi?"ab heute":"ab "+WT[new Date(x.von+"T12:00").getDay()]+" "+de(x.von))+(x.bis>=plusT(hi,7)?", mindestens bis ":" bis ")+WT[new Date(x.bis+"T12:00").getDay()]+" "+de(x.bis)+" ("+x.t+(x.bis>=plusT(hi,7)?"+":"")+" Tage)"+'</i></span><span class="chip gruen">Anbieten ›</span></div>').join("")+'</div>':"";
+    el.querySelectorAll("[data-f]").forEach(z=>z.onclick=()=>{const x=L[+z.dataset.f];anbOeffnen(x.von,x.bis,x.n)})}
+  {const t=setInterval(()=>{if(PREISE){clearInterval(t);anbFrei()}},200)}
+  window.addEventListener("mietix-abgleich",()=>{anbFrei();if($a("fAnb").classList.contains("auf"))anbZeichnen()});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)anbFrei()});
   // Bezahlt und Kaution zurück direkt in der Zeile (31.10.2026)
   const ZA=[["bar","Bar"],["ec","EC-Karte"],["kredit","Kreditkarte"],["ueberweisung","Überweisung"]];
   function vAendern(nr,fn){const l=lies("mietixVorgaenge",[]),v=l.find(x=>x.nr===nr);if(!v)return null;fn(v);try{localStorage.setItem("mietixVorgaenge",JSON.stringify(l))}catch(e){}return v}
@@ -647,6 +821,17 @@ zeigen();abgleichen();auslagernBald();
 })();
 </script>
 <script>
+/* Fenster (30.10.2026): Knopf mit data-fenster öffnet, ✕, Tipp daneben oder Esc schließt */
+(function(){if(window.mxAuf)return;
+  let bg=document.querySelector(".mxBg");if(!bg){bg=document.createElement("div");bg.className="mxBg";document.body.appendChild(bg)}
+  window.mxAuf=function(id){const f=document.getElementById(id);if(!f)return;mxZu();bg.classList.add("auf");f.classList.add("auf");
+    document.documentElement.style.overflow="hidden";document.body.style.overflow="hidden";f.scrollTop=0};
+  window.mxZu=function(){document.querySelectorAll(".mxFenster.auf").forEach(f=>f.classList.remove("auf"));bg.classList.remove("auf");
+    document.documentElement.style.overflow="";document.body.style.overflow=""};
+  document.addEventListener("click",function(e){const k=e.target.closest("[data-fenster]");if(k){e.preventDefault();mxAuf(k.dataset.fenster);return}
+    if(e.target.closest(".mxZu")||e.target===bg)mxZu()});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")mxZu()})})();
+</script><script>
 /* Mietix App-Gefühl (31.10.2026) */
 (function(){if(window.mxApp)return;window.mxApp=1;
   const pfad=location.pathname,istStart=/mietix-zentrale\/(index\.html)?$/.test(pfad)||/\/zentrale$/.test(pfad);
