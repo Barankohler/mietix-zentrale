@@ -35,8 +35,8 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--grau);
 </style><style>/* App-Design klar (01.11.2026) */
 body{background:#F2F2F7!important}
 /* Kopfzeile wie in iOS: „‹ Start“ als rote Schrift statt Pille */
-html body header .mxStart,html body .topbar .mxStart{border:0!important;padding:4px 0!important;color:#C4161C!important;opacity:1!important;font-size:17px!important;font-weight:600!important;gap:3px!important}
-html body .mxStart b{font-size:26px!important;font-weight:400!important;line-height:17px!important;margin-top:-3px!important}
+html body header .mxStart,html body .topbar .mxStart{border:0!important;padding:5px 12px 5px 9px!important;background:#E9E9EE!important;border-radius:10px!important;color:#C4161C!important;opacity:1!important;font-size:16px!important;font-weight:600!important;gap:3px!important;line-height:1.2!important}
+html body .mxStart b{font-size:20px!important;font-weight:400!important;line-height:16px!important;margin-top:-2px!important}
 /* Karten = gruppierte Liste: weiß, rund, ohne Rand */
 .karte{border:0!important;border-radius:14px!important}
 .liste,.notiz,.n,.zeitraumF{border-radius:14px!important}
@@ -569,6 +569,10 @@ zeigen();abgleichen();auslagernBald();
     "@view-transition{navigation:auto}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}"+
     /* neue Version */
     "#mxNeu{display:none;background:#1C1C1E;color:#fff;text-align:center;font:700 14px -apple-system,Inter,system-ui,sans-serif;padding:11px 16px;cursor:pointer}#mxNeu.an{display:block}#mxNeu b{color:#FF6B6B}"+
+    /* Jeder Knopf mit hellgrauem, abgerundetem Hintergrund, nie nur farbiger Text (02.11.2026, Baran: „dann erkennt man den Button direkt“). Farbige Hauptknöpfe bleiben. */
+    ".mxStart,.abgl a,.abgl-link,#ablNeuZugang,#ablPwNeu,#ablAus,.sZur,.buZurueck,#bZurueck,#sAlle,#mLoesch,#vOrtAendern,#mVerlBez,#mKautWeg,#mEndWeg,#mEndBez,.kurz>a,a.zu,.buVerw,.zurueckA,#kZu,a.loeschen,.aend,.n a.pdf,#entwurfLeeren,#entwurfZurueck,#weiterSpaeter,.mini,.mehr>span,.mehr>a,.unten>a,.pbTipp a[data-pb],#mVerlInfo .vz>a,#uKopf>a,.mxKlein>summary{background:#E9E9EE!important;border:0!important;border-radius:10px!important;padding:6px 12px!important;text-decoration:none!important;display:inline-flex!important;align-items:center;gap:3px;line-height:1.25!important;width:auto!important;max-width:100%;box-shadow:none!important;cursor:pointer;-webkit-tap-highlight-color:transparent}"+
+    ".buVerw,.sZur,.buZurueck,#uKopf>a{display:flex!important;width:max-content!important}.buVerw{margin-left:auto!important;margin-right:auto!important}"+
+    ".mxStart{color:#C4161C!important;font-size:16px!important;font-weight:700!important;letter-spacing:0!important;padding:6px 12px 6px 9px!important}.mxStart b{margin-top:-1px;font-size:18px!important}"+
     /* PC und Mac (1.11.2026, Baran: auf allen Geräten gleich): Kopfzeile und Inhalt in einer 680-px-Spalte in der Mitte.
        Muss ganz am Ende stehen: header{padding-left:16px!important} weiter oben (und look.py davor im head) würde sonst gewinnen */
     (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}"+
