@@ -77,7 +77,7 @@ main{max-width:640px;margin:0 auto;padding:12px 16px 90px}
 .agRow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:.5px solid var(--linie)}.agRow:first-child{border-top:0}
 .agRow .t b{font-size:15px}.agRow a{flex:0 0 auto;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:13px;border-radius:999px;padding:9px 13px}
 .agRow.war a{background:#F2F2F7;color:var(--grau)}
-.meld{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1C1C1E;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30;white-space:nowrap}
+.meld{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1C1C1E;color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:95;white-space:nowrap}
 .meld.an{opacity:1}
 /* Mieten des Kunden (1.11.2026): gruppierte Liste, Zeile öffnet die Mappe */
 .knoepfe{grid-template-columns:repeat(2,1fr)}
@@ -366,13 +366,13 @@ function zeichne(){ALLE=MK.alle();const l=gefiltert();
 function oeffne(n){AUF=n;BEARB=false;karte();$("karte").classList.add("auf");$("karte").scrollTop=0;history.pushState({kunde:n},"")}
 function zu(){AUF=null;BEARB=false;$("karte").classList.remove("auf")}
 window.mxZurueck=()=>{if(AUF){if(history.state&&history.state.kunde)history.back();else zu();return true}return false};
-window.addEventListener("popstate",()=>{if(AUF)zu()});
+window.addEventListener("popstate",()=>{if(AUF&&!(history.state&&history.state.kunde))zu()});   // ein Fenster über der Kundenakte schließt nur sich selbst
 function mieteZeile(v){const V="../mietix-vertrag/",preis='<b>'+(v.preis?EUR.format(v.preis):"")+'</b>';
   if(v.alt)return'<div class="mz"><div class="mzT"><b>'+esc(v.auto||"Miete")+'</b><i>'+de(v.von)+', aus der Excel</i></div><div class="mzR">'+preis+'</div></div>';
   // Stand wie in der Mappe: zurück, unterwegs (Übergabe gemacht), sonst gebucht (Übergabe offen)
   const vg=(()=>{try{return(JSON.parse(localStorage.getItem("mietixVorgaenge")||"[]")||[]).find(x=>x&&x.nr===v.nr)||{}}catch(_){return{}}})();
   const schild=(v.status==="zurück"?'<span class="schild gruen">zurück</span>':vg.ueb?'<span class="schild rot">unterwegs</span>':'<span class="schild grau">gebucht</span>')+(v.mieteOffen?'<span class="schild gelb">offen</span>':"");
-  return'<a class="mz" href="'+V+'?nr='+encodeURIComponent(v.nr)+'&amp;zeige=mappe" data-nr="'+esc(v.nr)+'"><div class="mzT"><b>'+esc(v.auto||"Miete")+'</b><i>'+de(v.von)+(v.bis&&v.bis!==v.von?" bis "+de(v.bis):"")+", Nr. "+esc(v.nr)+'</i></div>'
+  return'<a class="mz" href="'+V+'?nr='+encodeURIComponent(v.nr)+'&amp;zeige=mappe&amp;von='+encodeURIComponent(AUF||"")+'" data-nr="'+esc(v.nr)+'"><div class="mzT"><b>'+esc(v.auto||"Miete")+'</b><i>'+de(v.von)+(v.bis&&v.bis!==v.von?" bis "+de(v.bis):"")+", Nr. "+esc(v.nr)+'</i></div>'
     +'<div class="mzR">'+preis+(schild?'<span class="schilder">'+schild+'</span>':"")+'</div><em class="mzP">›</em></a>'}
 function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="../mietix-vertrag/";
   const seit=e.vertraege.length?e.vertraege[0].von:"",sMon=seit?MON[+seit.slice(5,7)-1]+" "+seit.slice(0,4):"";
@@ -408,12 +408,12 @@ function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="
   }
   $("karte").innerHTML=h+'</div>';
   $("kZu").onclick=ev=>{ev.preventDefault();window.mxZurueck()};
-  $("kBearb").onclick=()=>{BEARB=!BEARB;karte()};
+  $("kBearb").onclick=()=>{if(BEARB){$("dSpeichern").click();return}BEARB=true;try{history.replaceState(Object.assign({},history.state||{},{bearb:1}),"")}catch(x){}karte()};   // „Fertig“ speichert (04.11.2026)
   if(BEARB){$("dKeine").onclick=()=>$("dKeine").classList.toggle("an");
     // Angefangene Änderungen kommen wieder (1.11.2026, Regel: nichts verlieren)
     const KE=window.mxEntwurf?mxEntwurf("#karte","kunde:"+e.name,["dTel","dAnschrift","dGeb","dGebort","dEmail","dNotiz"]):null;if(KE)KE.holen();
     $("dSpeichern").onclick=()=>{MK.merken(e.name,{telefon:$("dTel").value.trim(),anschrift:$("dAnschrift").value.trim(),geb:$("dGeb").value,gebort:$("dGebort").value.trim(),
-      email:$("dEmail").value.trim(),notiz:$("dNotiz").value.trim(),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;meldung("Gespeichert, auf allen Geräten.");zeichne();karte()};
+      email:$("dEmail").value.trim(),notiz:$("dNotiz").value.trim(),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;try{history.replaceState(Object.assign({},history.state||{},{bearb:0}),"")}catch(x){}meldung("Gespeichert");zeichne();karte()};
     $("dLoeschen").onclick=ev=>{ev.preventDefault();if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+" löschen? Die Mietverträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
       MK.merken(e.name,{telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true});BEARB=false;meldung("Daten gelöscht.");zeichne();karte()}}}
 /* Angebot verschicken (31.10.2026, Baran: Autos antippen, Übergabe und Rückgabe mit Datum und Uhrzeit, seriös und attraktiv) */
@@ -462,6 +462,7 @@ $("filter").querySelectorAll("span").forEach(c=>c.onclick=()=>{$("filter").query
 $("sortierung").onchange=()=>{SORT=$("sortierung").value;zeichne()};
 $("neuLos").onclick=()=>{const n=$("neuName").value.trim();if(n.split(/\s+/).length<2){meldung("Bitte Vor- und Nachname.");return}
   MK.merken(n,{telefon:$("neuTel").value.trim()});$("neuName").value="";$("neuTel").value="";mxZu();meldung("Angelegt.");zeichne();oeffne(n)};
+(()=>{const st=history.state;if(st&&st.kunde&&!location.search)setTimeout(()=>{if(MK.alle().some(e=>e.name===st.kunde)){AUF=st.kunde;BEARB=!!st.bearb;ALLE=MK.alle();karte();$("karte").classList.add("auf")}},60)})();   // Neu laden: dieselbe Akte (04.11.2026)
 (()=>{const q=new URLSearchParams(location.search).get("kunde");if(q){history.replaceState(null,"",location.pathname);setTimeout(()=>{if(MK.alle().some(e=>e.name===q))oeffne(q);else{$("suche").value=q;zeichne()}},0)}})();
 zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
@@ -689,18 +690,13 @@ function sicherheitsnetz(k,alt,neu){
   const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]=alt;
   rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
 let rueckLaeuft=false,rueckTimer=null;
-function rueckZeigen(text){let el=document.getElementById("mietixRueck");
-  if(!el){el=document.createElement("div");el.id="mietixRueck";el.innerHTML='<span></span><button type="button">Rückgängig</button>';document.body.appendChild(el);
-    el.querySelector("button").onclick=rueckgaengig}
-  el.querySelector("span").textContent="✓ Gesichert: "+text;clearTimeout(rueckTimer);
-  // nur eine Meldung zur Zeit (31.10.2026): erst wenn die Meldung der Seite weg ist, erscheint „Rückgängig“ unten
-  const andere=()=>{try{return[...document.querySelectorAll("#meldung,#zMeld,#erfolgBox.auf,.bMeld,.meld.an,#meld.an")].some(m=>m.offsetParent!==null&&getComputedStyle(m).display!=="none"&&getComputedStyle(m).opacity!=="0")}catch(e){return false}};
-  let n=0;const los=()=>{if(andere()&&n++<20){rueckTimer=setTimeout(los,200);return}el.classList.add("an");rueckTimer=setTimeout(()=>el.classList.remove("an"),6000)};los()}
+// Rückgängig steht neben dem Titel, nie über einem Knopf (Baustein in stil/schutz.py, 04.11.2026)
+function rueckZeigen(text){if(window.mxRueckZeig)window.mxRueckZeig("mietixRueck","Rückgängig: "+text,rueckgaengig)}
 function rueckgaengig(){if(!burst)return;
   if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
   try{Object.keys(b).forEach(k=>{if(b[k]===null)localStorage.removeItem(k);else roh.call(localStorage,k,b[k])})}finally{rueckLaeuft=false}
-  const el=document.getElementById("mietixRueck");if(el){el.querySelector("span").textContent="Zurückgeholt.";clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),1500)}
+  const el=document.getElementById("mietixRueck");if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
   window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
   if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
@@ -783,11 +779,7 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   ".abgl.rot{border:2px solid #C4161C}.abgl.rot b{color:#C4161C}"+
   ".abgl.status{background:none;border:0;padding:2px 4px 8px;margin-bottom:6px;font-weight:700}.abgl.status.gruen span:first-child{color:#1B8A4B}"+
   ".abgl.status.gelb{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:10px 14px}.abgl.status.rot{background:#FDECEC;color:#C4161C;border-radius:12px;padding:10px 14px}"+
-  "#mietixRueck{position:fixed;left:16px;right:16px;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateY(40px);opacity:0;pointer-events:none;z-index:9999;background:#2E2E30;color:#fff;"+
-  "border-radius:999px;padding:8px 8px 8px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 14px Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);"+
-  "transition:transform .25s;max-width:560px;margin:0 auto;white-space:nowrap}#mietixRueck span{overflow:hidden;text-overflow:ellipsis;min-width:0}"+
-  "#mietixRueck.an{transform:translateY(0);opacity:1;pointer-events:auto}#mietixRueck{transition:transform .25s,opacity .25s!important;max-width:420px!important}#mietixRueck span{flex:1 1 auto}"+
-  "#mietixRueck button{flex:0 0 auto!important;width:auto!important;min-height:0!important;height:auto!important;margin:0!important;box-shadow:none!important;background:#C4161C!important;color:#fff!important;border:0!important;border-radius:999px!important;padding:9px 14px!important;font:800 14px Inter,system-ui,sans-serif!important;cursor:pointer;display:inline-block!important}";
+  "";
 document.head.appendChild(css);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
 window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
@@ -798,10 +790,21 @@ zeigen();abgleichen();auslagernBald();
 /* Fenster (30.10.2026): Knopf mit data-fenster öffnet, ✕, Tipp daneben oder Esc schließt */
 (function(){if(window.mxAuf)return;
   let bg=document.querySelector(".mxBg");if(!bg){bg=document.createElement("div");bg.className="mxBg";document.body.appendChild(bg)}
-  window.mxAuf=function(id){const f=document.getElementById(id);if(!f)return;mxZu();bg.classList.add("auf");f.classList.add("auf");
-    document.documentElement.style.overflow="hidden";document.body.style.overflow="hidden";f.scrollTop=0};
-  window.mxZu=function(){document.querySelectorAll(".mxFenster.auf").forEach(f=>f.classList.remove("auf"));bg.classList.remove("auf");
+  // Zurück-Taste und Wischen schließen zuerst das Fenster, die Seite bleibt (04.11.2026, Baran: „wo richtig zurück ist“)
+  let imVerlauf=false;
+  const schliessen=function(){document.querySelectorAll(".mxFenster.auf").forEach(f=>f.classList.remove("auf"));bg.classList.remove("auf");
     document.documentElement.style.overflow="";document.body.style.overflow=""};
+  window.mxAuf=function(id){const f=document.getElementById(id);if(!f)return;schliessen();bg.classList.add("auf");f.classList.add("auf");
+    document.documentElement.style.overflow="hidden";document.body.style.overflow="hidden";f.scrollTop=0;
+    if(!imVerlauf){try{history.pushState(Object.assign({},history.state||{},{mxF:id}),"");imVerlauf=true}catch(e){}}};
+  // ✕ nimmt den Eintrag wieder weg. Springt die Seite im selben Moment weiter, bleibt er als „überspringen“ im Verlauf stehen.
+  let still=false,skipT=null;
+  window.mxSkipNimm=function(){if(skipT){clearTimeout(skipT);skipT=null;return 1}return 0};   // die Seite springt selbst zurück und nimmt den Eintrag gleich mit
+  window.mxZu=function(){schliessen();if(!imVerlauf)return;imVerlauf=false;try{history.replaceState(Object.assign({},history.state||{},{mxSkip:1}),"")}catch(e){}
+    skipT=setTimeout(function(){skipT=null;if(history.state&&history.state.mxSkip){still=true;history.back()}},0)};
+  addEventListener("popstate",function(e){if(still){still=false;e.stopImmediatePropagation();return}
+    if(imVerlauf){imVerlauf=false;schliessen();e.stopImmediatePropagation();return}
+    if(e.state&&e.state.mxSkip){e.stopImmediatePropagation();history.back()}},true);
   document.addEventListener("click",function(e){const k=e.target.closest("[data-fenster]");if(k){e.preventDefault();mxAuf(k.dataset.fenster);return}
     if(e.target.closest(".mxZu")||e.target===bg)mxZu()});
   document.addEventListener("keydown",function(e){if(e.key==="Escape")mxZu()})})();
@@ -837,6 +840,30 @@ zeigen();abgleichen();auslagernBald();
     zuletzt=m;mxFehler("Da hat etwas nicht geklappt ("+m.slice(0,120)+"). Bitte die Seite neu laden.",15000)};
   addEventListener("error",e=>{if(e.message)melde(e.message)});
   addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
+
+  // Doppeltipp an derselben Stelle: der zweite Tipp zählt nicht (04.11.2026, Knopf-Test: zweimal WhatsApp, nächste Zeile gelöscht)
+  document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href="#"]');if(a)e.preventDefault()},true);   // ein Link ohne Ziel springt nie im Verlauf
+  {let t0=0,x0=0,y0=0;document.addEventListener("click",e=>{if(!e.isTrusted||(e.target.closest&&e.target.closest("#tZurueck,#tVor,[data-mehrfach]")))return;const jetzt=Date.now(),nah=Math.abs(e.clientX-x0)<24&&Math.abs(e.clientY-y0)<24,zu=jetzt-t0<400&&nah;
+    if(zu&&!(e.target.closest&&e.target.closest("input,textarea,select,canvas,label"))){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();return}t0=jetzt;x0=e.clientX;y0=e.clientY},true)}
+
+  // Rückgängig: dunkler Streifen unten mit Knopf, wie die übrigen Meldungen (04.11.2026)
+  // Rückgängig-Knopf (04.11.2026, Nachtest): neben dem Titel. Rollt der Titel weg oder liegt dort schon etwas, rechts an der ersten freien Stelle. Nie über einem Knopf.
+  const RK_STIL="#mietixRueck,#mxRueckBar{display:none;width:auto;min-height:0;height:auto;margin:0;border:0;border-radius:10px;background:#E9E9EE;color:#1C1C1E;font:700 14px -apple-system,system-ui,sans-serif;padding:7px 11px;cursor:pointer;white-space:nowrap;z-index:85;box-shadow:none}#mietixRueck.an,#mxRueckBar.an{display:block}#mietixRueck::after,#mxRueckBar::after{content:'';position:absolute;left:-4px;right:-4px;top:-8px;bottom:-8px}";
+  const trifft=(el,x0,y0,w,h)=>[...document.querySelectorAll("a,button,input,select,textarea,[role=button],.chip,.kachel,.zk a,img,.leiste,.mxStart")].some(e=>{if(e===el||e.contains(el)||el.contains(e)||!e.offsetParent&&getComputedStyle(e).position!=="fixed")return false;const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.left<x0+w+4&&r.right>x0-4&&r.top<y0+h+4&&r.bottom>y0-4});
+  function rkSetzen(el){const sicht=e=>e&&e.offsetParent!==null&&e.getBoundingClientRect().height>0;
+    const platz=[document.querySelector("#karte.auf .kk"),...document.querySelectorAll("h1"),...document.querySelectorAll(".buTop")].find(sicht);
+    el.classList.add("an");const w=el.offsetWidth||103,h=el.offsetHeight||31;
+    if(platz){const r=platz.getBoundingClientRect(),y=r.top+r.height/2-h/2,x=r.right-w;const t=document.createRange();t.selectNodeContents(platz);let tr=r.left;[...platz.childNodes].forEach(n=>{if(n===el)return;try{const q=document.createRange();q.selectNodeContents(n);q.getClientRects().length&&(tr=Math.max(tr,q.getBoundingClientRect().right))}catch(e){}});
+      if(r.bottom>h&&r.top<innerHeight-h&&tr+8<x&&!trifft(el,x,y,w,h)){if(getComputedStyle(platz).position==="static")platz.style.position="relative";if(el.parentNode!==platz)platz.appendChild(el);el.style.position="absolute";el.style.right="0";el.style.top="50%";el.style.transform="translateY(-50%)";return}}
+    if(el.parentNode!==document.body)document.body.appendChild(el);el.style.position="fixed";el.style.right="16px";el.style.transform="";const xf=innerWidth-16-w;
+    for(let y=10;y<innerHeight*0.7;y+=22){if(!trifft(el,xf,y,w,h)){el.style.top=y+"px";return}}el.classList.remove("an")}
+  window.mxRueckZeig=function(id,label,fn,ms){if(!document.body)return null;if(!document.getElementById("mxRkStil")){const c=document.createElement("style");c.id="mxRkStil";c.textContent=RK_STIL;document.head.appendChild(c)}
+    let el=document.getElementById(id);if(!el){el=document.createElement("button");el.type="button";el.id=id;document.body.appendChild(el)}
+    el.textContent="Rückgängig";el.setAttribute("aria-label",label);el.onclick=()=>{el.mxWill=false;fn()};el.mxWill=true;rkSetzen(el);
+    const auf=()=>{if(el.mxWill)rkSetzen(el)};if(!el.mxS){el.mxS=1;addEventListener("scroll",auf,{passive:true,capture:true});addEventListener("resize",auf)}
+    clearTimeout(el.mxT);const ab=()=>{const bedeckt=document.querySelector(".mxFenster.auf")||(document.getElementById("ug")&&!document.getElementById("ug").classList.contains("versteckt"));if(bedeckt){el.mxT=setTimeout(ab,3000);return}el.mxWill=false;el.classList.remove("an")};el.mxT=setTimeout(ab,ms||15000);return el};
+  window.mxRueckBar=function(text,fn,ms){const m=window.meldung||window.meld||window.nkMeldung;if(m)try{m(text)}catch(x){}
+    const el=window.mxRueckZeig("mxRueckBar","Rückgängig: "+text,()=>{el.classList.remove("an");clearTimeout(el.mxT);fn()},ms)};
 
   // Entwurf: Felder eines Bereichs beim Tippen sichern
   window.mxEntwurf=function(bereich,schluessel,nur){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;

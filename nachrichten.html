@@ -358,9 +358,11 @@ alleZeigen();
 document.querySelectorAll(".miete").forEach(i=>{i.onclick=e=>e.stopPropagation();["input","change"].forEach(t=>i.addEventListener(t,()=>zeige(i.closest(".n"))))});
 function speichereEigene(k,wert){const st=lies("mietixStand",{});const n=Object.assign({},st.nachrichten||{});if(wert===null)delete n[k];else n[k]=wert;st.nachrichten=n;
   try{localStorage.setItem("mietixStand",JSON.stringify(st))}catch(e){}}
+window.addEventListener("load",()=>{document.querySelectorAll(".n").forEach(el=>{let d=null;try{d=localStorage.getItem("mietixFeld:nachricht:"+el.dataset.k)}catch(e){}if(d){el.classList.add("auf");const a=el.querySelector(".aend");if(a)a.click()}})});   // Neu laden: angefangene Änderung ist wieder offen (04.11.2026)
 document.querySelectorAll(".aend").forEach(a=>a.onclick=ev=>{ev.preventDefault();const el=a.closest(".n"),k=el.dataset.k;if(el.querySelector("textarea"))return;
   const ta=document.createElement("textarea"),TK="mietixFeld:nachricht:"+k;let ent=null;try{ent=localStorage.getItem(TK)}catch(e){}
-  ta.value=ent||eigene()[k]||BASIS[k];ta.addEventListener("input",()=>{try{localStorage.setItem(TK,ta.value)}catch(e){}});   // Entwurf beim Tippen (1.11.2026)el.querySelector("pre").style.display="none";el.querySelector(".k").style.display="none";a.style.display="none";
+  ta.value=ent||eigene()[k]||BASIS[k];ta.addEventListener("input",()=>{try{localStorage.setItem(TK,ta.value)}catch(e){}});   // Entwurf beim Tippen (1.11.2026)
+  el.querySelector("pre").style.display="none";el.querySelector(".k").style.display="none";a.style.display="none";
   const kn=document.createElement("div");kn.className="k";kn.innerHTML='<div class="kop">Speichern</div><div class="hell">Original</div><div class="hell">Abbrechen</div>';
   ta.after(kn);el.querySelector("pre").after(ta);ta.after(kn);
   const fertig=()=>{try{localStorage.removeItem(TK)}catch(e){}ta.remove();kn.remove();el.querySelector("pre").style.display="";el.querySelector(".k").style.display="";a.style.display="";zeige(el)};
@@ -616,18 +618,13 @@ function sicherheitsnetz(k,alt,neu){
   const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]=alt;
   rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
 let rueckLaeuft=false,rueckTimer=null;
-function rueckZeigen(text){let el=document.getElementById("mietixRueck");
-  if(!el){el=document.createElement("div");el.id="mietixRueck";el.innerHTML='<span></span><button type="button">Rückgängig</button>';document.body.appendChild(el);
-    el.querySelector("button").onclick=rueckgaengig}
-  el.querySelector("span").textContent="✓ Gesichert: "+text;clearTimeout(rueckTimer);
-  // nur eine Meldung zur Zeit (31.10.2026): erst wenn die Meldung der Seite weg ist, erscheint „Rückgängig“ unten
-  const andere=()=>{try{return[...document.querySelectorAll("#meldung,#zMeld,#erfolgBox.auf,.bMeld,.meld.an,#meld.an")].some(m=>m.offsetParent!==null&&getComputedStyle(m).display!=="none"&&getComputedStyle(m).opacity!=="0")}catch(e){return false}};
-  let n=0;const los=()=>{if(andere()&&n++<20){rueckTimer=setTimeout(los,200);return}el.classList.add("an");rueckTimer=setTimeout(()=>el.classList.remove("an"),6000)};los()}
+// Rückgängig steht neben dem Titel, nie über einem Knopf (Baustein in stil/schutz.py, 04.11.2026)
+function rueckZeigen(text){if(window.mxRueckZeig)window.mxRueckZeig("mietixRueck","Rückgängig: "+text,rueckgaengig)}
 function rueckgaengig(){if(!burst)return;
   if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
   try{Object.keys(b).forEach(k=>{if(b[k]===null)localStorage.removeItem(k);else roh.call(localStorage,k,b[k])})}finally{rueckLaeuft=false}
-  const el=document.getElementById("mietixRueck");if(el){el.querySelector("span").textContent="Zurückgeholt.";clearTimeout(rueckTimer);rueckTimer=setTimeout(()=>el.classList.remove("an"),1500)}
+  const el=document.getElementById("mietixRueck");if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
   window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
   if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
@@ -710,11 +707,7 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   ".abgl.rot{border:2px solid #C4161C}.abgl.rot b{color:#C4161C}"+
   ".abgl.status{background:none;border:0;padding:2px 4px 8px;margin-bottom:6px;font-weight:700}.abgl.status.gruen span:first-child{color:#1B8A4B}"+
   ".abgl.status.gelb{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:10px 14px}.abgl.status.rot{background:#FDECEC;color:#C4161C;border-radius:12px;padding:10px 14px}"+
-  "#mietixRueck{position:fixed;left:16px;right:16px;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateY(40px);opacity:0;pointer-events:none;z-index:9999;background:#2E2E30;color:#fff;"+
-  "border-radius:999px;padding:8px 8px 8px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font:600 14px Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);"+
-  "transition:transform .25s;max-width:560px;margin:0 auto;white-space:nowrap}#mietixRueck span{overflow:hidden;text-overflow:ellipsis;min-width:0}"+
-  "#mietixRueck.an{transform:translateY(0);opacity:1;pointer-events:auto}#mietixRueck{transition:transform .25s,opacity .25s!important;max-width:420px!important}#mietixRueck span{flex:1 1 auto}"+
-  "#mietixRueck button{flex:0 0 auto!important;width:auto!important;min-height:0!important;height:auto!important;margin:0!important;box-shadow:none!important;background:#C4161C!important;color:#fff!important;border:0!important;border-radius:999px!important;padding:9px 14px!important;font:800 14px Inter,system-ui,sans-serif!important;cursor:pointer;display:inline-block!important}";
+  "";
 document.head.appendChild(css);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
 window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
@@ -753,6 +746,30 @@ zeigen();abgleichen();auslagernBald();
     zuletzt=m;mxFehler("Da hat etwas nicht geklappt ("+m.slice(0,120)+"). Bitte die Seite neu laden.",15000)};
   addEventListener("error",e=>{if(e.message)melde(e.message)});
   addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
+
+  // Doppeltipp an derselben Stelle: der zweite Tipp zählt nicht (04.11.2026, Knopf-Test: zweimal WhatsApp, nächste Zeile gelöscht)
+  document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href="#"]');if(a)e.preventDefault()},true);   // ein Link ohne Ziel springt nie im Verlauf
+  {let t0=0,x0=0,y0=0;document.addEventListener("click",e=>{if(!e.isTrusted||(e.target.closest&&e.target.closest("#tZurueck,#tVor,[data-mehrfach]")))return;const jetzt=Date.now(),nah=Math.abs(e.clientX-x0)<24&&Math.abs(e.clientY-y0)<24,zu=jetzt-t0<400&&nah;
+    if(zu&&!(e.target.closest&&e.target.closest("input,textarea,select,canvas,label"))){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();return}t0=jetzt;x0=e.clientX;y0=e.clientY},true)}
+
+  // Rückgängig: dunkler Streifen unten mit Knopf, wie die übrigen Meldungen (04.11.2026)
+  // Rückgängig-Knopf (04.11.2026, Nachtest): neben dem Titel. Rollt der Titel weg oder liegt dort schon etwas, rechts an der ersten freien Stelle. Nie über einem Knopf.
+  const RK_STIL="#mietixRueck,#mxRueckBar{display:none;width:auto;min-height:0;height:auto;margin:0;border:0;border-radius:10px;background:#E9E9EE;color:#1C1C1E;font:700 14px -apple-system,system-ui,sans-serif;padding:7px 11px;cursor:pointer;white-space:nowrap;z-index:85;box-shadow:none}#mietixRueck.an,#mxRueckBar.an{display:block}#mietixRueck::after,#mxRueckBar::after{content:'';position:absolute;left:-4px;right:-4px;top:-8px;bottom:-8px}";
+  const trifft=(el,x0,y0,w,h)=>[...document.querySelectorAll("a,button,input,select,textarea,[role=button],.chip,.kachel,.zk a,img,.leiste,.mxStart")].some(e=>{if(e===el||e.contains(el)||el.contains(e)||!e.offsetParent&&getComputedStyle(e).position!=="fixed")return false;const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.left<x0+w+4&&r.right>x0-4&&r.top<y0+h+4&&r.bottom>y0-4});
+  function rkSetzen(el){const sicht=e=>e&&e.offsetParent!==null&&e.getBoundingClientRect().height>0;
+    const platz=[document.querySelector("#karte.auf .kk"),...document.querySelectorAll("h1"),...document.querySelectorAll(".buTop")].find(sicht);
+    el.classList.add("an");const w=el.offsetWidth||103,h=el.offsetHeight||31;
+    if(platz){const r=platz.getBoundingClientRect(),y=r.top+r.height/2-h/2,x=r.right-w;const t=document.createRange();t.selectNodeContents(platz);let tr=r.left;[...platz.childNodes].forEach(n=>{if(n===el)return;try{const q=document.createRange();q.selectNodeContents(n);q.getClientRects().length&&(tr=Math.max(tr,q.getBoundingClientRect().right))}catch(e){}});
+      if(r.bottom>h&&r.top<innerHeight-h&&tr+8<x&&!trifft(el,x,y,w,h)){if(getComputedStyle(platz).position==="static")platz.style.position="relative";if(el.parentNode!==platz)platz.appendChild(el);el.style.position="absolute";el.style.right="0";el.style.top="50%";el.style.transform="translateY(-50%)";return}}
+    if(el.parentNode!==document.body)document.body.appendChild(el);el.style.position="fixed";el.style.right="16px";el.style.transform="";const xf=innerWidth-16-w;
+    for(let y=10;y<innerHeight*0.7;y+=22){if(!trifft(el,xf,y,w,h)){el.style.top=y+"px";return}}el.classList.remove("an")}
+  window.mxRueckZeig=function(id,label,fn,ms){if(!document.body)return null;if(!document.getElementById("mxRkStil")){const c=document.createElement("style");c.id="mxRkStil";c.textContent=RK_STIL;document.head.appendChild(c)}
+    let el=document.getElementById(id);if(!el){el=document.createElement("button");el.type="button";el.id=id;document.body.appendChild(el)}
+    el.textContent="Rückgängig";el.setAttribute("aria-label",label);el.onclick=()=>{el.mxWill=false;fn()};el.mxWill=true;rkSetzen(el);
+    const auf=()=>{if(el.mxWill)rkSetzen(el)};if(!el.mxS){el.mxS=1;addEventListener("scroll",auf,{passive:true,capture:true});addEventListener("resize",auf)}
+    clearTimeout(el.mxT);const ab=()=>{const bedeckt=document.querySelector(".mxFenster.auf")||(document.getElementById("ug")&&!document.getElementById("ug").classList.contains("versteckt"));if(bedeckt){el.mxT=setTimeout(ab,3000);return}el.mxWill=false;el.classList.remove("an")};el.mxT=setTimeout(ab,ms||15000);return el};
+  window.mxRueckBar=function(text,fn,ms){const m=window.meldung||window.meld||window.nkMeldung;if(m)try{m(text)}catch(x){}
+    const el=window.mxRueckZeig("mxRueckBar","Rückgängig: "+text,()=>{el.classList.remove("an");clearTimeout(el.mxT);fn()},ms)};
 
   // Entwurf: Felder eines Bereichs beim Tippen sichern
   window.mxEntwurf=function(bereich,schluessel,nur){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
