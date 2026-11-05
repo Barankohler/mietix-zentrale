@@ -392,7 +392,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
       alle.filter(x=>x.status!=="zurück"&&x.auto&&x.vonD&&x.bisD).forEach(x=>bl.push({a:x.auto,v:x.vonD+"T"+(x.vonU||"10:00"),b:x.bisD+"T"+(x.bisU||"10:00"),w:x.name}));
       anf.filter(a=>a.status==="gebucht"&&a.auto&&a.von&&a.bis&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.auto===a.auto&&ue(a.von,a.bis,x.vonD,x.bisD)))
         .forEach(a=>bl.push({a:a.auto,v:a.von+"T"+(a.vonU||"10:00"),b:a.bis+"T"+(a.bisU||"10:00"),w:a.name||"Buchung"}));
-      lies("mietixSperren",[]).forEach(s=>{if(s.auto&&s.von&&s.bis&&!s._weg)bl.push({a:s.auto,v:s.von+"T00:00",b:s.bis+"T23:59",w:"Sperre"})});
+      lies("mietixSperren",[]).forEach(s=>{if(s.auto&&s.von&&s.bis&&!s._weg)bl.push({a:s.auto,v:s.von+"T00:00",b:s.bis+"T23:59",w:"selbst gesperrt bis "+s.bis.split("-").reverse().join(".").slice(0,6)+(s.grund?": "+s.grund:"")})});
       const bis2=mo+"T23:59",schon={};
       bl.forEach((x,i)=>bl.forEach((y,j)=>{if(j<=i||x.a!==y.a||!ue(x.v,x.b,y.v,y.b))return;const ab=x.v>y.v?x.v:y.v;if(ab>bis2||(x.b<hi&&y.b<hi))return;
         const key=x.a+x.w+y.w;if(schon[key])return;schon[key]=1;
@@ -597,6 +597,9 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     lies("mietixAnfragen",[]).forEach(a=>{if(!a._weg&&a.status==="gebucht"&&gl(a.auto)&&a.von&&a.bis&&!a.vertrag&&ue(von,bis,a.von,a.bis))L.push(a.bis)});
     lies("mietixSperren",[]).forEach(z=>{if(!z._weg&&gl(z.auto)&&z.von&&z.bis&&ue(von,bis,z.von,plusT(z.bis,1)))L.push(plusT(z.bis,1))});
     return L.sort().pop()||""}
+  // Liegt das Auto wegen einer eigenen Sperre fest: klar benennen (05.11.2026)
+  function gesperrtText(auto,von,bis){const ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,n=autoName(auto),gl=a=>autoName(a)===n,L=belegtBis(auto,von,bis),s=lies("mietixSperren",[]).find(z=>!z._weg&&gl(z.auto)&&z.von&&z.bis&&ue(von,bis,z.von,plusT(z.bis,1))&&plusT(z.bis,1)===L);
+    return s?"selbst gesperrt bis "+s.bis.split("-").reverse().join(".").slice(0,6)+(s.grund?": "+s.grund:""):""}
   function anbAngebote(){if(!PREISE||!ANB.vonD||!ANB.bisD)return[];const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,r=Math.max(0,Math.min(90,+ANB.rabatt||0));
     return PREISE.cars.map(c=>{const name=c.anzeige||c.n;if(belegt(name,ANB.vonD,ANB.bisD))return null;const roh=listenMiete(c,start,d),L=Math.round(roh);
       const P=Math.round(roh*(1-r/100));return{name,L,P,km:(PREISE.freiKm||150)*d}}).filter(Boolean)}
@@ -629,9 +632,9 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     const ang=alleA.filter(a=>ANB.autos.includes(a.name)),d=anbTage();
     $a("anbAutosT").textContent=ANB.vonD&&ANB.bisD?(alleA.length?"Autos antippen, "+alleA.length+" frei für "+d+(d===1?" Tag":" Tage"):"Kein Auto frei für "+d+(d===1?" Tag":" Tage")):"Erst den Zeitraum wählen";
     // alle Autos: freie mit Preis pro Tag und Gesamtpreis, belegte grau mit „wieder frei“ (wie im Angebot)
-    const weg=PREISE.cars.map(c=>c.anzeige||c.n).filter(n=>!alleA.some(a=>a.name===n)).map(n=>({n,bis:belegtBis(n,ANB.vonD,ANB.bisD)})),kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
+    const weg=PREISE.cars.map(c=>c.anzeige||c.n).filter(n=>!alleA.some(a=>a.name===n)).map(n=>({n,bis:belegtBis(n,ANB.vonD,ANB.bisD),sp:gesperrtText(n,ANB.vonD,ANB.bisD)})),kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
     $a("anbAutos").innerHTML=!ANB.vonD||!ANB.bisD?"":alleA.map(a=>{const an=ANB.autos.includes(a.name);return '<div class="auto'+(an?" an":"")+'" data-a="'+esc(a.name)+'"><span class="n"><b>'+(an?'<span class="haken">✓</span>':"")+esc(a.name)+'</b><i>'+eur2(Math.round(a.P/d))+' € pro Tag, '+a.km.toLocaleString("de-DE")+' km inklusive</i></span><span class="p">'+eur2(a.P)+' €'+(a.P<a.L?'<i>statt '+eur2(a.L)+' €</i>':"")+'</span></div>'}).join("")+
-      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>belegt'+(x.bis?", wieder frei "+kz(x.bis):"")+'</i></span><span class="p"></span></div>').join("")||'<div class="leer">Keine Autos</div>';
+      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>'+(x.sp?esc(x.sp):'belegt'+(x.bis?", wieder frei "+kz(x.bis):""))+'</i></span><span class="p"></span></div>').join("")||'<div class="leer">Keine Autos</div>';
     document.querySelectorAll("#anbAutos [data-a]").forEach(e=>e.onclick=()=>{const n=e.dataset.a,i=ANB.autos.indexOf(n);if(i<0)ANB.autos.push(n);else ANB.autos.splice(i,1);anbZeichnen()});
     const ks=ang.length?anbKunden(ang.map(a=>a.name)):[],zeig=ANB.alle?ks:ks.slice(0,8),hi=iso(new Date());
     $a("anbWeiter").disabled=!ang.length;$a("anbWeiter").textContent=ang.length?"Weiter zu den Kunden ›":"Erst ein Auto antippen";
@@ -677,16 +680,16 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
   // Karte: alle Autos für den gewählten Zeitraum (01.11.2026, wie im Angebot): frei mit Preis pro Tag und Gesamtpreis, belegt grau mit „wieder frei“
   function anbFrei(){const el=$a("anbFrei");if(!el||!PREISE)return;if(!ANB.vonD){const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,3);anbZeitraum()}
     const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x),frei=[],weg=[];
-    PREISE.cars.forEach(c=>{const n=c.anzeige||c.n;if(belegt(n,ANB.vonD,ANB.bisD))weg.push({n,bis:belegtBis(n,ANB.vonD,ANB.bisD)});else frei.push({n,L:Math.round(listenMiete(c,start,d))})});
+    PREISE.cars.forEach(c=>{const n=c.anzeige||c.n;if(belegt(n,ANB.vonD,ANB.bisD))weg.push({n,bis:belegtBis(n,ANB.vonD,ANB.bisD),sp:gesperrtText(n,ANB.vonD,ANB.bisD)});else frei.push({n,L:Math.round(listenMiete(c,start,d))})});
     $a("anbKT").textContent=frei.length;$a("anbKT").classList.toggle("null",!frei.length);
     const kn=frei.length?anbKunden(frei.map(x=>x.n)).length:0;
     $a("anbKZahl").textContent=!frei.length?"In dieser Zeit ist kein Auto frei.":kn?kn+(kn===1?" früherer Kunde passt":" frühere Kunden passen")+", Stammkunden zuerst":"Noch keine früheren Kunden mit Telefonnummer.";
     $a("anbStart").disabled=!frei.length||!kn;
     el.innerHTML=frei.map(x=>'<span data-a="'+esc(x.n)+'" title="'+esc(x.n)+', '+eur2(x.L)+' €">'+esc(kurzA(x.n))+'</span>').join("")+
-      weg.map(x=>'<span class="weg" title="'+esc(x.n)+(x.bis?", wieder frei "+kz(x.bis):"")+'">'+esc(kurzA(x.n))+'</span>').join("");
+      weg.map(x=>'<span class="weg" title="'+esc(x.n)+(x.sp?" "+esc(x.sp):x.bis?", wieder frei "+kz(x.bis):"")+'">'+esc(kurzA(x.n))+'</span>').join("");
     el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a));return;
     el.innerHTML=frei.map(x=>'<div class="auto" data-a="'+esc(x.n)+'"><span class="n"><b>'+esc(x.n)+'</b><i>'+eur2(Math.round(x.L/d))+' € pro Tag</i></span><span class="p">'+eur2(x.L)+' €</span></div>').join("")+
-      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>belegt'+(x.bis?", wieder frei "+kz(x.bis):"")+'</i></span><span class="p"></span></div>').join("");
+      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>'+(x.sp?esc(x.sp):'belegt'+(x.bis?", wieder frei "+kz(x.bis):""))+'</i></span><span class="p"></span></div>').join("");
     el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a))}
   {const t=setInterval(()=>{if(PREISE){clearInterval(t);anbFrei();anbZeitraum()}},200)}
   window.addEventListener("mietix-abgleich",()=>{anbFrei();if($a("fAnb").classList.contains("auf"))anbZeichnen()});
