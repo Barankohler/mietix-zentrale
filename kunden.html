@@ -433,12 +433,12 @@ function agAutos(){const autos=FLOTTE||Object.keys((()=>{try{return JSON.parse(l
   $("agAutos").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{if(c.classList.contains("belegt")){meldung("In dem Zeitraum schon vergeben");return}const a=c.dataset.a;AG_AUTOS.has(a)?AG_AUTOS.delete(a):AG_AUTOS.add(a);agAutos();agListe()})}
 function agText(e){const vn=String(e.name||"").trim().split(/\s+/)[0],v=$("agVon").value,b=$("agBis").value,autos=[...AG_AUTOS];
   if(!v||!b||!autos.length)return"";
-  return "Hallo "+vn+",\n\nfür Ihren nächsten Ausflug haben wir noch "+(autos.length===1?"ein Fahrzeug":"Fahrzeuge")+" frei:\n\n"+autos.map(a=>"- "+a).join("\n")+
+  return "Für Ihren nächsten Ausflug haben wir noch "+(autos.length===1?"ein Fahrzeug":"Fahrzeuge")+" frei:\n\n"+autos.map(a=>"- "+a).join("\n")+
     "\n\nÜbergabe: "+lang(v)+", "+$("agVonU").value+" Uhr\nRückgabe: "+lang(b)+", "+$("agBisU").value+" Uhr\n\n"+
     (e.mieten>=2?"Als Stammkunde erhalten Sie bei uns einen besonders guten Preis.":"Wir machen Ihnen gern ein faires Angebot.")+
-    " Möchten Sie "+(autos.length===1?"das Fahrzeug":"eines der Fahrzeuge")+" reservieren? Eine kurze Antwort genügt.\n\nViele Grüße\nIhr Mietix-Team"}
+    " Möchten Sie "+(autos.length===1?"das Fahrzeug":"eines der Fahrzeuge")+" reservieren? Eine kurze Antwort genügt."}
 function agListe(){const nur=$("agNurStamm").classList.contains("an"),bereit=$("agVon").value&&$("agBis").value&&AG_AUTOS.size;
-  $("agVorschau").textContent=bereit?agText({name:"Vorname",mieten:nur?2:1}).replace("Hallo Vorname,","Hallo {Vorname},"):"Zeitraum wählen und mindestens ein Fahrzeug antippen.";
+  $("agVorschau").textContent=bereit?agText({name:"Vorname",mieten:nur?2:1}):"Zeitraum wählen und mindestens ein Fahrzeug antippen.";
   const l=ALLE.filter(e=>e.telefon&&!e.keineAngebote&&!e.gesperrt&&!e.warn.length&&(nur?e.mieten>=2:e.mieten>=1))
     .map(e=>Object.assign({war:e.angeschrieben&&tageSeit(e.angeschrieben)<14},e))
     .sort((a,b)=>((a.war?1:0)-(b.war?1:0))||(b.mieten-a.mieten)||((b.zuletzt||"")<(a.zuletzt||"")?-1:1));
