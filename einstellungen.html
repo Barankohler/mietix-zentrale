@@ -127,7 +127,9 @@ document.getElementById("kopieren").onclick=async function(){const k=this,alt=k.
      schickt sie hoch und holt neue Stände der anderen Geräte (beim Start, beim Zurückkehren zur Seite, jede Minute).
    - Ohne Internet oder ohne Anmeldung läuft alles wie vorher, der Abgleich holt später nach.
    - Gelöschte Einträge (Anfragen-Buch) gehen als {_weg:true} hoch, damit sie auch auf den anderen Geräten verschwinden.
-   - Anmeldung: E-Mail und Passwort, einmal pro Gerät. Gilt für alle Mietix-Werkzeuge auf barankohler.github.io. */
+   - Anmeldung: E-Mail und Passwort, einmal pro Gerät. Gilt für alle Mietix-Werkzeuge auf barankohler.github.io.
+   - Seit 05.11.2026: Hochladen nur, wenn der Eintrag oben noch so ist wie beim Holen. Sonst neu holen und zusammenführen.
+     Beschädigte Listen gehen nie hoch, viele Löschungen auf einmal nur nach Rückfrage. SQL dazu: aenderung_2026_11_05.sql */
 (function(){
 const URL_="https://zbeqrwvlmiulxvhryiku.supabase.co";
 const KEY="sb_publishable_LVkvpgXMpBbq_OXgwOfTqg_ZRcRkFyQ";   // öffentlich gedacht, Schutz über Anmeldung und Regeln in der Datenbank
@@ -137,9 +139,14 @@ const SPEICHER={mietixVorgaenge:{tab:"vorgaenge",pk:"nr",liste:true},mietixAnfra
   mietixAufgaben:{tab:"aufgaben",pk:"id",liste:true},mietixZustand:{tab:"zustand",pk:"id",liste:true},mietixAutos:{tab:"autos",pk:"name",liste:false},mietixStand:{tab:"stand",pk:"id",liste:false},mietixPapierkorb:{tab:"papierkorb",pk:"id",liste:true}};
 const roh=Storage.prototype.setItem;
 const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+// Eine Ablage lesen und dabei unterscheiden (05.11.2026): fehlt = gar nichts da, kaputt = da, aber nicht lesbar. Beides darf nie als „alles gelöscht“ hochgehen.
+function liesAblage(k){const c=SPEICHER[k],leer=c.liste?[]:{},r=localStorage.getItem(k);if(r===null||r==="")return{w:leer,fehlt:true};
+  try{const w=JSON.parse(r);if(w===null)return{w:leer,fehlt:true};if(c.liste?Array.isArray(w):(w&&typeof w==="object"&&!Array.isArray(w)))return{w}}catch(e){}
+  return{w:leer,kaputt:true}}
 const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v));return true}catch(e){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll. Seite offen lassen, sonst geht etwas verloren.");return false}};   // Hinweis auch hier (1.11.2026)
 // Jede Anfrage an den Speicher höchstens 20 Sekunden (31.10.2026): sonst hing der Abgleich bei schlechtem Netz für immer
-const holeMit=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);return fetch(u,Object.assign({},o,{signal:c.signal})).finally(()=>clearTimeout(t))};
+const KEINE_VERBINDUNG="Keine Verbindung, wird nachgeholt";   // statt „Failed to fetch“ und „signal is aborted“ (05.11.2026)
+const holeMit=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);return fetch(u,Object.assign({},o,{signal:c.signal})).catch(()=>{throw new Error(KEINE_VERBINDUNG)}).finally(()=>clearTimeout(t))};
 const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)};
 /* ---------- Unterschriften im eigenen Gerätespeicher (31.10.2026, Baran: auch bei 100 Mietverträgen flüssig, iPad, Handy, Laptop) ----------
    localStorage hat in Safari nur 5 MB. Bilder (data:image…) liegen darum in IndexedDB (viel größer), in localStorage steht nur "bild:<Kennung>".
@@ -197,6 +204,9 @@ async function auslagern(){if(ausLauf){auslagernBald();return}ausLauf=true;
       if(k in SPEICHER)merk("mietixAbgleich",H);roh.call(localStorage,k,JSON.stringify(s))}}
   catch(e){}finally{ausLauf=false}}
 let NEU_AUFBAU=false,sitzung=lies("mietixSitzung",null),laeuft=false,nochmal=false,zuletzt=null,fehler="";
+// ungesichert: hier wurde etwas geändert, das noch nicht oben ist. FRAGEN: was Baran entscheiden muss. HINWEISE: bleibt rot stehen, bis er es wegtippt (05.11.2026)
+let ungesichert=false,aenderungen=0,FRAGEN=[],HINWEISE=lies("mietixAbgleichHinweise",[]);const LOESCH={};
+function hinweis(text){if(!HINWEISE.includes(text)){HINWEISE=HINWEISE.concat([text]).slice(-5);merk("mietixAbgleichHinweise",HINWEISE)}if(window.mxFehler)mxFehler(text)}
 
 /* ---------- Anmeldung ---------- */
 async function auth(pfad,body){const r=await holeMit(URL_+"/auth/v1/"+pfad,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
@@ -206,7 +216,7 @@ function sichern(j){sitzung={token:j.access_token,neu:j.refresh_token,bis:Date.n
 async function token(){if(!sitzung)return null;
   if(Date.now()>sitzung.bis){try{sichern(await auth("token?grant_type=refresh_token",{refresh_token:sitzung.neu}))}
     // Abmelden nur, wenn der Speicher die Anmeldung wirklich ablehnt, nicht bei schlechtem Netz (30.10.2026)
-    catch(e){if(e.status>=400&&e.status<500){sitzung=null;localStorage.removeItem("mietixSitzung");zeigen()}return null}}
+    catch(e){if(e.status>=400&&e.status<500){sitzung=null;localStorage.removeItem("mietixSitzung");zeigen();return null}throw e}}
   return sitzung.token}
 async function api(pfad,opt){const t=await token();if(!t)throw new Error("nicht angemeldet");
   const r=await holeMit(URL_+"/rest/v1/"+pfad,Object.assign({},opt,{headers:Object.assign({apikey:KEY,Authorization:"Bearer "+t,"Content-Type":"application/json"},(opt||{}).headers||{})}));
@@ -224,7 +234,9 @@ function ausMap(k,m){const c=SPEICHER[k];if(!c.liste)return m;return Object.keys
    - Geändert schlägt Gelöscht: wird ein Eintrag hier geändert und dort gelöscht, bleibt er da.
    - Beim Holen wird zwei Minuten überlappend gefragt, damit kein Eintrag wegen ungleich gehender Uhren fehlt. */
 const UEBERLAPPUNG=2*60*1000;
-const FELDWEISE={mietixVorgaenge:1,mietixAnfragen:1,mietixKunden:1,mietixFahrzeuge:1,mietixAutos:1,mietixStand:1};
+const FELDWEISE={mietixVorgaenge:1,mietixAnfragen:1,mietixKunden:1,mietixFahrzeuge:1,mietixAutos:1,mietixStand:1,mietixAusgaben:1,mietixSperren:1,mietixAufgaben:1,mietixZustand:1};
+const HANDVOLL=5;   // mehr Löschungen auf einmal gehen nur nach Rückfrage hoch (Papierkorb räumt sich selbst auf, Stand sind Entwürfe)
+const MEHRZAHL={mietixVorgaenge:"Mietverträge",mietixAnfragen:"Anfragen",mietixKunden:"Kunden",mietixFahrzeuge:"Fahrzeuge",mietixAusgaben:"Ausgaben",mietixSperren:"Sperren",mietixAufgaben:"Aufgaben",mietixZustand:"Zustände",mietixAutos:"Autos",mietixStand:"Entwürfe",mietixPapierkorb:"Papierkorb"};
 // Inhalt unabhängig von der Reihenfolge der Felder (die Datenbank sortiert Felder um)
 const ordne=x=>istBild(x)?marke(x):Array.isArray(x)?x.map(ordne):x&&typeof x==="object"?Object.keys(x).sort().reduce((o,n)=>{o[n]=ordne(x[n]);return o},{}):x;
 const fp=x=>hash(JSON.stringify(ordne(x))===undefined?"":JSON.stringify(ordne(x)));
@@ -245,6 +257,7 @@ function zusammen(k,p,lokal,server,basisHash,basisFelder){
   const lokalGeaendert=lokal===undefined?(basisHash!==undefined&&basisHash!=="weg"):!gleichBasis(lokal,basisHash);
   if(server&&server._weg){if(lokal===undefined)return undefined;
     if(basisHash!==undefined&&lokalGeaendert)return lokal;          // hier geändert, dort gelöscht: bleibt da
+    if(basisHash===undefined&&!NEU_AUFBAU)andereFassung(k,p,lokal);   // hier neu, dort gelöscht: nicht still weg (05.11.2026)
     return undefined}
   if(lokal===undefined){if(basisHash!==undefined&&basisHash!=="weg"&&gleichBasis(server,basisHash))return undefined; // hier gelöscht, dort unverändert
     return server}
@@ -270,53 +283,97 @@ function zusammen(k,p,lokal,server,basisHash,basisFelder){
     if(streit)andereFassung(k,p,server);
     return out}
   andereFassung(k,p,server);return lokal}
+/* Gleiche Nummer, anderer Name (05.11.2026, zwei Geräte ohne Netz): zwei verschiedene Mietverträge. Beide bleiben, der spätere bekommt eine neue Nummer. */
+const nameGleich=(a,b)=>String(a||"").toLowerCase().replace(/\s+/g,"")===String(b||"").toLowerCase().replace(/\s+/g,"");
+const andererKunde=(a,b)=>!!(a&&b&&!b._weg&&String(a.name||"").trim()&&String(b.name||"").trim()&&!nameGleich(a.name,b.name));
+function freieNummer(m){let max=+(localStorage.getItem("mietixHoechsteNr")||0)||0;const nimm=s=>{if(/^\d{6}$/.test(String(s))&&+s>max)max=+s};
+  Object.keys(m).forEach(nimm);lies("mietixPapierkorb",[]).forEach(x=>{if(x&&x.ablage==="mietixVorgaenge")nimm(x.schluessel)});return String(max+1).padStart(6,"0")}
+function nummerGewechselt(m,alt,eintrag,neu){m[neu]=Object.assign({},eintrag,{nr:neu});
+  try{if(+neu>(+(localStorage.getItem("mietixHoechsteNr")||0)||0))roh.call(localStorage,"mietixHoechsteNr",String(+neu))}catch(e){}
+  hinweis("Die Nummer "+alt+" gab es zweimal. "+(eintrag.name||"Dieser Mietvertrag")+" hat jetzt Mietvertrag "+neu+". Schon ausgedruckt oder verschickt? Bitte neu ausgeben.");
+  window.dispatchEvent(new CustomEvent("mietix-nummer-neu",{detail:{alt,neu,name:eintrag.name||""}}))}
+// Holen, zusammenführen, hochladen. Geht ein Eintrag oben nicht mehr auf den geholten Stand, wird nur er neu geholt und die Runde wiederholt.
+async function ablageAbgleichen(k,c,h,zeilen,geholt){
+  for(let runde=0;;runde++){let anders=false;const l0=liesAblage(k);if(l0.kaputt)throw new Error(MEHRZAHL[k]+" auf diesem Gerät sind beschädigt, nichts davon wurde hochgeladen");const m2=alsMap(k,l0.w),doppelt=[];
+    zeilen.forEach(z=>{const p=String(z[c.pk]);if(z.geaendert>h.zeit)h.zeit=z.geaendert;h.ver[p]=z.geaendert;
+      if(k==="mietixVorgaenge"&&h.hash[p]===undefined&&andererKunde(m2[p],z.daten)&&fp(m2[p])!==fp(z.daten)){doppelt.push([p,m2[p]]);delete m2[p];anders=true}
+      const gleichB=x=>x===undefined?undefined:JSON.stringify(durch(x,y=>istBild(y)?marke(y):y));   // Bild und sein Verweis "bild:…" gelten als gleich (1.11.2026: sonst Dauerschleife, Seite sprang)
+      const vorher=p in m2?gleichB(m2[p]):undefined;
+      const ergebnis=zusammen(k,p,m2[p],z.daten,h.hash[p],h.felder[p]);
+      if(ergebnis===undefined){if(p in m2){delete m2[p];anders=true}}
+      else if(gleichB(ergebnis)!==vorher){m2[p]=ergebnis;anders=true}
+      // Grundlage für das nächste Mal ist jetzt der gemeinsame Stand
+      if(z.daten&&z.daten._weg){h.hash[p]="weg";delete h.felder[p]}
+      else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
+    for(const [alt,eintrag] of doppelt){let neu=await window.mietixNeueNummer();if(!neu||neu in m2)neu=freieNummer(m2);nummerGewechselt(m2,alt,eintrag,neu)}
+    if(anders){let w=ausMap(k,m2);try{w=await sicherRaus(k,w,{[k]:h})}catch(e){}
+      if(!merk(k,w))throw new Error("Speicher auf diesem Gerät voll");if(!geholt.includes(k))geholt.push(k)}
+    // hoch: alles, was hier anders ist als der gemeinsame Stand (auch Gelöschtes). Die Zeit nie hinter dem gehen, was schon oben steht: So fällt ein Gerät mit falscher Uhr auch ohne Datenbank-Regel nicht durchs Raster.
+    const m=alsMap(k,liesAblage(k).w),jetzt=new Date(Math.max(Date.now(),h.zeit?new Date(h.zeit).getTime()+1:0)).toISOString(),hoch=[];
+    let ohneBild=0;
+    for(const p of Object.keys(m)){if(gleichBasis(m[p],h.hash[p])){h.hash[p]=fp(m[p]);continue}
+      const daten=await bilderRein(m[p]);if(daten===null){ohneBild++;continue}   // nie eine Kennung statt Unterschrift hochschicken
+      hoch.push({[c.pk]:p,daten,geaendert:jetzt})}
+    // Löschen: viele auf einmal warten auf Baran
+    const frei=h.frei||[];delete h.frei;if(h.halt){h.halt=h.halt.filter(p=>!(p in m));if(!h.halt.length)delete h.halt}
+    const weg=Object.keys(h.hash).filter(p=>!(p in m)&&h.hash[p]!=="weg"&&!frei.includes(p)&&!(h.halt||[]).includes(p));
+    if(k!=="mietixPapierkorb"&&k!=="mietixStand"&&(weg.length>HANDVOLL||(weg.length>=3&&!Object.keys(m).length))){h.halt=(h.halt||[]).concat(weg)}
+    else weg.concat(frei).forEach(p=>{if(!(p in m)&&h.hash[p]!=="weg")hoch.push({[c.pk]:p,daten:{_weg:true},geaendert:jetzt})});
+    const streit=await hochladen(k,c,h,hoch);
+    if(!streit.length)return{m,ohneBild};
+    if(runde>=3){nochmal=true;throw new Error("Ein anderes Gerät speichert gerade, wird nachgeholt")}
+    zeilen=[];for(const p of streit){const z=await api(c.tab+"?select="+c.pk+",daten,geaendert&"+c.pk+"=eq."+encodeURIComponent(p),{method:"GET"})||[];
+      if(z[0])zeilen.push(z[0]);else delete h.ver[p]}}}
+// Neu: nur einfügen, wenn es den Eintrag oben noch nicht gibt. Vorhanden: nur ändern, wenn er oben noch den geholten Stand hat. Zurück kommt, was nicht hochging.
+async function hochladen(k,c,h,hoch){const streit=[],gelungen=(z,ver)=>{const p=z[c.pk];h.ver[p]=ver;
+    if(z.daten._weg){h.hash[p]="weg";delete h.felder[p]}else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}};
+  const neu=hoch.filter(z=>!h.ver[z[c.pk]]);
+  for(let i=0;i<neu.length;i+=200){const teil=neu.slice(i,i+200),r=await api(c.tab+"?on_conflict="+c.pk+"&select="+c.pk+",geaendert",{method:"POST",headers:{Prefer:"resolution=ignore-duplicates,return=representation"},body:JSON.stringify(teil)})||[];
+    const da={};r.forEach(x=>da[String(x[c.pk])]=x.geaendert);teil.forEach(z=>{const p=z[c.pk];if(p in da)gelungen(z,da[p]);else streit.push(p)})}
+  for(const z of hoch){const p=z[c.pk],ver=h.ver[p];if(!ver||neu.includes(z))continue;
+    const r=await api(c.tab+"?"+c.pk+"=eq."+encodeURIComponent(p)+"&geaendert=eq."+encodeURIComponent(ver)+"&select="+c.pk+",geaendert",{method:"PATCH",headers:{Prefer:"return=representation"},body:JSON.stringify({daten:z.daten,geaendert:z.geaendert})})||[];
+    if(r[0])gelungen(z,r[0].geaendert);else streit.push(p)}
+  return streit}
 async function abgleichen(){
-  if(!sitzung||!navigator.onLine)return;if(laeuft){nochmal=true;return}laeuft=true;fehler="";zeigen();
-  const H=lies("mietixAbgleich",{}),geholt=[];
+  if(!sitzung||!navigator.onLine)return;if(laeuft){nochmal=true;return}laeuft=true;const stand0=aenderungen;zeigen();
+  const H=lies("mietixAbgleich",{}),geholt=[],kaputt=[];let warnung="";
   // Einmal je Gerät (31.10.2026, iPad mit vollem Speicher): Mietverträge, Papierkorb und Unterschriften frisch vom gemeinsamen Stand übernehmen.
   // Nur hier Liegendes, das noch nie hochging, bleibt und geht hoch. Kein Doppel in den Papierkorb.
   if(!lies("mietixNeuAufbau1",false)){NEU_AUFBAU=true;["mietixVorgaenge","mietixPapierkorb","mietixStand"].forEach(k=>H[k]={zeit:"",hash:{},felder:{}})}
   try{
-    for(const k of Object.keys(SPEICHER)){const c=SPEICHER[k],h=H[k]=H[k]||{zeit:"",hash:{}};if(!h.felder)h.felder={};
+    for(const k of Object.keys(SPEICHER)){const c=SPEICHER[k],l=liesAblage(k);let h=H[k]=H[k]||{zeit:"",hash:{}};if(!h.felder)h.felder={};
+      // Beschädigt: nichts hochladen, nichts darüber schreiben. Baran entscheidet (Knopf „Neu holen“).
+      if(l.kaputt){kaputt.push(k);warnung=MEHRZAHL[k]+" auf diesem Gerät sind beschädigt, nichts davon wurde hochgeladen";continue}
+      // Ganze Liste weg, obwohl schon abgeglichen: Das ist kein Löschen. Alles frisch vom gemeinsamen Stand holen.
+      if(l.fehlt&&Object.keys(h.hash).some(p=>h.hash[p]!=="weg")){h=H[k]={zeit:"",hash:{},felder:{},ver:{}};hinweis(MEHRZAHL[k]+" fehlten auf diesem Gerät und wurden neu geholt.")}
+      // Erstes Mal mit dieser Fassung: einmal alles holen, damit der Stand jedes Eintrags bekannt ist
+      if(!h.ver){h.ver={};h.zeit=""}
+      if(k in LOESCH){const ja=LOESCH[k];delete LOESCH[k];if(h.halt){if(ja)h.frei=h.halt;else{h.halt.forEach(p=>{delete h.hash[p];delete h.felder[p];delete h.ver[p]});h.zeit=""}delete h.halt}}
       // 1) runter: was die anderen Geräte geschickt haben, Eintrag für Eintrag zusammengeführt
       const ab=h.zeit?new Date(new Date(h.zeit).getTime()-UEBERLAPPUNG).toISOString():"";
       const seit=ab?"&geaendert=gt."+encodeURIComponent(ab):"";
       const zeilen=await api(c.tab+"?select="+c.pk+",daten,geaendert&order=geaendert.asc"+seit,{method:"GET"})||[];
-      let anders=false;const m2=alsMap(k,lies(k,c.liste?[]:{}));
-      zeilen.forEach(z=>{const p=String(z[c.pk]);if(z.geaendert>h.zeit)h.zeit=z.geaendert;
-        const gleichB=x=>x===undefined?undefined:JSON.stringify(durch(x,y=>istBild(y)?marke(y):y));   // Bild und sein Verweis "bild:…" gelten als gleich (1.11.2026: sonst Dauerschleife, Seite sprang)
-        const vorher=p in m2?gleichB(m2[p]):undefined;
-        const ergebnis=zusammen(k,p,m2[p],z.daten,h.hash[p],h.felder[p]);
-        if(ergebnis===undefined){if(p in m2){delete m2[p];anders=true}}
-        else if(gleichB(ergebnis)!==vorher){m2[p]=ergebnis;anders=true}
-        // Grundlage für das nächste Mal ist jetzt der gemeinsame Stand
-        if(z.daten&&z.daten._weg){h.hash[p]="weg";delete h.felder[p]}
-        else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
-      if(anders){let w=ausMap(k,m2);try{w=await sicherRaus(k,w,H)}catch(e){}
-        if(!merk(k,w))throw new Error("Speicher auf diesem Gerät voll");geholt.push(k)}
-      // 2) hoch: alles, was hier anders ist als der gemeinsame Stand (auch Gelöschtes)
-      const m=alsMap(k,lies(k,c.liste?[]:{})),jetzt=new Date().toISOString(),hoch=[];
-      let ohneBild=0;
-      for(const p of Object.keys(m)){if(gleichBasis(m[p],h.hash[p])){h.hash[p]=fp(m[p]);continue}
-        const daten=await bilderRein(m[p]);if(daten===null){ohneBild++;continue}   // nie eine Kennung statt Unterschrift hochschicken
-        hoch.push({[c.pk]:p,daten,geaendert:jetzt})}
-      if(ohneBild)fehler="Unterschrift fehlt auf diesem Gerät ("+ohneBild+"x), bitte Baran Bescheid geben";
-      Object.keys(h.hash).forEach(p=>{if(!(p in m)&&h.hash[p]!=="weg")hoch.push({[c.pk]:p,daten:{_weg:true},geaendert:jetzt})});
-      for(let i=0;i<hoch.length;i+=200)await api(c.tab+"?on_conflict="+c.pk,{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(hoch.slice(i,i+200))});
-      hoch.forEach(z=>{const p=z[c.pk];if(z.daten._weg){h.hash[p]="weg";delete h.felder[p]}else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
-      if(k==="mietixVorgaenge"){const max=Math.max(0,...Object.keys(m).filter(n=>/^\d{6}$/.test(n)).map(Number));
+      // 2) zusammenführen und hoch
+      const e=await ablageAbgleichen(k,c,h,zeilen,geholt);
+      if(e.ohneBild)warnung="Unterschrift fehlt auf diesem Gerät ("+e.ohneBild+"x), bitte Baran Bescheid geben";
+      if(k==="mietixVorgaenge"){const max=Math.max(0,...Object.keys(e.m).filter(n=>/^\d{6}$/.test(n)).map(Number));
         if(max)await api("rpc/vertragsnummer_mindestens",{method:"POST",body:JSON.stringify({n:max})})}
       merk("mietixAbgleich",H)}
-    if(fehler)throw new Error(fehler);
+    if(warnung)throw new Error(warnung);
+    fehler="";if(aenderungen===stand0)ungesichert=false;   // Fehler und „Wird gesichert“ erst nach Erfolg weg (05.11.2026)
     zuletzt=new Date();if(NEU_AUFBAU){merk("mietixNeuAufbau1",true);NEU_AUFBAU=false}
-    if(geholt.length)window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:geholt}));
   }catch(e){fehler=e.message||"Abgleich fehlgeschlagen"}
+  FRAGEN=kaputt.map(k=>({art:"kaputt",k})).concat(Object.keys(SPEICHER).filter(k=>H[k]&&H[k].halt&&H[k].halt.length).map(k=>({art:"loeschen",k,n:H[k].halt.length})));
+  if(geholt.length)window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:geholt}));
   laeuft=false;zeigen();auslagernBald();if(nochmal){nochmal=false;setTimeout(abgleichen,500)}}
+// Knöpfe der roten Zeile: viele Löschungen freigeben oder zurückholen, beschädigte Liste neu holen
+window.mietixAbgleichWahl=function(art,k,ja){if(art==="kaputt"){const r=localStorage.getItem(k);if(r)dbRein([["kaputt:"+k+":"+Date.now(),r]]).catch(()=>{});localStorage.removeItem(k)}
+  else LOESCH[k]=!!ja;FRAGEN=FRAGEN.filter(f=>f.k!==k);zeigen();return abgleichen()};
 // Jede Änderung an den vier Speichern löst kurz danach einen Abgleich aus
 let warte=null;
 Storage.prototype.setItem=function(k,v){const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);
   if(this===localStorage&&(SPEICHER[k]||k==="mietixEntwurfProtokolle")&&typeof v==="string"&&v.indexOf('"data:image/')>=0)auslagernBald();
-  if(this===localStorage&&SPEICHER[k]){clearTimeout(warte);warte=setTimeout(abgleichen,800);if(k!=="mietixStand"&&k!=="mietixPapierkorb")sicherheitsnetz(k,alt,v)}};
+  if(this===localStorage&&SPEICHER[k]){aenderungen++;if(!ungesichert){ungesichert=true;if(sitzung&&!pwSetzen)zeigen()}clearTimeout(warte);warte=setTimeout(abgleichen,800);if(k!=="mietixStand"&&k!=="mietixPapierkorb")sicherheitsnetz(k,alt,v)}};
 
 /* ---------- Sicherheitsnetz (28.10.2026, Baran: "Verklicken darf nichts verlieren") ----------
    1. Rückgängig: jede Änderung an einer Ablage zeigt 8 Sekunden lang einen Knopf, der den Stand davor zurückholt.
@@ -340,7 +397,7 @@ function sicherheitsnetz(k,alt,neu){
       if(sitzung){clearTimeout(warte);warte=setTimeout(abgleichen,800)}}}catch(e){}}
   if(rueckLaeuft)return;
   // Rückgängig: Änderungen innerhalb von 0,7 Sekunden gehören zusammen (z. B. Mietvertrag + Kunde + Fahrzeug)
-  const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]=alt;
+  const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]={alt,neu};else burst[k].neu=neu;
   rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
 let rueckLaeuft=false,rueckTimer=null;
 // Rückgängig steht neben dem Titel, nie über einem Knopf (Baustein in stil/schutz.py, 04.11.2026)
@@ -348,9 +405,18 @@ function rueckZeigen(text){if(window.mxRueckZeig)window.mxRueckZeig("mietixRueck
 function rueckgaengig(){if(!burst)return;
   if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
   const b=burst;burst=null;rueckLaeuft=true;
-  try{Object.keys(b).forEach(k=>{if(b[k]===null)localStorage.removeItem(k);else roh.call(localStorage,k,b[k])})}finally{rueckLaeuft=false}
+  // Nur die eigene Änderung zurücknehmen (05.11.2026): Was inzwischen von anderen Geräten kam, bleibt stehen
+  try{Object.keys(b).forEach(k=>{const l=liesAblage(k);if(l.kaputt){if(window.mxFehler)mxFehler("Rückgängig ging nicht: "+MEHRZAHL[k]+" auf diesem Gerät sind beschädigt.");return}
+    const leer=SPEICHER[k].liste?[]:{},roh2=s=>alsMap(k,JSON.parse(s||"null")||leer),a=roh2(b[k].alt),n=roh2(b[k].neu),m=alsMap(k,l.w);
+    new Set([...Object.keys(a),...Object.keys(n)]).forEach(p=>{if(fp(a[p])===fp(n[p]))return;
+      if(!(p in a)){delete m[p];return}                                  // hier neu angelegt
+      if(!(p in n)||!(p in m)||!istObj(a[p])||!istObj(n[p])){m[p]=a[p];return}   // hier gelöscht
+      const o=Object.assign({},m[p]);new Set([...Object.keys(a[p]),...Object.keys(n[p])]).forEach(f=>{   // Feld für Feld: nur was hier geändert wurde und seitdem niemand sonst
+        if(fp(a[p][f])!==fp(n[p][f])&&fp(o[f])===fp(n[p][f])){if(f in a[p])o[f]=a[p][f];else delete o[f]}});
+      m[p]=o});
+    merk(k,ausMap(k,m))})}finally{rueckLaeuft=false}
   const el=document.getElementById("mietixRueck");if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
-  window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
+  ungesichert=true;zeigen();window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
   if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
     roh.call(localStorage,"mietixEntwurfVertrag",JSON.stringify(Object.assign({},e.eintrag,{zeit:new Date().toISOString()})));
@@ -361,8 +427,12 @@ window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),
   if(e.ablage==="schadensbelege"){const st=lies("mietixStand",{}),r=Object.assign({liste:[],max:{}},st.schadensbelege||{});   // Schadensbeleg (30.10.2026)
     if(!r.liste.some(x=>x.nr===e.eintrag.nr))r.liste=r.liste.concat([e.eintrag]);st.schadensbelege=r;merk("mietixPapierkorb",pk.filter(x=>x.id!==id));
     localStorage.setItem("mietixStand",JSON.stringify(st));window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixStand","mietixPapierkorb"]}));return true}
-  const c=SPEICHER[e.ablage];if(!c)return false;const m=alsMap(e.ablage,lies(e.ablage,c.liste?[]:{}));m[e.schluessel]=e.eintrag;
-  merk("mietixPapierkorb",pk.filter(x=>x.id!==id));localStorage.setItem(e.ablage,JSON.stringify(ausMap(e.ablage,m)));
+  const c=SPEICHER[e.ablage];if(!c)return false;const m=alsMap(e.ablage,lies(e.ablage,c.liste?[]:{})),da=m[e.schluessel];
+  merk("mietixPapierkorb",pk.filter(x=>x.id!==id));
+  // Steht unter dem Schlüssel schon etwas anderes, wird es nicht überschrieben (05.11.2026): anderer Kunde = neue Nummer, sonst tauschen die Fassungen den Platz
+  if(da!==undefined&&fp(da)!==fp(e.eintrag)&&e.ablage==="mietixVorgaenge"&&andererKunde(da,e.eintrag))nummerGewechselt(m,e.schluessel,e.eintrag,freieNummer(m));
+  else{if(da!==undefined&&fp(da)!==fp(e.eintrag))andereFassung(e.ablage,e.schluessel,da);m[e.schluessel]=e.eintrag}
+  localStorage.setItem(e.ablage,JSON.stringify(ausMap(e.ablage,m)));
   window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:[e.ablage,"mietixPapierkorb"]}));return true};
 window.mietixPapierkorb=()=>lies("mietixPapierkorb",[]).slice().sort((a,b)=>a.zeit<b.zeit?1:-1);
 
@@ -380,6 +450,7 @@ let pwSetzen=false,linkFehler="";
   pwSetzen=/invite|recovery|signup/.test(h.get("type")||"")})();
 
 /* ---------- Anzeige: Anmeldung oder Stand ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[x]));
 function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
   if(sitzung&&pwSetzen){el.innerHTML='<div class="abgl"><b>Passwort festlegen</b><div class="abgl-text">Für '+(sitzung.email||"dieses Konto")+'. Damit meldest du dich auf allen Geräten an, auch für die Brücke. Mindestens 8 Zeichen.</div>'+
     '<input id="ablNeu" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Neues Passwort (sichtbar, damit kein Tippfehler)">'+
@@ -390,7 +461,7 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
         if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.msg||j.message||"Speichern ging nicht")}
         pwSetzen=false;zeigen();abgleichen()}catch(e){f.textContent=e.message}};return}
   const pkt=document.getElementById("abgleichPunkt");
-  if(pkt)pkt.style.background=!sitzung?"#B0B0B3":fehler?"#C4161C":"#1B8A4B";
+  if(pkt)pkt.style.background=!sitzung?"#B0B0B3":fehler||FRAGEN.length||HINWEISE.length?"#C4161C":"#1B8A4B";
   // Anmelden nur auf Startseite und Einstellungen (31.10.2026), sonst eine schmale Zeile
   const haupt=/mietix-zentrale\/(index\.html|einstellungen\.html)?$/.test(location.pathname)||/\/(zentrale|einstellungen)$/.test(location.pathname);
   if(!sitzung&&!haupt){el.innerHTML='<div class="abgl klein rot"><span><b style="display:inline;margin:0">Nicht angemeldet.</b> Nichts wird gesichert.</span><a href="https://barankohler.github.io/mietix-zentrale/" style="color:#C4161C;font-weight:800;white-space:nowrap">Anmelden ›</a></div>';return}
@@ -402,7 +473,7 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
     const mail=()=>document.getElementById("ablMail").value.trim(),pw=()=>document.getElementById("ablPw").value,f=document.getElementById("ablFehler");
     document.getElementById("ablLos").onclick=async()=>{f.textContent="";
       try{sichern(await auth("token?grant_type=password",{email:mail(),password:pw()}));
-        zeigen();abgleichen()}catch(e){f.textContent=/Invalid login/i.test(e.message)?"E-Mail oder Passwort stimmt nicht.":e.message}};
+        zeigen();abgleichen()}catch(e){f.textContent=/Invalid login/i.test(e.message)?"E-Mail oder Passwort stimmt nicht.":e.message===KEINE_VERBINDUNG?"Keine Verbindung. Bitte Internet prüfen und noch einmal tippen.":e.message}};
     // Zugang selbst anlegen: geht nur, solange Baran die Registrierung in Supabase kurz freigibt
     document.getElementById("ablNeuZugang").onclick=async e=>{e.preventDefault();f.textContent="";
       if(!mail()||pw().length<8){f.textContent="Oben E-Mail und ein eigenes Passwort (mindestens 8 Zeichen) eintragen, dann hier tippen.";return}
@@ -412,10 +483,17 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
         /already/i.test(e.message)?"Für diese E-Mail gibt es schon einen Zugang. Bitte oben anmelden.":e.message}};return}
   // Sync-Status (31.10.2026): grün gesichert, gelb ohne Internet, rot bei Fehler. Passwort und Abmelden nur auf Startseite und Einstellungen.
   const uhr=zuletzt?String(zuletzt.getHours()).padStart(2,"0")+":"+String(zuletzt.getMinutes()).padStart(2,"0"):"";
-  const art=!navigator.onLine?"gelb":fehler?"rot":"gruen";
-  const stand=!navigator.onLine?"Ohne Internet: alles bleibt auf dem Gerät und wird nachgeholt":fehler?"Nicht gesichert: "+fehler:laeuft&&!zuletzt?"Wird gesichert …":"✓ Alles gesichert"+(uhr?", "+uhr+" Uhr":"");
-  const neuH='<div class="abgl klein status '+art+'"><span>'+stand+'</span>'+(haupt?'<span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span>':'')+'</div>';
+  const wird=ungesichert||(laeuft&&!zuletzt);   // solange etwas nicht oben ist, nie „Alles gesichert“ (05.11.2026)
+  const art=!navigator.onLine?"gelb":fehler?"rot":wird?"wird":"gruen";
+  const stand=!navigator.onLine?"Ohne Internet: alles bleibt auf dem Gerät und wird nachgeholt":fehler?"Nicht gesichert: "+esc(fehler):wird?"Wird gesichert …":"✓ Alles gesichert"+(uhr?", "+uhr+" Uhr":"");
+  const knopf=(t,a,k,ja)=>'<a href="#" class="abgl-wahl" data-art="'+a+'" data-k="'+k+'" data-ja="'+(ja?1:0)+'">'+t+'</a>';
+  const rot=FRAGEN.map(f=>'<div class="abgl klein status rot abgl-frage"><span>'+(f.art==="kaputt"?MEHRZAHL[f.k]+" auf diesem Gerät sind beschädigt. Nichts davon wurde hochgeladen.":f.n+" "+MEHRZAHL[f.k]+" wurden hier auf einmal entfernt. Noch nicht überall gelöscht.")+'</span><span class="abgl-wahlen">'+
+      (f.art==="kaputt"?knopf("Neu holen","kaputt",f.k,1):knopf("Überall löschen","loeschen",f.k,1)+knopf("Zurückholen","loeschen",f.k,0))+'</span></div>').join("")+
+    HINWEISE.map((t,i)=>'<div class="abgl klein status rot abgl-frage"><span>'+esc(t)+'</span><span class="abgl-wahlen">'+knopf("Verstanden","weg",i,1)+'</span></div>').join("");
+  const neuH='<div class="abgl klein status '+art+'"><span>'+stand+'</span>'+(haupt?'<span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span>':'')+'</div>'+rot;
   if(el.__mxH===neuH&&el.firstChild)return;el.__mxH=neuH;el.innerHTML=neuH;   // gleicher Text: nicht neu aufbauen (1.11.2026, Seite sprang)
+  el.querySelectorAll(".abgl-wahl").forEach(a=>a.onclick=e=>{e.preventDefault();const d=a.dataset;
+    if(d.art==="weg"){HINWEISE=HINWEISE.filter((x,i)=>i!==+d.k);merk("mietixAbgleichHinweise",HINWEISE);zeigen()}else window.mietixAbgleichWahl(d.art,d.k,d.ja==="1")});
   if(!haupt)return;
   // Angemeldet: neues Passwort setzen geht ohne das alte (für "Passwort vergessen" ohne Mail, 28.10.2026)
   document.getElementById("ablPwNeu").onclick=e=>{e.preventDefault();pwSetzen=true;zeigen()};
@@ -431,6 +509,7 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   ".abgl.klein{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:#6F6F72;padding:10px 14px}.abgl.klein a{color:#6F6F72}"+
   ".abgl.rot{border:2px solid #C4161C}.abgl.rot b{color:#C4161C}"+
   ".abgl.status{background:none;border:0;padding:2px 4px 8px;margin-bottom:6px;font-weight:700}.abgl.status.gruen span:first-child{color:#1B8A4B}"+
+  ".abgl.status.wird span:first-child{color:#6F6F72}.abgl-frage{flex-wrap:wrap}.abgl-frage>span:first-child{flex:1 1 100%}.abgl-wahlen{display:flex;gap:6px;flex-shrink:0;align-items:center}.abgl.klein a.abgl-wahl{background:#E9E9EE;color:#1C1C1E;border-radius:10px;padding:6px 10px;font-weight:700;text-decoration:none;white-space:nowrap}"+
   ".abgl.status.gelb{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:10px 14px}.abgl.status.rot{background:#FDECEC;color:#C4161C;border-radius:12px;padding:10px 14px}"+
   "";
 document.head.appendChild(css);
