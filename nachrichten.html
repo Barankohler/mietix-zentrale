@@ -28,7 +28,7 @@ h2.thema span{background:#E5E5EA;color:#3A3A3C;font-size:12px;border-radius:999p
 .k .kop{background:var(--bg);color:var(--rot)}.k .wa{background:#25D366;color:#fff}.k .pdf{background:#fff;color:var(--text);border:1.5px solid var(--rand)}
 .hinweis{font-size:13px;color:var(--grau);margin:0 4px 6px}
 input{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:46px;background:#fff}
-#suche{width:100%;border:1px solid var(--rand);border-radius:12px;padding:12px;font:600 16px -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:46px;background:#fff}
+#suche{width:100%;border:0;border-radius:12px;padding:0 12px;font:500 16px -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:44px;height:44px;box-sizing:border-box;background:#E4E4E9}
 .miete{width:100%;border:1.5px solid #FFE58A;background:#FFFBEA;border-radius:12px;padding:11px;font:700 16px -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;min-height:44px;margin-top:10px}
 .aend{display:none;font-size:13px;color:var(--grau);font-weight:700;margin-top:10px;text-decoration:none}.n.auf .aend{display:inline-block}
 .n textarea{width:100%;min-height:220px;border:1.5px solid var(--rot);border-radius:12px;padding:12px;font:14px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;margin-top:10px}
@@ -70,9 +70,12 @@ input.fehlt,select.fehlt,textarea.fehlt,.fehlt>input,input.rotRand{background-co
 .ereihe .minik[data-s]{background:transparent!important;border:0!important;border-radius:8px!important;color:#1C1C1E!important;font-weight:600!important;padding:9px 3px!important}
 .ereihe .minik[data-s].an{background:#1C1C1E!important;color:#fff!important;outline:0!important;font-weight:700!important}
 /* Löschen = rote Schrift ohne Kasten, Nebenaktion = roter Rand */
-.minik.weg{background:transparent!important;border-color:transparent!important;color:#FF3B30!important;font-weight:600!important}
+.minik.weg{background:#E9E9EE!important;border-color:transparent!important;color:#FF3B30!important;font-weight:600!important}
 .minik.angebot,.minik.wa,.minik.vertragk{text-decoration:none!important}
-.fsAuf{background:#fff!important;color:#C4161C!important;border:1.5px solid #C4161C!important}
+.fsAuf,.fsKn .fsHoch{background:#E9E9EE!important;color:#1C1C1E!important;border:0!important}
+.minik.waRand{background:#E9E9EE!important;color:#1E8E4E!important;border:0!important}
+.eintrag .minik.anzk{background:#E9E9EE!important;color:#C4161C!important;border:0!important}
+.zeile.tipp .eintr{background:#E9E9EE;border-radius:10px;padding:5px 10px}
 /* Überschriften über einer Liste: klein, grau, groß geschrieben, wie im Entwurf */
 html body h2.hT,html body p.feldname,html body main h2.gruppe,html body .app>h2,html body main>h2,html body h2.thema,html body .bereich>.kopf>b{font-size:13px!important;letter-spacing:.3px!important;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase!important}
 html body h2.hT{margin:20px 16px 7px!important}
@@ -86,7 +89,7 @@ html body .app>h2,html body main>h2{margin-left:16px!important;margin-right:16px
 .frage .chips [data-jn=ja].an{background:#34C759!important;color:#fff!important;outline:0}
 .frage .chips [data-jn=nein].an{background:#FF3B30!important;color:#fff!important;outline:0}
 /* Kunden: „‹ Kunden“ wie „‹ Start“ als rote Schrift, Überschriften klein und grau */
-html body .kTop #kZu{border:0!important;background:none!important;padding:4px 0!important;color:#C4161C!important;font-size:17px!important;font-weight:600!important}
+html body .kTop #kZu,html body .kTop #kBearb{border:0!important;background:#E9E9EE!important;border-radius:10px!important;padding:5px 12px!important;font-size:16px!important;font-weight:600!important;text-decoration:none!important}html body .kTop #kZu{color:#C4161C!important}
 html body .ab{font-size:13px!important;letter-spacing:.3px;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase;margin:20px 16px 7px!important}
 html body .ab span{text-transform:none;letter-spacing:0}
 /* Versteckt bleibt versteckt: display:flex!important oben darf .versteckt nicht schlagen (Fund 01.11.2026) */
@@ -121,10 +124,17 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 </style></head><body><script>
 /* Knopf-Paar je Nachricht: WhatsApp und Kopieren (02.11.2026) */
 (function(){if(window.nkPaar)return;
+  // Preise ohne Internet (05.11.2026): jede geladene Preisdatei bleibt auf dem Gerät, ohne Netz oder nach 6 Sekunden Warten gilt die letzte (Tiefgarage)
+  {const netz=window.fetch,K="mietixPreisKopie";window.fetch=function(u,o){const s=typeof u==="string"?u:(u&&u.url)||"";if(s.indexOf("mietix-preise/preise.json")<0)return netz.apply(this,arguments);
+    const kopie=()=>{try{const t=localStorage.getItem(K);return t?new Response(t,{status:200,headers:{"Content-Type":"application/json"}}):null}catch(e){return null}};
+    return new Promise((ok,nein)=>{let da=false;const uhr=setTimeout(()=>{const k=kopie();if(k&&!da){da=true;ok(k)}},6000);
+      netz.call(window,u,o).then(r=>{clearTimeout(uhr);if(r.ok){r.clone().text().then(t=>{try{if(t&&t.charAt(0)==="{"&&localStorage.getItem(K)!==t)localStorage.setItem(K,t)}catch(e){}}).catch(()=>{});if(!da){da=true;ok(r)}return}
+        const k=kopie();if(!da){da=true;ok(k||r)}}).catch(e=>{clearTimeout(uhr);const k=kopie();if(da)return;da=true;if(k)ok(k);else nein(e)})})}}
   const SWA='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>';
   const SKO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>';
   window.nkPaar=function(art){return'<span class="nkPaar'+(art?" "+art:"")+'"><button type="button" class="nkWa" data-nk="wa">'+SWA+'WhatsApp</button><button type="button" class="nkKo" data-nk="ko">'+SKO+'Kopieren</button></span>'};
-  window.nkNummer=function(t){let n=String(t||"").replace(/\D/g,"");if(String(t||"").trim().startsWith("+"))return n;if(n.startsWith("00"))return n.slice(2);if(n.startsWith("0"))return"49"+n.slice(1);return n};
+  // Eine Regel für alle Seiten (05.11.2026): + und 00 = Ländervorwahl steht schon da, 0 = deutsche Nummer, 15x/16x/17x ohne 0 = deutsches Handy
+  window.nkNummer=function(t){let n=String(t||"").replace(/\D/g,"");if(!n)return"";if(!String(t||"").trim().startsWith("+")){if(n.startsWith("00"))n=n.slice(2);else if(n.startsWith("0"))n="49"+n.slice(1);else if(/^1[567]\d{8,9}$/.test(n))n="49"+n}return n.replace(/^490/,"49")};
   // Baran 05.11.2026: keine Anrede am Anfang, kein Gruß am Ende, in jeder Nachricht. Auch selbst gespeicherte Texte laufen hier durch.
   window.nkOhneGruss=function(t){let s=String(t||"").replace(/^\s*(?:Hallo|Hi|Moin|Guten Tag|Guten Morgen|Guten Abend|Sehr geehrte[^\n,]*|Liebe[rs]?\b[^\n,]*)(?:\s+[^\s,!\n]+){0,2}\s*[,!]\s*/,"").replace(/\s*\n\s*(?:Viele|Liebe|Beste|Freundliche|Mit freundlichen)\s+Grüßen?\s*(?:\n[^\n]*)?\s*$/,"").replace(/\s*\n\s*(?:Ihr|Euer)\s+Mietix[- ]Team\s*$/,"").trim();return s?s.charAt(0).toUpperCase()+s.slice(1):s};
   window.nkWa=function(tel,text){const n=nkNummer(tel);window.open("https://wa.me/"+(n&&n.length>=8?n:"")+"?text="+encodeURIComponent(nkOhneGruss(text)),"_blank")};
@@ -247,9 +257,9 @@ Sie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als 
 
 Fahrzeug:
 
-Soll ich Ihnen eines davon dazubuchen? Geben Sie mir einfach kurz Bescheid.</pre><div class="k nkK"><span class="nkPaar"><button type="button" class="nkWa" data-nk="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>WhatsApp</button><button type="button" class="nkKo" data-nk="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>Kopieren</button></span></div></div></section><section id="t5"><h2 class="thema">Abholung und Rückgabe <span>3</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Hallo, Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>*Morgen ist es so weit*
+Soll ich Ihnen eines davon dazubuchen? Geben Sie mir einfach kurz Bescheid.</pre><div class="k nkK"><span class="nkPaar"><button type="button" class="nkWa" data-nk="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>WhatsApp</button><button type="button" class="nkKo" data-nk="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>Kopieren</button></span></div></div></section><section id="t5"><h2 class="thema">Abholung und Rückgabe <span>3</span></h2><div class="n" data-k="erinnerung"><b>Morgen ist es so weit</b><div class="v">Ihr Fahrzeug steht morgen für Sie bereit:</div><pre>*Morgen ist es so weit*
 
-Hallo, Ihr Fahrzeug steht morgen für Sie bereit:
+Ihr Fahrzeug steht morgen für Sie bereit:
 
 Fahrzeug:
 
@@ -257,17 +267,17 @@ Abholung ab:
 
 Mitbringen: Führerschein, Ausweis, Kaution
 
-Wir freuen uns auf Sie!</pre><div class="k nkK"><span class="nkPaar"><button type="button" class="nkWa" data-nk="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>WhatsApp</button><button type="button" class="nkKo" data-nk="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>Kopieren</button></span></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="rückgabe"><b>Erinnerung Rückgabe</b><div class="v">Hallo, eine kurze Erinnerung an Ihre Rückgabe:</div><pre>*Ihre Rückgabe*
+Wir freuen uns auf Sie!</pre><div class="k nkK"><span class="nkPaar"><button type="button" class="nkWa" data-nk="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>WhatsApp</button><button type="button" class="nkKo" data-nk="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>Kopieren</button></span></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="rückgabe"><b>Erinnerung Rückgabe</b><div class="v">Eine kurze Erinnerung an Ihre Rückgabe:</div><pre>*Ihre Rückgabe*
 
-Hallo, eine kurze Erinnerung an Ihre Rückgabe:
+Eine kurze Erinnerung an Ihre Rückgabe:
 
 Datum:
 
 Uhrzeit:
 
-Wir freuen uns auf Sie!</pre><div class="k nkK"><span class="nkPaar"><button type="button" class="nkWa" data-nk="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>WhatsApp</button><button type="button" class="nkKo" data-nk="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>Kopieren</button></span></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="verlängerungen"><b>Verlängerung anbieten</b><div class="v">Hallo, die meisten Kunden sagen bei der Rückgabe: „Schade, dass es schon vorbei ist.“ Darum einmalig für Sie:</div><pre>*Ihr Verlängerungsangebot*
+Wir freuen uns auf Sie!</pre><div class="k nkK"><span class="nkPaar"><button type="button" class="nkWa" data-nk="wa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>WhatsApp</button><button type="button" class="nkKo" data-nk="ko"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2"/></svg>Kopieren</button></span></div><a href="#" class="aend">Text ändern</a></div><div class="n" data-k="verlängerungen"><b>Verlängerung anbieten</b><div class="v">Die meisten Kunden sagen bei der Rückgabe: „Schade, dass es schon vorbei ist.“ Darum einmalig für Sie:</div><pre>*Ihr Verlängerungsangebot*
 
-Hallo, die meisten Kunden sagen bei der Rückgabe: „Schade, dass es schon vorbei ist.“ Darum einmalig für Sie:
+Die meisten Kunden sagen bei der Rückgabe: „Schade, dass es schon vorbei ist.“ Darum einmalig für Sie:
 
 Verlängerung bis:
 
@@ -334,7 +344,7 @@ const eur=n=>{n=+n||0;const g=Math.abs(n-Math.round(n))<0.005;return (g?Math.rou
 const zahlDE=s=>{s=String(s||"").replace(/[^\d,.]/g,"");if(!s)return 0;if(s.includes(","))s=s.replace(/\./g,"").replace(",",".");else if(/\.\d{3}$/.test(s))s=s.replace(/\./g,"");return +s||0};
 function zeige(el){const k=el.dataset.k;if(!k||k==="auto")return markieren(el);
   const eig=eigene()[k];let t=eig||BASIS[k];
-  if(k==="__anzahlung__"){const m=zahlDE(el.querySelector(".miete").value);if(m)t=t.replace(/^Betrag:[^\n]*$/m,"Betrag: "+eur(Math.round(m*30)/100)+" € (30 % von "+eur(m)+" €)")}
+  if(k==="__anzahlung__"){const m=zahlDE(el.querySelector(".miete").value);if(m)t=t.replace(/^Betrag:[^\n]*$/m,"Betrag: "+eur(Math.round(m*0.3))+" € (30 % von "+eur(Math.round(m))+" €)")}
   if(k==="__kmpaket__")t=kmPaketText(el.querySelector(".miete").value)||BASIS[k];
   if(k!=="__kaution__")el.querySelector("pre").textContent=mitDatum(t);markieren(el);
   const b=el.querySelector("b"),alt=b.querySelector(".eig");if(alt)alt.remove();if(eig){const s=document.createElement("span");s.className="eig";s.textContent="eigener Text";b.appendChild(s)}}
@@ -343,8 +353,8 @@ let PREISE=null;
 function kmPaketText(name){const c=PREISE&&PREISE.cars.find(x=>(x.anzeige||x.n)===name);if(!c||!c.km||c.km.length<2)return"";
   const st=PREISE.kmStufen||[50,100,150,200,300];
   return "*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\n"+
-    "Ihr "+name.replace(" performance"," Performance")+", für Ihre ganze Miete:\n"+st.map((k,i)=>"• +"+k.toLocaleString("de-DE")+" km für "+eur(c.km[i+1])+" € (statt "+eur(k*c.kmPreis)+" €)").join("\n")+
-    "\n\nOhne Paket kostet jeder Mehrkilometer "+eur(c.kmPreis)+" €. Mit dem großen Paket sparen Sie "+eur(st[st.length-1]*c.kmPreis-c.km[st.length])+" €.\n\nSoll ich Ihnen eines davon dazubuchen? Geben Sie mir einfach kurz Bescheid."}
+    "Ihr "+name.replace(" performance"," Performance")+", für Ihre ganze Miete:\n"+st.map((k,i)=>"• +"+k.toLocaleString("de-DE")+" km für "+eur(Math.round(c.km[i+1]))+" € (statt "+eur(Math.round(k*c.kmPreis))+" €)").join("\n")+
+    "\n\nOhne Paket kostet jeder Mehrkilometer "+eur(c.kmPreis)+" €. Mit dem großen Paket sparen Sie "+eur(Math.round(st[st.length-1]*c.kmPreis)-Math.round(c.km[st.length]))+" €.\n\nSoll ich Ihnen eines davon dazubuchen? Geben Sie mir einfach kurz Bescheid."}
 // „morgen“ und „übermorgen“ bekommen immer das Datum dazu (31.10.2026, Baran: „damit wir auf der sicheren Seite sind“).
 // Überschriften (*…*) bleiben, steht schon ein Datum dahinter, passiert nichts.
 const WTAG=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
@@ -589,9 +599,11 @@ async function ablageAbgleichen(k,c,h,zeilen,geholt){
       const daten=await bilderRein(m[p]);if(daten===null){ohneBild++;continue}   // nie eine Kennung statt Unterschrift hochschicken
       hoch.push({[c.pk]:p,daten,geaendert:jetzt})}
     // Löschen: viele auf einmal warten auf Baran
-    const frei=h.frei||[];delete h.frei;if(h.halt){h.halt=h.halt.filter(p=>!(p in m));if(!h.halt.length)delete h.halt}
-    const weg=Object.keys(h.hash).filter(p=>!(p in m)&&h.hash[p]!=="weg"&&!frei.includes(p)&&!(h.halt||[]).includes(p));
-    if(k!=="mietixPapierkorb"&&k!=="mietixStand"&&(weg.length>HANDVOLL||(weg.length>=3&&!Object.keys(m).length))){h.halt=(h.halt||[]).concat(weg)}
+    const frei=h.frei||[];delete h.frei;if(k==="mietixAufgaben")delete h.halt;if(h.halt){h.halt=h.halt.filter(p=>!(p in m));if(!h.halt.length)delete h.halt}
+    // Einträge ohne Kennung zählen nie als gelöscht; Aufgaben kommen aus der Excel und fragen nie nach (Baran 05.11.2026)
+    const ohneKennung=c.liste&&(liesAblage(k).w||[]).some(x=>x&&x[c.pk]===undefined);
+    const weg=ohneKennung?[]:Object.keys(h.hash).filter(p=>!(p in m)&&h.hash[p]!=="weg"&&!frei.includes(p)&&!(h.halt||[]).includes(p));
+    if(k!=="mietixPapierkorb"&&k!=="mietixStand"&&k!=="mietixAufgaben"&&(weg.length>HANDVOLL||(weg.length>=3&&!Object.keys(m).length))){h.halt=(h.halt||[]).concat(weg)}
     else weg.concat(frei).forEach(p=>{if(!(p in m)&&h.hash[p]!=="weg")hoch.push({[c.pk]:p,daten:{_weg:true},geaendert:jetzt})});
     const streit=await hochladen(k,c,h,hoch);
     if(!streit.length)return{m,ohneBild};
@@ -742,14 +754,13 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
   if(!sitzung){el.innerHTML='<div class="abgl rot"><b>Nicht angemeldet</b><div class="abgl-text">Einmal anmelden, dann ist alles gesichert.</div>'+
     '<input id="ablMail" type="email" inputmode="email" autocomplete="username" placeholder="E-Mail">'+
     '<input id="ablPw" type="password" autocomplete="current-password" placeholder="Passwort">'+
-    '<button id="ablLos" type="button">Anmelden</button><div class="abgl-fehler" id="ablFehler">'+linkFehler+'</div>'+
-    '<a href="#" id="ablNeuZugang" class="abgl-link">Noch keinen Zugang? Hier anlegen</a></div>';
+    '<button id="ablLos" type="button">Anmelden</button><div class="abgl-fehler" id="ablFehler">'+linkFehler+'</div></div>';
     const mail=()=>document.getElementById("ablMail").value.trim(),pw=()=>document.getElementById("ablPw").value,f=document.getElementById("ablFehler");
     document.getElementById("ablLos").onclick=async()=>{f.textContent="";
       try{sichern(await auth("token?grant_type=password",{email:mail(),password:pw()}));
         zeigen();abgleichen()}catch(e){f.textContent=/Invalid login/i.test(e.message)?"E-Mail oder Passwort stimmt nicht.":e.message===KEINE_VERBINDUNG?"Keine Verbindung. Bitte Internet prüfen und noch einmal tippen.":e.message}};
     // Zugang selbst anlegen: geht nur, solange Baran die Registrierung in Supabase kurz freigibt
-    document.getElementById("ablNeuZugang").onclick=async e=>{e.preventDefault();f.textContent="";
+    const neuZ=document.getElementById("ablNeuZugang");if(neuZ)neuZ.onclick=async e=>{e.preventDefault();f.textContent="";
       if(!mail()||pw().length<8){f.textContent="Oben E-Mail und ein eigenes Passwort (mindestens 8 Zeichen) eintragen, dann hier tippen.";return}
       try{const j=await auth("signup",{email:mail(),password:pw()});
         if(j.access_token){sichern(j);zeigen();abgleichen()}else f.textContent="Zugang angelegt. Bitte die Mail bestätigen und dann anmelden."}
@@ -919,10 +930,12 @@ zeigen();abgleichen();auslagernBald();
     ".mxStart,.abgl a,.abgl-link,#ablNeuZugang,#ablPwNeu,#ablAus,.sZur,.buZurueck,#bZurueck,#sAlle,#mLoesch,#vOrtAendern,#mVerlBez,#mKautWeg,#mEndWeg,#mEndBez,.kurz>a,a.zu,.buVerw,.zurueckA,#kZu,a.loeschen,.aend,.n a.pdf,#entwurfLeeren,#entwurfZurueck,#weiterSpaeter,.mini,.mehr>span,.mehr>a,.unten>a,.pbTipp a[data-pb],#mVerlInfo .vz>a,#uKopf>a,.mxKlein>summary{background:#E9E9EE!important;border:0!important;border-radius:10px!important;padding:6px 12px!important;text-decoration:none!important;display:inline-flex!important;align-items:center;gap:3px;line-height:1.25!important;width:auto!important;max-width:100%;box-shadow:none!important;cursor:pointer;-webkit-tap-highlight-color:transparent}"+
     ".buVerw,.sZur,.buZurueck,#uKopf>a{display:flex!important;width:max-content!important}.buVerw{margin-left:auto!important;margin-right:auto!important}"+
     ".mxStart{color:#C4161C!important;font-size:16px!important;font-weight:700!important;letter-spacing:0!important;padding:6px 12px 6px 9px!important}.mxStart b{margin-top:-1px;font-size:18px!important}"+
+    /* ‹ Start überall gleich groß (05.11.2026), auch wo look.py nicht gilt */
+    "html body header .mxStart,html body .topbar .mxStart{float:none!important;margin:0 10px 0 0!important;border:0!important;padding:5px 12px 5px 9px!important;background:#E9E9EE!important;border-radius:10px!important;color:#C4161C!important;opacity:1!important;font-size:16px!important;font-weight:600!important;gap:3px!important;line-height:1.2!important;min-height:44px!important;box-sizing:border-box;display:inline-flex!important;align-items:center!important}html body .mxStart b{font-size:20px!important;font-weight:400!important;line-height:16px!important;margin-top:-2px!important}"+
     /* PC und Mac (1.11.2026, Baran: auf allen Geräten gleich): Kopfzeile und Inhalt in einer 680-px-Spalte in der Mitte.
        Muss ganz am Ende stehen: header{padding-left:16px!important} weiter oben (und look.py davor im head) würde sonst gewinnen */
     (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}"+
-      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}");
+      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box;padding-left:16px!important;padding-right:16px!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}");
   document.head.appendChild(st);
 
   // ‹ Start und Symbol in der Kopfzeile
@@ -949,15 +962,25 @@ zeigen();abgleichen();auslagernBald();
       if(history.length>1&&document.referrer.indexOf(location.origin)===0)history.back();else location.href="https://barankohler.github.io/mietix-zentrale/"},{passive:true})}
 
   // Neue Version: die Seite aus dem Netz mit der geladenen vergleichen (ohne Daten, nur der Text der Seite)
+  // Seit 05.11.2026: nur die Kopfzeile abfragen (Stand der Seite im Netz gegen Stand der geladenen Seite), nicht jedes Mal die ganze Seite. Kennt der Server keinen Stand, wie bisher über den Text.
   let alt=null;
-  async function pruefen(){try{const r=await fetch(location.pathname,{cache:"no-store"});if(!r.ok)return;const t=await r.text(),h=t.length+":"+t.slice(-400);
-    if(alt===null){const c=await fetch(location.pathname,{cache:"force-cache"}).then(x=>x.text()).catch(()=>null);alt=c?c.length+":"+c.slice(-400):h}
-    if(h!==alt){let b=document.getElementById("mxNeu");if(!b){b=document.createElement("div");b.id="mxNeu";b.innerHTML="Neue Version da. <b>Tippen zum Aktualisieren</b>";b.onclick=()=>location.reload();
+  async function pruefen(){try{let neu=false;const k=await fetch(location.pathname,{method:"HEAD",cache:"no-store"}).catch(()=>null);
+    const lm=k&&k.ok?k.headers.get("last-modified"):null,tN=lm?Date.parse(lm):NaN,tD=Date.parse(document.lastModified);
+    if(!isNaN(tN)&&!isNaN(tD))neu=tN>tD+1000;
+    else{const r=await fetch(location.pathname,{cache:"no-store"});if(!r.ok)return;const t=await r.text(),h=t.length+":"+t.slice(-400);
+      if(alt===null){const c=await fetch(location.pathname,{cache:"force-cache"}).then(x=>x.text()).catch(()=>null);alt=c?c.length+":"+c.slice(-400):h}
+      neu=h!==alt}
+    if(neu){let b=document.getElementById("mxNeu");if(!b){b=document.createElement("div");b.id="mxNeu";b.innerHTML="Neue Version da. <b>Tippen zum Aktualisieren</b>";b.onclick=()=>location.reload();
       const kopf=document.querySelector("header,.topbar");if(kopf)kopf.after(b);else document.body.prepend(b)}b.classList.add("an")}}catch(e){}}
   setTimeout(pruefen,3000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)pruefen()});
 
   // Ohne Internet: Seite aus dem Speicher (sw.js liegt im Ordner der Seite)
   if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+  // Startseite: wichtige Seiten einmal in den Speicher, damit sie auch ohne Internet aufgehen, selbst wenn sie auf diesem Gerät noch nie offen waren (05.11.2026)
+  if(istStart&&"serviceWorker" in navigator&&"caches" in window&&location.protocol==="https:"&&location.hostname==="barankohler.github.io")setTimeout(async()=>{try{if(!navigator.onLine)return;const c=await caches.open("mietix-seiten-1");
+    for(const p of ["mietix-vertrag/","mietix-anfragen/","mietix-belegung/","mietix-belegung/angebot.html","mietix-autos/","mietix-geld/","mietix-zentrale/kunden.html","mietix-zentrale/nachrichten.html","mietix-zentrale/umsatzbringer.html"]){const u=location.origin+"/"+p;
+      try{if(!await c.match(u))await c.add(u);const o=p.split("/")[0]+"/";if(o!=="mietix-zentrale/")await navigator.serviceWorker.register("/"+o+"sw.js",{scope:"/"+o})}catch(e){}}}catch(e){}},6000);
 
   // Startseite: die meistgenutzten Seiten schon vorladen, dann öffnen sie ohne Wartezeit
   if(istStart)setTimeout(()=>["mietix-vertrag/","mietix-anfragen/","mietix-belegung/","mietix-autos/"].forEach(p=>{const l=document.createElement("link");l.rel="prefetch";l.href="https://barankohler.github.io/"+p;document.head.appendChild(l)}),2500);

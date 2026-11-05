@@ -63,9 +63,12 @@ input.fehlt,select.fehlt,textarea.fehlt,.fehlt>input,input.rotRand{background-co
 .ereihe .minik[data-s]{background:transparent!important;border:0!important;border-radius:8px!important;color:#1C1C1E!important;font-weight:600!important;padding:9px 3px!important}
 .ereihe .minik[data-s].an{background:#1C1C1E!important;color:#fff!important;outline:0!important;font-weight:700!important}
 /* Löschen = rote Schrift ohne Kasten, Nebenaktion = roter Rand */
-.minik.weg{background:transparent!important;border-color:transparent!important;color:#FF3B30!important;font-weight:600!important}
+.minik.weg{background:#E9E9EE!important;border-color:transparent!important;color:#FF3B30!important;font-weight:600!important}
 .minik.angebot,.minik.wa,.minik.vertragk{text-decoration:none!important}
-.fsAuf{background:#fff!important;color:#C4161C!important;border:1.5px solid #C4161C!important}
+.fsAuf,.fsKn .fsHoch{background:#E9E9EE!important;color:#1C1C1E!important;border:0!important}
+.minik.waRand{background:#E9E9EE!important;color:#1E8E4E!important;border:0!important}
+.eintrag .minik.anzk{background:#E9E9EE!important;color:#C4161C!important;border:0!important}
+.zeile.tipp .eintr{background:#E9E9EE;border-radius:10px;padding:5px 10px}
 /* Überschriften über einer Liste: klein, grau, groß geschrieben, wie im Entwurf */
 html body h2.hT,html body p.feldname,html body main h2.gruppe,html body .app>h2,html body main>h2,html body h2.thema,html body .bereich>.kopf>b{font-size:13px!important;letter-spacing:.3px!important;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase!important}
 html body h2.hT{margin:20px 16px 7px!important}
@@ -79,7 +82,7 @@ html body .app>h2,html body main>h2{margin-left:16px!important;margin-right:16px
 .frage .chips [data-jn=ja].an{background:#34C759!important;color:#fff!important;outline:0}
 .frage .chips [data-jn=nein].an{background:#FF3B30!important;color:#fff!important;outline:0}
 /* Kunden: „‹ Kunden“ wie „‹ Start“ als rote Schrift, Überschriften klein und grau */
-html body .kTop #kZu{border:0!important;background:none!important;padding:4px 0!important;color:#C4161C!important;font-size:17px!important;font-weight:600!important}
+html body .kTop #kZu,html body .kTop #kBearb{border:0!important;background:#E9E9EE!important;border-radius:10px!important;padding:5px 12px!important;font-size:16px!important;font-weight:600!important;text-decoration:none!important}html body .kTop #kZu{color:#C4161C!important}
 html body .ab{font-size:13px!important;letter-spacing:.3px;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase;margin:20px 16px 7px!important}
 html body .ab span{text-transform:none;letter-spacing:0}
 /* Versteckt bleibt versteckt: display:flex!important oben darf .versteckt nicht schlagen (Fund 01.11.2026) */
@@ -101,7 +104,7 @@ html body header .mxStart,html body .topbar .mxStart,html body .kTop #kZu{min-he
 input[type=date],input[type=time]{min-width:0;max-width:100%}
 </style><style>
 /* Listenkopf (04.11.2026) */
-.lkKopf{margin:12px 0 10px}.lkSuche{display:flex;align-items:center;gap:8px;background:#E4E4E9;border-radius:12px;padding:0 12px;height:42px}
+.lkKopf{margin:12px 0 10px}.lkSuche{display:flex;align-items:center;gap:8px;background:#E4E4E9;border-radius:12px;padding:0 12px;height:44px;box-sizing:border-box}
 .lkSuche svg{width:18px;height:18px;flex:0 0 auto;stroke:#6E6E73;fill:none;stroke-width:2;stroke-linecap:round}
 .lkSuche input{flex:1;min-width:0;width:100%!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;height:40px;font:500 16px inherit;font-family:inherit;outline:0;-webkit-appearance:none;appearance:none}
 .lkSuche input::-webkit-search-cancel-button{-webkit-appearance:none}
@@ -201,7 +204,7 @@ function zeichne(){
   // Was keinen eigenen Kasten hat (Schadensbelege, Autos), steht unter Sonstiges, sonst wäre es unsichtbar (04.11.2026)
   const KASTEN=BEREICHE.map(b=>b[0]).concat(["mietixEntwurfVertrag","mietixEntwurfBuchung"]);if(pk.some(e=>!KASTEN.includes(e.ablage)))BEREICHE.push(["_sonst","Sonstiges"]);
   const pkZeig=PK_LK.w.ber?BEREICHE.filter(b=>b[0]===PK_LK.w.ber):BEREICHE;
-  const extra=e=>{if(e.ablage==="mietixEntwurfVertrag"||e.ablage==="mietixEntwurfBuchung")return'<span class="haken">angefangen, nicht gespeichert</span>';if(e.ablage!=="mietixVorgaenge")return"";const v=e.eintrag||{};return '<span class="haken">Mietvertrag</span>'+(v.ueb?'<span class="haken">Übergabe</span>':"")+(v.rueck?'<span class="haken">Rückgabe</span>':"")+(v.schaden?'<span class="haken">Schaden</span>':"")};
+  const extra=e=>{if(e.ablage==="mietixEntwurfVertrag"||e.ablage==="mietixEntwurfBuchung")return'<span class="haken">angefangen, nicht gespeichert</span>, ';if(e.ablage!=="mietixVorgaenge")return"";const v=e.eintrag||{};return '<span class="haken">Mietvertrag</span>'+(v.ueb?'<span class="haken">Übergabe</span>':"")+(v.rueck?'<span class="haken">Rückgabe</span>':"")+(v.schaden?'<span class="haken">Schaden</span>':"")};
   $("geloescht").innerHTML=pkZeig.map(([k,t])=>{const l=pk.filter(e=>e.ablage===k||(k==="_sonst"&&!KASTEN.includes(e.ablage))||(k==="mietixVorgaenge"&&(e.ablage==="mietixEntwurfVertrag"||e.ablage==="mietixEntwurfBuchung")));
     return '<div class="bereich"><div class="kopf"><b>'+t+'</b><span class="'+(l.length?"":"null")+'">'+l.length+'</span></div><div class="karte">'+
       (l.length?l.map(e=>'<div class="z"><div class="t"><b>'+esc(e.text)+'</b><i>'+extra(e)+(/^Andere Fassung/.test(e.text||"")?'zur Seite gelegt ':'gelöscht ')+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">'+(PK_LK.aktiv()?"Nichts gefunden.":"Nichts gelöscht.")+'</div>')+'</div></div>'}).join("");
@@ -418,9 +421,11 @@ async function ablageAbgleichen(k,c,h,zeilen,geholt){
       const daten=await bilderRein(m[p]);if(daten===null){ohneBild++;continue}   // nie eine Kennung statt Unterschrift hochschicken
       hoch.push({[c.pk]:p,daten,geaendert:jetzt})}
     // Löschen: viele auf einmal warten auf Baran
-    const frei=h.frei||[];delete h.frei;if(h.halt){h.halt=h.halt.filter(p=>!(p in m));if(!h.halt.length)delete h.halt}
-    const weg=Object.keys(h.hash).filter(p=>!(p in m)&&h.hash[p]!=="weg"&&!frei.includes(p)&&!(h.halt||[]).includes(p));
-    if(k!=="mietixPapierkorb"&&k!=="mietixStand"&&(weg.length>HANDVOLL||(weg.length>=3&&!Object.keys(m).length))){h.halt=(h.halt||[]).concat(weg)}
+    const frei=h.frei||[];delete h.frei;if(k==="mietixAufgaben")delete h.halt;if(h.halt){h.halt=h.halt.filter(p=>!(p in m));if(!h.halt.length)delete h.halt}
+    // Einträge ohne Kennung zählen nie als gelöscht; Aufgaben kommen aus der Excel und fragen nie nach (Baran 05.11.2026)
+    const ohneKennung=c.liste&&(liesAblage(k).w||[]).some(x=>x&&x[c.pk]===undefined);
+    const weg=ohneKennung?[]:Object.keys(h.hash).filter(p=>!(p in m)&&h.hash[p]!=="weg"&&!frei.includes(p)&&!(h.halt||[]).includes(p));
+    if(k!=="mietixPapierkorb"&&k!=="mietixStand"&&k!=="mietixAufgaben"&&(weg.length>HANDVOLL||(weg.length>=3&&!Object.keys(m).length))){h.halt=(h.halt||[]).concat(weg)}
     else weg.concat(frei).forEach(p=>{if(!(p in m)&&h.hash[p]!=="weg")hoch.push({[c.pk]:p,daten:{_weg:true},geaendert:jetzt})});
     const streit=await hochladen(k,c,h,hoch);
     if(!streit.length)return{m,ohneBild};
@@ -571,14 +576,13 @@ function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
   if(!sitzung){el.innerHTML='<div class="abgl rot"><b>Nicht angemeldet</b><div class="abgl-text">Einmal anmelden, dann ist alles gesichert.</div>'+
     '<input id="ablMail" type="email" inputmode="email" autocomplete="username" placeholder="E-Mail">'+
     '<input id="ablPw" type="password" autocomplete="current-password" placeholder="Passwort">'+
-    '<button id="ablLos" type="button">Anmelden</button><div class="abgl-fehler" id="ablFehler">'+linkFehler+'</div>'+
-    '<a href="#" id="ablNeuZugang" class="abgl-link">Noch keinen Zugang? Hier anlegen</a></div>';
+    '<button id="ablLos" type="button">Anmelden</button><div class="abgl-fehler" id="ablFehler">'+linkFehler+'</div></div>';
     const mail=()=>document.getElementById("ablMail").value.trim(),pw=()=>document.getElementById("ablPw").value,f=document.getElementById("ablFehler");
     document.getElementById("ablLos").onclick=async()=>{f.textContent="";
       try{sichern(await auth("token?grant_type=password",{email:mail(),password:pw()}));
         zeigen();abgleichen()}catch(e){f.textContent=/Invalid login/i.test(e.message)?"E-Mail oder Passwort stimmt nicht.":e.message===KEINE_VERBINDUNG?"Keine Verbindung. Bitte Internet prüfen und noch einmal tippen.":e.message}};
     // Zugang selbst anlegen: geht nur, solange Baran die Registrierung in Supabase kurz freigibt
-    document.getElementById("ablNeuZugang").onclick=async e=>{e.preventDefault();f.textContent="";
+    const neuZ=document.getElementById("ablNeuZugang");if(neuZ)neuZ.onclick=async e=>{e.preventDefault();f.textContent="";
       if(!mail()||pw().length<8){f.textContent="Oben E-Mail und ein eigenes Passwort (mindestens 8 Zeichen) eintragen, dann hier tippen.";return}
       try{const j=await auth("signup",{email:mail(),password:pw()});
         if(j.access_token){sichern(j);zeigen();abgleichen()}else f.textContent="Zugang angelegt. Bitte die Mail bestätigen und dann anmelden."}
@@ -748,10 +752,12 @@ zeigen();abgleichen();auslagernBald();
     ".mxStart,.abgl a,.abgl-link,#ablNeuZugang,#ablPwNeu,#ablAus,.sZur,.buZurueck,#bZurueck,#sAlle,#mLoesch,#vOrtAendern,#mVerlBez,#mKautWeg,#mEndWeg,#mEndBez,.kurz>a,a.zu,.buVerw,.zurueckA,#kZu,a.loeschen,.aend,.n a.pdf,#entwurfLeeren,#entwurfZurueck,#weiterSpaeter,.mini,.mehr>span,.mehr>a,.unten>a,.pbTipp a[data-pb],#mVerlInfo .vz>a,#uKopf>a,.mxKlein>summary{background:#E9E9EE!important;border:0!important;border-radius:10px!important;padding:6px 12px!important;text-decoration:none!important;display:inline-flex!important;align-items:center;gap:3px;line-height:1.25!important;width:auto!important;max-width:100%;box-shadow:none!important;cursor:pointer;-webkit-tap-highlight-color:transparent}"+
     ".buVerw,.sZur,.buZurueck,#uKopf>a{display:flex!important;width:max-content!important}.buVerw{margin-left:auto!important;margin-right:auto!important}"+
     ".mxStart{color:#C4161C!important;font-size:16px!important;font-weight:700!important;letter-spacing:0!important;padding:6px 12px 6px 9px!important}.mxStart b{margin-top:-1px;font-size:18px!important}"+
+    /* ‹ Start überall gleich groß (05.11.2026), auch wo look.py nicht gilt */
+    "html body header .mxStart,html body .topbar .mxStart{float:none!important;margin:0 10px 0 0!important;border:0!important;padding:5px 12px 5px 9px!important;background:#E9E9EE!important;border-radius:10px!important;color:#C4161C!important;opacity:1!important;font-size:16px!important;font-weight:600!important;gap:3px!important;line-height:1.2!important;min-height:44px!important;box-sizing:border-box;display:inline-flex!important;align-items:center!important}html body .mxStart b{font-size:20px!important;font-weight:400!important;line-height:16px!important;margin-top:-2px!important}"+
     /* PC und Mac (1.11.2026, Baran: auf allen Geräten gleich): Kopfzeile und Inhalt in einer 680-px-Spalte in der Mitte.
        Muss ganz am Ende stehen: header{padding-left:16px!important} weiter oben (und look.py davor im head) würde sonst gewinnen */
     (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}"+
-      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}");
+      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box;padding-left:16px!important;padding-right:16px!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}");
   document.head.appendChild(st);
 
   // ‹ Start und Symbol in der Kopfzeile
@@ -778,15 +784,25 @@ zeigen();abgleichen();auslagernBald();
       if(history.length>1&&document.referrer.indexOf(location.origin)===0)history.back();else location.href="https://barankohler.github.io/mietix-zentrale/"},{passive:true})}
 
   // Neue Version: die Seite aus dem Netz mit der geladenen vergleichen (ohne Daten, nur der Text der Seite)
+  // Seit 05.11.2026: nur die Kopfzeile abfragen (Stand der Seite im Netz gegen Stand der geladenen Seite), nicht jedes Mal die ganze Seite. Kennt der Server keinen Stand, wie bisher über den Text.
   let alt=null;
-  async function pruefen(){try{const r=await fetch(location.pathname,{cache:"no-store"});if(!r.ok)return;const t=await r.text(),h=t.length+":"+t.slice(-400);
-    if(alt===null){const c=await fetch(location.pathname,{cache:"force-cache"}).then(x=>x.text()).catch(()=>null);alt=c?c.length+":"+c.slice(-400):h}
-    if(h!==alt){let b=document.getElementById("mxNeu");if(!b){b=document.createElement("div");b.id="mxNeu";b.innerHTML="Neue Version da. <b>Tippen zum Aktualisieren</b>";b.onclick=()=>location.reload();
+  async function pruefen(){try{let neu=false;const k=await fetch(location.pathname,{method:"HEAD",cache:"no-store"}).catch(()=>null);
+    const lm=k&&k.ok?k.headers.get("last-modified"):null,tN=lm?Date.parse(lm):NaN,tD=Date.parse(document.lastModified);
+    if(!isNaN(tN)&&!isNaN(tD))neu=tN>tD+1000;
+    else{const r=await fetch(location.pathname,{cache:"no-store"});if(!r.ok)return;const t=await r.text(),h=t.length+":"+t.slice(-400);
+      if(alt===null){const c=await fetch(location.pathname,{cache:"force-cache"}).then(x=>x.text()).catch(()=>null);alt=c?c.length+":"+c.slice(-400):h}
+      neu=h!==alt}
+    if(neu){let b=document.getElementById("mxNeu");if(!b){b=document.createElement("div");b.id="mxNeu";b.innerHTML="Neue Version da. <b>Tippen zum Aktualisieren</b>";b.onclick=()=>location.reload();
       const kopf=document.querySelector("header,.topbar");if(kopf)kopf.after(b);else document.body.prepend(b)}b.classList.add("an")}}catch(e){}}
   setTimeout(pruefen,3000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)pruefen()});
 
   // Ohne Internet: Seite aus dem Speicher (sw.js liegt im Ordner der Seite)
   if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+  // Startseite: wichtige Seiten einmal in den Speicher, damit sie auch ohne Internet aufgehen, selbst wenn sie auf diesem Gerät noch nie offen waren (05.11.2026)
+  if(istStart&&"serviceWorker" in navigator&&"caches" in window&&location.protocol==="https:"&&location.hostname==="barankohler.github.io")setTimeout(async()=>{try{if(!navigator.onLine)return;const c=await caches.open("mietix-seiten-1");
+    for(const p of ["mietix-vertrag/","mietix-anfragen/","mietix-belegung/","mietix-belegung/angebot.html","mietix-autos/","mietix-geld/","mietix-zentrale/kunden.html","mietix-zentrale/nachrichten.html","mietix-zentrale/umsatzbringer.html"]){const u=location.origin+"/"+p;
+      try{if(!await c.match(u))await c.add(u);const o=p.split("/")[0]+"/";if(o!=="mietix-zentrale/")await navigator.serviceWorker.register("/"+o+"sw.js",{scope:"/"+o})}catch(e){}}}catch(e){}},6000);
 
   // Startseite: die meistgenutzten Seiten schon vorladen, dann öffnen sie ohne Wartezeit
   if(istStart)setTimeout(()=>["mietix-vertrag/","mietix-anfragen/","mietix-belegung/","mietix-autos/"].forEach(p=>{const l=document.createElement("link");l.rel="prefetch";l.href="https://barankohler.github.io/"+p;document.head.appendChild(l)}),2500);
