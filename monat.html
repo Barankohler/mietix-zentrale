@@ -1,0 +1,1075 @@
+<!doctype html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#C4161C">
+<title>Mietix Monat</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+input,select,textarea{font-size:16px;font-family:inherit;max-width:100%;box-sizing:border-box}input[type=date]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;min-height:44px}
+:root{--rot:#C4161C;--text:#1C1C1E;--rand:#E5E5EA;--grau:#8E8E93;--bg:#F2F2F7;--gruen:#1B8A4B;--hell:#FDECEC;--gelb:#B7791F}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.35}
+header{background:#fff;border-bottom:3px solid var(--rot);padding:calc(12px + env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:5}
+header h1{font-size:20px;font-weight:700;letter-spacing:.5px}header h1 span{color:var(--rot)}
+main{max-width:680px;margin:0 auto;padding:4px 16px 90px}
+.karte{background:#fff;border-radius:12px;padding:16px 14px;margin-bottom:16px}
+.leise{font-size:13px;color:var(--grau);line-height:1.4}
+.hoch{color:var(--gruen)}.runter{color:var(--rot)}
+/* Oben: die drei Zahlen */
+.drei{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 10px}
+.gr{background:#fff;border-radius:12px;padding:12px 10px 11px;min-width:0}
+.gr i{display:block;font-style:normal;font-size:12px;font-weight:700;color:var(--grau);line-height:1.2;min-height:29px}
+.gr b{display:block;font-size:22px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums;margin-top:2px;white-space:nowrap}
+.gr small{display:block;font-size:12px;color:var(--grau);margin-top:2px}
+@media(max-width:370px){.gr b{font-size:19px}}
+.gesamt{padding:4px 14px 12px}
+.gz{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:10px 0;border-bottom:.5px solid #E5E5EA;font-size:15px}
+.gz b{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.gz.summe1{font-weight:700;font-size:17px;border-bottom:0;padding-bottom:2px}.gz.summe1 b{font-size:24px;color:var(--gruen);font-weight:700}
+.gz.offen{border-top:.5px solid #E5E5EA;border-bottom:0;margin-top:8px}.gz.offen b,.gz.offen span{color:var(--rot);font-weight:700}
+.vgl{font-size:13px;font-weight:600}
+.kz{font-size:13px;color:var(--grau);margin-top:8px;padding-top:10px;border-top:.5px solid #E5E5EA}
+/* Jede Miete als Tabelle */
+.abschnitt{font-size:13px;font-weight:600;color:var(--grau);text-transform:uppercase;letter-spacing:.4px;margin:22px 4px 8px}
+.tab{background:#fff;border-radius:12px;overflow:hidden}
+.tk,.tz{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(4,minmax(0,1fr));gap:6px;align-items:center;padding:10px 12px}
+.tk{font-size:11px;font-weight:700;color:var(--grau);text-transform:uppercase;letter-spacing:.2px;border-bottom:.5px solid #D1D1D6}
+.tk span:not(:first-child),.tz>span:not(.wer){text-align:right}
+.tz{border-bottom:.5px solid #E5E5EA;color:inherit;font-size:14px;font-variant-numeric:tabular-nums;font-weight:600;cursor:pointer;width:100%;background:#fff;border-left:0;border-right:0;border-top:0;font-family:inherit;text-align:left}
+.tz:active{background:#F2F2F7}
+.tz .wer b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tz .wer small{display:block;font-size:12px;color:var(--grau);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tz u{text-decoration:none;color:#C7C7CC;font-weight:500}
+.tz .ges{font-weight:700;color:var(--gruen)}
+.tz .off{display:inline-block;font-style:normal;font-size:11px;font-weight:700;color:var(--rot);background:var(--hell);border-radius:5px;padding:1px 5px;margin-top:3px}
+.tz .aend{display:inline-block;font-style:normal;font-size:11px;font-weight:600;color:var(--grau);background:#EFEFF1;border-radius:5px;padding:1px 6px;margin-top:3px}
+.tz.fuss{background:#FAFAFC;border-bottom:0;font-weight:700;cursor:default}
+@media(max-width:560px){.tk,.tz{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:4px}.tz .wer{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.tz .wer b{font-size:16px}.tk span:first-child{display:none}.tk span:nth-child(2),.tz>span:nth-child(2){text-align:left}.tz.fuss .wer b{font-size:15px}}
+.leer{text-align:center;padding:30px 10px;color:var(--grau);font-weight:600}
+/* Ändern-Fenster */
+.fk{font-size:13px;font-weight:600;color:var(--grau);text-transform:uppercase;letter-spacing:.4px;margin:18px 2px 6px}
+.fg{background:#F7F7F9;border-radius:12px;padding:4px 12px}
+.fz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1.4fr);gap:6px;align-items:center;padding:8px 0;border-bottom:.5px solid #E5E5EA}
+.fz:last-child{border-bottom:0}
+.fz>label{font-size:15px;font-weight:600}.fz>label small{display:block;font-size:12px;color:var(--grau);font-weight:500}
+.fz input{width:100%;border:0;border-radius:10px;background:#fff;padding:9px 10px;font-size:16px;font-weight:600;color:var(--text);min-height:44px}
+.fz input:focus{outline:2px solid var(--rot);outline-offset:-2px}
+.fz input.falsch{outline:2px solid var(--rot);background:var(--hell)}
+.fz.grund{grid-template-columns:minmax(0,1fr) minmax(0,2.25fr)}
+.fz input[type=date]{padding:9px 6px;font-size:15px}
+.fhin{font-size:13px;line-height:1.4;margin-top:8px;padding:8px 10px;border-radius:10px;display:none}
+.fhin.gelb{display:block;background:#FDF3E1;color:#7A5212}.fhin.rot{display:block;background:var(--hell);color:var(--rot);font-weight:600}
+.fknoepfe{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px}
+.fknoepfe a,.fknoepfe button{display:flex;align-items:center;justify-content:center;border:0;border-radius:14px;padding:14px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none}
+.fknoepfe a{background:#E9E9EE;color:var(--text)}.fknoepfe button{background:var(--rot);color:#fff}
+.meldung{position:fixed;left:16px;right:16px;bottom:24px;max-width:520px;margin:0 auto;background:var(--gruen);color:#fff;border-radius:14px;padding:12px 14px;font-weight:700;z-index:99;display:none;align-items:center;justify-content:space-between;gap:12px}
+.meldung button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:10px;padding:8px 12px;font:inherit;font-weight:700;cursor:pointer}
+</style><style>/* App-Design klar (01.11.2026) */
+body{background:#F2F2F7!important}
+/* Kopfzeile wie in iOS: „‹ Start“ als rote Schrift statt Pille */
+html body header .mxStart,html body .topbar .mxStart{border:0!important;padding:5px 12px 5px 9px!important;background:#E9E9EE!important;border-radius:10px!important;color:#C4161C!important;opacity:1!important;font-size:16px!important;font-weight:600!important;gap:3px!important;line-height:1.2!important}
+html body .mxStart b{font-size:20px!important;font-weight:400!important;line-height:16px!important;margin-top:-2px!important}
+/* Karten = gruppierte Liste: weiß, rund, ohne Rand */
+.karte{border:0!important;border-radius:14px!important}
+.liste,.notiz,.n,.zeitraumF{border-radius:14px!important}
+/* Überschrift in der Karte: klein, grau, groß geschrieben (wie iOS-Einstellungen) */
+html body main .karte>h2,html body .karte>h2{font-size:13px!important;letter-spacing:.3px!important;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase!important;margin-bottom:9px}
+/* Eingabefelder: grau gefüllt, ohne Rand. Antippen: weiß mit rotem Rand */
+input:not([type=checkbox]):not([type=radio]):not([type=search]):not([type=range]):not([type=file]),select,textarea{background-color:#F2F2F7!important;border:1.5px solid transparent!important;border-radius:10px!important}
+input:not([type=checkbox]):not([type=radio]):focus,select:focus,textarea:focus{background-color:#fff!important;border-color:#C4161C!important;outline:0!important}
+input::placeholder,textarea::placeholder{color:#AEAEB2}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%238A8A8E' stroke-width='2' fill='none'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;padding-right:34px!important}
+input.fehlt,select.fehlt,textarea.fehlt,.fehlt>input,input.rotRand{background-color:#FDE8E8!important;border-color:#FF3B30!important}
+/* Auswahl-Leiste: grau, die gewählte weiß (Reiter, Zeitraum-Knöpfe, Filter) */
+.reiter,.schnell,.chips,.tChips{background:#E3E3E8!important;border-radius:10px!important;padding:2px!important;gap:2px!important;display:flex!important;flex-wrap:wrap}
+.reiter{margin-left:0!important;margin-right:0!important;flex-wrap:nowrap!important}
+.reiter div,.schnell .c,.chips .c,.chips .chip,.tChips .chip{flex:1 1 auto!important;background:transparent!important;border:0!important;border-radius:8px!important;color:#1C1C1E!important;font-weight:600!important;font-size:14px!important;padding:8px 10px!important;text-align:center;min-height:0!important;line-height:1.25}
+/* Gewählt immer deutlich: dunkel mit weißer Schrift (Baran 01.11.2026: „muss immer angezeigt werden, bei jedem Knopf“) */
+.reiter div.an,.schnell .c.an,.chips .c.an,.chips .chip.an,.tChips .chip.an,.chip.an,.c.an,.wahlK.an{background:#1C1C1E!important;color:#fff!important;outline:0!important;font-weight:700!important}
+.chip b,.chip em{color:inherit}
+.filter,.tage{background:#E3E3E8!important;border-radius:10px!important;padding:2px!important;gap:2px!important;display:flex!important}
+.filter span,.tage .tag{flex:1 0 auto!important;background:transparent!important;border:0!important;border-radius:8px!important;color:#1C1C1E!important;font-weight:600!important;font-size:14px!important;padding:8px 10px!important;text-align:center;box-shadow:none!important}
+.filter span.an,.tage .tag.an{background:#1C1C1E!important;color:#fff!important;outline:0!important;font-weight:700!important}
+.filter span.an b{color:#FF8A8F!important}
+.ereihe:has(.minik[data-s]){background:#E3E3E8;border-radius:10px;padding:2px;gap:2px!important}
+.ereihe .minik[data-s]{background:transparent!important;border:0!important;border-radius:8px!important;color:#1C1C1E!important;font-weight:600!important;padding:9px 3px!important}
+.ereihe .minik[data-s].an{background:#1C1C1E!important;color:#fff!important;outline:0!important;font-weight:700!important}
+/* Löschen = rote Schrift ohne Kasten, Nebenaktion = roter Rand */
+.minik.weg{background:#E9E9EE!important;border-color:transparent!important;color:#FF3B30!important;font-weight:600!important}
+.minik.angebot,.minik.wa,.minik.vertragk{text-decoration:none!important}
+.fsAuf,.fsKn .fsHoch{background:#E9E9EE!important;color:#1C1C1E!important;border:0!important}
+.minik.waRand{background:#E9E9EE!important;color:#1E8E4E!important;border:0!important}
+.eintrag .minik.anzk{background:#E9E9EE!important;color:#C4161C!important;border:0!important}
+.zeile.tipp .eintr{background:#E9E9EE;border-radius:10px;padding:5px 10px}
+/* Überschriften über einer Liste: klein, grau, groß geschrieben, wie im Entwurf */
+html body h2.hT,html body p.feldname,html body main h2.gruppe,html body .app>h2,html body main>h2,html body h2.thema,html body .bereich>.kopf>b{font-size:13px!important;letter-spacing:.3px!important;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase!important}
+html body h2.hT{margin:20px 16px 7px!important}
+html body .app>h2,html body main>h2{margin-left:16px!important;margin-right:16px!important}
+/* Zeile öffnet etwas: grauer Pfeil rechts */
+.vpfeil{color:#C7C7CC!important;font-weight:400!important;font-size:22px!important}
+.hListe .heute:after{content:"";flex:0 0 8px;width:8px;height:14px;margin-left:8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Cpath d='M1.5 1.5l5 5.5-5 5.5' stroke='%23C7C7CC' stroke-width='2.4' fill='none'/%3E%3C/svg%3E") no-repeat center}
+/* Ja / Nein: Haken und Kreuz. Bei Rückgabe-Fragen Ja grün, Nein rot (Entwurf app_2) */
+.chips [data-jn].an:before{font-weight:800;margin-right:5px}
+.chips [data-jn=ja].an:before{content:"✓"}.chips [data-jn=nein].an:before{content:"✕"}
+.frage .chips [data-jn=ja].an{background:#34C759!important;color:#fff!important;outline:0}
+.frage .chips [data-jn=nein].an{background:#FF3B30!important;color:#fff!important;outline:0}
+/* Kunden: „‹ Kunden“ wie „‹ Start“ als rote Schrift, Überschriften klein und grau */
+html body .kTop #kZu,html body .kTop #kBearb{border:0!important;background:#E9E9EE!important;border-radius:10px!important;padding:5px 12px!important;font-size:16px!important;font-weight:600!important;text-decoration:none!important}html body .kTop #kZu{color:#C4161C!important}
+html body .ab{font-size:13px!important;letter-spacing:.3px;color:#6E6E73!important;font-weight:600!important;text-transform:uppercase;margin:20px 16px 7px!important}
+html body .ab span{text-transform:none;letter-spacing:0}
+/* Versteckt bleibt versteckt: display:flex!important oben darf .versteckt nicht schlagen (Fund 01.11.2026) */
+.reiter.versteckt,.schnell.versteckt,.chips.versteckt,.tChips.versteckt,.filter.versteckt,.tage.versteckt,.reiter[hidden],.schnell[hidden],.chips[hidden],.tChips[hidden],.filter[hidden],.tage[hidden],.reiter div.versteckt{display:none!important}
+/* Kreise mit Anfangsbuchstaben: grau statt bunt (Baran: „viel zu bunt“) */
+.av,.vav{background:#C7C7CC!important;color:#fff!important}
+.leiste button{border-radius:13px!important}
+/* Tippflächen mindestens 44 px (Prüfbericht 01.11.2026). Kleine Knöpfe bleiben optisch klein, die Fläche zum Antippen wird größer */
+html body header .mxStart,html body .topbar .mxStart,html body .kTop #kZu{min-height:44px!important;display:inline-flex!important;align-items:center!important}
+.z button.chip,.z .chip.akt,#ablPwNeu,#ablAus{position:relative}
+.z button.chip:after,.z .chip.akt:after,#ablPwNeu:after,#ablAus:after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:44px;transform:translateY(-50%)}
+#ablPwNeu,#ablAus{display:inline-block;padding:6px 2px}
+/* Nichts abschneiden am Handy: lange Namen und Autos dürfen in die zweite Zeile */
+.k .t b span.n,.t b span.n{white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+/* PC und Mac (Test 01.11.2026): Kopfzeile und Inhalt in derselben 680-px-Spalte, auf allen Seiten gleich */
+@media(min-width:760px){header,.topbar,.kTop{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}
+  main,.app{max-width:680px!important;margin-left:auto!important;margin-right:auto!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}
+#sortierung{font-size:16px!important}   /* sonst zoomt das iPhone beim Antippen */
+input[type=date],input[type=time]{min-width:0;max-width:100%}
+</style><style>
+/* Listenkopf (04.11.2026) */
+.lkKopf{margin:12px 0 10px}.lkSuche{display:flex;align-items:center;gap:8px;background:#E4E4E9;border-radius:12px;padding:0 12px;height:44px;box-sizing:border-box}
+.lkSuche svg{width:18px;height:18px;flex:0 0 auto;stroke:#6E6E73;fill:none;stroke-width:2;stroke-linecap:round}
+.lkSuche input{flex:1;min-width:0;width:100%!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;height:40px;font:500 16px inherit;font-family:inherit;outline:0;-webkit-appearance:none;appearance:none}
+.lkSuche input::-webkit-search-cancel-button{-webkit-appearance:none}
+.lkSuche button{flex:0 0 auto;border:0;background:#AEAEB2;color:#fff;border-radius:50%;width:20px;height:20px;padding:0;font-size:12px;line-height:20px;cursor:pointer}
+.lkFelder{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column;gap:10px;margin-top:10px}
+.lkFeld{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:9px 12px;cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
+.lkFeld span{flex:1;min-width:0}.lkFeld small{display:block;font-size:11px;font-weight:700;color:#8A8A8E;text-transform:uppercase;letter-spacing:.4px}
+.lkFeld b{display:block;font-size:16px;font-weight:700;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lkFeld em{font-style:normal;color:#C7C7CC;font-size:20px}
+.lkFeld.gew b{color:#C4161C}
+.lkZeile{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:9px 4px 0;font-size:14px;font-weight:600;color:#6E6E73;min-height:18px}
+.lkZeile a{color:#C4161C;font-weight:700;text-decoration:none;white-space:nowrap;cursor:pointer}
+.lkRad{background:#F7F7F9;border-radius:14px;overflow:hidden}.lkRad div{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:.5px solid #E5E5EA;cursor:pointer}.lkRad div:first-child{border-top:0}
+.lkRad div span{flex:1;min-width:0;font-size:16px;font-weight:600}.lkRad div u{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:2px solid #C7C7CC;box-sizing:border-box}.lkRad div.an u{border:7px solid #C4161C}
+.lkFertig{display:block;width:100%;margin-top:14px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
+
+.mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
+.mxKnopf span,.mxKlapp>summary span{flex:1;min-width:0}
+.mxKnopf b,.mxKlapp>summary b{display:block;font-size:16px;font-weight:800;color:#1C1C1E}
+.mxKnopf i,.mxKlapp>summary i{display:block;font-style:normal;font-size:13px;color:#8A8A8E;margin-top:2px;font-weight:600}
+.mxKnopf em,.mxKlapp>summary em{flex:0 0 auto;font-style:normal;font-size:28px;color:#C4161C;font-weight:700;line-height:1;transition:transform .15s}
+.mxKnopf:active,.mxKlapp>summary:active{background:#F6F6F7}
+.mxKlapp>summary{list-style:none}.mxKlapp>summary::-webkit-details-marker{display:none}
+.mxKlapp[open]>summary{margin-bottom:10px}.mxKlapp[open]>summary em{transform:rotate(90deg)}
+.mxBg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;display:none}.mxBg.auf{display:block}
+.mxFenster{position:fixed;left:0;right:0;bottom:0;z-index:91;background:#fff;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:none;box-shadow:0 -10px 30px rgba(0,0,0,.18);margin:0 auto;max-width:560px;box-sizing:border-box;text-align:left}
+.mxFenster.auf{display:block;animation:mxHoch .22s ease-out}.mxBg.auf{animation:mxBlende .2s ease-out}
+@keyframes mxHoch{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}@keyframes mxBlende{from{opacity:0}to{opacity:1}}
+@media(min-width:700px){.mxFenster{top:50%;bottom:auto;transform:translateY(-50%);border-radius:22px;width:calc(100% - 48px);padding:20px}.mxFenster.auf{animation:mxMitte .2s ease-out}}
+@keyframes mxMitte{from{transform:translateY(-46%);opacity:0}to{transform:translateY(-50%);opacity:1}}
+.mxKopf{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.mxKopf h3{font-size:19px;font-weight:900;margin:0;color:#1C1C1E}
+.mxZu{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:0;background:#F2F2F4;font-size:17px;font-weight:800;cursor:pointer;color:#1C1C1E;font-family:inherit}
+.mxKlein{margin-top:8px}.mxKlein>summary{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:14px;font-weight:800;color:#1C1C1E;background:#F2F2F4;border-radius:999px;padding:9px 14px;min-height:40px;box-sizing:border-box}
+.mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
+.mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
+</style></head><body><script>
+/* Listenkopf: Suche, Auswahlfelder, Trefferzahl, Filter zurücksetzen (04.11.2026) */
+(function(){if(window.mxListenkopf)return;
+  const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+  const norm=t=>String(t==null?"":t).toLowerCase().replace(/\s+/g," ").trim();
+  function blatt(titel,werte,wert,fertig){let f=document.getElementById("lkFenster");
+    if(!f){f=document.createElement("div");f.className="mxFenster";f.id="lkFenster";f.setAttribute("role","dialog");document.body.appendChild(f)}
+    let w=wert;f.setAttribute("aria-label",titel);
+    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div><div class="lkRad">'+
+      werte.map(([v,t],i)=>'<div data-i="'+i+'" class="'+(v===w?"an":"")+'"><span>'+esc(t)+'</span><u></u></div>').join("")+'</div><button type="button" class="lkFertig">Fertig</button>';
+    f.querySelectorAll("[data-i]").forEach(z=>z.onclick=()=>{w=werte[+z.dataset.i][0];f.querySelectorAll("[data-i]").forEach(y=>y.classList.toggle("an",y===z))});
+    f.querySelector(".lkFertig").onclick=()=>{window.mxZu();fertig(w)};window.mxAuf("lkFenster")}
+  window.mxListenkopf=function(hostId,schluessel,o){const K="mietixLK:"+schluessel;let st={};try{st=JSON.parse(sessionStorage.getItem(K)||"{}")}catch(e){}
+    const LK={q:norm(st.q),w:Object.assign({},st.w||{}),roh:st.q||""};let bau=false,zeileT="";
+    const merke=()=>{try{sessionStorage.setItem(K,JSON.stringify({q:LK.roh,w:LK.w}))}catch(e){}};
+    const host=()=>document.getElementById(hostId);
+    const felderZeigen=()=>{(o.felder||[]).forEach(f=>{const el=host().querySelector('[data-lk="'+f.k+'"]');if(!el)return;const v=LK.w[f.k]||"",p=(f.werte()||[]).find(x=>x[0]===v);
+      el.querySelector("b").textContent=v?(p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
+    const zeileZeigen=()=>{const z=host().querySelector(".lkZeile");if(!z)return;z.innerHTML='<span>'+esc(zeileT)+'</span>'+(LK.aktiv()?'<a role="button" tabindex="0">Filter zurücksetzen</a>':"");
+      const a=z.querySelector("a");if(a)a.onclick=()=>{LK.roh="";LK.q="";LK.w={};merke();const i=host().querySelector("input");if(i)i.value="";kreuz();felderZeigen();o.neu()}};
+    const kreuz=()=>{const k=host().querySelector(".lkSuche button");if(k)k.style.display=LK.roh?"":"none"};
+    LK.aktiv=()=>!!LK.q||Object.keys(LK.w).some(k=>LK.w[k]);
+    LK.passt=t=>{if(!LK.q)return true;const h=norm(t);return LK.q.split(" ").every(x=>h.includes(x))};
+    LK.zeile=t=>{zeileT=t;zeileZeigen()};
+    LK.bauen=()=>{const h=host();if(!h)return LK;if(!bau||!h.firstChild){bau=true;h.innerHTML='<div class="lkKopf"><label class="lkSuche"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input type="search" autocomplete="off" placeholder="'+esc(o.suche||"Suchen")+'" aria-label="Suchen"><button type="button" aria-label="Suche leeren">✕</button></label>'+
+        ((o.felder||[]).length?'<div class="lkFelder">'+o.felder.map(f=>'<div class="lkFeld" role="button" tabindex="0" data-lk="'+f.k+'"><span><small>'+esc(f.t)+'</small><b></b></span><em>›</em></div>').join("")+'</div>':"")+'<div class="lkZeile"></div></div>';
+      const i=h.querySelector("input");i.value=LK.roh;i.addEventListener("input",()=>{LK.roh=i.value;LK.q=norm(i.value);merke();kreuz();o.neu()});
+      h.querySelector(".lkSuche button").onclick=e=>{e.preventDefault();i.value="";LK.roh="";LK.q="";merke();kreuz();o.neu();i.focus()};kreuz();
+      (o.felder||[]).forEach(f=>{h.querySelector('[data-lk="'+f.k+'"]').onclick=()=>{blatt(f.t,[["",f.alle]].concat(f.werte()||[]),LK.w[f.k]||"",w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()})}})}
+      felderZeigen();zeileZeigen();return LK};
+    return LK};
+  const tag=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  window.mxListenkopf.zeit=[["heute","Heute"],["woche","Diese Woche"],["naechsteW","Nächste Woche"],["monat","Dieser Monat"],["vormonat","Letzter Monat"],["naechsterM","Nächster Monat"],["jahr","Dieses Jahr"]];
+  window.mxListenkopf.spanne=function(w){const n=new Date(),j=n.getFullYear(),m=n.getMonth(),mo=new Date(j,m,n.getDate()-((n.getDay()+6)%7));
+    const pl=(d,x)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+x);
+    return{heute:[tag(n),tag(n)],woche:[tag(mo),tag(pl(mo,6))],naechsteW:[tag(pl(mo,7)),tag(pl(mo,13))],monat:[tag(new Date(j,m,1)),tag(new Date(j,m+1,0))],vormonat:[tag(new Date(j,m-1,1)),tag(new Date(j,m,0))],naechsterM:[tag(new Date(j,m+1,1)),tag(new Date(j,m+2,0))],jahr:[j+"-01-01",j+"-12-31"]}[w]||null};
+})();
+</script>
+<header><h1>MIETIX <span>MONAT</span></h1></header>
+<main>
+<div id="abgleich"></div>
+<div id="lk"></div>
+<div id="inhalt"><div class="leer">Wird geladen …</div></div>
+</main>
+<div class="mxFenster" id="fAendern" role="dialog" aria-label="Zahlungen ändern"></div>
+<div class="meldung" id="meldung"><span id="meldungT"></span><button type="button" id="meldungZ">Rückgängig</button></div>
+<script>
+const $=id=>document.getElementById(id);
+const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+const schreib=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+const zahl=v=>{if(v===null||v===undefined)return null;const s=String(v).replace(/€/g,"").trim();if(!s)return null;
+  const n=parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""));return isNaN(n)?null:n};
+const n0=v=>zahl(v)||0;
+const eur=n=>Math.round(n||0).toLocaleString("de-DE")+" €";
+const wie=n=>{n=Math.round(+n||0);return n.toLocaleString("de-DE")};   // so steht ein Betrag im Mietvertrag (ohne €)
+const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const de=s=>s&&/^\d{4}-\d\d-\d\d/.test(s)?s.slice(8,10)+"."+s.slice(5,7)+".":"";
+const istTag=s=>/^\d{4}-\d\d-\d\d$/.test(String(s||""));
+const MON=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const monName=m=>MON[+m.slice(5,7)-1]+" "+m.slice(0,4);
+const pad=n=>String(n).padStart(2,"0");
+const heute=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
+const JETZT=heute().slice(0,7);
+const vorMon=m=>{const d=new Date(+m.slice(0,4),+m.slice(5,7)-2,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)};
+const MAPPE=nr=>"https://barankohler.github.io/mietix-vertrag/?nr="+encodeURIComponent(nr)+"&zeige=mappe&von=Monat";
+const ANFRAGE=a=>a.status==="gebucht"?"https://barankohler.github.io/mietix-vertrag/?buchung="+encodeURIComponent(a.id)+"&von=Monat":"https://barankohler.github.io/mietix-anfragen/?zeige="+encodeURIComponent(a.id);   // wie Seite Geld
+const ichMail=()=>{try{return((JSON.parse(localStorage.getItem("mietixSitzung")||"null")||{}).email||"").toLowerCase()}catch(e){return""}};
+
+/* ---------- Jede Miete in Posten ----------
+   art: miete | verl | nach | kaution;  am leer = noch offen.  Nichts wird doppelt gezählt (siehe Kopf der Datei). */
+const imRest=y=>!!(y.imRest||y.bezahlt);   // so liegt die Verlängerung im Mietvertrag im Rest
+function verlInRest(v){return(v.verlaengerungen||[]).filter(imRest).reduce((s,y)=>s+(+y.aufpreis||0),0)}
+function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kautionRueck||{},an=z.anz||{},re=z.rest||{};
+  if(n0(an.betrag))l.push({art:"miete",t:"Anzahlung",b:n0(an.betrag),am:istTag(an.am)?an.am:""});
+  const mietRest=n0(re.betrag)-verlInRest(v);
+  if(mietRest>0)l.push({art:"miete",t:"Mietpreis Rest",b:mietRest,am:istTag(re.am)?re.am:""});
+  (v.verlaengerungen||[]).forEach((y,i)=>{const b=+y.aufpreis||0;if(b<=0)return;
+    const am=y.imRest?(istTag(re.am)?re.am:""):y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";
+    l.push({art:"verl",t:"Verlängerung"+(v.verlaengerungen.length>1?" "+(i+1):""),b,am})});
+  const s=+e.summe||0;
+  if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0;
+    if(bz&&bz.art==="Kaution"&&kr.verrechnet){}   // steckt im Einbehalt der Kaution
+    else if(eB>0)l.push({art:"nach",t:"Nachzahlung Rückgabe",b:eB,am:bz.am});
+    if(!(bz&&bz.art==="Kaution"&&kr.verrechnet)&&s-eB>0)l.push({art:"nach",t:"Nachzahlung Rückgabe",b:s-eB,am:""})}
+  if(kr.verrechnet&&+kr.einbehalt>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:+kr.einbehalt,am})}
+  return l}
+// Anzahlung einer Buchung ohne Mietvertrag zählt schon (wie Seite Geld)
+function anfrageZeilen(){return lies("mietixAnfragen",[]).filter(a=>a&&!a._weg&&a.status!=="abgesagt"&&!a.vertrag&&a.anzahlung&&n0(a.anzahlung.betrag)).map(a=>({
+  anf:a,v:{nr:"",name:a.name||"",auto:a.auto||"",vonD:a.von||a.vonD||"",bisD:a.bis||a.bisD||""},
+  p:[{art:"miete",t:"Anzahlung",b:n0(a.anzahlung.betrag),am:istTag(a.anzahlung.am)?a.anzahlung.am:""}]}))}
+function alleMieten(){return lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&v.nr).map(v=>({v,p:posten(v)})).concat(anfrageZeilen())}
+
+/* ---------- Seite ---------- */
+function zeichne(){
+  const M=LK.w.mon||JETZT,inMon=d=>String(d||"").slice(0,7)===M;
+  const alle=alleMieten();
+  const liste=alle.map(x=>{const drin=x.p.filter(y=>y.am&&inMon(y.am)),offen=x.p.filter(y=>!y.am);
+      const zeitIn=String(x.v.vonD||"").slice(0,7)<=M&&String(x.v.bisD||x.v.vonD||"").slice(0,7)>=M;
+      return Object.assign(x,{drin,offen,rein:drin.reduce((s,y)=>s+y.b,0),off:offen.reduce((s,y)=>s+y.b,0),zeigen:drin.length>0||(zeitIn&&offen.length>0)})})
+    .filter(x=>x.zeigen);
+  const passt=liste.filter(x=>(!LK.w.auto||x.v.auto===LK.w.auto)&&LK.passt(x.v.name+" "+x.v.auto+" "+x.v.nr));
+  LK.zeile(passt.length+(passt.length===1?" Miete":" Mieten")+" im "+monName(M));
+  const sum=a=>passt.reduce((s,x)=>s+x.drin.filter(y=>y.art===a).reduce((t,y)=>t+y.b,0),0);
+  const anz=a=>passt.filter(x=>x.drin.some(y=>y.art===a)).length;
+  const miete=sum("miete"),verl=sum("verl"),kEin=sum("kaution"),nach=sum("nach"),rein=miete+verl+kEin+nach,offen=passt.reduce((s,x)=>s+x.off,0);
+  // Kaution: bei Übergabe im Monat erhalten, und was gerade bei uns liegt (erhalten, noch nicht zurückgegeben)
+  const kautErh=v=>{const k=(v.zahlung||{}).kaut||{};return istTag(k.am)?n0(k.betrag):0};
+  const kErh=passt.filter(x=>x.v.zahlung&&inMon(((x.v.zahlung||{}).kaut||{}).am)).reduce((s,x)=>s+kautErh(x.v),0);
+  const kBei=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&(!LK.w.auto||v.auto===LK.w.auto)).reduce((s,v)=>{const kr=v.kautionRueck||{};return s+(kautErh(v)&&!istTag(kr.am)?Math.max(0,kautErh(v)-(kr.verrechnet?+kr.einbehalt||0:0)):0)},0);
+  const vm=vorMon(M),reinVor=alle.reduce((s,x)=>s+x.p.filter(y=>String(y.am).slice(0,7)===vm).reduce((t,y)=>t+y.b,0),0);
+  const d=reinVor?Math.round((rein-reinVor)/reinVor*100):null,st=n=>n+(n===1?" Miete":" Mieten"),MN=MON[+M.slice(5,7)-1];
+  let h='<div class="drei">'+
+    '<div class="gr"><i>Mietpreise</i><b>'+eur(miete)+'</b><small>'+st(anz("miete"))+'</small></div>'+
+    '<div class="gr"><i>Verlängerungen</i><b>'+eur(verl)+'</b><small>'+st(anz("verl"))+'</small></div>'+
+    '<div class="gr"><i>Kaution einbehalten</i><b>'+eur(kEin)+'</b><small>'+st(anz("kaution"))+'</small></div></div>';
+  h+='<div class="karte gesamt">'+
+    '<div class="gz"><span>Nachzahlungen bei Rückgabe</span><b>'+eur(nach)+'</b></div>'+
+    '<div class="gz summe1"><span>Zusammen im '+MN+'</span><b>'+eur(rein)+'</b></div>'+
+    (d!=null&&!LK.aktiv()?'<div class="vgl '+(d>=0?"hoch":"runter")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+' % gegenüber '+MON[+vm.slice(5,7)-1]+' ('+eur(reinVor)+')</div>':"")+
+    (offen?'<div class="gz offen"><span>Noch offen</span><b>'+eur(offen)+'</b></div>':"")+
+    '<div class="kz">Kaution: '+eur(kErh)+' im '+MN+' bei Übergabe erhalten, '+eur(kBei)+' liegen gerade bei uns.</div></div>';
+  h+='<div class="abschnitt">Jede Miete im '+MN+'</div>';
+  if(!passt.length)h+='<div class="karte leer">Keine Miete im '+monName(M)+(LK.aktiv()?" mit diesem Filter":"")+'.</div>';
+  else{h+='<div class="tab"><div class="tk"><span>Miete</span><span>Mietpreis</span><span>Verläng.</span><span>Kaution</span><span>Gesamt</span></div>';
+    passt.sort((a,b)=>String(b.v.vonD).localeCompare(String(a.v.vonD))).forEach((x,i)=>{const s=a=>x.drin.filter(y=>y.art===a).reduce((t,y)=>t+y.b,0),zelle=b=>b?eur(b):'<u>0 €</u>';
+      const schl=x.anf?"a:"+x.anf.id:"v:"+x.v.nr;
+      h+='<button type="button" class="tz" data-m="'+esc(schl)+'"><span class="wer"><b>'+esc(x.v.name||"Ohne Namen")+'</b><small>'+esc(x.v.auto)+(x.v.vonD?', '+de(x.v.vonD):"")+(x.anf?', Buchung':"")+'</small>'+
+        (x.off?'<em class="off">'+eur(x.off)+' offen</em>':"")+'<em class="aend">Ändern</em></span>'+
+        '<span>'+zelle(s("miete"))+'</span><span>'+zelle(s("verl"))+'</span><span>'+zelle(s("kaution"))+'</span><span class="ges">'+eur(x.rein)+'</span></button>'});
+    h+='<div class="tz fuss"><span class="wer"><b>Summe</b></span><span>'+eur(miete)+'</span><span>'+eur(verl)+'</span><span>'+eur(kEin)+'</span><span class="ges">'+eur(rein)+'</span></div></div>'+
+      (nach?'<div class="leise" style="margin:8px 4px 0">Gesamt enthält auch Nachzahlungen bei Rückgabe ('+eur(nach)+').</div>':"")}
+  h+='<div class="leise" style="text-align:center;margin-top:16px">Gezählt wird, was im Mietvertrag als bezahlt steht, im Monat der Zahlung. Stimmt etwas nicht, Miete antippen und ändern.</div>';
+  $("inhalt").innerHTML=h;
+  $("inhalt").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>oeffne(b.dataset.m))}
+
+/* ---------- Ändern: direkt hier korrigieren, gespeichert wird im Mietvertrag ---------- */
+let OFFEN=null;
+function feld(id,wert,art,ph){return art==="tag"?'<input type="date" id="'+id+'" value="'+esc(istTag(wert)?wert:"")+'" aria-label="Bezahlt am">'
+  :art==="text"?'<input id="'+id+'" value="'+esc(wert||"")+'" placeholder="'+esc(ph||"")+'" data-einheit="">'
+  :'<input id="'+id+'" inputmode="decimal" data-einheit="€" value="'+(wert?wie(wert):"")+'" placeholder="0">'}
+const zeile=(t,u,a,b)=>'<div class="fz"><label>'+t+(u?'<small>'+u+'</small>':"")+'</label>'+a+(b||"<span></span>")+'</div>';
+function oeffne(schl){const f=$("fAendern");
+  if(schl.startsWith("a:")){const a=lies("mietixAnfragen",[]).find(x=>x&&x.id===schl.slice(2));if(!a)return;const z=a.anzahlung||{};OFFEN={schl};
+    f.innerHTML='<div class="mxKopf"><h3>'+esc(a.name||"Buchung")+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+
+      '<div class="leise">'+esc(a.auto||"")+', Buchung noch ohne Mietvertrag</div>'+
+      '<div class="fk">Anzahlung</div><div class="fg">'+zeile("Anzahlung","Betrag und bezahlt am",feld("eAnz",n0(z.betrag)),feld("eAnzAm",z.am,"tag"))+'</div>'+
+      '<div class="fhin" id="eHin"></div><div class="fknoepfe"><a href="'+esc(ANFRAGE(a))+'">Buchung öffnen</a><button type="button" id="eSp">Speichern</button></div>';
+  }else{const v=lies("mietixVorgaenge",[]).find(x=>x&&x.nr===schl.slice(2));if(!v)return;OFFEN={schl};
+    const z=v.zahlung||{},an=z.anz||{},re=z.rest||{},ka=z.kaut||{},kr=v.kautionRueck||{},e=v.endabrechnung||{},vl=v.verlaengerungen||[];
+    const s=+e.summe||0,bz=e.bezahlt||null,mitKaution=!!(bz&&bz.art==="Kaution"&&kr.verrechnet);
+    const teile=[e.mehrkm?"Mehr-km":"",e.tank?"Tank":"",e.versp?"Verspätung":"",(e.extra||[]).length?"Sonstiges":""].filter(Boolean).join(", ");
+    let h='<div class="mxKopf"><h3>'+esc(v.name||"Mietvertrag")+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+
+      '<div class="leise">'+esc(v.auto||"")+(v.vonD?', '+de(v.vonD)+' bis '+de(v.bisD):"")+', Nr. '+esc(v.nr)+'. Bezahlt-Datum leer lassen heißt: noch offen.</div>'+
+      '<div class="fk">Mietpreis</div><div class="fg">'+
+        zeile("Anzahlung","",feld("eAnz",n0(an.betrag)),feld("eAnzAm",an.am,"tag"))+
+        zeile("Rest","ohne Verlängerung",feld("eRest",Math.max(0,n0(re.betrag)-verlInRest(v))),feld("eRestAm",re.am,"tag"))+'</div>';
+    if(vl.length)h+='<div class="fk">Verlängerungen</div><div class="fg">'+vl.map((y,i)=>zeile("Verlängerung"+(vl.length>1?" "+(i+1):""),"bis "+de(y.bisNeu||"")+(y.imRest?", kommt mit dem Rest":""),feld("eV"+i,+y.aufpreis||0),
+        y.imRest?'<span class="leise" style="text-align:right">wie Rest</span>':feld("eVAm"+i,y.bezahlt?(y.bezahltAm||y.am):"","tag"))).join("")+'</div>';
+    if(s>0)h+='<div class="fk">Nachzahlung bei Rückgabe</div><div class="fg">'+
+      (mitKaution?zeile("Abgerechnet "+eur(s),(teile?teile+", ":"")+"mit der Kaution verrechnet",'<span></span>')
+        :zeile("Bezahlt","abgerechnet "+eur(s)+(teile?", "+teile:""),feld("eNach",bz?(bz.betrag!=null?+bz.betrag:s):s),feld("eNachAm",bz&&bz.am,"tag")))+'</div>';
+    h+='<div class="fk">Kaution</div><div class="fg">'+
+      zeile("Erhalten","bei Übergabe",feld("eKaut",n0(ka.betrag)),feld("eKautAm",ka.am,"tag"))+
+      zeile("Einbehalten","bleibt bei uns",feld("eEin",kr.verrechnet?+kr.einbehalt||0:0),'<span></span>')+
+      '<div class="fz grund"><label>Grund</label>'+feld("eGrund",kr.verrechnet?kr.grund:"","text","Schaden, Reinigung, Tank")+'</div>'+
+      zeile("Zurückgegeben","Datum leer: noch nicht",feld("eZur",kr.betrag!=null?+kr.betrag||0:0),feld("eZurAm",kr.am,"tag"))+'</div>'+
+      '<div class="fhin" id="eHin"></div>'+
+      '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Mappe öffnen</a><button type="button" id="eSp">Speichern</button></div>';
+    f.innerHTML=h}
+  f.querySelector(".mxZu").onclick=()=>window.mxZu();
+  f.querySelectorAll("input").forEach(i=>i.addEventListener("input",pruefe));
+  $("eSp").onclick=speichern;
+  window.mxAuf("fAendern");if(typeof window.mxEinheit==="function")window.mxEinheit();pruefe()}
+// Prüft beim Tippen: rote Felder, wenn keine Zahl; gelber Hinweis, wenn die Kaution nicht aufgeht (nur Hinweis, Speichern geht trotzdem)
+function pruefe(){let falsch=0;document.querySelectorAll("#fAendern input[inputmode=decimal]").forEach(i=>{const bad=i.value.trim()!==""&&zahl(i.value)===null||(zahl(i.value)||0)<0;i.classList.toggle("falsch",bad);if(bad)falsch++});
+  const hin=$("eHin");if(!hin)return!falsch;
+  if(falsch){hin.className="fhin rot";hin.textContent="Bitte nur Zahlen eintragen, zum Beispiel 800. Rot markiert ist, was nicht passt.";return false}
+  if($("eKaut")){const k=zahl($("eKaut").value)||0,ein=zahl($("eEin").value)||0,zur=zahl($("eZur").value)||0;
+    if(k&&ein+zur&&Math.round(ein+zur)!==Math.round(k)){hin.className="fhin gelb";hin.textContent="Kaution erhalten "+eur(k)+", einbehalten und zurück zusammen "+eur(ein+zur)+". Bitte kurz prüfen.";return true}}
+  hin.className="fhin";hin.textContent="";return true}
+function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
+  const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
+  if(schl.startsWith("a:")){const l=lies("mietixAnfragen",[]),a=l.find(x=>x&&x.id===schl.slice(2));if(!a)return;const vorher=JSON.stringify(a);
+    const za=a.anzahlung||{};if(Math.round(n0(za.betrag))===w("eAnz")&&(istTag(za.am)?za.am:"")===t("eAnzAm")){window.mxZu();return}   // nichts geändert
+    a.anzahlung=Object.assign({},za,{betrag:w("eAnz"),am:t("eAnzAm")});
+    (a.verlauf=a.verlauf||[]).push({am:jetzt,was:"Anzahlung auf der Seite Monat geändert"});
+    return fertig("mietixAnfragen","id",a.id,vorher,l)}
+  const l=lies("mietixVorgaenge",[]),v=l.find(x=>x&&x.nr===schl.slice(2));if(!v)return;const vorher=JSON.stringify(v);
+  // Nur was wirklich anders ist, wird geschrieben: Öffnen und Speichern ohne Änderung lässt den Mietvertrag, wie er ist
+  const z=v.zahlung=v.zahlung||{};
+  const setz=(k,b,am)=>{const o=Object.assign({},z[k]||{});let neu=false;
+    if(Math.round(n0(o.betrag))!==b){o.betrag=b?wie(b):"";neu=true}
+    if((istTag(o.am)?o.am:"")!==am){o.am=am;if(!am&&k!=="kaut")o.art="";neu=true}
+    if(neu)z[k]=o};
+  setz("anz",w("eAnz"),t("eAnzAm"));
+  // Verlängerungen zuerst, dann der Rest: im Mietvertrag steckt die Verlängerung im Rest
+  let preisPlus=0;(v.verlaengerungen||[]).forEach((y,i)=>{if(!$("eV"+i))return;const neu=w("eV"+i),alt=+y.aufpreis||0;if(neu!==alt){preisPlus+=neu-alt;y.aufpreis=neu}
+    if(!y.imRest){const am=t("eVAm"+i),war=y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";if(am!==war){if(am){y.bezahlt=true;y.bezahltAm=am}else{y.bezahlt=false;delete y.bezahltAm}}}});
+  if(preisPlus){v.preis1=wie(n0(v.preis1)+preisPlus);v.gesamt=wie(n0(v.preis1)+n0(v.preis2)+n0(v.paketPreis))}   // Mietpreis im Mietvertrag zieht mit, wie beim Verlängern
+  {const r=Math.round(n0((z.rest||{}).betrag)),vr=verlInRest(v),soll=w("eRest")+vr;   // Rest ohne Verlängerung unverändert: Rest wächst nur um die geänderte Verlängerung
+    setz("rest",soll===r?r:soll,t("eRestAm"))}
+  if($("eNach")){const e=v.endabrechnung,b=w("eNach"),am=t("eNachAm"),bz=e.bezahlt||null,warAm=bz&&istTag(bz.am)?bz.am:"",warB=bz?(bz.betrag!=null?Math.round(+bz.betrag||0):Math.round(+e.summe||0)):Math.round(+e.summe||0);
+    if(am!==warAm||b!==warB){if(am){e.bezahlt=Object.assign({},bz||{},{am});if(e.bezahlt.art==="Kaution")e.bezahlt.art="";if(b===Math.round(+e.summe||0))delete e.bezahlt.betrag;else e.bezahlt.betrag=b}else delete e.bezahlt}}
+  setz("kaut",w("eKaut"),t("eKautAm"));
+  {const kr=v.kautionRueck||{},ein=w("eEin"),zur=w("eZur"),zurAm=t("eZurAm"),grund=t("eGrund").trim();
+    const warEin=kr.verrechnet?Math.round(+kr.einbehalt||0):0,warZur=kr.betrag!=null?Math.round(+kr.betrag||0):0,warAm=istTag(kr.am)?kr.am:"",warGrund=kr.verrechnet?String(kr.grund||""):"";
+    if(ein!==warEin||zur!==warZur||zurAm!==warAm||grund!==warGrund){const k=v.kautionRueck=Object.assign({},kr);
+      if(zur!==warZur)k.betrag=zur;if(zurAm!==warAm)k.am=zurAm;if(grund!==warGrund)k.grund=grund;
+      if(ein!==warEin){k.einbehalt=ein;if(ein){k.verrechnet=true;k.teil=false}else if(!k.posten||!k.posten.length)delete k.verrechnet}}}
+  if(JSON.stringify(v)===vorher){window.mxZu();return}   // nichts geändert
+  const m=ichMail();if(m)v.geaendert={wer:m,am:jetzt};
+  (v.verlauf=v.verlauf||[]).push({am:jetzt,was:"Zahlungen auf der Seite Monat geändert"});
+  fertig("mietixVorgaenge","nr",v.nr,vorher,l)}
+let ZURUECK=null,MT=0;
+function fertig(k,pk,id,vorher,l){if(!schreib(k,l)){const hin=$("eHin");hin.className="fhin rot";hin.textContent="Nicht gespeichert: der Speicher dieses Geräts ist voll. Bitte Seite neu laden und noch einmal versuchen.";return}
+  window.mxZu();zeichne();ZURUECK={k,pk,id,vorher};
+  const me=$("meldung");$("meldungT").textContent="✓ Gespeichert, auch im Mietvertrag";me.style.display="flex";clearTimeout(MT);MT=setTimeout(()=>{me.style.display="none";ZURUECK=null},7000)}
+$("meldungZ").onclick=()=>{const z=ZURUECK;if(!z)return;const l=lies(z.k,[]),i=l.findIndex(x=>x&&x[z.pk]===z.id);if(i>=0){l[i]=JSON.parse(z.vorher);schreib(z.k,l)}
+  ZURUECK=null;$("meldung").style.display="none";zeichne()};
+
+const MONATE=()=>{const s=new Set();alleMieten().forEach(x=>x.p.forEach(p=>p.am&&s.add(p.am.slice(0,7))));s.delete(JETZT);
+  return[...s].sort().reverse().map(m=>[m,m.slice(0,4)===JETZT.slice(0,4)?MON[+m.slice(5,7)-1]:monName(m)])};
+const LK=mxListenkopf("lk","monat",{suche:"Name, Auto oder Nummer",felder:[
+  {k:"mon",t:"Monat",alle:MON[+JETZT.slice(5,7)-1],werte:MONATE},
+  {k:"auto",t:"Fahrzeug",alle:"Alle",werte:()=>[...new Set(alleMieten().map(x=>x.v.auto).filter(Boolean))].sort().map(a=>[a,a])}],neu:zeichne}).bauen();
+zeichne();
+// Kommt vom Abgleich etwas Neues, neu zeichnen, aber nie ein offenes Ändern-Fenster überschreiben
+window.addEventListener("mietix-abgleich",()=>{if(!$("fAendern").classList.contains("auf"))zeichne()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("fAendern").classList.contains("auf"))zeichne()});
+</script>
+<script>/* Mietix Abgleich: Mietverträge, Anfragen, Kunden und Fahrzeuge auf allen Geräten gleich (Supabase Frankfurt, seit 26.10.2026).
+   Wird von tools/vertrag/build_html.py und tools/anfragen/build_html.py in die Seite eingebaut.
+   - Die Werkzeuge arbeiten weiter nur mit localStorage. Dieser Baustein merkt jede Änderung an den vier Speichern,
+     schickt sie hoch und holt neue Stände der anderen Geräte (beim Start, beim Zurückkehren zur Seite, jede Minute).
+   - Ohne Internet oder ohne Anmeldung läuft alles wie vorher, der Abgleich holt später nach.
+   - Gelöschte Einträge (Anfragen-Buch) gehen als {_weg:true} hoch, damit sie auch auf den anderen Geräten verschwinden.
+   - Anmeldung: E-Mail und Passwort, einmal pro Gerät. Gilt für alle Mietix-Werkzeuge auf barankohler.github.io.
+   - Seit 05.11.2026: Hochladen nur, wenn der Eintrag oben noch so ist wie beim Holen. Sonst neu holen und zusammenführen.
+     Beschädigte Listen gehen nie hoch, viele Löschungen auf einmal nur nach Rückfrage. SQL dazu: aenderung_2026_11_05.sql */
+(function(){
+const URL_="https://zbeqrwvlmiulxvhryiku.supabase.co";
+const KEY="sb_publishable_LVkvpgXMpBbq_OXgwOfTqg_ZRcRkFyQ";   // öffentlich gedacht, Schutz über Anmeldung und Regeln in der Datenbank
+const SPEICHER={mietixVorgaenge:{tab:"vorgaenge",pk:"nr",liste:true},mietixAnfragen:{tab:"anfragen",pk:"id",liste:true},
+  mietixKunden:{tab:"kunden",pk:"name",liste:false},mietixFahrzeuge:{tab:"fahrzeuge",pk:"name",liste:false},
+  mietixAusgaben:{tab:"ausgaben",pk:"id",liste:true},mietixSperren:{tab:"sperren",pk:"id",liste:true},
+  mietixAufgaben:{tab:"aufgaben",pk:"id",liste:true},mietixZustand:{tab:"zustand",pk:"id",liste:true},mietixAutos:{tab:"autos",pk:"name",liste:false},mietixStand:{tab:"stand",pk:"id",liste:false},mietixPapierkorb:{tab:"papierkorb",pk:"id",liste:true}};
+const roh=Storage.prototype.setItem;
+const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+// Eine Ablage lesen und dabei unterscheiden (05.11.2026): fehlt = gar nichts da, kaputt = da, aber nicht lesbar. Beides darf nie als „alles gelöscht“ hochgehen.
+function liesAblage(k){const c=SPEICHER[k],leer=c.liste?[]:{},r=localStorage.getItem(k);if(r===null||r==="")return{w:leer,fehlt:true};
+  try{const w=JSON.parse(r);if(w===null)return{w:leer,fehlt:true};if(c.liste?Array.isArray(w):(w&&typeof w==="object"&&!Array.isArray(w)))return{w}}catch(e){}
+  return{w:leer,kaputt:true}}
+const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v));return true}catch(e){if(window.mxVoll)mxVoll();else if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll. Seite offen lassen, sonst geht etwas verloren.");return false}};   // Hinweis auch hier (1.11.2026)
+// Jede Anfrage an den Speicher höchstens 20 Sekunden (31.10.2026): sonst hing der Abgleich bei schlechtem Netz für immer
+const KEINE_VERBINDUNG="Keine Verbindung, wird nachgeholt";   // statt „Failed to fetch“ und „signal is aborted“ (05.11.2026)
+const holeMit=(u,o)=>{const c=new AbortController(),t=setTimeout(()=>c.abort(),20000);return fetch(u,Object.assign({},o,{signal:c.signal})).catch(()=>{throw new Error(KEINE_VERBINDUNG)}).finally(()=>clearTimeout(t))};
+const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)};
+/* ---------- Unterschriften im eigenen Gerätespeicher (31.10.2026, Baran: auch bei 100 Mietverträgen flüssig, iPad, Handy, Laptop) ----------
+   localStorage hat in Safari nur 5 MB. Bilder (data:image…) liegen darum in IndexedDB (viel größer), in localStorage steht nur "bild:<Kennung>".
+   Der gemeinsame Speicher bekommt immer das ganze Bild, nie die Kennung. Fehlt ein Bild auf dem Gerät, wird es dort geholt.
+   Ohne IndexedDB (privates Fenster) bleibt alles wie vorher im localStorage. */
+const istBild=x=>typeof x==="string"&&x.length>200&&x.startsWith("data:image/");
+const istMarke=x=>typeof x==="string"&&x.startsWith("bild:");
+const h2=s=>{let a=0x811c9dc5;for(let i=0;i<s.length;i++){a^=s.charCodeAt(i);a=Math.imul(a,16777619)}return(a>>>0).toString(36)};
+const MARKEN=new Map(),BILD=new Map();
+const marke=s=>{let m=MARKEN.get(s);if(!m){m="bild:"+s.length.toString(36)+"-"+(Number(hash(s))>>>0).toString(36)+"-"+h2(s);MARKEN.set(s,m)}return m};
+const durch=(x,f)=>typeof x==="string"?f(x):Array.isArray(x)?x.map(y=>durch(y,f)):x&&typeof x==="object"?Object.keys(x).reduce((o,n)=>{o[n]=durch(x[n],f);return o},{}):x;
+let DB=null;
+const dbAuf=()=>DB||(DB=new Promise((ok,no)=>{try{const r=indexedDB.open("mietix",1);r.onupgradeneeded=()=>r.result.createObjectStore("bilder");
+  r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error);r.onblocked=()=>no(new Error("blockiert"))}catch(e){no(e)}}).catch(e=>{DB=null;throw e}));
+const dbRein=paare=>dbAuf().then(db=>new Promise((ok,no)=>{const t=db.transaction("bilder","readwrite"),st=t.objectStore("bilder");
+  paare.forEach(([k,v])=>st.put(v,k));t.oncomplete=()=>ok(true);t.onerror=t.onabort=()=>no(t.error||new Error("IndexedDB"))}));
+const dbHol=k=>dbAuf().then(db=>new Promise(ok=>{const r=db.transaction("bilder").objectStore("bilder").get(k);r.onsuccess=()=>ok(r.result||null);r.onerror=()=>ok(null)})).catch(()=>null);
+// Bilder raus: erst wenn sie sicher im Gerätespeicher liegen, kommt die Kennung zurück (sonst Fehler, dann bleibt das Bild stehen)
+async function bilderRaus(w){const neu=[];const s=durch(w,x=>{if(!istBild(x))return x;const m=marke(x);BILD.set(m,x);neu.push([m,x]);return m});
+  if(neu.length)await dbRein(neu);return s}
+// Alles vom gemeinsamen Speicher einmal in den Gerätespeicher holen (nur nötig, wenn das Gerät Bilder verloren hat)
+let ALLE_BILDER=null;
+function alleBilderHolen(){if(ALLE_BILDER)return ALLE_BILDER;
+  ALLE_BILDER=(async()=>{const neu=[];for(const t of["vorgaenge","stand","papierkorb"]){const z=await api(t+"?select=daten",{method:"GET"})||[];
+      durch(z.map(r=>r.daten),x=>{if(istBild(x)){const m=marke(x);if(!BILD.has(m)){BILD.set(m,x);neu.push([m,x])}}return x})}
+    try{if(neu.length)await dbRein(neu)}catch(e){}})().catch(e=>{ALLE_BILDER=null});return ALLE_BILDER}
+async function bildZuMarke(m){if(BILD.has(m))return BILD.get(m);const d=await dbHol(m);if(d){BILD.set(m,d);return d}return null}
+// Bilder rein: für den gemeinsamen Speicher und für das PDF. null = ein Bild fehlt überall, dann nichts hochschicken.
+async function bilderRein(w){const marken=new Set();durch(w,x=>{if(istMarke(x))marken.add(x);return x});if(!marken.size)return w;
+  for(const m of marken)if(!(await bildZuMarke(m))){if(sitzung&&navigator.onLine)await alleBilderHolen();break}
+  for(const m of marken)if(!BILD.has(m))return null;
+  return durch(w,x=>istMarke(x)?BILD.get(x):x)}
+window.mietixBild=async s=>{if(!istMarke(s))return s;const d=await bildZuMarke(s);if(d)return d;
+  if(sitzung&&navigator.onLine){await alleBilderHolen();if(BILD.has(s))return BILD.get(s)}return""};
+window.mietixBilderRein=bilderRein;
+/* Sicher auslagern: nur Einträge, die genau so schon im gemeinsamen Speicher liegen (Fingerabdruck = Grundlage).
+   Grund: Eine alte, noch offene Mietix-Seite kennt die Kennungen nicht. Stimmt die Grundlage, schickt sie nichts;
+   wäre der Eintrag noch nicht oben, könnte sie sonst die Kennung statt der Unterschrift hochschicken.
+   Die Grundlage wird gleich mit auf die ausgelagerte Form gesetzt (der Fingerabdruck ist derselbe). Ohne Anmeldung: immer. */
+async function sicherRaus(k,w,H){const c=SPEICHER[k];if(!c)return bilderRaus(w);
+  const h=H[k]=H[k]||{zeit:"",hash:{},felder:{}};if(!h.felder)h.felder={};const m=alsMap(k,w);let neu=false;
+  for(const p of Object.keys(m)){if(!JSON.stringify(m[p]).includes('"data:image/'))continue;
+    if(sitzung&&!gleichBasis(m[p],h.hash[p]))continue;   // noch nicht oben: bleibt vorerst ganz
+    m[p]=await bilderRaus(m[p]);neu=true;if(sitzung){h.hash[p]=fp(m[p]);if(FELDWEISE[k])h.felder[p]=felderVon(m[p])}}
+  return neu?ausMap(k,m):w}
+// Was die Seiten mit Bild in den localStorage schreiben, wird kurz danach ausgelagert
+let ausT=null,ausLauf=false;
+const auslagernBald=()=>{clearTimeout(ausT);ausT=setTimeout(auslagern,300)};
+async function auslagern(){if(ausLauf){auslagernBald();return}ausLauf=true;
+  try{for(const k of Object.keys(SPEICHER).concat(["mietixEntwurfProtokolle"])){const r=localStorage.getItem(k);if(!r||r.indexOf('"data:image/')<0)continue;
+      let w;try{w=JSON.parse(r)}catch(e){continue}
+      const H=lies("mietixAbgleich",{}),hv=JSON.stringify(H),s=await sicherRaus(k,w,H);if(s===w)continue;
+      if(localStorage.getItem(k)!==r||(laeuft&&k in SPEICHER)){auslagernBald();continue}   // inzwischen geändert oder Abgleich läuft: gleich noch einmal
+      if(JSON.stringify(lies("mietixAbgleich",{}))!==hv){auslagernBald();continue}
+      if(k in SPEICHER)merk("mietixAbgleich",H);roh.call(localStorage,k,JSON.stringify(s))}}
+  catch(e){}finally{ausLauf=false}}
+let NEU_AUFBAU=false,sitzung=lies("mietixSitzung",null),laeuft=false,nochmal=false,zuletzt=null,fehler="";
+// ungesichert: hier wurde etwas geändert, das noch nicht oben ist. FRAGEN: was Baran entscheiden muss. HINWEISE: bleibt rot stehen, bis er es wegtippt (05.11.2026)
+let ungesichert=false,aenderungen=0,FRAGEN=[],HINWEISE=lies("mietixAbgleichHinweise",[]);const LOESCH={};
+function hinweis(text){if(!HINWEISE.includes(text)){HINWEISE=HINWEISE.concat([text]).slice(-5);merk("mietixAbgleichHinweise",HINWEISE)}if(window.mxFehler)mxFehler(text)}
+
+/* ---------- Anmeldung ---------- */
+async function auth(pfad,body){const r=await holeMit(URL_+"/auth/v1/"+pfad,{method:"POST",headers:{apikey:KEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(j.error_description||j.msg||j.message||"Anmeldung fehlgeschlagen");e.status=r.status;throw e}return j}
+function sichern(j){sitzung={token:j.access_token,neu:j.refresh_token,bis:Date.now()+(j.expires_in||3600)*1000-60000,
+  email:(j.user&&j.user.email)||(sitzung&&sitzung.email)||""};merk("mietixSitzung",sitzung)}
+async function token(){if(!sitzung)return null;
+  if(Date.now()>sitzung.bis){try{sichern(await auth("token?grant_type=refresh_token",{refresh_token:sitzung.neu}))}
+    // Abmelden nur, wenn der Speicher die Anmeldung wirklich ablehnt, nicht bei schlechtem Netz (30.10.2026)
+    catch(e){if(e.status>=400&&e.status<500){sitzung=null;localStorage.removeItem("mietixSitzung");zeigen();return null}throw e}}
+  return sitzung.token}
+async function api(pfad,opt){const t=await token();if(!t)throw new Error("nicht angemeldet");
+  const r=await holeMit(URL_+"/rest/v1/"+pfad,Object.assign({},opt,{headers:Object.assign({apikey:KEY,Authorization:"Bearer "+t,"Content-Type":"application/json"},(opt||{}).headers||{})}));
+  if(!r.ok)throw new Error("Speicher antwortet "+r.status);const s=await r.text();return s?JSON.parse(s):null}
+
+/* ---------- Abgleich ---------- */
+function alsMap(k,w){const c=SPEICHER[k],m={};if(c.liste)(w||[]).forEach(x=>{if(x&&x[c.pk]!==undefined)m[String(x[c.pk])]=x});else Object.assign(m,w||{});return m}
+function ausMap(k,m){const c=SPEICHER[k];if(!c.liste)return m;return Object.keys(m).sort().map(p=>m[p])}
+/* Zusammenführen statt Überschreiben (30.10.2026, Nachtschicht):
+   - Erst holen, dann schicken. So kennt jedes Gerät den neuesten Stand, bevor es seinen eigenen hochlädt.
+   - Je Eintrag merkt sich das Gerät, wie er beim letzten Abgleich aussah (Fingerabdruck je Feld).
+     Haben beide Geräte verschiedene Felder geändert, kommen beide Änderungen zusammen.
+   - Haben beide dasselbe Feld verschieden geändert, bleibt die Fassung dieses Geräts stehen und die andere
+     Fassung liegt im Papierkorb ("Andere Fassung"), dort kann man sie wiederherstellen. Nichts verschwindet still.
+   - Geändert schlägt Gelöscht: wird ein Eintrag hier geändert und dort gelöscht, bleibt er da.
+   - Beim Holen wird zwei Minuten überlappend gefragt, damit kein Eintrag wegen ungleich gehender Uhren fehlt. */
+const UEBERLAPPUNG=2*60*1000;
+const FELDWEISE={mietixVorgaenge:1,mietixAnfragen:1,mietixKunden:1,mietixFahrzeuge:1,mietixAutos:1,mietixStand:1,mietixAusgaben:1,mietixSperren:1,mietixAufgaben:1,mietixZustand:1};
+const HANDVOLL=5;   // mehr Löschungen auf einmal gehen nur nach Rückfrage hoch (Papierkorb räumt sich selbst auf, Stand sind Entwürfe)
+const MEHRZAHL={mietixVorgaenge:"Mietverträge",mietixAnfragen:"Anfragen",mietixKunden:"Kunden",mietixFahrzeuge:"Fahrzeuge",mietixAusgaben:"Ausgaben",mietixSperren:"Sperren",mietixAufgaben:"Aufgaben",mietixZustand:"Zustände",mietixAutos:"Autos",mietixStand:"Entwürfe",mietixPapierkorb:"Papierkorb"};
+// Inhalt unabhängig von der Reihenfolge der Felder (die Datenbank sortiert Felder um)
+const ordne=x=>istBild(x)?marke(x):Array.isArray(x)?x.map(ordne):x&&typeof x==="object"?Object.keys(x).sort().reduce((o,n)=>{o[n]=ordne(x[n]);return o},{}):x;
+const fp=x=>hash(JSON.stringify(ordne(x))===undefined?"":JSON.stringify(ordne(x)));
+// Fingerabdruck stimmt mit der Grundlage überein (neue Form oder die Form vor dem 30.10.2026)
+const ordneRoh=x=>Array.isArray(x)?x.map(ordneRoh):x&&typeof x==="object"?Object.keys(x).sort().reduce((o,n)=>{o[n]=ordneRoh(x[n]);return o},{}):x;
+const gleichBasis=(x,b)=>b!==undefined&&(fp(x)===b||hash(JSON.stringify(x))===b||hash(JSON.stringify(ordneRoh(x)))===b);
+// Fingerabdruck je Feld, bei Unterobjekten (zahlung, ueb, rueck …) zusätzlich je Unterfeld "feld.unter" (31.10.2026: zwei Handys, zwei Zahlungen)
+const istObj=x=>x&&typeof x==="object"&&!Array.isArray(x);
+const felderVon=x=>{const f={};if(istObj(x))Object.keys(x).forEach(n=>{f[n]=fp(x[n]);if(istObj(x[n]))Object.keys(x[n]).forEach(u=>f[n+"."+u]=fp(x[n][u]))});return f};
+function andereFassung(k,p,eintrag){if(k==="mietixPapierkorb"||k==="mietixStand")return;
+  const pk=lies("mietixPapierkorb",[]),jetzt=new Date().toISOString(),c=SPEICHER[k];
+  const s=fp(eintrag);if(pk.some(x=>x.ablage===k&&x.schluessel===p&&fp(x.eintrag)===s))return;
+  pk.push({id:k+":"+p+":"+Date.now()+":f",ablage:k,schluessel:p,eintrag,zeit:jetzt,andere:true,
+    text:"Andere Fassung: "+(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(eintrag||{})});
+  merk("mietixPapierkorb",pk)}
+function zusammen(k,p,lokal,server,basisHash,basisFelder){
+  // Rückgabe: der Eintrag, der hier stehen soll (undefined = löschen)
+  const lokalGeaendert=lokal===undefined?(basisHash!==undefined&&basisHash!=="weg"):!gleichBasis(lokal,basisHash);
+  if(server&&server._weg){if(lokal===undefined)return undefined;
+    if(basisHash!==undefined&&lokalGeaendert)return lokal;          // hier geändert, dort gelöscht: bleibt da
+    if(basisHash===undefined&&!NEU_AUFBAU)andereFassung(k,p,lokal);   // hier neu, dort gelöscht: nicht still weg (05.11.2026)
+    return undefined}
+  if(lokal===undefined){if(basisHash!==undefined&&basisHash!=="weg"&&gleichBasis(server,basisHash))return undefined; // hier gelöscht, dort unverändert
+    return server}
+  if(fp(lokal)===fp(server))return lokal;
+  if(basisHash===undefined){if(!NEU_AUFBAU)andereFassung(k,p,lokal);return server}  // erstes Mal auf diesem Gerät: gemeinsamer Stand gilt, eigener liegt im Papierkorb
+  if(!lokalGeaendert)return server;                                   // hier nichts geändert: neuer Stand gilt
+  if(gleichBasis(server,basisHash))return lokal;                               // dort nichts geändert: eigener Stand bleibt
+  // beide geändert
+  if(FELDWEISE[k]&&basisFelder&&typeof lokal==="object"&&typeof server==="object"&&!Array.isArray(lokal)){
+    const out={},namen=new Set([...Object.keys(lokal),...Object.keys(server),...Object.keys(basisFelder)]);let streit=false;
+    namen.forEach(n=>{const lf=n in lokal?fp(lokal[n]):undefined,sf=n in server?fp(server[n]):undefined,bf=basisFelder[n];
+      if(lf===sf){if(n in lokal)out[n]=lokal[n]}
+      else if(lf===bf){if(n in server)out[n]=server[n]}
+      else if(sf===bf){if(n in lokal)out[n]=lokal[n]}
+      else if(istObj(lokal[n])&&istObj(server[n])){   // beide Geräte haben im selben Unterobjekt geändert: Unterfeld für Unterfeld
+        const o={},un=new Set([...Object.keys(lokal[n]),...Object.keys(server[n])]);
+        un.forEach(u=>{const lu=u in lokal[n]?fp(lokal[n][u]):undefined,su=u in server[n]?fp(server[n][u]):undefined,bu=basisFelder[n+"."+u];
+          if(lu===su||su===bu){if(u in lokal[n])o[u]=lokal[n][u]}
+          else if(lu===bu){if(u in server[n])o[u]=server[n][u]}
+          else{streit=true;if(u in lokal[n])o[u]=lokal[n][u]}});
+        out[n]=o}
+      else{streit=true;if(n in lokal)out[n]=lokal[n];else if(n in server)out[n]=server[n]}});
+    if(streit)andereFassung(k,p,server);
+    return out}
+  andereFassung(k,p,server);return lokal}
+/* Gleiche Nummer, anderer Name (05.11.2026, zwei Geräte ohne Netz): zwei verschiedene Mietverträge. Beide bleiben, der spätere bekommt eine neue Nummer. */
+const nameGleich=(a,b)=>String(a||"").toLowerCase().replace(/\s+/g,"")===String(b||"").toLowerCase().replace(/\s+/g,"");
+const andererKunde=(a,b)=>!!(a&&b&&!b._weg&&String(a.name||"").trim()&&String(b.name||"").trim()&&!nameGleich(a.name,b.name));
+function freieNummer(m){let max=+(localStorage.getItem("mietixHoechsteNr")||0)||0;const nimm=s=>{if(/^\d{6}$/.test(String(s))&&+s>max)max=+s};
+  Object.keys(m).forEach(nimm);lies("mietixPapierkorb",[]).forEach(x=>{if(x&&x.ablage==="mietixVorgaenge")nimm(x.schluessel)});return String(max+1).padStart(6,"0")}
+function nummerGewechselt(m,alt,eintrag,neu){m[neu]=Object.assign({},eintrag,{nr:neu});
+  try{if(+neu>(+(localStorage.getItem("mietixHoechsteNr")||0)||0))roh.call(localStorage,"mietixHoechsteNr",String(+neu))}catch(e){}
+  hinweis("Die Nummer "+alt+" gab es zweimal. "+(eintrag.name||"Dieser Mietvertrag")+" hat jetzt Mietvertrag "+neu+". Schon ausgedruckt oder verschickt? Bitte neu ausgeben.");
+  window.dispatchEvent(new CustomEvent("mietix-nummer-neu",{detail:{alt,neu,name:eintrag.name||""}}))}
+// Holen, zusammenführen, hochladen. Geht ein Eintrag oben nicht mehr auf den geholten Stand, wird nur er neu geholt und die Runde wiederholt.
+async function ablageAbgleichen(k,c,h,zeilen,geholt){
+  for(let runde=0;;runde++){let anders=false;const l0=liesAblage(k);if(l0.kaputt)throw new Error(MEHRZAHL[k]+" auf diesem Gerät sind beschädigt, nichts davon wurde hochgeladen");const m2=alsMap(k,l0.w),doppelt=[];
+    zeilen.forEach(z=>{const p=String(z[c.pk]);if(z.geaendert>h.zeit)h.zeit=z.geaendert;h.ver[p]=z.geaendert;
+      if(k==="mietixVorgaenge"&&h.hash[p]===undefined&&andererKunde(m2[p],z.daten)&&fp(m2[p])!==fp(z.daten)){doppelt.push([p,m2[p]]);delete m2[p];anders=true}
+      const gleichB=x=>x===undefined?undefined:JSON.stringify(durch(x,y=>istBild(y)?marke(y):y));   // Bild und sein Verweis "bild:…" gelten als gleich (1.11.2026: sonst Dauerschleife, Seite sprang)
+      const vorher=p in m2?gleichB(m2[p]):undefined;
+      const ergebnis=zusammen(k,p,m2[p],z.daten,h.hash[p],h.felder[p]);
+      if(ergebnis===undefined){if(p in m2){delete m2[p];anders=true}}
+      else if(gleichB(ergebnis)!==vorher){m2[p]=ergebnis;anders=true}
+      // Grundlage für das nächste Mal ist jetzt der gemeinsame Stand
+      if(z.daten&&z.daten._weg){h.hash[p]="weg";delete h.felder[p]}
+      else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
+    for(const [alt,eintrag] of doppelt){let neu=await window.mietixNeueNummer();if(!neu||neu in m2)neu=freieNummer(m2);nummerGewechselt(m2,alt,eintrag,neu)}
+    if(anders){let w=ausMap(k,m2);try{w=await sicherRaus(k,w,{[k]:h})}catch(e){}
+      if(!merk(k,w))throw new Error("Speicher auf diesem Gerät voll");if(!geholt.includes(k))geholt.push(k)}
+    // hoch: alles, was hier anders ist als der gemeinsame Stand (auch Gelöschtes). Die Zeit nie hinter dem gehen, was schon oben steht: So fällt ein Gerät mit falscher Uhr auch ohne Datenbank-Regel nicht durchs Raster.
+    const m=alsMap(k,liesAblage(k).w),jetzt=new Date(Math.max(Date.now(),h.zeit?new Date(h.zeit).getTime()+1:0)).toISOString(),hoch=[];
+    let ohneBild=0;
+    for(const p of Object.keys(m)){if(gleichBasis(m[p],h.hash[p])){h.hash[p]=fp(m[p]);continue}
+      const daten=await bilderRein(m[p]);if(daten===null){ohneBild++;continue}   // nie eine Kennung statt Unterschrift hochschicken
+      hoch.push({[c.pk]:p,daten,geaendert:jetzt})}
+    // Löschen: viele auf einmal warten auf Baran
+    const frei=h.frei||[];delete h.frei;if(k==="mietixAufgaben")delete h.halt;if(h.halt){h.halt=h.halt.filter(p=>!(p in m));if(!h.halt.length)delete h.halt}
+    // Einträge ohne Kennung zählen nie als gelöscht; Aufgaben kommen aus der Excel und fragen nie nach (Baran 05.11.2026)
+    const ohneKennung=c.liste&&(liesAblage(k).w||[]).some(x=>x&&x[c.pk]===undefined);
+    const weg=ohneKennung?[]:Object.keys(h.hash).filter(p=>!(p in m)&&h.hash[p]!=="weg"&&!frei.includes(p)&&!(h.halt||[]).includes(p));
+    if(k!=="mietixPapierkorb"&&k!=="mietixStand"&&k!=="mietixAufgaben"&&(weg.length>HANDVOLL||(weg.length>=3&&!Object.keys(m).length))){h.halt=(h.halt||[]).concat(weg)}
+    else weg.concat(frei).forEach(p=>{if(!(p in m)&&h.hash[p]!=="weg")hoch.push({[c.pk]:p,daten:{_weg:true},geaendert:jetzt})});
+    const streit=await hochladen(k,c,h,hoch);
+    if(!streit.length)return{m,ohneBild};
+    if(runde>=3){nochmal=true;throw new Error("Ein anderes Gerät speichert gerade, wird nachgeholt")}
+    zeilen=[];for(const p of streit){const z=await api(c.tab+"?select="+c.pk+",daten,geaendert&"+c.pk+"=eq."+encodeURIComponent(p),{method:"GET"})||[];
+      if(z[0])zeilen.push(z[0]);else delete h.ver[p]}}}
+// Neu: nur einfügen, wenn es den Eintrag oben noch nicht gibt. Vorhanden: nur ändern, wenn er oben noch den geholten Stand hat. Zurück kommt, was nicht hochging.
+async function hochladen(k,c,h,hoch){const streit=[],gelungen=(z,ver)=>{const p=z[c.pk];h.ver[p]=ver;
+    if(z.daten._weg){h.hash[p]="weg";delete h.felder[p]}else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}};
+  const neu=hoch.filter(z=>!h.ver[z[c.pk]]);
+  for(let i=0;i<neu.length;i+=200){const teil=neu.slice(i,i+200),r=await api(c.tab+"?on_conflict="+c.pk+"&select="+c.pk+",geaendert",{method:"POST",headers:{Prefer:"resolution=ignore-duplicates,return=representation"},body:JSON.stringify(teil)})||[];
+    const da={};r.forEach(x=>da[String(x[c.pk])]=x.geaendert);teil.forEach(z=>{const p=z[c.pk];if(p in da)gelungen(z,da[p]);else streit.push(p)})}
+  for(const z of hoch){const p=z[c.pk],ver=h.ver[p];if(!ver||neu.includes(z))continue;
+    const r=await api(c.tab+"?"+c.pk+"=eq."+encodeURIComponent(p)+"&geaendert=eq."+encodeURIComponent(ver)+"&select="+c.pk+",geaendert",{method:"PATCH",headers:{Prefer:"return=representation"},body:JSON.stringify({daten:z.daten,geaendert:z.geaendert})})||[];
+    if(r[0])gelungen(z,r[0].geaendert);else streit.push(p)}
+  return streit}
+async function abgleichen(){
+  if(!sitzung||!navigator.onLine)return;if(laeuft){nochmal=true;return}laeuft=true;const stand0=aenderungen;zeigen();
+  const H=lies("mietixAbgleich",{}),geholt=[],kaputt=[];let warnung="";
+  // Einmal je Gerät (31.10.2026, iPad mit vollem Speicher): Mietverträge, Papierkorb und Unterschriften frisch vom gemeinsamen Stand übernehmen.
+  // Nur hier Liegendes, das noch nie hochging, bleibt und geht hoch. Kein Doppel in den Papierkorb.
+  if(!lies("mietixNeuAufbau1",false)){NEU_AUFBAU=true;["mietixVorgaenge","mietixPapierkorb","mietixStand"].forEach(k=>H[k]={zeit:"",hash:{},felder:{}})}
+  try{
+    for(const k of Object.keys(SPEICHER)){const c=SPEICHER[k],l=liesAblage(k);let h=H[k]=H[k]||{zeit:"",hash:{}};if(!h.felder)h.felder={};
+      // Beschädigt: nichts hochladen, nichts darüber schreiben. Baran entscheidet (Knopf „Neu holen“).
+      if(l.kaputt){kaputt.push(k);warnung=MEHRZAHL[k]+" auf diesem Gerät sind beschädigt, nichts davon wurde hochgeladen";continue}
+      // Ganze Liste weg, obwohl schon abgeglichen: Das ist kein Löschen. Alles frisch vom gemeinsamen Stand holen.
+      if(l.fehlt&&Object.keys(h.hash).some(p=>h.hash[p]!=="weg")){h=H[k]={zeit:"",hash:{},felder:{},ver:{}};hinweis(MEHRZAHL[k]+" fehlten auf diesem Gerät und wurden neu geholt.")}
+      // Erstes Mal mit dieser Fassung: einmal alles holen, damit der Stand jedes Eintrags bekannt ist
+      if(!h.ver){h.ver={};h.zeit=""}
+      if(k in LOESCH){const ja=LOESCH[k];delete LOESCH[k];if(h.halt){if(ja)h.frei=h.halt;else{h.halt.forEach(p=>{delete h.hash[p];delete h.felder[p];delete h.ver[p]});h.zeit=""}delete h.halt}}
+      // 1) runter: was die anderen Geräte geschickt haben, Eintrag für Eintrag zusammengeführt
+      const ab=h.zeit?new Date(new Date(h.zeit).getTime()-UEBERLAPPUNG).toISOString():"";
+      const seit=ab?"&geaendert=gt."+encodeURIComponent(ab):"";
+      const zeilen=await api(c.tab+"?select="+c.pk+",daten,geaendert&order=geaendert.asc"+seit,{method:"GET"})||[];
+      // 2) zusammenführen und hoch
+      const e=await ablageAbgleichen(k,c,h,zeilen,geholt);
+      if(e.ohneBild)warnung="Unterschrift fehlt auf diesem Gerät ("+e.ohneBild+"x), bitte Baran Bescheid geben";
+      if(k==="mietixVorgaenge"){const max=Math.max(0,...Object.keys(e.m).filter(n=>/^\d{6}$/.test(n)).map(Number));
+        if(max)await api("rpc/vertragsnummer_mindestens",{method:"POST",body:JSON.stringify({n:max})})}
+      merk("mietixAbgleich",H)}
+    if(warnung)throw new Error(warnung);
+    fehler="";if(aenderungen===stand0)ungesichert=false;   // Fehler und „Wird gesichert“ erst nach Erfolg weg (05.11.2026)
+    zuletzt=new Date();if(NEU_AUFBAU){merk("mietixNeuAufbau1",true);NEU_AUFBAU=false}
+  }catch(e){fehler=e.message||"Abgleich fehlgeschlagen"}
+  FRAGEN=kaputt.map(k=>({art:"kaputt",k})).concat(Object.keys(SPEICHER).filter(k=>H[k]&&H[k].halt&&H[k].halt.length).map(k=>({art:"loeschen",k,n:H[k].halt.length})));
+  if(geholt.length)window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:geholt}));
+  laeuft=false;zeigen();auslagernBald();if(nochmal){nochmal=false;setTimeout(abgleichen,500)}}
+// Knöpfe der roten Zeile: viele Löschungen freigeben oder zurückholen, beschädigte Liste neu holen
+window.mietixAbgleichWahl=function(art,k,ja){if(art==="kaputt"){const r=localStorage.getItem(k);if(r)dbRein([["kaputt:"+k+":"+Date.now(),r]]).catch(()=>{});localStorage.removeItem(k)}
+  else LOESCH[k]=!!ja;FRAGEN=FRAGEN.filter(f=>f.k!==k);zeigen();return abgleichen()};
+// Jede Änderung an den vier Speichern löst kurz danach einen Abgleich aus
+let warte=null;
+Storage.prototype.setItem=function(k,v){const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);
+  if(this===localStorage&&(SPEICHER[k]||k==="mietixEntwurfProtokolle")&&typeof v==="string"&&v.indexOf('"data:image/')>=0)auslagernBald();
+  if(this===localStorage&&SPEICHER[k]){aenderungen++;if(!ungesichert){ungesichert=true;if(sitzung&&!pwSetzen)zeigen()}clearTimeout(warte);warte=setTimeout(abgleichen,800);if(k!=="mietixStand"&&k!=="mietixPapierkorb")sicherheitsnetz(k,alt,v)}};
+
+/* ---------- Sicherheitsnetz (28.10.2026, Baran: "Verklicken darf nichts verlieren") ----------
+   1. Rückgängig: jede Änderung an einer Ablage zeigt 8 Sekunden lang einen Knopf, der den Stand davor zurückholt.
+   2. Papierkorb: was aus einer Liste verschwindet, landet in mietixPapierkorb (Tabelle papierkorb, 90 Tage) und
+      kann in der Zentrale wiederhergestellt werden (window.mietixWiederherstellen).
+   3. Die Datenbank schreibt dazu jede Änderung in die Tabelle verlauf (SQL in tools/vertrag/speicher.sql). */
+const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
+  mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
+const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
+  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
+  mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
+  mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
+let burst=null,burstZeit=null;
+function sicherheitsnetz(k,alt,neu){
+  // Papierkorb: Einträge, die aus einer Liste verschwunden sind (nicht bei Rückgängig selbst)
+  if(!rueckLaeuft){try{const c=SPEICHER[k];const ma=alsMap(k,JSON.parse(alt||"null")||(c.liste?[]:{})),mn=alsMap(k,JSON.parse(neu||"null")||(c.liste?[]:{}));
+    const weg=Object.keys(ma).filter(p=>!(p in mn));
+    if(weg.length){const pk=lies("mietixPapierkorb",[]),jetzt=new Date().toISOString();
+      weg.forEach(p=>pk.push({id:k+":"+p+":"+Date.now(),ablage:k,schluessel:p,eintrag:ma[p],zeit:jetzt,text:(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(ma[p]||{})}));
+      const grenze=new Date(Date.now()-90*864e5).toISOString();merk("mietixPapierkorb",pk.filter(x=>x.zeit>grenze));
+      if(sitzung){clearTimeout(warte);warte=setTimeout(abgleichen,800)}}}catch(e){}}
+  if(rueckLaeuft)return;
+  // Rückgängig: Änderungen innerhalb von 0,7 Sekunden gehören zusammen (z. B. Mietvertrag + Kunde + Fahrzeug)
+  const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]={alt,neu};else burst[k].neu=neu;
+  rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
+let rueckLaeuft=false,rueckTimer=null;
+// Rückgängig steht neben dem Titel, nie über einem Knopf (Baustein in stil/schutz.py, 04.11.2026)
+function rueckZeigen(text){if(window.mxRueckZeig)window.mxRueckZeig("mietixRueck","Rückgängig: "+text,rueckgaengig)}
+function rueckgaengig(){if(!burst)return;
+  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
+  const b=burst;burst=null;rueckLaeuft=true;
+  // Nur die eigene Änderung zurücknehmen (05.11.2026): Was inzwischen von anderen Geräten kam, bleibt stehen
+  try{Object.keys(b).forEach(k=>{const l=liesAblage(k);if(l.kaputt){if(window.mxFehler)mxFehler("Rückgängig ging nicht: "+MEHRZAHL[k]+" auf diesem Gerät sind beschädigt.");return}
+    const leer=SPEICHER[k].liste?[]:{},roh2=s=>alsMap(k,JSON.parse(s||"null")||leer),a=roh2(b[k].alt),n=roh2(b[k].neu),m=alsMap(k,l.w);
+    new Set([...Object.keys(a),...Object.keys(n)]).forEach(p=>{if(fp(a[p])===fp(n[p]))return;
+      if(!(p in a)){delete m[p];return}                                  // hier neu angelegt
+      if(!(p in n)||!(p in m)||!istObj(a[p])||!istObj(n[p])){m[p]=a[p];return}   // hier gelöscht
+      const o=Object.assign({},m[p]);new Set([...Object.keys(a[p]),...Object.keys(n[p])]).forEach(f=>{   // Feld für Feld: nur was hier geändert wurde und seitdem niemand sonst
+        if(fp(a[p][f])!==fp(n[p][f])&&fp(o[f])===fp(n[p][f])){if(f in a[p])o[f]=a[p][f];else delete o[f]}});
+      m[p]=o});
+    merk(k,ausMap(k,m))})}finally{rueckLaeuft=false}
+  const el=document.getElementById("mietixRueck");if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
+  ungesichert=true;zeigen();window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
+window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
+  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
+    roh.call(localStorage,"mietixEntwurfVertrag",JSON.stringify(Object.assign({},e.eintrag,{zeit:new Date().toISOString()})));
+    window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
+  if(e.ablage==="mietixEntwurfBuchung"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangene Buchung (02.11.2026): liegt nur auf dem Gerät, frisch für 7 Tage
+    roh.call(localStorage,"mietixEntwurfBuchung",JSON.stringify(Object.assign({},e.eintrag,{zeit:Date.now()})));
+    window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
+  if(e.ablage==="schadensbelege"){const st=lies("mietixStand",{}),r=Object.assign({liste:[],max:{}},st.schadensbelege||{});   // Schadensbeleg (30.10.2026)
+    if(!r.liste.some(x=>x.nr===e.eintrag.nr))r.liste=r.liste.concat([e.eintrag]);st.schadensbelege=r;merk("mietixPapierkorb",pk.filter(x=>x.id!==id));
+    localStorage.setItem("mietixStand",JSON.stringify(st));window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixStand","mietixPapierkorb"]}));return true}
+  const c=SPEICHER[e.ablage];if(!c)return false;const m=alsMap(e.ablage,lies(e.ablage,c.liste?[]:{})),da=m[e.schluessel];
+  merk("mietixPapierkorb",pk.filter(x=>x.id!==id));
+  // Steht unter dem Schlüssel schon etwas anderes, wird es nicht überschrieben (05.11.2026): anderer Kunde = neue Nummer, sonst tauschen die Fassungen den Platz
+  if(da!==undefined&&fp(da)!==fp(e.eintrag)&&e.ablage==="mietixVorgaenge"&&andererKunde(da,e.eintrag))nummerGewechselt(m,e.schluessel,e.eintrag,freieNummer(m));
+  else{if(da!==undefined&&fp(da)!==fp(e.eintrag))andereFassung(e.ablage,e.schluessel,da);m[e.schluessel]=e.eintrag}
+  localStorage.setItem(e.ablage,JSON.stringify(ausMap(e.ablage,m)));
+  // Mietvertrag mit Storno zurück: die Buchung kommt mit, wie bei Rückgängig (K B6, 05.11.2026)
+  let auch=[];if(e.ablage==="mietixVorgaenge"){const an=lies("mietixAnfragen",[]);let neu=false;an.forEach(x=>{if(x&&!x._weg&&x.storniert&&x.storniert.mitVertrag===e.schluessel){x.status="gebucht";delete x.storniert;(x.verlauf=x.verlauf||[]).push({am:new Date().toISOString(),was:"Storno zurückgenommen, Mietvertrag "+e.schluessel+" wiederhergestellt"});neu=true}});
+    if(neu){localStorage.setItem("mietixAnfragen",JSON.stringify(an));auch=["mietixAnfragen"]}}
+  window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:[e.ablage,"mietixPapierkorb"].concat(auch)}));return true};
+window.mietixPapierkorb=()=>lies("mietixPapierkorb",[]).slice().sort((a,b)=>a.zeit<b.zeit?1:-1);
+
+/* ---------- Vertragsnummer aus dem gemeinsamen Speicher ---------- */
+window.mietixNeueNummer=async function(){if(!sitzung||!navigator.onLine)return null;
+  try{const n=await api("rpc/neue_vertragsnummer",{method:"POST",body:"{}"});return typeof n==="string"?n:null}catch(e){return null}};
+window.mietixAbgleichen=abgleichen;
+
+/* ---------- Link aus der Einladungs- oder Passwort-Mail: Passwort selbst festlegen ---------- */
+let pwSetzen=false,linkFehler="";
+(function(){const h=new URLSearchParams(location.hash.slice(1));if(!h.get("access_token")&&!h.get("error"))return;
+  history.replaceState(null,"",location.pathname+location.search);
+  if(h.get("error")){linkFehler="Der Link aus der Mail ist abgelaufen oder schon benutzt. Bitte eine neue Einladung anfordern.";return}
+  sichern({access_token:h.get("access_token"),refresh_token:h.get("refresh_token"),expires_in:+h.get("expires_in")||3600});
+  pwSetzen=/invite|recovery|signup/.test(h.get("type")||"")})();
+
+/* ---------- Anzeige: Anmeldung oder Stand ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,x=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[x]));
+function zeigen(){const el=document.getElementById("abgleich");if(!el)return;
+  if(sitzung&&pwSetzen){el.innerHTML='<div class="abgl"><b>Passwort festlegen</b><div class="abgl-text">Für '+(sitzung.email||"dieses Konto")+'. Damit meldest du dich auf allen Geräten an, auch für die Brücke. Mindestens 8 Zeichen.</div>'+
+    '<input id="ablNeu" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Neues Passwort (sichtbar, damit kein Tippfehler)">'+
+    '<button id="ablSetzen" type="button">Passwort speichern</button><div class="abgl-fehler" id="ablFehler"></div></div>';
+    document.getElementById("ablSetzen").onclick=async()=>{const pw=document.getElementById("ablNeu").value,f=document.getElementById("ablFehler");
+      if(pw.length<8){f.textContent="Bitte mindestens 8 Zeichen.";return}
+      try{const t=await token();const r=await fetch(URL_+"/auth/v1/user",{method:"PUT",headers:{apikey:KEY,Authorization:"Bearer "+t,"Content-Type":"application/json"},body:JSON.stringify({password:pw})});
+        if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.msg||j.message||"Speichern ging nicht")}
+        pwSetzen=false;zeigen();abgleichen()}catch(e){f.textContent=e.message}};return}
+  const pkt=document.getElementById("abgleichPunkt");
+  if(pkt)pkt.style.background=!sitzung?"#B0B0B3":fehler||FRAGEN.length||HINWEISE.length?"#C4161C":"#1B8A4B";
+  // Anmelden nur auf Startseite und Einstellungen (31.10.2026), sonst eine schmale Zeile
+  const haupt=/mietix-zentrale\/(index\.html|einstellungen\.html)?$/.test(location.pathname)||/\/(zentrale|einstellungen)$/.test(location.pathname);
+  if(!sitzung&&!haupt){el.innerHTML='<div class="abgl klein rot"><span><b style="display:inline;margin:0">Nicht angemeldet.</b> Nichts wird gesichert.</span><a href="https://barankohler.github.io/mietix-zentrale/" style="color:#C4161C;font-weight:800;white-space:nowrap">Anmelden ›</a></div>';return}
+  if(!sitzung){el.innerHTML='<div class="abgl rot"><b>Nicht angemeldet</b><div class="abgl-text">Einmal anmelden, dann ist alles gesichert.</div>'+
+    '<input id="ablMail" type="email" inputmode="email" autocomplete="username" placeholder="E-Mail">'+
+    '<input id="ablPw" type="password" autocomplete="current-password" placeholder="Passwort">'+
+    '<button id="ablLos" type="button">Anmelden</button><div class="abgl-fehler" id="ablFehler">'+linkFehler+'</div></div>';
+    const mail=()=>document.getElementById("ablMail").value.trim(),pw=()=>document.getElementById("ablPw").value,f=document.getElementById("ablFehler");
+    document.getElementById("ablLos").onclick=async()=>{f.textContent="";
+      try{sichern(await auth("token?grant_type=password",{email:mail(),password:pw()}));
+        zeigen();abgleichen()}catch(e){f.textContent=/Invalid login/i.test(e.message)?"E-Mail oder Passwort stimmt nicht.":e.message===KEINE_VERBINDUNG?"Keine Verbindung. Bitte Internet prüfen und noch einmal tippen.":e.message}};
+    // Zugang selbst anlegen: geht nur, solange Baran die Registrierung in Supabase kurz freigibt
+    const neuZ=document.getElementById("ablNeuZugang");if(neuZ)neuZ.onclick=async e=>{e.preventDefault();f.textContent="";
+      if(!mail()||pw().length<8){f.textContent="Oben E-Mail und ein eigenes Passwort (mindestens 8 Zeichen) eintragen, dann hier tippen.";return}
+      try{const j=await auth("signup",{email:mail(),password:pw()});
+        if(j.access_token){sichern(j);zeigen();abgleichen()}else f.textContent="Zugang angelegt. Bitte die Mail bestätigen und dann anmelden."}
+      catch(e){f.textContent=/not allowed|disabled/i.test(e.message)?"Zugang anlegen ist gerade gesperrt. Baran muss es kurz freigeben.":
+        /already/i.test(e.message)?"Für diese E-Mail gibt es schon einen Zugang. Bitte oben anmelden.":e.message}};return}
+  // Sync-Status (31.10.2026): grün gesichert, gelb ohne Internet, rot bei Fehler. Passwort und Abmelden nur auf Startseite und Einstellungen.
+  const uhr=zuletzt?String(zuletzt.getHours()).padStart(2,"0")+":"+String(zuletzt.getMinutes()).padStart(2,"0"):"";
+  const wird=ungesichert||(laeuft&&!zuletzt);   // solange etwas nicht oben ist, nie „Alles gesichert“ (05.11.2026)
+  const art=!navigator.onLine?"gelb":fehler?"rot":wird?"wird":"gruen";
+  const stand=!navigator.onLine?"Ohne Internet: alles bleibt auf dem Gerät und wird nachgeholt":fehler?"Nicht gesichert: "+esc(fehler):wird?"Wird gesichert …":"✓ Alles gesichert"+(uhr?", "+uhr+" Uhr":"");
+  const knopf=(t,a,k,ja)=>'<a href="#" class="abgl-wahl" data-art="'+a+'" data-k="'+k+'" data-ja="'+(ja?1:0)+'">'+t+'</a>';
+  const rot=FRAGEN.map(f=>'<div class="abgl klein status rot abgl-frage"><span>'+(f.art==="kaputt"?MEHRZAHL[f.k]+" auf diesem Gerät sind beschädigt. Nichts davon wurde hochgeladen.":f.n+" "+MEHRZAHL[f.k]+" wurden hier auf einmal entfernt. Noch nicht überall gelöscht.")+'</span><span class="abgl-wahlen">'+
+      (f.art==="kaputt"?knopf("Neu holen","kaputt",f.k,1):knopf("Überall löschen","loeschen",f.k,1)+knopf("Zurückholen","loeschen",f.k,0))+'</span></div>').join("")+
+    HINWEISE.map((t,i)=>'<div class="abgl klein status rot abgl-frage"><span>'+esc(t)+'</span><span class="abgl-wahlen">'+knopf("Verstanden","weg",i,1)+'</span></div>').join("");
+  const neuH='<div class="abgl klein status '+art+'"><span>'+stand+'</span>'+(haupt?'<span><a href="#" id="ablPwNeu">Passwort ändern</a> &nbsp; <a href="#" id="ablAus">abmelden</a></span>':'')+'</div>'+rot;
+  if(el.__mxH===neuH&&el.firstChild)return;el.__mxH=neuH;el.innerHTML=neuH;   // gleicher Text: nicht neu aufbauen (1.11.2026, Seite sprang)
+  el.querySelectorAll(".abgl-wahl").forEach(a=>a.onclick=e=>{e.preventDefault();const d=a.dataset;
+    if(d.art==="weg"){HINWEISE=HINWEISE.filter((x,i)=>i!==+d.k);merk("mietixAbgleichHinweise",HINWEISE);zeigen()}else window.mietixAbgleichWahl(d.art,d.k,d.ja==="1")});
+  if(!haupt)return;
+  // Angemeldet: neues Passwort setzen geht ohne das alte (für "Passwort vergessen" ohne Mail, 28.10.2026)
+  document.getElementById("ablPwNeu").onclick=e=>{e.preventDefault();pwSetzen=true;zeigen()};
+  document.getElementById("ablAus").onclick=e=>{e.preventDefault();if(!confirm("Auf diesem Gerät abmelden? Die Daten bleiben hier."))return;
+    sitzung=null;localStorage.removeItem("mietixSitzung");zeigen()}}
+const css=document.createElement("style");
+css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16px;padding:14px;margin-bottom:14px}"+
+  ".abgl b{display:block;font-size:15px;margin-bottom:4px}.abgl-text{font-size:13px;color:#6F6F72;margin-bottom:8px}"+
+  ".abgl input{width:100%;border:1px solid #E4E4E7;border-radius:12px;padding:12px;font-weight:600;font-size:16px;font-family:inherit;margin-top:6px;min-height:46px;box-sizing:border-box}"+
+  ".abgl button{width:100%;margin-top:8px;background:#C4161C;color:#fff;border:0;border-radius:12px;padding:13px;font-weight:800;font-size:16px;font-family:inherit;cursor:pointer}"+
+  ".abgl-fehler{color:#C4161C;font-size:13px;font-weight:700;margin-top:6px}"+
+  ".abgl-link{display:block;text-align:center;margin-top:10px;font-size:13px;color:#6F6F72}"+
+  ".abgl.klein{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:#6F6F72;padding:10px 14px}.abgl.klein a{color:#6F6F72}"+
+  ".abgl.rot{border:2px solid #C4161C}.abgl.rot b{color:#C4161C}"+
+  ".abgl.status{background:none;border:0;padding:2px 4px 8px;margin-bottom:6px;font-weight:700}.abgl.status.gruen span:first-child{color:#1B8A4B}"+
+  ".abgl.status.wird span:first-child{color:#6F6F72}.abgl-frage{flex-wrap:wrap}.abgl-frage>span:first-child{flex:1 1 100%}.abgl-wahlen{display:flex;gap:6px;flex-shrink:0;align-items:center}.abgl.klein a.abgl-wahl{background:#E9E9EE;color:#1C1C1E;border-radius:10px;padding:6px 10px;font-weight:700;text-decoration:none;white-space:nowrap}"+
+  ".abgl.status.gelb{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:10px 14px}.abgl.status.rot{background:#FDECEC;color:#C4161C;border-radius:12px;padding:10px 14px}"+
+  "";
+document.head.appendChild(css);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
+window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
+setInterval(abgleichen,60000);
+zeigen();abgleichen();auslagernBald();
+})();
+</script>
+<script>
+/* Schutz (1.11.2026, Baran: geht etwas nicht, roter Hinweis mit Grund; alles sofort speichern) */
+(function(){if(window.mxFehler)return;
+  const css=document.createElement("style");css.textContent=
+    "#mxFehler{position:fixed;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:9999;max-width:560px;margin:0 auto;background:#C4161C;color:#fff;"+
+    "border-radius:14px;padding:13px 46px 13px 16px;font:700 15px/1.35 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25)!important;display:none;cursor:pointer}"+
+    "#mxFehler.an{display:block;animation:mxFehlerAuf .2s ease-out}#mxFehler i{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-style:normal;font-size:19px;opacity:.85}"+
+    "@keyframes mxFehlerAuf{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}";
+  document.head.appendChild(css);
+  let box=null,uhr=null;
+  window.mxFehler=function(text,ms){if(!document.body)return;
+    if(!box){box=document.createElement("div");box.id="mxFehler";box.setAttribute("role","alert");box.onclick=()=>box.classList.remove("an");document.body.appendChild(box)}
+    box.textContent=String(text||"");const x=document.createElement("i");x.textContent="✕";box.appendChild(x);box.classList.add("an");
+    clearTimeout(uhr);if(ms)uhr=setTimeout(()=>box.classList.remove("an"),ms)};
+
+  // Speicher voll: Ausweg ohne Löschen (05.11.2026, D25). Alles Getippte dieser Seite lässt sich kopieren und auf einem anderen Gerät weitermachen, gelöscht wird nichts
+  function getippt(){const z=[];document.querySelectorAll("input,textarea,select").forEach(e=>{if(e.disabled||e.type==="password"||e.type==="hidden"||e.type==="file"||e.type==="button"||e.type==="submit"||!e.offsetParent)return;
+      if((e.type==="checkbox"||e.type==="radio")&&!e.checked)return;const w=e.tagName==="SELECT"?(e.options[e.selectedIndex]||{}).text:e.value;if(!w||!String(w).trim())return;
+      const l=(e.id&&document.querySelector('label[for="'+e.id+'"]'))||e.closest("label")||(e.previousElementSibling&&e.previousElementSibling.tagName==="LABEL"?e.previousElementSibling:null);z.push(((l&&l.textContent.trim())||e.placeholder||e.id||"Feld")+": "+String(w).trim())});
+    return document.title+", "+new Date().toLocaleString("de-DE")+"\n"+z.join("\n")}
+  async function kopieren(t){try{await navigator.clipboard.writeText(t);return true}catch(e){const a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand("copy")}catch(x){}a.remove();return ok}}
+  window.mxVoll=function(){mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll. Nichts wird gelöscht. Seite offen lassen, das Getippte kopieren und auf einem anderen Gerät weitermachen.");
+    const b=box;if(!b||b.querySelector("#mxKopier"))return;const k=document.createElement("button");k.id="mxKopier";k.type="button";k.textContent="Getipptes kopieren";
+    k.style.cssText="display:block;width:auto;min-height:40px;margin:10px 0 0;padding:8px 14px;border:0;border-radius:10px;background:#fff;color:#C4161C;font:700 15px -apple-system,system-ui,sans-serif;cursor:pointer";
+    k.onclick=async e=>{e.stopPropagation();const ok=await kopieren(getippt());k.textContent=ok?"✓ Kopiert, jetzt auf dem anderen Gerät einfügen":"Kopieren ging nicht, bitte abschreiben"};b.appendChild(k)};
+
+  // Speichern auf dem Gerät scheitert: jede Seite meldet es rot, auch wenn sie den Fehler selbst verschluckt
+  try{const orig=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(k,v){try{return orig.call(this,k,v)}catch(e){
+      mxVoll();throw e}}}catch(e){}
+
+  // Preise nicht geladen (nur Seiten, die Preise brauchen)
+  if(document.documentElement.innerHTML.indexOf("mietix-preise/preise.json")>=0)setTimeout(()=>{
+    fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status)})
+      .catch(()=>mxFehler((navigator.onLine?"Die Preise konnten nicht geladen werden.":"Kein Internet: Die Preise konnten nicht geladen werden.")+" Preise und Kaution erst nach dem Neuladen verwenden."))},5000);
+
+  // Unerwartete Fehler: lieber sagen als still hängen
+  let zuletzt="";
+  const melde=m=>{m=String(m||"").trim();if(!m||m===zuletzt||/ResizeObserver|^Script error|AbortError|NotAllowedError|share|Load failed|Failed to fetch|NetworkError|Transition|view transition|InvalidStateError/i.test(m))return;
+    zuletzt=m;mxFehler("Da hat etwas nicht geklappt ("+m.slice(0,120)+"). Bitte die Seite neu laden.",15000)};
+  addEventListener("error",e=>{if(e.message)melde(e.message)});
+  addEventListener("unhandledrejection",e=>melde(e.reason&&(e.reason.message||e.reason)));
+
+  // Doppeltipp an derselben Stelle: der zweite Tipp zählt nicht (04.11.2026, Knopf-Test: zweimal WhatsApp, nächste Zeile gelöscht)
+  document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest('a[href="#"]');if(a)e.preventDefault()},true);   // ein Link ohne Ziel springt nie im Verlauf
+  {let t0=0,x0=0,y0=0;document.addEventListener("click",e=>{if(!e.isTrusted||(e.target.closest&&e.target.closest("#tZurueck,#tVor,[data-mehrfach]")))return;const jetzt=Date.now(),nah=Math.abs(e.clientX-x0)<24&&Math.abs(e.clientY-y0)<24,zu=jetzt-t0<400&&nah;
+    if(zu&&!(e.target.closest&&e.target.closest("input,textarea,select,canvas,label"))){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();return}t0=jetzt;x0=e.clientX;y0=e.clientY},true)}
+
+  // Rückgängig: dunkler Streifen unten mit Knopf, wie die übrigen Meldungen (04.11.2026)
+  // Rückgängig-Knopf (04.11.2026, Nachtest): neben dem Titel. Rollt der Titel weg oder liegt dort schon etwas, rechts an der ersten freien Stelle. Nie über einem Knopf.
+  const RK_STIL="#mietixRueck,#mxRueckBar{display:none;width:auto;min-height:0;height:auto;margin:0;border:0;border-radius:10px;background:#E9E9EE;color:#1C1C1E;font:700 14px -apple-system,system-ui,sans-serif;padding:7px 11px;cursor:pointer;white-space:nowrap;z-index:85;box-shadow:none}#mietixRueck.an,#mxRueckBar.an{display:block}#mietixRueck::after,#mxRueckBar::after{content:'';position:absolute;left:-4px;right:-4px;top:-8px;bottom:-8px}";
+  const trifft=(el,x0,y0,w,h)=>[...document.querySelectorAll("a,button,input,select,textarea,[role=button],.chip,.kachel,.zk a,img,.leiste,.mxStart")].some(e=>{if(e===el||e.contains(el)||el.contains(e)||!e.offsetParent&&getComputedStyle(e).position!=="fixed")return false;const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.left<x0+w+4&&r.right>x0-4&&r.top<y0+h+4&&r.bottom>y0-4});
+  function rkSetzen(el){const sicht=e=>e&&e.offsetParent!==null&&e.getBoundingClientRect().height>0;
+    const platz=[document.querySelector("#karte.auf .kk"),...document.querySelectorAll("h1"),...document.querySelectorAll(".buTop")].find(sicht);
+    el.classList.add("an");const w=el.offsetWidth||103,h=el.offsetHeight||31;
+    if(platz){const r=platz.getBoundingClientRect(),y=r.top+r.height/2-h/2,x=r.right-w;const t=document.createRange();t.selectNodeContents(platz);let tr=r.left;[...platz.childNodes].forEach(n=>{if(n===el)return;try{const q=document.createRange();q.selectNodeContents(n);q.getClientRects().length&&(tr=Math.max(tr,q.getBoundingClientRect().right))}catch(e){}});
+      if(r.bottom>h&&r.top<innerHeight-h&&tr+8<x&&!trifft(el,x,y,w,h)){if(getComputedStyle(platz).position==="static")platz.style.position="relative";if(el.parentNode!==platz)platz.appendChild(el);el.style.position="absolute";el.style.right="0";el.style.top="50%";el.style.transform="translateY(-50%)";return}}
+    if(el.parentNode!==document.body)document.body.appendChild(el);el.style.position="fixed";el.style.right="16px";el.style.transform="";const xf=innerWidth-16-w;
+    for(let y=10;y<innerHeight*0.7;y+=22){if(!trifft(el,xf,y,w,h)){el.style.top=y+"px";return}}el.classList.remove("an")}
+  window.mxRueckZeig=function(id,label,fn,ms){if(!document.body)return null;if(!document.getElementById("mxRkStil")){const c=document.createElement("style");c.id="mxRkStil";c.textContent=RK_STIL;document.head.appendChild(c)}
+    let el=document.getElementById(id);if(!el){el=document.createElement("button");el.type="button";el.id=id;document.body.appendChild(el)}
+    el.textContent="Rückgängig";el.setAttribute("aria-label",label);el.onclick=()=>{el.mxWill=false;fn()};el.mxWill=true;rkSetzen(el);
+    const auf=()=>{if(el.mxWill)rkSetzen(el)};if(!el.mxS){el.mxS=1;addEventListener("scroll",auf,{passive:true,capture:true});addEventListener("resize",auf)}
+    clearTimeout(el.mxT);const ab=()=>{const bedeckt=document.querySelector(".mxFenster.auf")||(document.getElementById("ug")&&!document.getElementById("ug").classList.contains("versteckt"));if(bedeckt){el.mxT=setTimeout(ab,3000);return}el.mxWill=false;el.classList.remove("an")};el.mxT=setTimeout(ab,ms||15000);return el};
+  window.mxRueckBar=function(text,fn,ms){const m=window.meldung||window.meld||window.nkMeldung;if(m)try{m(text)}catch(x){}
+    const el=window.mxRueckZeig("mxRueckBar","Rückgängig: "+text,()=>{el.classList.remove("an");clearTimeout(el.mxT);fn()},ms)};
+
+  // Entwurf: Felder eines Bereichs beim Tippen sichern
+  window.mxEntwurf=function(bereich,schluessel,nur){const el=typeof bereich==="string"?document.querySelector(bereich):bereich,K="mietixFeld:"+schluessel;
+    const leer={holen(){return false},weg(){},merken(){}};if(!el)return leer;
+    const felder=()=>[...el.querySelectorAll("input[id],textarea[id],select[id]")].filter(f=>!/^(password|file|hidden|button|submit|search)$/.test(f.type)&&(!nur||nur.includes(f.id)));
+    let aus=false;
+    const merken=()=>{if(aus)return;const d={};let etwas=false;felder().forEach(f=>{const v=f.type==="checkbox"?f.checked:f.value;d[f.id]=v;if(v&&v!==true)etwas=true});
+      try{if(etwas)localStorage.setItem(K,JSON.stringify(d));else localStorage.removeItem(K)}catch(e){}};
+    el.addEventListener("input",merken);el.addEventListener("change",merken);
+    return{merken,
+      holen(){let d=null;try{d=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}if(!d)return false;let n=0;aus=true;
+        felder().forEach(f=>{if(!(f.id in d))return;const v=d[f.id];if(f.type==="checkbox"){if(f.checked!==!!v){f.checked=!!v;n++}}else if(v!=null&&String(v)!==""&&f.value!==v){f.value=v;n++}else return;
+          f.dispatchEvent(new Event("input",{bubbles:true}));f.dispatchEvent(new Event("change",{bubbles:true}))});aus=false;return n>0},
+      weg(){try{localStorage.removeItem(K)}catch(e){}}}};
+})();
+</script><script>
+/* Mietix App-Gefühl (31.10.2026) */
+(function(){if(window.mxApp)return;window.mxApp=1;
+  const pfad=location.pathname,istStart=/mietix-zentrale\/(index\.html)?$/.test(pfad)||/\/zentrale$/.test(pfad);
+  const art=/anfragen/.test(pfad)?"anfragen":/angebot/.test(pfad)?"angebot":/belegung/.test(pfad)?"kalender":/vertrag/.test(pfad)?"vertrag":
+    /kunden/.test(pfad)?"kunden":/autos/.test(pfad)?"autos":/geld/.test(pfad)?"geld":/schaden/.test(pfad)?"schaeden":/nachrichten/.test(pfad)?"nachrichten":
+    /statistik/.test(pfad)?"zahlen":/story/.test(pfad)?"story":/papierkorb/.test(pfad)?"papierkorb":/einstellungen/.test(pfad)?"einstellungen":"";
+  const SYM={
+ "anfragen":'<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+ "kalender":'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ "angebot":'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 12h3M13 12h3M8 16h3M13 16h3"/>',
+ "vertrag":'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/>',
+ "kunden":'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ "autos":'<path d="M3 13l2-5h14l2 5v5H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/>',
+ "geld":'<rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="12" cy="12" r="2.5"/>',
+ "schaeden":'<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h0"/>',
+ "nachrichten":'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
+ "zahlen":'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+ "story":'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 17l3-4 2 2 3-4"/>',
+ "papierkorb":'<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14"/>',
+ "einstellungen":'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>'
+};
+  const st=document.createElement("style");st.textContent=
+    /* eine Kopfzeile für alle: weiß, roter Strich */
+    (istStart?"":"header{background:#fff!important;color:#1C1C1E!important;border-bottom:3px solid #C4161C!important}header h1{color:#1C1C1E!important;white-space:nowrap}header h1 span{color:#C4161C!important}")+
+    ".topbar{background:#fff!important;color:#1C1C1E!important;border-bottom:3px solid #C4161C!important;overflow:hidden}.topbar .brand{color:#1C1C1E!important}.topbar .brand-sub{color:#8A8A8E!important}"+
+    ".mxStart{display:inline-flex;align-items:center;gap:2px;vertical-align:middle;border-radius:999px;border:1.5px solid currentColor;text-decoration:none;font-weight:800;letter-spacing:0;text-transform:none;opacity:.8;-webkit-tap-highlight-color:transparent;line-height:1}"+
+    "header .mxStart,.topbar .mxStart{float:none!important;margin:0 10px 0 0!important;padding:5px 11px 5px 8px!important;font-size:13px!important;color:inherit!important;font-family:-apple-system,Inter,system-ui,sans-serif!important}"+
+    ".mxStart b{font-size:17px;line-height:13px;margin-top:-2px}.mxStart:active{opacity:.5}"+
+    ".mxSym{display:inline-block;width:19px;height:19px;vertical-align:-4px;margin-right:6px;stroke:#C4161C;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}"+
+    "@media(max-width:360px){header .mxStart,.topbar .mxStart{padding:4px 8px 4px 6px!important;margin-right:6px!important;font-size:12px!important}.mxSym{display:none}}"+
+    "@media(max-width:480px){.topbar .brand-sub{display:none}}"+
+    /* Design für alle Seiten (31.10.2026, Baran: „seriöse, schöne App. Übersichtlich, klar und direkt“) */
+    "body,input,button,select,textarea{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',Arial,sans-serif!important}"+
+    "body{background:#F2F2F7!important;color:#1C1C1E}"+
+    "*:not(.mxFenster):not(#mietixRueck):not(#erfolgBox){box-shadow:none!important}"+
+    "input:focus,textarea:focus,select:focus{outline:2px solid #C4161C!important;outline-offset:-2px}"+
+    "input[type=date],input[type=time]{min-width:0;max-width:100%}"+   /* Datumsfelder laufen auf dem iPhone sonst über den Rand */
+    "h2,.karte h2,h2.gruppe,.feldname,.sTitel{text-transform:none!important;letter-spacing:-.2px!important;font-size:17px!important;font-weight:700!important;color:#1C1C1E!important}"+
+    (istStart?"":"header{display:block!important;padding-left:16px!important;padding-right:16px!important}header h1,.topbar h1{margin:0!important;padding:0!important}"+
+      ".mxTop{display:flex;align-items:center;justify-content:space-between;min-height:34px;margin-bottom:4px}"+
+      "header h1 .mxTitel,.topbar h1 .mxTitel{font-size:28px;font-weight:800;letter-spacing:-.5px;color:#1C1C1E!important;transition:font-size .15s}"+
+      "html.mxKlein header h1 .mxTitel,html.mxKlein .topbar h1 .mxTitel{font-size:18px}html.mxKlein .mxTop{min-height:0;margin-bottom:0}"+
+      ".topbar{display:block!important;padding:calc(10px + env(safe-area-inset-top)) 16px 10px!important}.topbar .brand,.topbar .brand-sub{display:none!important}")+
+    /* App-Gefühl: nichts markieren, nicht zoomen, kein grauer Tipp-Schatten */
+    "html{-webkit-text-size-adjust:100%;touch-action:manipulation}"+
+    "button,a,.chip,.knopf,.kachel,.mxKnopf,summary,[data-fenster],label,.reiter div,.tag,.minik,.z,.vorgang,.punkt{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}"+
+    "input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text}"+
+    /* sanftes Überblenden zwischen den Seiten */
+    "@view-transition{navigation:auto}::view-transition-old(root),::view-transition-new(root){animation-duration:.18s}"+
+    /* neue Version */
+    "#mxNeu{display:none;background:#1C1C1E;color:#fff;text-align:center;font:700 14px -apple-system,Inter,system-ui,sans-serif;padding:11px 16px;cursor:pointer}#mxNeu.an{display:block}#mxNeu b{color:#FF6B6B}"+
+    /* Jeder Knopf mit hellgrauem, abgerundetem Hintergrund, nie nur farbiger Text (02.11.2026, Baran: „dann erkennt man den Button direkt“). Farbige Hauptknöpfe bleiben. */
+    ".mxStart,.abgl a,.abgl-link,#ablNeuZugang,#ablPwNeu,#ablAus,.sZur,.buZurueck,#bZurueck,#sAlle,#mLoesch,#vOrtAendern,#mVerlBez,#mKautWeg,#mEndWeg,#mEndBez,.kurz>a,a.zu,.buVerw,.zurueckA,#kZu,a.loeschen,.aend,.n a.pdf,#entwurfLeeren,#entwurfZurueck,#weiterSpaeter,.mini,.mehr>span,.mehr>a,.unten>a,.pbTipp a[data-pb],#mVerlInfo .vz>a,#uKopf>a,.mxKlein>summary{background:#E9E9EE!important;border:0!important;border-radius:10px!important;padding:6px 12px!important;text-decoration:none!important;display:inline-flex!important;align-items:center;gap:3px;line-height:1.25!important;width:auto!important;max-width:100%;box-shadow:none!important;cursor:pointer;-webkit-tap-highlight-color:transparent}"+
+    ".buVerw,.sZur,.buZurueck,#uKopf>a{display:flex!important;width:max-content!important}.buVerw{margin-left:auto!important;margin-right:auto!important}"+
+    ".mxStart{color:#C4161C!important;font-size:16px!important;font-weight:700!important;letter-spacing:0!important;padding:6px 12px 6px 9px!important}.mxStart b{margin-top:-1px;font-size:18px!important}"+
+    /* ‹ Start überall gleich groß (05.11.2026), auch wo look.py nicht gilt */
+    "html body header .mxStart,html body .topbar .mxStart{float:none!important;margin:0 10px 0 0!important;border:0!important;padding:5px 12px 5px 9px!important;background:#E9E9EE!important;border-radius:10px!important;color:#C4161C!important;opacity:1!important;font-size:16px!important;font-weight:600!important;gap:3px!important;line-height:1.2!important;min-height:44px!important;box-sizing:border-box;display:inline-flex!important;align-items:center!important}html body .mxStart b{font-size:20px!important;font-weight:400!important;line-height:16px!important;margin-top:-2px!important}"+
+    /* PC und Mac (1.11.2026, Baran: auf allen Geräten gleich): Kopfzeile und Inhalt in einer 680-px-Spalte in der Mitte.
+       Muss ganz am Ende stehen: header{padding-left:16px!important} weiter oben (und look.py davor im head) würde sonst gewinnen */
+    (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2 + 16px))!important;padding-right:max(16px,calc((100% - 680px)/2 + 16px))!important}"+
+      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box;padding-left:16px!important;padding-right:16px!important}header .plus{right:max(16px,calc((100% - 680px)/2 + 16px))!important}}");
+  document.head.appendChild(st);
+
+  // ‹ Start und Symbol in der Kopfzeile
+  const ziel=document.querySelector("header h1")||document.querySelector(".topbar");
+  const TITEL={anfragen:"Anfragen",angebot:"Angebot",kalender:"Kalender",vertrag:"Buchungen",kunden:"Kunden",autos:"Autos",geld:"Geld",
+    schaeden:/schadensformular/.test(pfad)?"Schadensmeldung":/schadensklaerung/.test(pfad)?"Schadensklärung":"Schäden",nachrichten:"Nachrichten",zahlen:"Zahlen",story:"Story",papierkorb:"Papierkorb",einstellungen:"Einstellungen"};
+  if(ziel&&!istStart&&!document.querySelector(".mxStart")){
+    const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");
+    const top=document.createElement("div");top.className="mxTop";top.appendChild(a);
+    const punkt=ziel.querySelector("#abgleichPunkt"),titel=TITEL[art]||(ziel.textContent||"").replace(/^\s*MIETIX\s*/i,"").trim();
+    let h=ziel;if(ziel.tagName!=="H1"){h=document.createElement("h1");ziel.appendChild(h)}
+    h.innerHTML='<span class="mxTitel">'+titel+'</span>';if(punkt){punkt.style.marginLeft="8px";punkt.style.verticalAlign="middle";h.appendChild(punkt)}
+    h.parentNode.insertBefore(top,h);
+    addEventListener("scroll",()=>document.documentElement.classList.toggle("mxKlein",scrollY>40),{passive:true})}
+
+  // Wischen vom linken Rand = zurück (nur als App, im Browser macht das Safari)
+  const alsApp=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
+  if(alsApp){let x0=null,y0=0;
+    document.addEventListener("touchstart",e=>{const t=e.touches[0];x0=(t.clientX<=24&&e.touches.length===1&&!e.target.closest("canvas,.pad,#ug,input,textarea,select"))?t.clientX:null;y0=t.clientY},{passive:true});
+    document.addEventListener("touchend",e=>{if(x0===null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=Math.abs(t.clientY-y0);x0=null;if(dx<80||dy>60)return;
+      if(document.querySelector(".mxFenster.auf")&&window.mxZu){mxZu();return}
+      if(typeof window.mxZurueck==="function"&&window.mxZurueck())return;
+      if(istStart)return;
+      if(history.length>1&&document.referrer.indexOf(location.origin)===0)history.back();else location.href="https://barankohler.github.io/mietix-zentrale/"},{passive:true})}
+
+  // Neue Version: die Seite aus dem Netz mit der geladenen vergleichen (ohne Daten, nur der Text der Seite)
+  // Seit 05.11.2026: nur die Kopfzeile abfragen (Stand der Seite im Netz gegen Stand der geladenen Seite), nicht jedes Mal die ganze Seite. Kennt der Server keinen Stand, wie bisher über den Text.
+  let alt=null;
+  async function pruefen(){try{let neu=false;const k=await fetch(location.pathname,{method:"HEAD",cache:"no-store"}).catch(()=>null);
+    const lm=k&&k.ok?k.headers.get("last-modified"):null,tN=lm?Date.parse(lm):NaN,tD=Date.parse(document.lastModified);
+    if(!isNaN(tN)&&!isNaN(tD))neu=tN>tD+1000;
+    else{const r=await fetch(location.pathname,{cache:"no-store"});if(!r.ok)return;const t=await r.text(),h=t.length+":"+t.slice(-400);
+      if(alt===null){const c=await fetch(location.pathname,{cache:"force-cache"}).then(x=>x.text()).catch(()=>null);alt=c?c.length+":"+c.slice(-400):h}
+      neu=h!==alt}
+    if(neu){let b=document.getElementById("mxNeu");if(!b){b=document.createElement("div");b.id="mxNeu";b.innerHTML="Neue Version da. <b>Tippen zum Aktualisieren</b>";b.onclick=()=>location.reload();
+      const kopf=document.querySelector("header,.topbar");if(kopf)kopf.after(b);else document.body.prepend(b)}b.classList.add("an")}}catch(e){}}
+  setTimeout(pruefen,3000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)pruefen()});
+
+  // Ohne Internet: Seite aus dem Speicher (sw.js liegt im Ordner der Seite)
+  if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+  // Startseite: wichtige Seiten einmal in den Speicher, damit sie auch ohne Internet aufgehen, selbst wenn sie auf diesem Gerät noch nie offen waren (05.11.2026)
+  if(istStart&&"serviceWorker" in navigator&&"caches" in window&&location.protocol==="https:"&&location.hostname==="barankohler.github.io")setTimeout(async()=>{try{if(!navigator.onLine)return;const c=await caches.open("mietix-seiten-1");
+    for(const p of ["mietix-vertrag/","mietix-anfragen/","mietix-belegung/","mietix-belegung/angebot.html","mietix-autos/","mietix-geld/","mietix-zentrale/kunden.html","mietix-zentrale/nachrichten.html","mietix-zentrale/umsatzbringer.html"]){const u=location.origin+"/"+p;
+      try{if(!await c.match(u))await c.add(u);const o=p.split("/")[0]+"/";if(o!=="mietix-zentrale/")await navigator.serviceWorker.register("/"+o+"sw.js",{scope:"/"+o})}catch(e){}}}catch(e){}},6000);
+
+  // Startseite: die meistgenutzten Seiten schon vorladen, dann öffnen sie ohne Wartezeit
+  if(istStart)setTimeout(()=>["mietix-vertrag/","mietix-anfragen/","mietix-belegung/","mietix-autos/"].forEach(p=>{const l=document.createElement("link");l.rel="prefetch";l.href="https://barankohler.github.io/"+p;document.head.appendChild(l)}),2500);
+})();
+</script><script>
+/* Einheit fest im Zahlenfeld (31.10.2026) */
+(function(){if(window.mxEinheit)return;
+  const REGELN=[[/€|&euro;|\beur\b|betrag|preis|kaution|einbehalt|aufpreis|kosten|wert\b|selbstbeteiligung/i,"€"],
+    [/rabatt|prozent/i,"%"],[/liter/i,"Liter"],[/profiltiefe|\bmm\b/i,"mm"],[/stück|schlüssel/i,"Stück"],[/^\s*alter\b/i,"Jahre"],
+    [/kilometer|\bkm\b|freikm/i,"km"]];
+  const AUS=new Set(["nr"]);   // Mietvertrag-Nummer bleibt ohne Einheit
+  function beschriftung(f){let l=f.id?document.querySelector('label[for="'+f.id+'"]'):null;
+    if(!l){let e=f.previousElementSibling;while(e&&!l){if(e.tagName==="LABEL")l=e;e=e.previousElementSibling}}
+    if(!l&&f.parentElement){const ls=f.parentElement.querySelectorAll("label");if(ls.length===1)l=ls[0]}
+    return l}
+  function einheit(f){if(f.dataset.einheit!==undefined)return f.dataset.einheit;
+    if(/^(VL|VR|HL|HR)$/.test(f.placeholder||""))return"mm";   // Profiltiefe je Rad, eine Beschriftung für vier Felder
+    // Einheit steht schon direkt am Feld (€-Kästchen davor, "km" dahinter): nichts doppelt
+    for(const n of [f.previousElementSibling,f.nextElementSibling])if(n&&n.tagName!=="LABEL"&&n.tagName!=="INPUT"&&/^\s*(€|km|%|prozent|liter|mm)/i.test(n.textContent||""))return"";
+    const l=beschriftung(f),t=((l?l.textContent:"")+" "+(f.placeholder||"")).trim();
+    for(const [re,e] of REGELN)if(re.test(t))return e;return""}
+  function bild(e){const w=Math.round(e.length*10.5+4),
+      svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="22"><text x="'+w+'" y="16" text-anchor="end" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#8A8A8E">'+e+'</text></svg>';
+    return{url:'url("data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)+'")',w}}
+  function setzen(f){if(f.dataset.mxE||AUS.has(f.id)||f.type==="date"||f.type==="time")return;
+    const e=einheit(f);f.dataset.mxE="1";if(!e)return;const b=bild(e),pr=parseFloat(getComputedStyle(f).paddingRight)||12;
+    f.style.backgroundImage=b.url;f.style.backgroundRepeat="no-repeat";f.style.backgroundPosition="right "+Math.max(12,pr)+"px center";
+    f.style.paddingRight=(Math.max(12,pr)+b.w+8)+"px";
+    // dieselbe Einheit am Ende der Beschriftung ist jetzt doppelt
+    const l=beschriftung(f),t=l&&l.lastChild;if(t&&t.nodeType===3){const ende={"€":/\s*€\s*$/,"km":/\s*\(km\)\s*$/,"mm":/\s+in mm\s*$/,"Stück":/\s*\(Stück\)\s*$/}[e];
+      if(ende&&ende.test(t.nodeValue)&&t.nodeValue.replace(ende,"").trim())t.nodeValue=t.nodeValue.replace(ende,"")}}
+  function alle(w){(w||document).querySelectorAll('input[inputmode="decimal"],input[inputmode="numeric"],input[type="number"]').forEach(setzen)}
+  window.mxEinheit=alle;alle();
+  new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input"))setzen(n);else if(n.querySelectorAll)alle(n)}})
+    .observe(document.body,{childList:true,subtree:true})})();
+</script><script>
+/* Anschrift getrennt (31.10.2026) */
+(function(){if(window.mxAnschrift)return;
+  const desc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
+  const st=document.createElement("style");st.textContent=".mxAZ{display:grid;grid-template-columns:minmax(90px,32%) 1fr;gap:10px}.mxAZ>div{min-width:0}.mxAZ input{width:100%;box-sizing:border-box}";document.head.appendChild(st);
+  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/);
+    if(m){s=m[1].trim().replace(/,$/,"");p=m[2];o=m[3].trim()}else if(voll&&/\d/.test(v))s=v;else o=v.replace(/^,\s*/,"");return{s,p,o}}   // ohne Hausnummer ist es ein Ort (31.10.2026)
+  function setzen(inp){if(inp.dataset.mxA)return;inp.dataset.mxA="1";const voll=inp.dataset.anschrift!=="plzort";
+    const lab=inp.previousElementSibling&&inp.previousElementSibling.tagName==="LABEL"?inp.previousElementSibling:null;
+    const ic=inp.className,lc=lab?lab.className:"",feld=(t,l,extra)=>lab?'<label class="'+lc+'">'+l+'</label><input class="'+ic+'" data-t="'+t+'" autocomplete="off"'+(extra||"")+'>':'<input class="'+ic+'" data-t="'+t+'" placeholder="'+l+'" autocomplete="off"'+(extra||"")+'>';
+    const w=document.createElement("div");w.className="mxAnschr";
+    w.innerHTML=(voll?feld("s","Straße und Hausnummer"):"")+'<div class="mxAZ"><div>'+feld("p","PLZ",' inputmode="numeric" maxlength="5"')+'</div><div>'+feld("o","Wohnort")+'</div></div>';
+    inp.after(w);inp.style.display="none";if(lab)lab.style.display="none";
+    const f=t=>w.querySelector('[data-t="'+t+'"]');
+    const verteilen=v=>{const x=teile(v,voll);if(f("s"))desc.set.call(f("s"),x.s);desc.set.call(f("p"),x.p);desc.set.call(f("o"),x.o)};
+    const zusammen=()=>{const s=f("s")?desc.get.call(f("s")).trim():"",p=desc.get.call(f("p")).trim(),o=desc.get.call(f("o")).trim(),po=(p+" "+o).trim();return voll?[s,po].filter(Boolean).join(", "):po};
+    Object.defineProperty(inp,"value",{configurable:true,get(){return desc.get.call(this)},set(v){desc.set.call(this,v);verteilen(v)}});
+    verteilen(desc.get.call(inp));
+    w.querySelectorAll("input").forEach(e=>e.addEventListener("input",()=>{desc.set.call(inp,zusammen());inp.dispatchEvent(new Event("input",{bubbles:true}));inp.dispatchEvent(new Event("change",{bubbles:true}))}))}
+  window.mxAnschrift=setzen;
+  const alle=w=>(w||document).querySelectorAll("input[data-anschrift]").forEach(setzen);alle();
+  new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input[data-anschrift]"))setzen(n);else if(n.querySelectorAll)alle(n)}}).observe(document.body,{childList:true,subtree:true})})();
+</script><script>
+/* Fenster (30.10.2026): Knopf mit data-fenster öffnet, ✕, Tipp daneben oder Esc schließt */
+(function(){if(window.mxAuf)return;
+  let bg=document.querySelector(".mxBg");if(!bg){bg=document.createElement("div");bg.className="mxBg";document.body.appendChild(bg)}
+  // Zurück-Taste und Wischen schließen zuerst das Fenster, die Seite bleibt (04.11.2026, Baran: „wo richtig zurück ist“)
+  let imVerlauf=false;
+  const schliessen=function(){document.querySelectorAll(".mxFenster.auf").forEach(f=>f.classList.remove("auf"));bg.classList.remove("auf");
+    document.documentElement.style.overflow="";document.body.style.overflow=""};
+  window.mxAuf=function(id){const f=document.getElementById(id);if(!f)return;schliessen();bg.classList.add("auf");f.classList.add("auf");
+    document.documentElement.style.overflow="hidden";document.body.style.overflow="hidden";f.scrollTop=0;
+    if(!imVerlauf){try{history.pushState(Object.assign({},history.state||{},{mxF:id}),"");imVerlauf=true}catch(e){}}};
+  // ✕ nimmt den Eintrag wieder weg. Springt die Seite im selben Moment weiter, bleibt er als „überspringen“ im Verlauf stehen.
+  let still=false,skipT=null;
+  window.mxSkipNimm=function(){if(skipT){clearTimeout(skipT);skipT=null;return 1}return 0};   // die Seite springt selbst zurück und nimmt den Eintrag gleich mit
+  window.mxZu=function(){schliessen();if(!imVerlauf)return;imVerlauf=false;try{history.replaceState(Object.assign({},history.state||{},{mxSkip:1}),"")}catch(e){}
+    skipT=setTimeout(function(){skipT=null;if(history.state&&history.state.mxSkip){still=true;history.back()}},0)};
+  addEventListener("popstate",function(e){if(still){still=false;e.stopImmediatePropagation();return}
+    if(imVerlauf){imVerlauf=false;schliessen();e.stopImmediatePropagation();return}
+    if(e.state&&e.state.mxSkip){e.stopImmediatePropagation();history.back()}},true);
+  document.addEventListener("click",function(e){const k=e.target.closest("[data-fenster]");if(k){e.preventDefault();mxAuf(k.dataset.fenster);return}
+    if(e.target.closest(".mxZu")||e.target===bg)mxZu()});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")mxZu()})})();
+</script></body></html>
