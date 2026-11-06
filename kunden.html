@@ -267,38 +267,54 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
    window.mietixKunden.alle()               alle Kunden mit Verlauf (Mietverträge, Anfragen, Schäden)
    window.mietixKunden.finde(text)          Treffer zu einem Suchtext
    window.mietixKunden.anhaengen(feld, auf)  Trefferliste unter einem Eingabefeld, antippen ruft auf(kunde)
-   window.mietixKunden.merken(name, werte)  Felder eines Kunden im gemeinsamen Speicher ändern */
+   window.mietixKunden.merken(name, werte)  Felder eines Kunden im gemeinsamen Speicher ändern (null löscht, "" lässt stehen)
+   window.mietixKunden.eins(name)           der Kunde zu einem Namen, auch zusammengeführt (e.namen: alle Schreibweisen) */
 (function(){
 const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
 const schreib=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};   // false: nicht gespeichert, roter Hinweis kommt aus stil/schutz.py
-const norm=s=>String(s||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();   // Çelik findet man auch als celik
+const norm=s=>String(s||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/ı/g,"i").replace(/ł/g,"l").replace(/ø/g,"o").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();   // Çelik findet man auch als celik, Yılmaz als yilmaz (06.11.2026)
 const ziffern=n=>String(n||"").replace(/\D/g,"").replace(/^0049/,"0").replace(/^49/,"0");
 const de=s=>s&&/^\d{4}-\d{2}-\d{2}$/.test(s)?s.split("-").reverse().join("."):String(s||"");
 const heute=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const zahl=s=>{if(typeof s==="number")return s;s=String(s||"").replace(/[^\d,.-]/g,"");if(!s)return 0;
   if(s.includes(",")){s=s.replace(/\./g,"").replace(",",".")}else if((s.match(/\./g)||[]).length>1||/\.\d{3}$/.test(s))s=s.replace(/\./g,"");return +s||0};
 const leer=n=>({name:n,telefon:"",anschrift:"",geb:"",gebort:"",email:"",ort:"",notiz:"",keineAngebote:false,gesperrt:false,angeschrieben:"",
-  rechtsstreit:false,schadenOffen:0,schadenFaelle:0,schaeden:[],vertraege:[],anfragen:[],quelle:""});
+  rechtsstreit:false,schadenOffen:0,schadenFaelle:0,schaeden:[],vertraege:[],anfragen:[],quelle:"",namen:[String(n||"").trim()],_tels:[]});
+// Zwei Einträge sind derselbe Mensch (gleiche Telefonnummer): b geht in a auf, nichts geht verloren (06.11.2026)
+function verschmelze(a,b){["telefon","anschrift","geb","gebort","email","ort","notiz"].forEach(f=>{if(!a[f]&&b[f])a[f]=b[f]});
+  if(b.angeschrieben>a.angeschrieben)a.angeschrieben=b.angeschrieben;
+  ["keineAngebote","gesperrt","rechtsstreit"].forEach(f=>{a[f]=a[f]||b[f]});a.schadenOffen+=b.schadenOffen;a.schadenFaelle+=b.schadenFaelle;
+  a.schaeden=a.schaeden.concat(b.schaeden);a.vertraege=a.vertraege.concat(b.vertraege);a.anfragen=a.anfragen.concat(b.anfragen);
+  b.namen.forEach(n=>{if(!a.namen.includes(n))a.namen.push(n)});b._tels.forEach(z=>{if(!a._tels.includes(z))a._tels.push(z)})}
 function alle(){
   const K=lies("mietixKunden",{}),V=lies("mietixVorgaenge",[]),A=lies("mietixAnfragen",[]),m={},h=heute();
   const hol=(name,quelle)=>{const k=norm(name);if(!k)return null;if(!m[k]){m[k]=leer(String(name).trim());m[k].quelle=quelle}return m[k]};
   Object.keys(K).forEach(n=>{const d=K[n];if(!d||d._weg)return;const e=hol(n,"kunden");if(!e)return;
     ["telefon","anschrift","geb","gebort","email","ort","notiz","angeschrieben"].forEach(f=>{if(d[f])e[f]=String(d[f])});
     e.keineAngebote=!!d.keineAngebote;e.gesperrt=!!d.gesperrt;e.rechtsstreit=!!d.rechtsstreit;
-    e.schadenOffen=+d.schadenOffen||0;e.schadenFaelle=+d.schadenFaelle||0;if(Array.isArray(d.schaeden))e.schaeden=d.schaeden});
+    e.schadenOffen=+d.schadenOffen||0;e.schadenFaelle=+d.schadenFaelle||0;if(Array.isArray(d.schaeden))e.schaeden=d.schaeden;
+    if(d.telefon)e._tels.push(ziffern(d.telefon))});
   V.forEach(v=>{if(!v||!v.name)return;const e=hol(v.name,"vertrag");if(!e)return;
-    if(!e.gesperrt)["telefon","anschrift","geb","gebort","email"].forEach(f=>{if(!e[f]&&v[f])e[f]=String(v[f])});
+    if(!e.gesperrt){["telefon","anschrift","geb","gebort","email"].forEach(f=>{if(!e[f]&&v[f])e[f]=String(v[f])});if(v.telefon)e._tels.push(ziffern(v.telefon))}
     const z=v.zahlung||{},rest=z.rest||{};
     e.vertraege.push({nr:v.nr,auto:v.auto||"",von:v.vonD||"",bis:v.bisD||"",preis:zahl(v.gesamt||v.preis1),status:v.status||"",
       mieteOffen:!!(v.vonD&&v.vonD<h&&((!rest.am&&zahl(rest.betrag))||(v.verlaengerungen||[]).some(y=>!y.bezahlt?+y.aufpreis>0:y.gezahlt!=null&&(+y.aufpreis||0)>y.gezahlt)))})});   // wie offenBetrag im Mietvertrag (05.11.2026)
   A.forEach(a=>{if(!a||!a.name)return;const e=hol(a.name,"anfrage");if(!e)return;
-    if(!e.gesperrt){if(!e.telefon&&a.nummer)e.telefon=String(a.nummer);if(!e.ort&&a.ort)e.ort=String(a.ort)}
+    if(!e.gesperrt){if(!e.telefon&&a.nummer)e.telefon=String(a.nummer);if(!e.ort&&a.ort)e.ort=String(a.ort);if(a.nummer)e._tels.push(ziffern(a.nummer))}
     e.anfragen.push({tag:a.tag||"",auto:a.auto||"",von:a.von||"",bis:a.bis||"",status:a.status||""})});
+  // Gleiche Telefonnummer = derselbe Kunde, auch bei anderer Schreibweise des Namens (wie die Seite Anfragen, 06.11.2026)
+  {const wem={};Object.keys(m).forEach(k=>{const e=m[k];if(!e)return;
+    const ziel=[...new Set(e._tels)].filter(z=>z.length>=6).map(z=>wem[z]).find(x=>x&&x!==k&&m[x]);
+    if(ziel){verschmelze(m[ziel],e);delete m[k];e._tels.forEach(z=>{if(z.length>=6&&!wem[z])wem[z]=ziel})}
+    else e._tels.forEach(z=>{if(z.length>=6&&!wem[z])wem[z]=k})});
+   // nach „Daten auf Kundenwunsch löschen“ fehlt die Nummer: der Verweis mit hält die Einträge zusammen
+   Object.keys(K).forEach(n=>{const d=K[n];if(!d||d._weg||!d.mit)return;const a=m[norm(d.mit)],b=m[norm(n)];if(a&&b&&a!==b){verschmelze(a,b);delete m[norm(n)]}});
+   Object.values(m).forEach(e=>{if(e.gesperrt)["telefon","anschrift","geb","gebort","email","notiz","ort"].forEach(f=>e[f]="")})}
   // Ältere Mieten aus der Excel (Reiter Geld, 31.10.2026): kommen über die Brücke als mietixStand.statistik.verlauf.
   // Gleicher Kunde über Telefon oder Namen (auch Nachname zuerst), gleiche Miete wie ein Mietvertrag (Auto, ±3 Tage) zählt nur einmal.
   const S=(lies("mietixStand",{})||{}).statistik,VL=S&&Array.isArray(S.verlauf)?S.verlauf:[];
   if(VL.length){const dreh=n=>norm(n).split(" ").sort().join(" "),nachTel={},nachName={};
-    Object.values(m).forEach(e=>{const z=ziffern(e.telefon);if(z.length>=6)nachTel[z]=e;nachName[dreh(e.name)]=e});
+    Object.values(m).forEach(e=>{const z=ziffern(e.telefon);if(z.length>=6)nachTel[z]=e;e._tels.forEach(t=>{if(t.length>=6&&!nachTel[t])nachTel[t]=e});e.namen.forEach(x=>{nachName[dreh(x)]=e});nachName[dreh(e.name)]=e});
     VL.forEach(x=>{if(!x||!x.name)return;const z=ziffern(x.tel);
       let e=(z.length>=6&&nachTel[z])||nachName[dreh(x.name)];
       if(!e){e=hol(x.name,"excel");if(!e)return;nachName[dreh(x.name)]=e;if(z.length>=6)nachTel[z]=e}
@@ -320,15 +336,16 @@ function alle(){
 function alter(geb){if(!/^\d{4}-\d{2}-\d{2}$/.test(geb||""))return null;const g=new Date(geb),h=new Date();
   let a=h.getFullYear()-g.getFullYear();if(h.getMonth()<g.getMonth()||(h.getMonth()===g.getMonth()&&h.getDate()<g.getDate()))a--;return a>0&&a<120?a:null}
 function passt(e,tok){const t=norm(tok),z=ziffern(tok);
-  if(t&&(norm(e.name).includes(t)||norm(e.ort).includes(t)||norm(e.anschrift).includes(t)||norm(e.email).includes(t)||norm(e.gebort).includes(t)))return true;
+  if(t&&(norm(e.name).includes(t)||(e.namen||[]).some(n=>norm(n).includes(t))||norm(e.ort).includes(t)||norm(e.anschrift).includes(t)||norm(e.email).includes(t)||norm(e.gebort).includes(t)))return true;
   if(z.length>=3&&ziffern(e.telefon).includes(z))return true;
   if(e.geb&&(de(e.geb).includes(tok.trim())||e.geb.includes(tok.trim())))return true;
   if(/^\d{1,2}\.\d{1,2}\.?$/.test(tok.trim())&&e.geb){const p=tok.trim().replace(/\.$/,"").split(".");if(e.geb.slice(5)===p[1].padStart(2,"0")+"-"+p[0].padStart(2,"0"))return true}
   return false}
 function finde(text,liste){const tok=String(text||"").trim().split(/\s+/).filter(Boolean);if(!tok.length)return[];
   return (liste||alle()).filter(e=>tok.every(t=>passt(e,t))).sort((a,b)=>b.mieten-a.mieten||norm(a.name).localeCompare(norm(b.name)))}
+// Nur null löscht ein Feld; ein leeres Feld löscht nichts (06.11.2026, Prüfung: „Kunde anlegen“ mit leerem Telefon löschte die Nummer)
 function merken(name,werte){const K=lies("mietixKunden",{});const alt=Object.keys(K).find(n=>norm(n)===norm(name))||String(name).trim();
-  const d=Object.assign({},K[alt]||{});Object.keys(werte).forEach(k=>{if(werte[k]===null||werte[k]===undefined||werte[k]==="")delete d[k];else d[k]=werte[k]});
+  const d=Object.assign({},K[alt]||{});Object.keys(werte).forEach(k=>{if(werte[k]===null)delete d[k];else if(werte[k]!==undefined&&werte[k]!=="")d[k]=werte[k]});
   K[alt]=d;schreib("mietixKunden",K);return d}
 function zeile(e){const info=[e.geb?"geb. "+de(e.geb):"",e.telefon,e.ort,e.mieten?e.mieten+(e.mieten===1?" Miete":" Mieten"):"noch kein Mietvertrag"].filter(Boolean).join("  |  ");
   return'<div class="ksT"><b>'+esc(e.name)+(e.warn.length?' <i class="ksWarn">ACHTUNG</i>':"")+'</b><span>'+esc(info)+'</span></div>'}
@@ -349,7 +366,10 @@ function anhaengen(feld,auf,opt){opt=opt||{};css();const box=document.createElem
   feld.addEventListener("input",zeichne);feld.addEventListener("focus",zeichne);
   feld.addEventListener("blur",()=>{zu=setTimeout(()=>box.style.display="none",250)});
   return{neu:zeichne}}
-window.mietixKunden={alle,finde,anhaengen,merken,norm,ziffern,de,alter,heute};
+// ein Kunde zu einem Namen, auch bei anderer Schreibweise (Yilmaz/Yılmaz) oder zusammengeführt über die Telefonnummer
+function eins(name,liste){const n=norm(name);if(!n)return null;liste=liste||alle();
+  return liste.find(e=>e.name===name)||liste.find(e=>norm(e.name)===n)||liste.find(e=>(e.namen||[]).some(x=>norm(x)===n))||null}
+window.mietixKunden={alle,finde,anhaengen,merken,norm,ziffern,de,alter,heute,eins};
 window.dispatchEvent(new Event("mietix-kunden-bereit"));
 })();
 </script>
@@ -418,7 +438,7 @@ function mieteZeile(v){const V="../mietix-vertrag/",preis='<b>'+(v.preis?EUR.for
   const schild=(v.status==="zurück"?'<span class="schild gruen">zurück</span>':vg.ueb?'<span class="schild rot">unterwegs</span>':'<span class="schild grau">gebucht</span>')+(v.mieteOffen?'<span class="schild gelb">offen</span>':"");
   return'<a class="mz" href="'+V+'?nr='+encodeURIComponent(v.nr)+'&amp;zeige=mappe&amp;von='+encodeURIComponent(AUF||"")+'" data-nr="'+esc(v.nr)+'"><div class="mzT"><b>'+esc(v.auto||"Miete")+'</b><i>'+de(v.von)+(v.bis&&v.bis!==v.von?" bis "+de(v.bis):"")+", Nr. "+esc(v.nr)+'</i></div>'
     +'<div class="mzR">'+preis+(schild?'<span class="schilder">'+schild+'</span>':"")+'</div><em class="mzP">›</em></a>'}
-function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="../mietix-vertrag/";
+function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V="../mietix-vertrag/";   // auch andere Schreibweise, zusammengeführt über die Telefonnummer (06.11.2026)
   const seit=e.vertraege.length?e.vertraege[0].von:"",sMon=seit?MON[+seit.slice(5,7)-1]+" "+seit.slice(0,4):"";
   const unter=e.mieten>=2?"Stammkunde, "+e.mieten+" Mieten seit "+sMon:e.mieten===1?"1 Miete im "+sMon:e.anfragen.length?"Bisher nur Anfrage":"Noch keine Miete";
   const tel=MK.ziffern(e.telefon),t=String(e.anschrift||"").match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/),str=t?t[1].replace(/,$/,""):(e.anschrift||""),plzOrt=t?t[2]+" "+t[3]:(e.ort||"");
@@ -456,20 +476,34 @@ function karte(){const e=ALLE.find(x=>x.name===AUF);if(!e){zu();return}const V="
   if(BEARB){$("dKeine").onclick=()=>$("dKeine").classList.toggle("an");
     // Angefangene Änderungen kommen wieder (1.11.2026, Regel: nichts verlieren)
     const KE=window.mxEntwurf?mxEntwurf("#karte","kunde:"+e.name,["dTel","dAnschrift","dGeb","dGebort","dEmail","dNotiz"]):null;if(KE)KE.holen();
-    $("dSpeichern").onclick=()=>{MK.merken(e.name,{telefon:$("dTel").value.trim(),anschrift:$("dAnschrift").value.trim(),geb:$("dGeb").value,gebort:$("dGebort").value.trim(),
-      email:$("dEmail").value.trim(),notiz:$("dNotiz").value.trim(),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;try{history.replaceState(Object.assign({},history.state||{},{bearb:0}),"")}catch(x){}meldung("Gespeichert");zeichne();karte()};
-    $("dLoeschen").onclick=ev=>{ev.preventDefault();if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+" löschen? Die Mietverträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
-      MK.merken(e.name,{telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true});BEARB=false;meldung("Daten gelöscht.");zeichne();karte()}}}
+    const hand=v=>v===""?null:v;   // hier ist ein geleertes Feld gewollt und löscht (merken lässt "" sonst stehen, 06.11.2026)
+    $("dSpeichern").onclick=()=>{MK.merken(e.name,{telefon:hand($("dTel").value.trim()),anschrift:hand($("dAnschrift").value.trim()),geb:hand($("dGeb").value),gebort:hand($("dGebort").value.trim()),
+      email:hand($("dEmail").value.trim()),notiz:hand($("dNotiz").value.trim()),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;try{history.replaceState(Object.assign({},history.state||{},{bearb:0}),"")}catch(x){}meldung("Gespeichert");zeichne();karte()};
+    // trifft alle Schreibweisen desselben Kunden (gleiche Telefonnummer), sonst bliebe ein Teil stehen (06.11.2026, Datenschutz)
+    $("dLoeschen").onclick=ev=>{ev.preventDefault();const andere=(e.namen||[]).filter(n=>n!==e.name);
+      if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+(andere.length?" (auch gespeichert als "+andere.join(", ")+")":"")+" löschen, auch in seinen Anfragen? Die Mietverträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
+      const weg={telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true};
+      // auch in den Anfragen dieses Kunden: Einträge bleiben, persönliche Angaben werden geleert (06.11.2026). Abgleich erkennt die Änderung wie bei jedem Speichern
+      {const nn=(e.namen||[e.name]).map(MK.norm),tt=(e._tels||[]).concat(MK.ziffern(e.telefon)).filter(z=>z.length>=6);let A=[];try{A=JSON.parse(localStorage.getItem("mietixAnfragen")||"[]")||[]}catch(x){}
+        let n=0;A.forEach(a=>{if(!a||a._weg)return;if(!nn.includes(MK.norm(a.name))&&!(tt.length&&tt.includes(MK.ziffern(a.nummer))))return;
+          ["nummer","alter","ort","anschrift","geb","gebort","email","notiz"].forEach(f=>{if(a[f])a[f]=""});a.datenGeloescht=heute;n++});
+        if(n)try{localStorage.setItem("mietixAnfragen",JSON.stringify(A))}catch(x){meldung("Nicht gespeichert, Speicher voll.");return}}
+      MK.merken(e.name,weg);andere.forEach(n=>MK.merken(n,Object.assign({mit:e.name},weg)));BEARB=false;meldung("Daten gelöscht.");zeichne();karte()}}}
 /* Angebot verschicken (31.10.2026, Baran: Autos antippen, Übergabe und Rückgabe mit Datum und Uhrzeit, seriös und attraktiv) */
 let FLOTTE=null,AG_AUTOS=new Set();
 fetch("https://barankohler.github.io/mietix-preise/preise.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(p=>{if(p&&p.cars){FLOTTE=p.cars.map(c=>c.anzeige||c.n);if($("fAngebot").classList.contains("auf"))agAutos()}}).catch(()=>{});
 const isoD=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 const plus=(iso,n)=>{const d=new Date(iso+"T12:00");d.setDate(d.getDate()+n);return isoD(d)};
 const lang=iso=>{const d=new Date(iso+"T12:00");return WT[d.getDay()]+", "+iso.split("-").reverse().join(".")};
-function agBelegt(){const v=$("agVon").value,b=$("agBis").value,s=new Set();if(!v||!b)return s;const ue=(a1,b1)=>a1&&b1&&a1<b&&b1>v;
+// Belegt: Buchung (gebucht), Mietvertrag, Sperre. Mit Uhrzeit wie im Angebot; ein überfälliges Auto bleibt belegt, bis es zurück ist (06.11.2026)
+function agBelegt(){const v=$("agVon").value,b=$("agBis").value,s=new Set();if(!v||!b)return s;
+  const V0=v+"T"+($("agVonU").value||"10:00"),B0=b+"T"+($("agBisU").value||"10:00"),jt=new Date(),jetzt=isoD(jt)+"T"+String(jt.getHours()).padStart(2,"0")+":"+String(jt.getMinutes()).padStart(2,"0");
+  const ue=(a1,au,b1,bu)=>a1&&b1&&(a1+"T"+(au||"10:00"))<B0&&(b1+"T"+(bu||"10:00"))>V0;
   const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
-  lies("mietixVorgaenge",[]).forEach(x=>{if(x.status!=="zurück"&&ue(x.vonD,x.bisD))s.add(x.auto)});
-  lies("mietixAnfragen",[]).forEach(a=>{if(a.status==="gebucht"&&ue(a.von,a.bis))s.add(a.auto)});
+  lies("mietixVorgaenge",[]).forEach(x=>{if(!x||x._weg||x.status==="zurück")return;
+    const ueber=x.ueb&&x.bisD&&(x.bisD+"T"+(x.bisU||"10:00"))<jetzt;
+    if(ue(x.vonD,x.vonU,ueber?"9999-12-31":x.bisD,x.bisU))s.add(x.auto)});
+  lies("mietixAnfragen",[]).forEach(a=>{if(a&&!a._weg&&a.status==="gebucht"&&ue(a.von,a.vonU,a.bis,a.bisU))s.add(a.auto)});
   lies("mietixSperren",[]).forEach(x=>{if(!x._weg&&x.von&&x.bis&&x.von<b&&x.bis>=v)s.add(x.auto)});return s}   // letzter Tag einer Sperre ist frei, Regel wie im Kalender (D17, 05.11.2026)
 function agAutos(){const autos=FLOTTE||Object.keys((()=>{try{return JSON.parse(localStorage.getItem("mietixAutos")||"{}")}catch(e){return{}}})()),bel=agBelegt();
   [...AG_AUTOS].forEach(a=>{if(bel.has(a))AG_AUTOS.delete(a)});
@@ -483,7 +517,10 @@ function agText(e){const vn=String(e.name||"").trim().split(/\s+/)[0],v=$("agVon
     " Möchten Sie "+(autos.length===1?"das Fahrzeug":"eines der Fahrzeuge")+" reservieren? Eine kurze Antwort genügt."}
 function agListe(){const nur=$("agNurStamm").classList.contains("an"),bereit=$("agVon").value&&$("agBis").value&&AG_AUTOS.size;
   $("agVorschau").textContent=bereit?agText({name:"Vorname",mieten:nur?2:1}):"Zeitraum wählen und mindestens ein Fahrzeug antippen.";
-  const l=ALLE.filter(e=>e.telefon&&!e.keineAngebote&&!e.gesperrt&&!e.warn.length&&(nur?e.mieten>=2:e.mieten>=1))
+  // nicht an Kunden, die gerade ein Auto haben oder überfällig sind (wie die Startseite, 06.11.2026)
+  let VG=[];try{VG=JSON.parse(localStorage.getItem("mietixVorgaenge")||"[]")||[]}catch(x){}
+  const unterwegs=e=>e.vertraege.some(v=>v.nr&&VG.some(x=>x&&x.nr===v.nr&&!x._weg&&x.ueb&&x.status!=="zurück"));
+  const l=ALLE.filter(e=>e.telefon&&!e.keineAngebote&&!e.gesperrt&&!e.warn.length&&!unterwegs(e)&&(nur?e.mieten>=2:e.mieten>=1))
     .map(e=>Object.assign({war:e.angeschrieben&&tageSeit(e.angeschrieben)<14},e))
     .sort((a,b)=>((a.war?1:0)-(b.war?1:0))||(b.mieten-a.mieten)||((b.zuletzt||"")<(a.zuletzt||"")?-1:1));
   $("agListe").innerHTML=!bereit?"":l.length?'<div class="feld">'+l.map(e=>'<div class="agRow'+(e.war?" war":"")+'" data-n="'+esc(e.name)+'"><div class="t"><b>'+esc(e.name)+'</b><i>'+esc(wieOft(e))+(e.war?", angeschrieben "+de(e.angeschrieben):"")+'</i></div><a target="_blank" href="'+wa(e.telefon,agText(e))+'">WhatsApp</a></div>').join("")+'</div>'
@@ -504,11 +541,15 @@ $("angebotAuf").onclick=()=>{mxAuf("fAngebot");if(!$("agVon").value){const w=new
 $("suche").addEventListener("input",zeichne);
 $("filter").querySelectorAll("span").forEach(c=>c.onclick=()=>{$("filter").querySelectorAll("span").forEach(x=>x.classList.remove("an"));c.classList.add("an");FILTER=c.dataset.f;zeichne()});
 $("sortierung").onchange=()=>{SORT=$("sortierung").value;zeichne()};
-$("neuLos").onclick=()=>{const n=$("neuName").value.trim();if(n.split(/\s+/).length<2){meldung("Bitte Vor- und Nachname.");return}
-  MK.merken(n,{telefon:$("neuTel").value.trim()});$("neuName").value="";$("neuTel").value="";if(window.NEU_ENT)NEU_ENT.weg();mxZu();meldung("Angelegt.");zeichne();oeffne(n)};
+$("neuLos").onclick=()=>{const n=$("neuName").value.trim(),t=$("neuTel").value.trim();if(n.split(/\s+/).length<2){meldung("Bitte Vor- und Nachname.");return}
+  // schon da (Name oder Telefonnummer): den vorhandenen Kunden öffnen, nichts überschreiben (06.11.2026)
+  const zt=MK.ziffern(t),da=MK.eins(n,MK.alle())||(zt.length>=6?MK.alle().find(e=>MK.ziffern(e.telefon)===zt):null);
+  if(da){if(t&&!da.telefon&&!da.gesperrt)MK.merken(da.name,{telefon:t});$("neuName").value="";$("neuTel").value="";if(window.NEU_ENT)NEU_ENT.weg();mxZu();zeichne();oeffne(da.name);
+    meldung(t&&da.telefon&&MK.ziffern(da.telefon)!==zt?"Schon vorhanden. Andere Nummer unter Bearbeiten ändern.":"Schon vorhanden.");return}
+  MK.merken(n,t?{telefon:t}:{});$("neuName").value="";$("neuTel").value="";if(window.NEU_ENT)NEU_ENT.weg();mxZu();meldung("Angelegt.");zeichne();oeffne(n)};
 document.addEventListener("DOMContentLoaded",()=>{if(window.mxEntwurf){window.NEU_ENT=mxEntwurf("#fNeu","kundeNeu",["neuName","neuTel"]);NEU_ENT.holen()}});   // Getipptes bleibt beim Neuladen (05.11.2026)
-(()=>{const st=history.state;if(st&&st.kunde&&!location.search)setTimeout(()=>{if(MK.alle().some(e=>e.name===st.kunde)){AUF=st.kunde;BEARB=!!st.bearb;ALLE=MK.alle();karte();$("karte").classList.add("auf")}},60)})();   // Neu laden: dieselbe Akte (04.11.2026)
-(()=>{const q=new URLSearchParams(location.search).get("kunde");if(q){history.replaceState(null,"",location.pathname);setTimeout(()=>{if(MK.alle().some(e=>e.name===q))oeffne(q);else{$("suche").value=q;zeichne()}},0)}})();
+(()=>{const st=history.state;if(st&&st.kunde&&!location.search)setTimeout(()=>{const ek=MK.eins(st.kunde);if(ek){AUF=ek.name;BEARB=!!st.bearb;ALLE=MK.alle();karte();$("karte").classList.add("auf")}},60)})();   // Neu laden: dieselbe Akte (04.11.2026)
+(()=>{const q=new URLSearchParams(location.search).get("kunde");if(q){history.replaceState(null,"",location.pathname);setTimeout(()=>{const ek=MK.eins(q);if(ek)oeffne(ek.name);else{$("suche").value=q;zeichne()}},0)}})();
 zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)zeichne()});

@@ -138,7 +138,7 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 .anbLinie{border-top:1px solid #EFEFF2;margin:14px -16px 12px}
 .anbSchilder{display:flex;flex-wrap:wrap;gap:6px}
 .anbSchilder span{font-size:13.5px;font-weight:800;border-radius:999px;padding:7px 11px;background:#E3F4EA;color:#1E8E4E;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.anbSchilder span.weg{background:#F2F2F4;color:#AEAEB2;text-decoration:line-through;cursor:default}
+.anbSchilder span.weg{background:#F2F2F4;color:#AEAEB2;text-decoration:line-through;cursor:default}.anbSchilder span.weg.ueb{background:#FFF4D6;color:#9A6400;text-decoration:none}
 .anbHin{font-size:13px;color:var(--grau);font-weight:600;margin:7px 2px 0;line-height:1.35}
 .anbGruen{display:block;width:100%;border:0;border-radius:14px;padding:15px;font-weight:800;font-size:16px;font-family:inherit;background:#25D366;color:#fff;margin-top:12px;cursor:pointer}
 .anbGruen:disabled{background:#BDBDC2}
@@ -158,8 +158,10 @@ body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{
 #uKopf{display:none}
 body.nurUmsatz .app>*:not(#umsatzTeil):not(.mxFenster):not(script):not(style):not(#stand){display:none!important}
 body.nurUmsatz #stand{display:none}body.nurUmsatz #stand.auf{display:block}
-body.nurUmsatz #uKopf{display:block;margin:4px 2px 14px}html body #uKopf>a{color:var(--rot)!important;font-size:16px!important;font-weight:600!important;text-decoration:none;min-height:44px;box-sizing:border-box;padding:5px 12px 5px 9px!important;display:inline-flex!important;align-items:center}
-#uKopf h1{font-size:32px;font-weight:800;margin:6px 0 4px}#uKopf p{color:var(--grau);font-size:15px;font-weight:600}
+body.nurUmsatz #uKopf{display:block;background:#fff;border-bottom:3px solid var(--rot);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;position:sticky;top:0;z-index:5;margin:0 0 14px}html body #uKopf>a{color:var(--rot)!important;font-size:16px!important;font-weight:600!important;text-decoration:none;min-height:44px;box-sizing:border-box;padding:5px 12px 5px 9px!important;display:inline-flex!important;align-items:center}
+#uKopf h1{font-size:28px;font-weight:800;letter-spacing:-.5px;margin:4px 0 0;color:#1C1C1E}#uUnter{color:var(--grau);font-size:15px;font-weight:600;margin:0 2px 14px}body:not(.nurUmsatz) #uUnter{display:none}
+@media(min-width:760px){body.nurUmsatz #uKopf{padding-left:max(16px,calc((100% - 680px)/2));padding-right:max(16px,calc((100% - 680px)/2))}}
+/* Kopfzeile wie auf allen Seiten (06.11.2026): weiß mit rotem Strich, „‹ Start“ und Titel oben, „Nicht angemeldet“ darunter */
 body:not(.nurUmsatz) #umsatzTeil{display:none}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
@@ -293,7 +295,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     if(w)w.onclick=e=>{e.preventDefault();e.stopPropagation();nkWa(tl(),tx());if(nachher)nachher("wa")};
     if(k)k.onclick=async e=>{e.preventDefault();e.stopPropagation();const ok=await nkKopieren(tx());if(ok&&nachher)nachher("ko")}};
 })();
-</script><div class="app">
+</script><div id="uKopf"><a href="./">‹ Start</a><h1>Umsatzbringer</h1></div><div class="app">
 <header><h1><img src="logo.png" alt="Mietix Sportwagenvermietung" class="logo"></h1><span id="punkt" title="Anmeldung und Stand"></span></header>
 <div id="stand"><div id="abgleich"></div><div id="bruecke" class="tipp" style="text-align:left;margin:0 4px 6px"></div></div>
 
@@ -307,7 +309,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
 <h2 id="waTitel" class="versteckt">WhatsApp heute</h2>
 <div class="k versteckt" id="waK"><button type="button" class="waNext" id="waNext">Nächste senden ›</button><div id="wa"></div></div>
-<div id="umsatzTeil"><div id="uKopf"><a href="./">‹ Start</a><h1>Umsatzbringer</h1><p>Freie Autos an frühere Kunden schicken</p></div>
+<div id="umsatzTeil"><p id="uUnter">Freie Autos an frühere Kunden schicken</p>
 <h2>Freie Autos anbieten</h2>
 <div class="k anbKarte"><div class="anbS"><span class="anbNr">1</span><b>Wann?</b></div>
   <div class="anbZr" id="anbKZr"><span data-d="1">1 Tag</span><span data-d="2">2 Tage</span><span data-d="3">3 Tage</span><span data-d="7">1 Woche</span><span data-we="5,1">Fr bis Sa</span><span data-we="5,2">Fr bis So</span><span data-we="6,2">Sa bis Mo</span><span data-we="5,3">Fr bis Mo</span></div>
@@ -315,7 +317,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
   <div class="anbLinie"></div>
   <div class="anbS"><span class="anbNr">2</span><b>Frei in dieser Zeit</b><span class="anbZahl" id="anbKT"></span></div>
   <div id="anbFrei" class="anbSchilder"></div>
-  <div class="anbHin">Durchgestrichen = schon vermietet. Ein Auto antippen = nur dieses anbieten.</div>
+  <div class="anbHin">Durchgestrichen = vermietet oder gesperrt. Ein Auto antippen = nur dieses anbieten.</div>
   <div class="anbLinie"></div>
   <div class="anbS"><span class="anbNr">3</span><b>Kunden anschreiben</b></div>
   <div class="anbHin" id="anbKZahl" style="margin-top:-4px"></div>
@@ -532,7 +534,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
       // Kilometerpaket anbieten: Abholung heute oder morgen, noch kein Paket
       const c=preis(v.auto);
       if(!v.ueb&&(v.vonD===hi||v.vonD===mo)&&!v.paketKm&&!v.kmAngeboten&&c&&c.km&&c.km.length>1){const st=PREISE.kmStufen||[50,100,150,200,300];
-        L.push({g:"Kilometerpaket anbieten",t:v.name,i:v.auto+", Abholung "+(v.vonD===hi?"heute":"morgen")+", noch kein Paket",tel:v.telefon,mark:{nr:v.nr,feld:"kmAngeboten"},
+        L.push({g:"Kilometerpaket anbieten",t:v.name,i:v.auto+", Abholung "+(v.vonD===hi?"heute":"morgen, "+de(mo))+", noch kein Paket",tel:v.telefon,mark:{nr:v.nr,feld:"kmAngeboten"},
           text:"*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\nIhr "+v.auto+", für Ihre ganze Miete:\n"+
             st.map((k,i)=>"- +"+k.toLocaleString("de-DE")+" km für "+eur2(c.km[i+1])+" € (statt "+eur2(k*c.kmPreis)+" €)").join("\n")+"\n\nSoll ich Ihnen eines davon dazubuchen? Geben Sie mir einfach kurz Bescheid."})}
       // Danke nach der Rückgabe heute
@@ -593,29 +595,34 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
   const $a=id=>document.getElementById(id);
   function anbTage(){return Math.max(1,Math.round((new Date(ANB.bisD+"T12:00")-new Date(ANB.vonD+"T12:00"))/864e5))}   // Tage nach Datum wie auf allen Seiten, auch über die Zeitumstellung (Baran 05.11.2026)
   // Belegt im Zeitraum: Mietvertrag (nicht zurück), gebuchte Anfrage oder Sperre
-  function belegt(auto,von,bis){const ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,n=autoName(auto),gl=a=>autoName(a)===n;
-    return lies("mietixVorgaenge",[]).some(x=>!x._weg&&x.status!=="storniert"&&x.status!=="zurück"&&gl(x.auto)&&x.vonD&&x.bisD&&ue(von,bis,x.vonD,x.ueb&&x.bisD<iso(new Date())?plusT(iso(new Date()),1):x.bisD))
-      ||lies("mietixAnfragen",[]).some(a=>!a._weg&&a.status==="gebucht"&&gl(a.auto)&&a.von&&a.bis&&!a.vertrag&&ue(von,bis,a.von,a.bis))
-      ||lies("mietixSperren",[]).some(s=>!s._weg&&gl(s.auto)&&s.von&&s.bis&&sperreTrifft(von,bis,s))}
-  function belegtBis(auto,von,bis){const ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,n=autoName(auto),gl=a=>autoName(a)===n,L=[];
-    lies("mietixVorgaenge",[]).forEach(x=>{if(!x._weg&&x.status!=="storniert"&&x.status!=="zurück"&&gl(x.auto)&&x.vonD&&x.bisD&&ue(von,bis,x.vonD,x.bisD))L.push(x.bisD)});
-    lies("mietixAnfragen",[]).forEach(a=>{if(!a._weg&&a.status==="gebucht"&&gl(a.auto)&&a.von&&a.bis&&!a.vertrag&&ue(von,bis,a.von,a.bis))L.push(a.bis)});
-    lies("mietixSperren",[]).forEach(z=>{if(!z._weg&&gl(z.auto)&&z.von&&z.bis&&sperreTrifft(von,bis,z))L.push(z.bis)});
-    return L.sort().pop()||""}
-  // Liegt das Auto wegen einer eigenen Sperre fest: klar benennen (05.11.2026)
-  function gesperrtText(auto,von,bis){const ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,n=autoName(auto),gl=a=>autoName(a)===n,L=belegtBis(auto,von,bis),s=lies("mietixSperren",[]).find(z=>!z._weg&&gl(z.auto)&&z.von&&z.bis&&sperreTrifft(von,bis,z)&&z.bis===L);
-    return s?"selbst gesperrt bis "+s.bis.split("-").reverse().join(".").slice(0,6)+(s.grund?": "+s.grund:""):""}
+  // Uhrzeit zählt mit, Regel wie im Angebot (06.11.2026, Prüfung: RS 6 kommt um 18 Uhr zurück und stand ab 10 Uhr als frei da).
+  // Überfällig (übergeben, Rückgabezeit vorbei, noch nicht zurück) belegt das Auto, bis es zurück ist, auf Kalender, Angebot und hier gleich.
+  const ZT=(d,u)=>d+"T"+(u||"10:00");
+  function belegtListe(auto,von,bis){const n=autoName(auto),gl=a=>autoName(a)===n,v=ZT(von,ANB.vonU),b=ZT(bis,ANB.bisU),j=new Date(),jz=iso(j)+"T"+pad(j.getHours())+":"+pad(j.getMinutes()),L=[],V=lies("mietixVorgaenge",[]);
+    V.forEach(x=>{if(x._weg||x.status==="storniert"||x.status==="zurück"||!gl(x.auto)||!x.vonD||!x.bisD)return;const xb=ZT(x.bisD,x.bisU),ueber=!!x.ueb&&xb<jz;
+      if(v<(ueber?"9999-12-31":xb)&&b>ZT(x.vonD,x.vonU))L.push({bis:x.bisD,bisU:x.bisU||"10:00",ueber,name:x.name||""})});
+    lies("mietixAnfragen",[]).forEach(a=>{if(a._weg||a.status!=="gebucht"||!gl(a.auto)||!a.von||!a.bis||(a.vertrag&&V.some(x=>x.nr===a.vertrag))||V.some(x=>nG2(x.name)===nG2(a.name)&&gl(x.auto)&&x.vonD&&x.bisD&&x.vonD<a.bis&&x.bisD>a.von))return;
+      if(v<ZT(a.bis,a.bisU||(a.angebot&&a.angebot.bisU))&&b>ZT(a.von,a.vonU||(a.angebot&&a.angebot.vonU)))L.push({bis:a.bis,bisU:a.bisU||(a.angebot&&a.angebot.bisU)||"10:00"})});
+    lies("mietixSperren",[]).forEach(z=>{if(!z._weg&&gl(z.auto)&&z.von&&z.bis&&v<z.bis+"T00:00"&&b>z.von+"T00:00")L.push({bis:z.bis,sperre:true,grund:z.grund||""})});
+    return L}
+  function belegt(auto,von,bis){return belegtListe(auto,von,bis).length>0}
+  // Warum nicht frei: überfällig, selbst gesperrt (05.11.2026) oder belegt mit „wieder frei“
+  function wegText(auto,von,bis){const L=belegtListe(auto,von,bis),u=L.find(x=>x.ueber),kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
+    if(u)return "seit "+kz(u.bis)+" überfällig, noch nicht zurück";
+    const m=L.map(x=>x.bis).sort().pop()||"",s=L.find(x=>x.sperre&&x.bis===m),mu=(L.filter(x=>x.bis===m&&x.bisU).map(x=>x.bisU).sort().pop())||"";
+    return s?"selbst gesperrt bis "+s.bis.split("-").reverse().join(".").slice(0,6)+(s.grund?": "+s.grund:""):"belegt"+(m?", wieder frei "+kz(m)+(mu?" "+uhrT(mu):""):"")}
+  const istUeber=(auto,von,bis)=>belegtListe(auto,von,bis).some(x=>x.ueber);
   function anbAngebote(){if(!PREISE||!ANB.vonD||!ANB.bisD)return[];const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,r=Math.max(0,Math.min(90,+ANB.rabatt||0));
     return PREISE.cars.map(c=>{const name=c.anzeige||c.n;if(belegt(name,ANB.vonD,ANB.bisD))return null;const roh=listenMiete(c,start,d),L=Math.round(roh);
       const P=Math.round(roh*(1-r/100));return{name,L,P,km:(PREISE.freiKm||150)*d}}).filter(Boolean)}
   // Frühere Kunden: je Name die Mieten, das letzte Auto und den Monat; wer gerade mietet oder bald abholt, fällt raus
   function anbKunden(gewaehlt){const hi=iso(new Date()),k=lies("mietixKunden",{}),M={};
     lies("mietixVorgaenge",[]).filter(x=>!x._weg&&x.status!=="storniert"&&x.name).forEach(x=>{const n=nG2(x.name),m=M[n]=M[n]||{name:x.name,mieten:0,letzt:null,tel:"",bald:false,autos:new Set()};
-      m.mieten++;m.autos.add(autoName(x.auto));if(x.telefon)m.tel=x.telefon;if(!m.letzt||String(x.vonD)>String(m.letzt.vonD))m.letzt=x;if(x.status!=="zurück"&&String(x.bisD||"")>=hi)m.bald=true});
+      m.mieten++;m.autos.add(autoName(x.auto));if(x.telefon)m.tel=x.telefon;if(!m.letzt||String(x.vonD)>String(m.letzt.vonD))m.letzt=x;if(x.status!=="zurück"&&(String(x.bisD||"")>=hi||x.ueb))m.bald=true});   // überfälliges Auto zählt mit (06.11.2026, wie Startseite)
     const kk=n=>Object.keys(k).find(x=>nG2(x)===n);
     return Object.keys(M).map(n=>{const m=M[n],key=kk(n),e=key?k[key]:{};if(!m.tel&&e&&e.telefon)m.tel=e.telefon;m.key=key||m.name;m.am=(e&&e.angebotAm)||"";
         m.passt=gewaehlt.some(a=>m.autos.has(a));return m})
-      .filter(m=>{const e=k[m.key]||{};return m.tel&&!m.bald&&!e._weg&&!e.keineAngebote&&!e.gesperrt&&!e.schadenOffen&&!e.rechtsstreit&&!lies("mietixVorgaenge",[]).some(x=>!x._weg&&nG2(x.name)===nG2(m.name)&&x.status==="zurück"&&endRest(x)>0)})
+      .filter(m=>{const e=k[m.key]||{};return m.tel&&!m.bald&&!e._weg&&!e.keineAngebote&&!e.gesperrt&&!e.schadenOffen&&!e.rechtsstreit&&!lies("mietixVorgaenge",[]).some(x=>!x._weg&&nG2(x.name)===nG2(m.name)&&x.status==="zurück"&&(endRest(x)>0||offenB(x)>0))})
       .sort((a,b)=>(!!a.am-!!b.am)||(b.passt-a.passt)||((b.mieten>=2)-(a.mieten>=2))||String(b.letzt.vonD).localeCompare(String(a.letzt.vonD)))}
   function anbText(m,ang){const we=(()=>{const v=new Date(ANB.vonD+"T12:00").getDay();return(v===5||v===6)&&anbTage()<=3&&[0,1,6].includes(new Date(ANB.bisD+"T12:00").getDay())})();
     const eins=ang.length===1,r=+ANB.rabatt||0,l=m.letzt,mon=l&&l.vonD?MON[+String(l.vonD).slice(5,7)-1]:"";
@@ -637,9 +644,9 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     const ang=alleA.filter(a=>ANB.autos.includes(a.name)),d=anbTage();
     $a("anbAutosT").textContent=ANB.vonD&&ANB.bisD?(alleA.length?"Autos antippen, "+alleA.length+" frei für "+d+(d===1?" Tag":" Tage"):"Kein Auto frei für "+d+(d===1?" Tag":" Tage")):"Erst den Zeitraum wählen";
     // alle Autos: freie mit Preis pro Tag und Gesamtpreis, belegte grau mit „wieder frei“ (wie im Angebot)
-    const weg=PREISE.cars.map(c=>c.anzeige||c.n).filter(n=>!alleA.some(a=>a.name===n)).map(n=>({n,bis:belegtBis(n,ANB.vonD,ANB.bisD),sp:gesperrtText(n,ANB.vonD,ANB.bisD)})),kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
+    const weg=PREISE.cars.map(c=>c.anzeige||c.n).filter(n=>!alleA.some(a=>a.name===n)).map(n=>({n,txt:wegText(n,ANB.vonD,ANB.bisD)}));
     $a("anbAutos").innerHTML=!ANB.vonD||!ANB.bisD?"":alleA.map(a=>{const an=ANB.autos.includes(a.name);return '<div class="auto'+(an?" an":"")+'" data-a="'+esc(a.name)+'"><span class="n"><b>'+(an?'<span class="haken">✓</span>':"")+esc(a.name)+'</b><i>'+eur2(Math.round(a.P/d))+' € pro Tag, '+a.km.toLocaleString("de-DE")+' km inklusive</i></span><span class="p">'+eur2(a.P)+' €'+(a.P<a.L?'<i>statt '+eur2(a.L)+' €</i>':"")+'</span></div>'}).join("")+
-      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>'+(x.sp?esc(x.sp):'belegt'+(x.bis?", wieder frei "+kz(x.bis):""))+'</i></span><span class="p"></span></div>').join("")||'<div class="leer">Keine Autos</div>';
+      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>'+esc(x.txt)+'</i></span><span class="p"></span></div>').join("")||'<div class="leer">Keine Autos</div>';
     document.querySelectorAll("#anbAutos [data-a]").forEach(e=>e.onclick=()=>{const n=e.dataset.a,i=ANB.autos.indexOf(n);if(i<0)ANB.autos.push(n);else ANB.autos.splice(i,1);anbZeichnen()});
     const ks=ang.length?anbKunden(ang.map(a=>a.name)):[],zeig=ANB.alle?ks:ks.slice(0,8),hi=iso(new Date());
     $a("anbWeiter").disabled=!ang.length;$a("anbWeiter").textContent=ang.length?"Weiter zu den Kunden ›":"Erst ein Auto antippen";
@@ -665,16 +672,18 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
   const anbZtText=()=>{if(!ANB.vonD||!ANB.bisD)return"";const d=anbTage(),kt=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
     return kt(ANB.vonD)+" "+uhrT(ANB.vonU)+" bis "+kt(ANB.bisD)+" "+uhrT(ANB.bisU)+' <small>'+d+(d===1?" Tag":" Tage")+',</small> <u>ändern</u>'};
   // Auswahl sichtbar (1.11.2026, Baran): Markierung aus dem Zeitraum selbst, stimmt auch beim Öffnen und nach Datum von Hand
-  function anbZeitraum(){const h=iso(new Date()),w=new Date().getDay();[...document.querySelectorAll("#anbKZr span")].forEach(c=>{let v=h,b;
+  // Zwei Knöpfe mit gleichem Zeitraum (Freitag: „3 Tage“ und „Fr bis Mo“): nur der angetippte ist markiert (06.11.2026)
+  function anbZeitraum(){const h=iso(new Date()),w=new Date().getDay(),K=[...document.querySelectorAll("#anbKZr span")],passt=K.filter(c=>{let v=h,b;
       if(c.dataset.d)b=plusT(h,+c.dataset.d);else{const[wd,n]=c.dataset.we.split(",").map(Number);v=plusT(h,(wd-w+7)%7);b=plusT(v,n)}
-      c.classList.toggle("an",!!ANB.vonD&&ANB.vonD===v&&ANB.bisD===b)});
+      return !!ANB.vonD&&ANB.vonD===v&&ANB.bisD===b}),g=passt.includes(ANB.chip)?ANB.chip:passt[0];
+    K.forEach(c=>c.classList.toggle("an",c===g));
     {const zr=$a("anbKZr"),g=zr.querySelector("span.an");if(g&&(g.offsetLeft<zr.scrollLeft||g.offsetLeft+g.offsetWidth>zr.scrollLeft+zr.clientWidth))zr.scrollLeft=g.offsetLeft-zr.clientWidth/2+g.offsetWidth/2}   // gewählter Knopf immer im Blick
     $a("anbKZt").innerHTML=anbZtText();$a("anbFZt").innerHTML=anbZtText();
     $a("anbVonD").value=ANB.vonD;$a("anbVonU").value=ANB.vonU;$a("anbBisD").value=ANB.bisD;$a("anbBisU").value=ANB.bisU}
   const anbNeu=()=>{ANB.autos=null;anbZeitraum();anbFrei();if($a("fAnb").classList.contains("auf"))anbZeichnen()};
   [...$a("anbKZr").children].forEach(c=>c.onclick=()=>{const h=iso(new Date());
     if(c.dataset.d){ANB.vonD=h;ANB.bisD=plusT(h,+c.dataset.d)}else{const[wd,n]=c.dataset.we.split(",").map(Number),v=plusT(h,(wd-new Date().getDay()+7)%7);ANB.vonD=v;ANB.bisD=plusT(v,n)}
-    c.dataset.von=ANB.vonD;c.dataset.bis=ANB.bisD;anbNeu()});
+    c.dataset.von=ANB.vonD;c.dataset.bis=ANB.bisD;ANB.chip=c;anbNeu()});
   [["anbVonD","vonD"],["anbVonU","vonU"],["anbBisD","bisD"],["anbBisU","bisU"]].forEach(([id,f])=>$a(id).addEventListener("change",()=>{ANB[f]=$a(id).value;
     if((f==="vonD"||f==="bisD")&&ANB.vonD&&ANB.bisD<=ANB.vonD)ANB.bisD=plusT(ANB.vonD,1);anbNeu()}));
   // „ändern“ im Kunden-Fenster: nach „Fertig“ geht es dorthin zurück
@@ -685,16 +694,16 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
   // Karte: alle Autos für den gewählten Zeitraum (01.11.2026, wie im Angebot): frei mit Preis pro Tag und Gesamtpreis, belegt grau mit „wieder frei“
   function anbFrei(){const el=$a("anbFrei");if(!el||!PREISE)return;if(!ANB.vonD){const h=iso(new Date());ANB.vonD=h;ANB.bisD=plusT(h,3);anbZeitraum()}
     const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,kz=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x),frei=[],weg=[];
-    PREISE.cars.forEach(c=>{const n=c.anzeige||c.n;if(belegt(n,ANB.vonD,ANB.bisD))weg.push({n,bis:belegtBis(n,ANB.vonD,ANB.bisD),sp:gesperrtText(n,ANB.vonD,ANB.bisD)});else frei.push({n,L:Math.round(listenMiete(c,start,d))})});
+    PREISE.cars.forEach(c=>{const n=c.anzeige||c.n;if(belegt(n,ANB.vonD,ANB.bisD))weg.push({n,txt:wegText(n,ANB.vonD,ANB.bisD),ueb:istUeber(n,ANB.vonD,ANB.bisD)});else frei.push({n,L:Math.round(listenMiete(c,start,d))})});
     $a("anbKT").textContent=frei.length;$a("anbKT").classList.toggle("null",!frei.length);
     const kn=frei.length?anbKunden(frei.map(x=>x.n)).length:0;
     $a("anbKZahl").textContent=!frei.length?"In dieser Zeit ist kein Auto frei.":kn?kn+(kn===1?" früherer Kunde passt":" frühere Kunden passen")+", Stammkunden zuerst":"Noch keine früheren Kunden mit Telefonnummer.";
     $a("anbStart").disabled=!frei.length||!kn;
     el.innerHTML=frei.map(x=>'<span data-a="'+esc(x.n)+'" title="'+esc(x.n)+', '+eur2(x.L)+' €">'+esc(kurzA(x.n))+'</span>').join("")+
-      weg.map(x=>'<span class="weg" title="'+esc(x.n)+(x.sp?" "+esc(x.sp):x.bis?", wieder frei "+kz(x.bis):"")+'">'+esc(kurzA(x.n))+'</span>').join("");
+      weg.map(x=>'<span class="weg'+(x.ueb?" ueb":"")+'" title="'+esc(x.n)+", "+esc(x.txt)+'">'+esc(kurzA(x.n))+(x.ueb?" überfällig":"")+'</span>').join("");
     el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a));return;
     el.innerHTML=frei.map(x=>'<div class="auto" data-a="'+esc(x.n)+'"><span class="n"><b>'+esc(x.n)+'</b><i>'+eur2(Math.round(x.L/d))+' € pro Tag</i></span><span class="p">'+eur2(x.L)+' €</span></div>').join("")+
-      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>'+(x.sp?esc(x.sp):'belegt'+(x.bis?", wieder frei "+kz(x.bis):""))+'</i></span><span class="p"></span></div>').join("");
+      weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>'+esc(x.txt)+'</i></span><span class="p"></span></div>').join("");
     el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a))}
   {const t=setInterval(()=>{if(PREISE){clearInterval(t);anbFrei();anbZeitraum()}},200)}
   window.addEventListener("mietix-abgleich",()=>{anbFrei();if($a("fAnb").classList.contains("auf"))anbZeichnen()});

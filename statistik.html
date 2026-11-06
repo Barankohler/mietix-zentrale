@@ -154,7 +154,8 @@ function zeichne(){const S=(lies("mietixStand",{})||{}).statistik;
   // Vergleich mit demselben Zeitraum im Vormonat (1. bis heute), sonst erschreckt am Monatsanfang ein großes Minus
   const V=S.vergleich,fair=V&&vor&&V.vormonat===vor.name&&tag<tageMonat;
   const d=pz(jetzt.rein,fair?V.vormonatBisTag:(vor&&vor.rein));
-  const unterwegs=lies("mietixVorgaenge",[]).filter(v=>v.status!=="zurück"&&v.vonD&&v.bisD&&v.vonD<=new Date(h.getTime()-h.getTimezoneOffset()*6e4).toISOString().slice(0,10)&&v.bisD>=new Date(h.getTime()-h.getTimezoneOffset()*6e4).toISOString().slice(0,10)).length;
+  // Unterwegs = übergeben und noch nicht zurück, überfällige zählen mit; heute beginnende ohne Übergabe nicht (Prüfung 06.11.2026, wie die Startseite)
+  const unterwegs=new Set(lies("mietixVorgaenge",[]).filter(v=>!v._weg&&v.ueb&&v.status!=="zurück"&&v.auto).map(v=>v.auto)).size;
   let html="";
 
   // 1. Der Monat in einer Zahl
@@ -213,7 +214,8 @@ function zeichne(){const S=(lies("mietixStand",{})||{}).statistik;
   if(d!=null&&d>0)tipps.push([1,'Mehr Umsatz als im '+vor.name+': <b>+'+d+' %</b>.']);
   html+='<div class="karte"><h2>Daran arbeiten</h2>'+tipps.map(([gut,t])=>'<div class="tipp'+(gut?" gut":"")+'"><b>'+(gut?"✓":"!")+'</b><span>'+t+'</span></div>').join("")+'</div>';
 
-  html+='<div class="leise" style="text-align:center">Zahlen aus der Excel, Stand '+new Date(S.stand).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+' Uhr. Miete zählt, sobald sie bezahlt ist.</div>';
+  const standD=S.stand?new Date(S.stand):null,standOk=standD&&!isNaN(standD.getTime());   // ohne Zeitstempel nie „Invalid Date“ (Prüfung 06.11.2026)
+  html+='<div class="leise" style="text-align:center">Zahlen aus der Excel, '+(standOk?'Stand '+standD.toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+' Uhr':'Stand unbekannt')+'. Miete zählt, sobald sie bezahlt ist.</div>';
   $("inhalt").innerHTML=html}
 zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
