@@ -393,7 +393,9 @@ const SVG_WA='<svg viewBox="0 0 24 24" stroke="#128C4A"><path d="M4 20l1.3-3.9A8
   SVG_TEL='<svg viewBox="0 0 24 24" stroke="#1C1C1E"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
   SVG_MV='<svg viewBox="0 0 24 24" stroke="#C4161C"><path d="M6 3h9l4 4v14H6z"/><path d="M12 10v6M9 13h6"/></svg>';
 // wie oft und wann (Baran, 31.10.2026: „man sollte sehen, wie oft er gemietet hat, vielleicht sogar wann“)
-function wieOft(e,ohneAuto){if(!e.mieten)return e.anfragen.length?"nur Anfrage, noch keine Miete":"noch keine Miete";
+// Buchung (Stand gebucht) heißt Buchung, nicht Anfrage; gezählt wird weiter nur der Mietvertrag (06.11.2026)
+const hatBuchung=e=>(e.anfragen||[]).some(a=>a.status==="gebucht");
+function wieOft(e,ohneAuto){if(!e.mieten)return hatBuchung(e)?"Buchung, noch keine Miete":e.anfragen.length?"nur Anfrage, noch keine Miete":"noch keine Miete";
   const z=e.zuletzt||"",zuk=z>heute;
   return e.mieten+(e.mieten===1?" Miete":" Mieten")+(z?(zuk?", gebucht für ":", zuletzt ")+de(z):"")+(e.letztesAuto&&!ohneAuto?" ("+e.letztesAuto.replace(/^(Audi|Mercedes-Benz|Mercedes|VW|BMW) /,"")+")":"")}
 function gefiltert(){let l=$("suche").value.trim()?MK.finde($("suche").value,ALLE):ALLE.slice();
@@ -440,7 +442,7 @@ function mieteZeile(v){const V="../mietix-vertrag/",preis='<b>'+(v.preis?EUR.for
     +'<div class="mzR">'+preis+(schild?'<span class="schilder">'+schild+'</span>':"")+'</div><em class="mzP">›</em></a>'}
 function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V="../mietix-vertrag/";   // auch andere Schreibweise, zusammengeführt über die Telefonnummer (06.11.2026)
   const seit=e.vertraege.length?e.vertraege[0].von:"",sMon=seit?MON[+seit.slice(5,7)-1]+" "+seit.slice(0,4):"";
-  const unter=e.mieten>=2?"Stammkunde, "+e.mieten+" Mieten seit "+sMon:e.mieten===1?"1 Miete im "+sMon:e.anfragen.length?"Bisher nur Anfrage":"Noch keine Miete";
+  const unter=e.mieten>=2?"Stammkunde, "+e.mieten+" Mieten seit "+sMon:e.mieten===1?"1 Miete im "+sMon:hatBuchung(e)?"Bisher gebucht, noch keine Miete":e.anfragen.length?"Bisher nur Anfrage":"Noch keine Miete";
   const tel=MK.ziffern(e.telefon),t=String(e.anschrift||"").match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/),str=t?t[1].replace(/,$/,""):(e.anschrift||""),plzOrt=t?t[2]+" "+t[3]:(e.ort||"");
   const wert=x=>x?'<b>'+esc(x)+'</b>':'<b class="leer2">nicht eingetragen</b>';
   let h='<div class="kTop"><a href="#" id="kZu">‹ Kunden</a><button type="button" id="kBearb">'+(BEARB?"Fertig":"Bearbeiten")+'</button></div><div class="blatt">';
@@ -481,13 +483,23 @@ function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V
       email:hand($("dEmail").value.trim()),notiz:hand($("dNotiz").value.trim()),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;try{history.replaceState(Object.assign({},history.state||{},{bearb:0}),"")}catch(x){}meldung("Gespeichert");zeichne();karte()};
     // trifft alle Schreibweisen desselben Kunden (gleiche Telefonnummer), sonst bliebe ein Teil stehen (06.11.2026, Datenschutz)
     $("dLoeschen").onclick=ev=>{ev.preventDefault();const andere=(e.namen||[]).filter(n=>n!==e.name);
-      if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+(andere.length?" (auch gespeichert als "+andere.join(", ")+")":"")+" löschen, auch in seinen Anfragen? Die Mietverträge bleiben (Aufbewahrungspflicht), der Kunde bekommt keine Angebote mehr."))return;
+      const nn=(e.namen||[e.name]).map(MK.norm),tt=(e._tels||[]).concat(MK.ziffern(e.telefon)).filter(z=>z.length>=6),istEr=(name,tel)=>nn.includes(MK.norm(name))||!!(tt.length&&tt.includes(MK.ziffern(tel)));
+      // Schadensbelege bleiben (Aufbewahrung, Baran entscheidet), in der Rückfrage erwähnt (06.11.2026)
+      let belege=0;try{const sb=((JSON.parse(localStorage.getItem("mietixStand")||"{}")||{}).schadensbelege||{}).liste;if(Array.isArray(sb))belege=sb.filter(b=>b&&istEr(b.name,b.telefon)).length}catch(x){}
+      if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+(andere.length?" (auch gespeichert als "+andere.join(", ")+")":"")+" löschen, auch in seinen Anfragen und im Papierkorb? Die Mietverträge bleiben (Aufbewahrungspflicht)"+(belege?(belege===1?", der Schadensbeleg bleibt auch (Aufbewahrung)":", die "+belege+" Schadensbelege bleiben auch (Aufbewahrung)"):"")+", der Kunde bekommt keine Angebote mehr."))return;
       const weg={telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true};
       // auch in den Anfragen dieses Kunden: Einträge bleiben, persönliche Angaben werden geleert (06.11.2026). Abgleich erkennt die Änderung wie bei jedem Speichern
-      {const nn=(e.namen||[e.name]).map(MK.norm),tt=(e._tels||[]).concat(MK.ziffern(e.telefon)).filter(z=>z.length>=6);let A=[];try{A=JSON.parse(localStorage.getItem("mietixAnfragen")||"[]")||[]}catch(x){}
-        let n=0;A.forEach(a=>{if(!a||a._weg)return;if(!nn.includes(MK.norm(a.name))&&!(tt.length&&tt.includes(MK.ziffern(a.nummer))))return;
-          ["nummer","alter","ort","anschrift","geb","gebort","email","notiz"].forEach(f=>{if(a[f])a[f]=""});a.datenGeloescht=heute;n++});
+      const AF=["nummer","alter","ort","anschrift","geb","gebort","email","notiz"],KF=["telefon","anschrift","geb","gebort","email","notiz","ort"];
+      {let A=[];try{A=JSON.parse(localStorage.getItem("mietixAnfragen")||"[]")||[]}catch(x){}
+        let n=0;A.forEach(a=>{if(!a||a._weg)return;if(!istEr(a.name,a.nummer))return;
+          AF.forEach(f=>{if(a[f])a[f]=""});a.datenGeloescht=heute;n++});
         if(n)try{localStorage.setItem("mietixAnfragen",JSON.stringify(A))}catch(x){meldung("Nicht gespeichert, Speicher voll.");return}}
+      // Papierkorb: gelöschte Anfragen und Kunden dieses Kunden behalten ihren Eintrag, die persönlichen Angaben gehen raus, sonst kämen sie mit „Wiederherstellen“ zurück (06.11.2026)
+      {let P=[];try{P=JSON.parse(localStorage.getItem("mietixPapierkorb")||"[]")||[]}catch(x){}
+        let n=0;P.forEach(p=>{if(!p||!p.eintrag||typeof p.eintrag!=="object")return;const x=p.eintrag;
+          if(p.ablage==="mietixAnfragen"&&istEr(x.name,x.nummer)){AF.forEach(f=>{if(x[f])x[f]=""});x.datenGeloescht=heute;n++}
+          else if(p.ablage==="mietixKunden"&&istEr(p.schluessel||x.name,x.telefon)){KF.forEach(f=>{if(x[f])x[f]=""});x.gesperrt=true;x.keineAngebote=true;n++}});
+        if(n)try{localStorage.setItem("mietixPapierkorb",JSON.stringify(P))}catch(x){meldung("Nicht gespeichert, Speicher voll.");return}}
       MK.merken(e.name,weg);andere.forEach(n=>MK.merken(n,Object.assign({mit:e.name},weg)));BEARB=false;meldung("Daten gelöscht.");zeichne();karte()}}}
 /* Angebot verschicken (31.10.2026, Baran: Autos antippen, Übergabe und Rückgabe mit Datum und Uhrzeit, seriös und attraktiv) */
 let FLOTTE=null,AG_AUTOS=new Set();
@@ -530,13 +542,20 @@ function agListe(){const nur=$("agNurStamm").classList.contains("an"),bereit=$("
 function agMarken(){const v=$("agVon").value,b=$("agBis").value,w=new Date().getDay();
   $("agDauer").querySelectorAll(".chip").forEach(c=>c.classList.toggle("an",!!v&&v===heute&&b===plus(heute,+c.dataset.d)));
   $("agWe").querySelectorAll(".chip").forEach(c=>{const[wd,n]=c.dataset.we.split(",").map(Number),a=plus(heute,(wd-w+7)%7);c.classList.toggle("an",!!v&&v===a&&b===plus(a,n))})}
-function agZeitraum(v,b){$("agVon").value=v;$("agBis").value=b;agMarken();agAutos();agListe()}
+// Übergabe nie in der Vergangenheit (06.11.2026): heute schon vorbei, dann nächste volle Stunde (mindestens 1 Stunde ab jetzt), nach 20 Uhr ab morgen 10:00
+function agNichtVorbei(){const v=$("agVon").value;if(!v)return false;const jt=new Date(),hm=String(jt.getHours()).padStart(2,"0")+":"+String(jt.getMinutes()).padStart(2,"0"),u=$("agVonU").value||"10:00";
+  if(v>heute||(v===heute&&u>hm))return false;
+  const altU=u,b=$("agBis").value,tage=b?Math.max(1,Math.round((new Date(b+"T12:00")-new Date(v+"T12:00"))/864e5)):1;
+  const n=new Date(jt.getTime()+36e5);let h=n.getHours()+(n.getMinutes()||n.getSeconds()?1:0),nv=heute;
+  if(v<heute||h>20||n.getDate()!==jt.getDate()){nv=plus(heute,1);h=10}
+  const nu=String(h).padStart(2,"0")+":00";$("agVon").value=nv;$("agVonU").value=nu;$("agBis").value=plus(nv,tage);if(($("agBisU").value||"10:00")===altU)$("agBisU").value=nu;return true}
+function agZeitraum(v,b){$("agVon").value=v;$("agBis").value=b;agNichtVorbei();agMarken();agAutos();agListe()}
 $("agDauer").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{agZeitraum(heute,plus(heute,+c.dataset.d));c.classList.add("an")});
 $("agWe").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{const [wd,n]=c.dataset.we.split(",").map(Number),w=new Date().getDay(),v=plus(heute,(wd-w+7)%7);agZeitraum(v,plus(v,n));c.classList.add("an")});
-["agVon","agBis","agVonU","agBisU"].forEach(i=>$(i).addEventListener("change",()=>{if(i==="agVon"||i==="agBis")agMarken();agAutos();agListe()}));
+["agVon","agBis","agVonU","agBisU"].forEach(i=>$(i).addEventListener("change",()=>{if((i==="agVon"||i==="agVonU")&&agNichtVorbei())meldung("Übergabe liegt nicht in der Vergangenheit: "+$("agVonU").value+" Uhr");if(i==="agVon"||i==="agBis")agMarken();agAutos();agListe()}));
 ["agVon","agBis"].forEach(i=>$(i).addEventListener("input",agMarken));
 $("agNurStamm").onclick=()=>{$("agNurStamm").classList.toggle("an");agListe()};
-$("angebotAuf").onclick=()=>{mxAuf("fAngebot");if(!$("agVon").value){const w=new Date().getDay(),v=plus(heute,(5-w+7)%7);agZeitraum(v,plus(v,2));$("agWe").querySelector('[data-we="5,2"]').classList.add("an")}else{agAutos();agListe()}};
+$("angebotAuf").onclick=()=>{mxAuf("fAngebot");if(!$("agVon").value){const w=new Date().getDay(),v=plus(heute,(5-w+7)%7);agZeitraum(v,plus(v,2));$("agWe").querySelector('[data-we="5,2"]').classList.add("an")}else{agNichtVorbei();agAutos();agListe()}};
 /* Suche, Filter, Sortierung, neuer Kunde */
 $("suche").addEventListener("input",zeichne);
 $("filter").querySelectorAll("span").forEach(c=>c.onclick=()=>{$("filter").querySelectorAll("span").forEach(x=>x.classList.remove("an"));c.classList.add("an");FILTER=c.dataset.f;zeichne()});
@@ -1119,8 +1138,8 @@ zeigen();abgleichen();auslagernBald();
     "html body header .mxStart,html body .topbar .mxStart{float:none!important;margin:0 10px 0 0!important;border:0!important;padding:5px 12px 5px 9px!important;background:#E9E9EE!important;border-radius:10px!important;color:#C4161C!important;opacity:1!important;font-size:16px!important;font-weight:600!important;gap:3px!important;line-height:1.2!important;min-height:44px!important;box-sizing:border-box;display:inline-flex!important;align-items:center!important}html body .mxStart b{font-size:20px!important;font-weight:400!important;line-height:16px!important;margin-top:-2px!important}"+
     /* PC und Mac (1.11.2026, Baran: auf allen Geräten gleich): Kopfzeile und Inhalt in einer 680-px-Spalte in der Mitte.
        Muss ganz am Ende stehen: header{padding-left:16px!important} weiter oben (und look.py davor im head) würde sonst gewinnen */
-    (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2))!important;padding-right:max(16px,calc((100% - 680px)/2))!important}"+
-      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box;padding-left:16px!important;padding-right:16px!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}");
+    (istStart||art==="kalender"||art==="schaeden"?"":"@media(min-width:760px){header,.topbar{padding-left:max(16px,calc((100% - 680px)/2 + 16px))!important;padding-right:max(16px,calc((100% - 680px)/2 + 16px))!important}"+
+      "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box;padding-left:16px!important;padding-right:16px!important}header .plus{right:max(16px,calc((100% - 680px)/2 + 16px))!important}}");
   document.head.appendChild(st);
 
   // ‹ Start und Symbol in der Kopfzeile
