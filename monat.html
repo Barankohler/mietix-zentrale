@@ -47,24 +47,6 @@ main{max-width:680px;margin:0 auto;padding:4px 16px 90px}
 .tz.fuss{background:#FAFAFC;border-bottom:0;font-weight:700;cursor:default}
 @media(max-width:560px){.tk,.tz{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:4px}.tz .wer{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.tz .wer b{font-size:16px}.tk span:first-child{display:none}.tk span:nth-child(2),.tz>span:nth-child(2){text-align:left}.tz.fuss .wer b{font-size:15px}}
 .leer{text-align:center;padding:30px 10px;color:var(--grau);font-weight:600}
-/* Ändern-Fenster */
-.fk{font-size:13px;font-weight:600;color:var(--grau);text-transform:uppercase;letter-spacing:.4px;margin:18px 2px 6px}
-.fg{background:#F7F7F9;border-radius:12px;padding:4px 12px}
-.fz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1.4fr);gap:6px;align-items:center;padding:8px 0;border-bottom:.5px solid #E5E5EA}
-.fz:last-child{border-bottom:0}
-.fz>label{font-size:15px;font-weight:600}.fz>label small{display:block;font-size:12px;color:var(--grau);font-weight:500}
-.fz input{width:100%;border:0;border-radius:10px;background:#fff;padding:9px 10px;font-size:16px;font-weight:600;color:var(--text);min-height:44px}
-.fz input:focus{outline:2px solid var(--rot);outline-offset:-2px}
-.fz input.falsch{outline:2px solid var(--rot);background:var(--hell)}
-.fz.grund{grid-template-columns:minmax(0,1fr) minmax(0,2.25fr)}
-.fz input[type=date]{padding:9px 6px;font-size:15px}
-.fhin{font-size:13px;line-height:1.4;margin-top:8px;padding:8px 10px;border-radius:10px;display:none}
-.fhin.gelb{display:block;background:#FDF3E1;color:#7A5212}.fhin.rot{display:block;background:var(--hell);color:var(--rot);font-weight:600}
-.fknoepfe{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px}
-.fknoepfe a,.fknoepfe button{display:flex;align-items:center;justify-content:center;border:0;border-radius:14px;padding:14px;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none}
-.fknoepfe a{background:#E9E9EE;color:var(--text)}.fknoepfe button{background:var(--rot);color:#fff}
-.meldung{position:fixed;left:16px;right:16px;bottom:24px;max-width:520px;margin:0 auto;background:var(--gruen);color:#fff;border-radius:14px;padding:12px 14px;font-weight:700;z-index:99;display:none;align-items:center;justify-content:space-between;gap:12px}
-.meldung button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:10px;padding:8px 12px;font:inherit;font-weight:700;cursor:pointer}
 </style><style>/* App-Design klar (01.11.2026) */
 body{background:#F2F2F7!important}
 /* Kopfzeile wie in iOS: „‹ Start“ als rote Schrift statt Pille */
@@ -151,6 +133,11 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 .lkZeile a{color:#C4161C;font-weight:700;text-decoration:none;white-space:nowrap;cursor:pointer}
 .lkRad{background:#F7F7F9;border-radius:14px;overflow:hidden}.lkRad div{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:.5px solid #E5E5EA;cursor:pointer}.lkRad div:first-child{border-top:0}
 .lkRad div span{flex:1;min-width:0;font-size:16px;font-weight:600}.lkRad div u{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:2px solid #C7C7CC;box-sizing:border-box}.lkRad div.an u{border:7px solid #C4161C}
+.lkVb{margin-top:14px;display:grid;gap:10px}.mxKopf+.lkVb{margin-top:0}.lkVbZ{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px}.lkVbZ>div{min-width:0}
+.lkVbZ label{display:block;margin:0 0 5px 3px!important;font-size:14px;font-weight:700;color:#6E6E73}
+.lkVbZ input{display:block;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box;height:48px;margin:0!important;padding:0 12px!important;border:0!important;border-radius:12px;background:#F2F2F7;font-family:inherit;font-size:16px;font-weight:600;color:#1C1C1E;text-align:left;-webkit-appearance:none;appearance:none}
+.lkVbZ input::-webkit-date-and-time-value{text-align:left}
+.lkVbF{color:#C4161C;font-size:14px;font-weight:700;margin:8px 3px 0}.lkVbF:empty{display:none}
 .lkFertig{display:block;width:100%;margin-top:14px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
@@ -173,24 +160,177 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 .mxKlein{margin-top:8px}.mxKlein>summary{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:14px;font-weight:800;color:#1C1C1E;background:#F2F2F4;border-radius:999px;padding:9px 14px;min-height:40px;box-sizing:border-box}
 .mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
 .mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
-</style></head><body><script>
+</style><style>
+/* Zahlungen ändern (08.11.2026) */
+.mxAe{position:relative;display:inline-block;flex:none;border:0;background:#EFEFF1;color:#1C1C1E;border-radius:9px;padding:6px 11px;font-size:13px;font-weight:600;font-family:inherit;line-height:1.2;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;text-decoration:none}
+.mxAe::after{content:"";position:absolute;inset:-8px -5px}.mxAe:active{background:#E0E0E5}
+.mxZa .fl{font-size:13px;color:#8E8E93;line-height:1.4}
+.mxZa .fk{font-size:13px;font-weight:600;color:#8E8E93;text-transform:uppercase;letter-spacing:.4px;margin:18px 2px 6px}
+.mxZa .fg{background:#F7F7F9;border-radius:12px;padding:4px 12px}
+.mxZa .fz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1.4fr);gap:6px;align-items:center;padding:8px 0;border-bottom:.5px solid #E5E5EA}
+.mxZa .fz:last-child{border-bottom:0}
+.mxZa .fz>label{display:block;margin:0;font-size:15px;font-weight:600;color:#1C1C1E}.mxZa .fz>label small{display:block;font-size:12px;color:#8E8E93;font-weight:500}
+.mxZa .fz input{width:100%;margin:0;border:0;border-radius:10px;background:#fff;padding:9px 10px;font-size:16px;font-weight:600;color:#1C1C1E;min-height:44px}
+.mxZa .fz input:focus{outline:2px solid #C4161C;outline-offset:-2px}
+.mxZa .fz input.falsch{outline:2px solid #C4161C;background:#FDECEC}
+.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr) minmax(0,2.25fr)}
+.mxZa .fz input[type=date]{padding:9px 6px;font-size:15px}
+.mxZa .fz .aw{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;background:#fff;border:0;border-radius:10px;padding:9px 10px;min-height:44px;font-size:16px;font-weight:600;font-family:inherit;color:#1C1C1E;text-align:left;cursor:pointer}
+.mxZa .fz .aw span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mxZa .fz .aw em{flex:none;font-style:normal;color:#C7C7CC;font-size:20px;line-height:1}
+.mxZa .fhin{font-size:13px;line-height:1.4;margin-top:8px;padding:8px 10px;border-radius:10px;display:none}
+.mxZa .fhin.gelb{display:block;background:#FDF3E1;color:#7A5212}.mxZa .fhin.rot{display:block;background:#FDECEC;color:#C4161C;font-weight:600}
+.mxZa .fknoepfe{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px}
+.mxZa .fknoepfe a,.mxZa .fknoepfe button{display:flex;align-items:center;justify-content:center;border:0;border-radius:14px;padding:14px;margin:0;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none}
+.mxZa .fknoepfe a,.mxZa .fknoepfe .g{background:#E9E9EE;color:#1C1C1E}.mxZa .fknoepfe .r{background:#C4161C;color:#fff}
+.mxZa .wl{background:#F7F7F9;border-radius:12px;overflow:hidden}
+.mxZa .wl button{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;margin:0;border:0;border-top:.5px solid #E5E5EA;background:none;padding:13px 14px;min-height:48px;font-size:16px;font-weight:600;font-family:inherit;color:#1C1C1E;text-align:left;cursor:pointer}
+.mxZa .wl button:first-child{border-top:0}.mxZa .wl button b{flex:none;color:#1B8A4B;font-size:18px;line-height:1}
+.mxZa .wl button.an{background:#EDF7F1}
+#mxZaMeld{position:fixed;left:16px;right:16px;bottom:24px;max-width:520px;margin:0 auto;background:#1B8A4B;color:#fff;border-radius:14px;padding:12px 14px;font-weight:700;z-index:99;display:none;align-items:center;justify-content:space-between;gap:12px}
+#mxZaMeld button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:10px;padding:8px 12px;margin:0;font:inherit;font-weight:700;cursor:pointer;flex:none}
+/* iPhone: Betrag und Datum sind immer ganz zu lesen (08.11.2026, stand „2.00“ statt 2.000) */
+@media(max-width:560px){.mxZa .fz{grid-template-columns:104px minmax(0,1fr) 116px}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:104px minmax(0,1fr)}.mxZa .fz>label{font-size:13.5px}.mxZa .fz input[type=date]{padding:9px 4px}.mxZa .fz input[inputmode=decimal]{padding-left:8px}}
+@media(max-width:389px){.mxZa .fz{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);row-gap:6px}.mxZa .fz>label{grid-column:1/-1}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr)}}
+</style><script>
+(function(){
+const $=id=>document.getElementById(id);
+const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+const schreib=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+const zahl=v=>{if(v===null||v===undefined)return null;const s=String(v).replace(/€/g,"").trim();if(!s)return null;
+  const n=parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""));return isNaN(n)?null:n};
+const n0=v=>zahl(v)||0;
+const eur=n=>Math.round(n||0).toLocaleString("de-DE")+" €";
+const wie=n=>{n=Math.round(+n||0);return n.toLocaleString("de-DE")};   // so steht ein Betrag im Mietvertrag (ohne €)
+const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const de=s=>s&&/^\d{4}-\d\d-\d\d/.test(s)?s.slice(8,10)+"."+s.slice(5,7)+".":"";
+const istTag=s=>/^\d{4}-\d\d-\d\d$/.test(String(s||""));
+const ichMail=()=>{try{return((JSON.parse(localStorage.getItem("mietixSitzung")||"null")||{}).email||"").toLowerCase()}catch(e){return""}};
+const verlInRest=v=>(v.verlaengerungen||[]).filter(y=>!!(y.imRest||y.bezahlt)).reduce((s,y)=>s+(+y.aufpreis||0),0);   // so liegt die Verlängerung im Mietvertrag im Rest
+let VON="Monat",NACHHER=()=>{},UNTEN=24,OFFEN=null,ZURUECK=null,MT=0;
+const zu=()=>encodeURIComponent(VON);
+const MAPPE=nr=>"https://barankohler.github.io/mietix-vertrag/?nr="+encodeURIComponent(nr)+"&zeige=mappe&von="+zu();
+const ANFRAGE=a=>a.status==="gebucht"?"https://barankohler.github.io/mietix-vertrag/?buchung="+encodeURIComponent(a.id)+"&von="+zu():"https://barankohler.github.io/mietix-anfragen/?zeige="+encodeURIComponent(a.id);
+function blatt(){let f=$("fAendern");if(!f){f=document.createElement("div");f.id="fAendern";f.setAttribute("role","dialog");f.setAttribute("aria-label","Zahlungen ändern");document.body.appendChild(f)}f.classList.add("mxFenster","mxZa");return f}
+function feld(id,wert,art,ph){return art==="tag"?'<input type="date" id="'+id+'" value="'+esc(istTag(wert)?wert:"")+'" aria-label="Bezahlt am">'
+  :art==="text"?'<input id="'+id+'" value="'+esc(wert||"")+'" placeholder="'+esc(ph||"")+'" data-einheit="">'
+  :'<input id="'+id+'" inputmode="decimal" data-einheit="€" value="'+(wert?wie(wert):"")+'" placeholder="0">'}
+const zeile=(t,u,a,b)=>'<div class="fz"><label>'+t+(u?'<small>'+u+'</small>':"")+'</label>'+a+(b||"<span></span>")+'</div>';
+const kopf=t=>'<div class="mxKopf"><h3>'+esc(t)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>';
+function oeffne(schl){const f=blatt();
+  if(schl.startsWith("a:")){const a=lies("mietixAnfragen",[]).find(x=>x&&x.id===schl.slice(2));if(!a)return fehlt();const z=a.anzahlung||{};OFFEN={schl};
+    f.innerHTML=kopf(a.name||"Buchung")+
+      '<div class="fl">'+esc(a.auto||"")+', Buchung noch ohne Mietvertrag</div>'+
+      '<div class="fk">Anzahlung</div><div class="fg">'+zeile("Anzahlung","Betrag und bezahlt am",feld("eAnz",n0(z.betrag)),feld("eAnzAm",z.am,"tag"))+'</div>'+
+      '<div class="fhin" id="eHin"></div><div class="fknoepfe"><a href="'+esc(ANFRAGE(a))+'">Buchung öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
+  }else{const v=lies("mietixVorgaenge",[]).find(x=>x&&x.nr===schl.slice(2));if(!v)return fehlt();OFFEN={schl};
+    const z=v.zahlung||{},an=z.anz||{},re=z.rest||{},ka=z.kaut||{},kr=v.kautionRueck||{},e=v.endabrechnung||{},vl=v.verlaengerungen||[];
+    const s=+e.summe||0,bz=e.bezahlt||null,mitKaution=!!(bz&&bz.art==="Kaution"&&kr.verrechnet);
+    const teile=[e.mehrkm?"Mehr-km":"",e.tank?"Tank":"",e.versp?"Verspätung":"",(e.extra||[]).length?"Sonstiges":""].filter(Boolean).join(", ");
+    let h=kopf(v.name||"Mietvertrag")+
+      '<div class="fl">'+esc(v.auto||"")+(v.vonD?', '+de(v.vonD)+' bis '+de(v.bisD):"")+', Nr. '+esc(v.nr)+'. Bezahlt-Datum leer lassen heißt: noch offen.</div>'+
+      '<div class="fk">Mietpreis</div><div class="fg">'+
+        zeile("Anzahlung","",feld("eAnz",n0(an.betrag)),feld("eAnzAm",an.am,"tag"))+
+        zeile("Rest","ohne Verlängerung",feld("eRest",Math.max(0,n0(re.betrag)-verlInRest(v))),feld("eRestAm",re.am,"tag"))+'</div>';
+    if(vl.length)h+='<div class="fk">Verlängerungen</div><div class="fg">'+vl.map((y,i)=>zeile("Verlängerung"+(vl.length>1?" "+(i+1):""),"bis "+de(y.bisNeu||"")+(y.imRest?", kommt mit dem Rest":""),feld("eV"+i,+y.aufpreis||0),
+        y.imRest?'<span class="fl" style="text-align:right">wie Rest</span>':feld("eVAm"+i,y.bezahlt?(y.bezahltAm||y.am):"","tag"))).join("")+'</div>';
+    if(s>0)h+='<div class="fk">Nachzahlung bei Rückgabe</div><div class="fg">'+
+      (mitKaution?zeile("Abgerechnet "+eur(s),(teile?teile+", ":"")+"mit der Kaution verrechnet",'<span></span>')
+        :zeile("Bezahlt","abgerechnet "+eur(s)+(teile?", "+teile:""),feld("eNach",bz?(bz.betrag!=null?+bz.betrag:s):s),feld("eNachAm",bz&&bz.am,"tag")))+'</div>';
+    h+='<div class="fk">Kaution</div><div class="fg">'+
+      zeile("Erhalten","bei Übergabe",feld("eKaut",n0(ka.betrag)),feld("eKautAm",ka.am,"tag"))+
+      zeile("Einbehalten","bleibt bei uns",feld("eEin",kr.verrechnet?+kr.einbehalt||0:0),'<span></span>')+
+      '<div class="fz grund"><label>Grund</label>'+feld("eGrund",kr.verrechnet?kr.grund:"","text","Schaden, Reinigung, Tank")+'</div>'+
+      zeile("Zurückgegeben","Datum leer: noch nicht",feld("eZur",kr.betrag!=null?+kr.betrag||0:0),feld("eZurAm",kr.am,"tag"))+'</div>'+
+      '<div class="fhin" id="eHin"></div>'+
+      '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Mappe öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
+    f.innerHTML=h}
+  f.querySelectorAll("input").forEach(i=>i.addEventListener("input",pruefe));
+  $("eSp").onclick=speichern;
+  window.mxAuf("fAendern");if(typeof window.mxEinheit==="function")window.mxEinheit();pruefe()}
+function fehlt(){if(window.mxFehler)window.mxFehler("Diese Miete ist hier nicht mehr vorhanden. Bitte Seite neu laden.",4000);else alert("Diese Miete ist hier nicht mehr vorhanden. Bitte Seite neu laden.")}
+// Prüft beim Tippen: rote Felder, wenn keine Zahl; gelber Hinweis, wenn die Kaution nicht aufgeht (nur Hinweis, Speichern geht trotzdem)
+function pruefe(){let falsch=0;document.querySelectorAll("#fAendern input[inputmode=decimal]").forEach(i=>{const bad=i.value.trim()!==""&&zahl(i.value)===null||(zahl(i.value)||0)<0;i.classList.toggle("falsch",bad);if(bad)falsch++});
+  const hin=$("eHin");if(!hin)return!falsch;
+  if(falsch){hin.className="fhin rot";hin.textContent="Bitte nur Zahlen eintragen, zum Beispiel 800. Rot markiert ist, was nicht passt.";return false}
+  if($("eKaut")){const k=zahl($("eKaut").value)||0,ein=zahl($("eEin").value)||0,zur=zahl($("eZur").value)||0;
+    if(k&&ein+zur&&Math.round(ein+zur)!==Math.round(k)){hin.className="fhin gelb";hin.textContent="Kaution erhalten "+eur(k)+", einbehalten und zurück zusammen "+eur(ein+zur)+". Bitte kurz prüfen.";return true}}
+  hin.className="fhin";hin.textContent="";return true}
+function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
+  const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
+  if(schl.startsWith("a:")){const l=lies("mietixAnfragen",[]),a=l.find(x=>x&&x.id===schl.slice(2));if(!a)return weg();const vorher=JSON.stringify(a);
+    const za=a.anzahlung||{};if(Math.round(n0(za.betrag))===w("eAnz")&&(istTag(za.am)?za.am:"")===t("eAnzAm")){window.mxZu();return}   // nichts geändert
+    a.anzahlung=Object.assign({},za,{betrag:w("eAnz"),am:t("eAnzAm")});
+    (a.verlauf=a.verlauf||[]).push({am:jetzt,was:"Anzahlung auf der Seite "+VON+" geändert"});
+    return fertig("mietixAnfragen","id",a.id,vorher,l)}
+  const l=lies("mietixVorgaenge",[]),v=l.find(x=>x&&x.nr===schl.slice(2));if(!v)return weg();const vorher=JSON.stringify(v);
+  // Nur was wirklich anders ist, wird geschrieben: Öffnen und Speichern ohne Änderung lässt den Mietvertrag, wie er ist
+  const z=v.zahlung=v.zahlung||{};
+  const setz=(k,b,am)=>{const o=Object.assign({},z[k]||{});let neu=false;
+    if(Math.round(n0(o.betrag))!==b){o.betrag=b?wie(b):"";neu=true}
+    if((istTag(o.am)?o.am:"")!==am){o.am=am;if(!am&&k!=="kaut")o.art="";neu=true}
+    if(neu)z[k]=o};
+  setz("anz",w("eAnz"),t("eAnzAm"));
+  // Verlängerungen zuerst, dann der Rest: im Mietvertrag steckt die Verlängerung im Rest
+  let preisPlus=0;(v.verlaengerungen||[]).forEach((y,i)=>{if(!$("eV"+i))return;const neu=w("eV"+i),alt=+y.aufpreis||0;if(neu!==alt){preisPlus+=neu-alt;y.aufpreis=neu}
+    if(!y.imRest){const am=t("eVAm"+i),war=y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";if(am!==war){if(am){y.bezahlt=true;y.bezahltAm=am}else{y.bezahlt=false;delete y.bezahltAm}}}});
+  if(preisPlus){v.preis1=wie(n0(v.preis1)+preisPlus);v.gesamt=wie(n0(v.preis1)+n0(v.preis2)+n0(v.paketPreis))}   // Mietpreis im Mietvertrag zieht mit, wie beim Verlängern
+  {const r=Math.round(n0((z.rest||{}).betrag)),vr=verlInRest(v),soll=w("eRest")+vr;   // Rest ohne Verlängerung unverändert: Rest wächst nur um die geänderte Verlängerung
+    setz("rest",soll===r?r:soll,t("eRestAm"))}
+  if($("eNach")){const e=v.endabrechnung,b=w("eNach"),am=t("eNachAm"),bz=e.bezahlt||null,warAm=bz&&istTag(bz.am)?bz.am:"",warB=bz?(bz.betrag!=null?Math.round(+bz.betrag||0):Math.round(+e.summe||0)):Math.round(+e.summe||0);
+    if(am!==warAm||b!==warB){if(am){e.bezahlt=Object.assign({},bz||{},{am});if(e.bezahlt.art==="Kaution")e.bezahlt.art="";if(b===Math.round(+e.summe||0))delete e.bezahlt.betrag;else e.bezahlt.betrag=b}else delete e.bezahlt}}
+  setz("kaut",w("eKaut"),t("eKautAm"));
+  {const kr=v.kautionRueck||{},ein=w("eEin"),zur=w("eZur"),zurAm=t("eZurAm"),grund=t("eGrund").trim();
+    const warEin=kr.verrechnet?Math.round(+kr.einbehalt||0):0,warZur=kr.betrag!=null?Math.round(+kr.betrag||0):0,warAm=istTag(kr.am)?kr.am:"",warGrund=kr.verrechnet?String(kr.grund||""):"";
+    if(ein!==warEin||zur!==warZur||zurAm!==warAm||grund!==warGrund){const k=v.kautionRueck=Object.assign({},kr);
+      if(zur!==warZur)k.betrag=zur;if(zurAm!==warAm)k.am=zurAm;if(grund!==warGrund)k.grund=grund;
+      if(ein!==warEin){k.einbehalt=ein;if(ein){k.verrechnet=true;k.teil=false}else if(!k.posten||!k.posten.length)delete k.verrechnet}}}
+  if(JSON.stringify(v)===vorher){window.mxZu();return}   // nichts geändert
+  const m=ichMail();if(m)v.geaendert={wer:m,am:jetzt};
+  (v.verlauf=v.verlauf||[]).push({am:jetzt,was:"Zahlungen auf der Seite "+VON+" geändert"});
+  fertig("mietixVorgaenge","nr",v.nr,vorher,l)}
+function weg(){const h=$("eHin");h.className="fhin rot";h.textContent="Nicht gespeichert: Diese Miete ist hier nicht mehr vorhanden. Bitte Seite neu laden."}
+function fertig(k,pk,id,vorher,l){if(!schreib(k,l)){const hin=$("eHin");hin.className="fhin rot";hin.textContent="Nicht gespeichert: der Speicher dieses Geräts ist voll. Bitte Seite neu laden und noch einmal versuchen.";return}
+  window.mxZu();NACHHER();
+  gespeichert("✓ Gespeichert, auch im Mietvertrag",()=>{const l2=lies(k,[]),i=l2.findIndex(x=>x&&x[pk]===id);if(i>=0){l2[i]=JSON.parse(vorher);schreib(k,l2)}NACHHER()})}
+// Das Speichern zeigt sonst zusätzlich den allgemeinen Knopf „Rückgängig“ oben: hier reicht der eine im grünen Hinweis
+function einKnopf(){const e=$("mietixRueck");if(e){e.mxWill=false;e.classList.remove("an");clearTimeout(e.mxT)}}
+function gespeichert(text,rueck){let me=$("mxZaMeld");if(!me){me=document.createElement("div");me.id="mxZaMeld";me.innerHTML='<span></span><button type="button">Rückgängig</button>';document.body.appendChild(me);
+    me.querySelector("button").onclick=()=>{const r=ZURUECK;ZURUECK=null;clearTimeout(MT);me.style.display="none";if(r)r();einKnopf()}}
+  einKnopf();me.style.bottom=UNTEN+"px";me.querySelector("span").textContent=text;ZURUECK=rueck;me.style.display="flex";clearTimeout(MT);MT=setTimeout(()=>{me.style.display="none";ZURUECK=null},7000)}
+// Knopf „Ändern“: auch innerhalb einer Zeile, die sonst in die Mappe führt
+function auslesen(e){const k=e.target.closest&&e.target.closest("[data-za]");if(!k)return null;e.preventDefault();e.stopPropagation();return k.dataset.za}
+document.addEventListener("click",e=>{const s=auslesen(e);if(s)oeffne(s)},true);
+document.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const s=auslesen(e);if(s)oeffne(s)},true);
+window.mxZahlung={oeffne,verlInRest,gespeichert,
+  setup(o){VON=o.von||VON;NACHHER=o.nachher||NACHHER;UNTEN=o.unten||UNTEN},
+  knopf:schl=>'<span class="mxAe" role="button" tabindex="0" data-za="'+esc(schl)+'">Ändern</span>'};
+})();
+</script></head><body><script>
 /* Listenkopf: Suche, Auswahlfelder, Trefferzahl, Filter zurücksetzen (04.11.2026) */
 (function(){if(window.mxListenkopf)return;
   const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
   const norm=t=>String(t==null?"":t).toLowerCase().replace(/\s+/g," ").trim();
-  function blatt(titel,werte,wert,fertig){let f=document.getElementById("lkFenster");
+  const freiTeile=w=>{const t=String(w||"").split("|");return t[0]==="frei"?{vd:t[1]||"",vu:t[2]||"10:00",bd:t[3]||"",bu:t[4]||"10:00"}:null};
+  const freiText=w=>{const p=freiTeile(w),j=new Date().getFullYear(),k=x=>{const t=x.split("-");return Number(t[2])+"."+Number(t[1])+"."+(Number(t[0])===j?"":t[0].slice(2))};return p.vd&&p.bd?k(p.vd)+" bis "+k(p.bd):p.vd?"ab "+k(p.vd):"bis "+k(p.bd)};
+  const vbZeile=(t,d,u)=>'<div class="lkVbZ"><div><label for="'+d+'">'+t+'</label><input type="date" id="'+d+'"></div><div><label for="'+u+'">Uhr</label><input type="time" id="'+u+'" value="10:00"></div></div>';
+  function blatt(titel,werte,wert,fertig,frei){let f=document.getElementById("lkFenster");
     if(!f){f=document.createElement("div");f.className="mxFenster";f.id="lkFenster";f.setAttribute("role","dialog");document.body.appendChild(f)}
     let w=wert;f.setAttribute("aria-label",titel);
-    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div><div class="lkRad">'+
-      werte.map(([v,t],i)=>'<div data-i="'+i+'" class="'+(v===w?"an":"")+'"><span>'+esc(t)+'</span><u></u></div>').join("")+'</div><button type="button" class="lkFertig">Fertig</button>';
-    f.querySelectorAll("[data-i]").forEach(z=>z.onclick=()=>{w=werte[+z.dataset.i][0];f.querySelectorAll("[data-i]").forEach(y=>y.classList.toggle("an",y===z))});
-    f.querySelector(".lkFertig").onclick=()=>{window.mxZu();fertig(w)};window.mxAuf("lkFenster")}
+    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+(frei==="nur"?"":'<div class="lkRad">'+
+      werte.map(([v,t],i)=>'<div data-i="'+i+'" class="'+(v===w?"an":"")+'"><span>'+esc(t)+'</span><u></u></div>').join("")+'</div>')+(frei?'<div class="lkVb">'+vbZeile("von","lkVonD","lkVonU")+vbZeile("bis","lkBisD","lkBisU")+'</div><div class="lkVbF" role="alert"></div>':"")+'<button type="button" class="lkFertig">Fertig</button>';
+    const fld=i=>document.getElementById(i),feh=f.querySelector(".lkVbF"),rad=z=>f.querySelectorAll("[data-i]").forEach(y=>y.classList.toggle("an",y===z));
+    f.querySelectorAll("[data-i]").forEach(z=>z.onclick=()=>{w=werte[+z.dataset.i][0];rad(z);if(frei){fld("lkVonD").value="";fld("lkBisD").value="";fld("lkVonU").value="10:00";fld("lkBisU").value="10:00";feh.textContent=""}});
+    if(frei){const p=freiTeile(w);if(p){fld("lkVonD").value=p.vd;fld("lkVonU").value=p.vu;fld("lkBisD").value=p.bd;fld("lkBisU").value=p.bu}
+      const neu=()=>{feh.textContent="";const vd=fld("lkVonD").value,bd=fld("lkBisD").value;if(vd||bd){w=["frei",vd,fld("lkVonU").value||"10:00",bd,fld("lkBisU").value||"10:00"].join("|");rad(null)}else if(freiTeile(w)){w="";rad(f.querySelector('[data-i="0"]'))}};
+      ["lkVonD","lkVonU","lkBisD","lkBisU"].forEach(i=>{fld(i).addEventListener("input",neu);fld(i).addEventListener("change",neu)})}
+    f.querySelector(".lkFertig").onclick=()=>{const p=frei&&freiTeile(w);if(p&&p.vd&&p.bd&&p.vd+"T"+p.vu>p.bd+"T"+p.bu){feh.textContent="„bis“ liegt vor „von“. Bitte Datum oder Uhrzeit ändern.";return}window.mxZu();fertig(w)};window.mxAuf("lkFenster")}
   window.mxListenkopf=function(hostId,schluessel,o){const K="mietixLK:"+schluessel;let st={};try{st=JSON.parse(sessionStorage.getItem(K)||"{}")}catch(e){}
     const LK={q:norm(st.q),w:Object.assign({},st.w||{}),roh:st.q||""};let bau=false,zeileT="";
+    (o.felder||[]).forEach(f=>{if(f.frei==="nur"&&LK.w[f.k]&&!freiTeile(LK.w[f.k]))delete LK.w[f.k]});
     const merke=()=>{try{sessionStorage.setItem(K,JSON.stringify({q:LK.roh,w:LK.w}))}catch(e){}};
     const host=()=>document.getElementById(hostId);
     const felderZeigen=()=>{(o.felder||[]).forEach(f=>{const el=host().querySelector('[data-lk="'+f.k+'"]');if(!el)return;const v=LK.w[f.k]||"",p=(f.werte()||[]).find(x=>x[0]===v);
-      el.querySelector("b").textContent=v?(p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
+      el.querySelector("b").textContent=v?(freiTeile(v)?freiText(v):p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
     const zeileZeigen=()=>{const z=host().querySelector(".lkZeile");if(!z)return;z.innerHTML='<span>'+esc(zeileT)+'</span>'+(LK.aktiv()?'<a role="button" tabindex="0">Filter zurücksetzen</a>':"");
       const a=z.querySelector("a");if(a)a.onclick=()=>{LK.roh="";LK.q="";LK.w={};merke();const i=host().querySelector("input");if(i)i.value="";kreuz();felderZeigen();o.neu()}};
     const kreuz=()=>{const k=host().querySelector(".lkSuche button");if(k)k.style.display=LK.roh?"":"none"};
@@ -201,12 +341,17 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
         ((o.felder||[]).length?'<div class="lkFelder">'+o.felder.map(f=>'<div class="lkFeld" role="button" tabindex="0" data-lk="'+f.k+'"><span><small>'+esc(f.t)+'</small><b></b></span><em>›</em></div>').join("")+'</div>':"")+'<div class="lkZeile"></div></div>';
       const i=h.querySelector("input");i.value=LK.roh;i.addEventListener("input",()=>{LK.roh=i.value;LK.q=norm(i.value);merke();kreuz();o.neu()});
       h.querySelector(".lkSuche button").onclick=e=>{e.preventDefault();i.value="";LK.roh="";LK.q="";merke();kreuz();o.neu();i.focus()};kreuz();
-      (o.felder||[]).forEach(f=>{h.querySelector('[data-lk="'+f.k+'"]').onclick=()=>{blatt(f.t,[["",f.alle]].concat(f.werte()||[]),LK.w[f.k]||"",w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()})}})}
+      (o.felder||[]).forEach(f=>{h.querySelector('[data-lk="'+f.k+'"]').onclick=()=>{blatt(f.t,[["",f.alle]].concat(f.werte()||[]),LK.w[f.k]||"",w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()},f.frei)}})}
       felderZeigen();zeileZeigen();return LK};
     return LK};
   const tag=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   window.mxListenkopf.zeit=[["heute","Heute"],["woche","Diese Woche"],["naechsteW","Nächste Woche"],["monat","Dieser Monat"],["vormonat","Letzter Monat"],["naechsterM","Nächster Monat"],["jahr","Dieses Jahr"]];
-  window.mxListenkopf.spanne=function(w){const n=new Date(),j=n.getFullYear(),m=n.getMonth(),mo=new Date(j,m,n.getDate()-((n.getDay()+6)%7));
+  window.mxListenkopf.freiText=freiText;
+  /* Liegt eine Miete im Zeitraum? Bei von/bis mit Uhrzeit minutengenau, bei den festen Knöpfen wie bisher nach Tagen */
+  window.mxListenkopf.ueberlappt=function(w,vd,vu,bd,bu){const s=window.mxListenkopf.spanne(w);if(!s)return true;
+    if(freiTeile(w)){const an=vd?vd+"T"+(vu||"00:00"):"",en=(bd||vd)?(bd||vd)+"T"+(bu||"23:59"):"";return an<=s[1]&&en>=s[0]}
+    return String(vd||"")<=s[1]&&String(bd||vd||"")>=s[0]};
+  window.mxListenkopf.spanne=function(w){const p=freiTeile(w);if(p)return[p.vd?p.vd+"T"+p.vu:"0000-01-01T00:00",p.bd?p.bd+"T"+p.bu:"9999-12-31T23:59"];const n=new Date(),j=n.getFullYear(),m=n.getMonth(),mo=new Date(j,m,n.getDate()-((n.getDay()+6)%7));
     const pl=(d,x)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+x);
     return{heute:[tag(n),tag(n)],woche:[tag(mo),tag(pl(mo,6))],naechsteW:[tag(pl(mo,7)),tag(pl(mo,13))],monat:[tag(new Date(j,m,1)),tag(new Date(j,m+1,0))],vormonat:[tag(new Date(j,m-1,1)),tag(new Date(j,m,0))],naechsterM:[tag(new Date(j,m+1,1)),tag(new Date(j,m+2,0))],jahr:[j+"-01-01",j+"-12-31"]}[w]||null};
 })();
@@ -218,7 +363,6 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 <div id="inhalt"><div class="leer">Wird geladen …</div></div>
 </main>
 <div class="mxFenster" id="fAendern" role="dialog" aria-label="Zahlungen ändern"></div>
-<div class="meldung" id="meldung"><span id="meldungT"></span><button type="button" id="meldungZ">Rückgängig</button></div>
 <script>
 const $=id=>document.getElementById(id);
 const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
@@ -227,7 +371,6 @@ const zahl=v=>{if(v===null||v===undefined)return null;const s=String(v).replace(
   const n=parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""));return isNaN(n)?null:n};
 const n0=v=>zahl(v)||0;
 const eur=n=>Math.round(n||0).toLocaleString("de-DE")+" €";
-const wie=n=>{n=Math.round(+n||0);return n.toLocaleString("de-DE")};   // so steht ein Betrag im Mietvertrag (ohne €)
 const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
 const de=s=>s&&/^\d{4}-\d\d-\d\d/.test(s)?s.slice(8,10)+"."+s.slice(5,7)+".":"";
 const istTag=s=>/^\d{4}-\d\d-\d\d$/.test(String(s||""));
@@ -237,14 +380,10 @@ const pad=n=>String(n).padStart(2,"0");
 const heute=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
 const JETZT=heute().slice(0,7);
 const vorMon=m=>{const d=new Date(+m.slice(0,4),+m.slice(5,7)-2,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)};
-const MAPPE=nr=>"https://barankohler.github.io/mietix-vertrag/?nr="+encodeURIComponent(nr)+"&zeige=mappe&von=Monat";
-const ANFRAGE=a=>a.status==="gebucht"?"https://barankohler.github.io/mietix-vertrag/?buchung="+encodeURIComponent(a.id)+"&von=Monat":"https://barankohler.github.io/mietix-anfragen/?zeige="+encodeURIComponent(a.id);   // wie Seite Geld
-const ichMail=()=>{try{return((JSON.parse(localStorage.getItem("mietixSitzung")||"null")||{}).email||"").toLowerCase()}catch(e){return""}};
 
 /* ---------- Jede Miete in Posten ----------
    art: miete | verl | nach | kaution;  am leer = noch offen.  Nichts wird doppelt gezählt (siehe Kopf der Datei). */
-const imRest=y=>!!(y.imRest||y.bezahlt);   // so liegt die Verlängerung im Mietvertrag im Rest
-function verlInRest(v){return(v.verlaengerungen||[]).filter(imRest).reduce((s,y)=>s+(+y.aufpreis||0),0)}
+const verlInRest=mxZahlung.verlInRest;   // liegt im Baustein, damit Fenster und Rechnung dasselbe sagen
 function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kautionRueck||{},an=z.anz||{},re=z.rest||{};
   if(n0(an.betrag))l.push({art:"miete",t:"Anzahlung",b:n0(an.betrag),am:istTag(an.am)?an.am:""});
   const mietRest=n0(re.betrag)-verlInRest(v);
@@ -306,92 +445,9 @@ function zeichne(){
       (nach?'<div class="leise" style="margin:8px 4px 0">Gesamt enthält auch Nachzahlungen bei Rückgabe ('+eur(nach)+').</div>':"")}
   h+='<div class="leise" style="text-align:center;margin-top:16px">Gezählt wird, was im Mietvertrag als bezahlt steht, im Monat der Zahlung. Stimmt etwas nicht, Miete antippen und ändern.</div>';
   $("inhalt").innerHTML=h;
-  $("inhalt").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>oeffne(b.dataset.m))}
+  $("inhalt").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>mxZahlung.oeffne(b.dataset.m))}
 
-/* ---------- Ändern: direkt hier korrigieren, gespeichert wird im Mietvertrag ---------- */
-let OFFEN=null;
-function feld(id,wert,art,ph){return art==="tag"?'<input type="date" id="'+id+'" value="'+esc(istTag(wert)?wert:"")+'" aria-label="Bezahlt am">'
-  :art==="text"?'<input id="'+id+'" value="'+esc(wert||"")+'" placeholder="'+esc(ph||"")+'" data-einheit="">'
-  :'<input id="'+id+'" inputmode="decimal" data-einheit="€" value="'+(wert?wie(wert):"")+'" placeholder="0">'}
-const zeile=(t,u,a,b)=>'<div class="fz"><label>'+t+(u?'<small>'+u+'</small>':"")+'</label>'+a+(b||"<span></span>")+'</div>';
-function oeffne(schl){const f=$("fAendern");
-  if(schl.startsWith("a:")){const a=lies("mietixAnfragen",[]).find(x=>x&&x.id===schl.slice(2));if(!a)return;const z=a.anzahlung||{};OFFEN={schl};
-    f.innerHTML='<div class="mxKopf"><h3>'+esc(a.name||"Buchung")+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+
-      '<div class="leise">'+esc(a.auto||"")+', Buchung noch ohne Mietvertrag</div>'+
-      '<div class="fk">Anzahlung</div><div class="fg">'+zeile("Anzahlung","Betrag und bezahlt am",feld("eAnz",n0(z.betrag)),feld("eAnzAm",z.am,"tag"))+'</div>'+
-      '<div class="fhin" id="eHin"></div><div class="fknoepfe"><a href="'+esc(ANFRAGE(a))+'">Buchung öffnen</a><button type="button" id="eSp">Speichern</button></div>';
-  }else{const v=lies("mietixVorgaenge",[]).find(x=>x&&x.nr===schl.slice(2));if(!v)return;OFFEN={schl};
-    const z=v.zahlung||{},an=z.anz||{},re=z.rest||{},ka=z.kaut||{},kr=v.kautionRueck||{},e=v.endabrechnung||{},vl=v.verlaengerungen||[];
-    const s=+e.summe||0,bz=e.bezahlt||null,mitKaution=!!(bz&&bz.art==="Kaution"&&kr.verrechnet);
-    const teile=[e.mehrkm?"Mehr-km":"",e.tank?"Tank":"",e.versp?"Verspätung":"",(e.extra||[]).length?"Sonstiges":""].filter(Boolean).join(", ");
-    let h='<div class="mxKopf"><h3>'+esc(v.name||"Mietvertrag")+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+
-      '<div class="leise">'+esc(v.auto||"")+(v.vonD?', '+de(v.vonD)+' bis '+de(v.bisD):"")+', Nr. '+esc(v.nr)+'. Bezahlt-Datum leer lassen heißt: noch offen.</div>'+
-      '<div class="fk">Mietpreis</div><div class="fg">'+
-        zeile("Anzahlung","",feld("eAnz",n0(an.betrag)),feld("eAnzAm",an.am,"tag"))+
-        zeile("Rest","ohne Verlängerung",feld("eRest",Math.max(0,n0(re.betrag)-verlInRest(v))),feld("eRestAm",re.am,"tag"))+'</div>';
-    if(vl.length)h+='<div class="fk">Verlängerungen</div><div class="fg">'+vl.map((y,i)=>zeile("Verlängerung"+(vl.length>1?" "+(i+1):""),"bis "+de(y.bisNeu||"")+(y.imRest?", kommt mit dem Rest":""),feld("eV"+i,+y.aufpreis||0),
-        y.imRest?'<span class="leise" style="text-align:right">wie Rest</span>':feld("eVAm"+i,y.bezahlt?(y.bezahltAm||y.am):"","tag"))).join("")+'</div>';
-    if(s>0)h+='<div class="fk">Nachzahlung bei Rückgabe</div><div class="fg">'+
-      (mitKaution?zeile("Abgerechnet "+eur(s),(teile?teile+", ":"")+"mit der Kaution verrechnet",'<span></span>')
-        :zeile("Bezahlt","abgerechnet "+eur(s)+(teile?", "+teile:""),feld("eNach",bz?(bz.betrag!=null?+bz.betrag:s):s),feld("eNachAm",bz&&bz.am,"tag")))+'</div>';
-    h+='<div class="fk">Kaution</div><div class="fg">'+
-      zeile("Erhalten","bei Übergabe",feld("eKaut",n0(ka.betrag)),feld("eKautAm",ka.am,"tag"))+
-      zeile("Einbehalten","bleibt bei uns",feld("eEin",kr.verrechnet?+kr.einbehalt||0:0),'<span></span>')+
-      '<div class="fz grund"><label>Grund</label>'+feld("eGrund",kr.verrechnet?kr.grund:"","text","Schaden, Reinigung, Tank")+'</div>'+
-      zeile("Zurückgegeben","Datum leer: noch nicht",feld("eZur",kr.betrag!=null?+kr.betrag||0:0),feld("eZurAm",kr.am,"tag"))+'</div>'+
-      '<div class="fhin" id="eHin"></div>'+
-      '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Mappe öffnen</a><button type="button" id="eSp">Speichern</button></div>';
-    f.innerHTML=h}
-  f.querySelector(".mxZu").onclick=()=>window.mxZu();
-  f.querySelectorAll("input").forEach(i=>i.addEventListener("input",pruefe));
-  $("eSp").onclick=speichern;
-  window.mxAuf("fAendern");if(typeof window.mxEinheit==="function")window.mxEinheit();pruefe()}
-// Prüft beim Tippen: rote Felder, wenn keine Zahl; gelber Hinweis, wenn die Kaution nicht aufgeht (nur Hinweis, Speichern geht trotzdem)
-function pruefe(){let falsch=0;document.querySelectorAll("#fAendern input[inputmode=decimal]").forEach(i=>{const bad=i.value.trim()!==""&&zahl(i.value)===null||(zahl(i.value)||0)<0;i.classList.toggle("falsch",bad);if(bad)falsch++});
-  const hin=$("eHin");if(!hin)return!falsch;
-  if(falsch){hin.className="fhin rot";hin.textContent="Bitte nur Zahlen eintragen, zum Beispiel 800. Rot markiert ist, was nicht passt.";return false}
-  if($("eKaut")){const k=zahl($("eKaut").value)||0,ein=zahl($("eEin").value)||0,zur=zahl($("eZur").value)||0;
-    if(k&&ein+zur&&Math.round(ein+zur)!==Math.round(k)){hin.className="fhin gelb";hin.textContent="Kaution erhalten "+eur(k)+", einbehalten und zurück zusammen "+eur(ein+zur)+". Bitte kurz prüfen.";return true}}
-  hin.className="fhin";hin.textContent="";return true}
-function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
-  const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
-  if(schl.startsWith("a:")){const l=lies("mietixAnfragen",[]),a=l.find(x=>x&&x.id===schl.slice(2));if(!a)return;const vorher=JSON.stringify(a);
-    const za=a.anzahlung||{};if(Math.round(n0(za.betrag))===w("eAnz")&&(istTag(za.am)?za.am:"")===t("eAnzAm")){window.mxZu();return}   // nichts geändert
-    a.anzahlung=Object.assign({},za,{betrag:w("eAnz"),am:t("eAnzAm")});
-    (a.verlauf=a.verlauf||[]).push({am:jetzt,was:"Anzahlung auf der Seite Monat geändert"});
-    return fertig("mietixAnfragen","id",a.id,vorher,l)}
-  const l=lies("mietixVorgaenge",[]),v=l.find(x=>x&&x.nr===schl.slice(2));if(!v)return;const vorher=JSON.stringify(v);
-  // Nur was wirklich anders ist, wird geschrieben: Öffnen und Speichern ohne Änderung lässt den Mietvertrag, wie er ist
-  const z=v.zahlung=v.zahlung||{};
-  const setz=(k,b,am)=>{const o=Object.assign({},z[k]||{});let neu=false;
-    if(Math.round(n0(o.betrag))!==b){o.betrag=b?wie(b):"";neu=true}
-    if((istTag(o.am)?o.am:"")!==am){o.am=am;if(!am&&k!=="kaut")o.art="";neu=true}
-    if(neu)z[k]=o};
-  setz("anz",w("eAnz"),t("eAnzAm"));
-  // Verlängerungen zuerst, dann der Rest: im Mietvertrag steckt die Verlängerung im Rest
-  let preisPlus=0;(v.verlaengerungen||[]).forEach((y,i)=>{if(!$("eV"+i))return;const neu=w("eV"+i),alt=+y.aufpreis||0;if(neu!==alt){preisPlus+=neu-alt;y.aufpreis=neu}
-    if(!y.imRest){const am=t("eVAm"+i),war=y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";if(am!==war){if(am){y.bezahlt=true;y.bezahltAm=am}else{y.bezahlt=false;delete y.bezahltAm}}}});
-  if(preisPlus){v.preis1=wie(n0(v.preis1)+preisPlus);v.gesamt=wie(n0(v.preis1)+n0(v.preis2)+n0(v.paketPreis))}   // Mietpreis im Mietvertrag zieht mit, wie beim Verlängern
-  {const r=Math.round(n0((z.rest||{}).betrag)),vr=verlInRest(v),soll=w("eRest")+vr;   // Rest ohne Verlängerung unverändert: Rest wächst nur um die geänderte Verlängerung
-    setz("rest",soll===r?r:soll,t("eRestAm"))}
-  if($("eNach")){const e=v.endabrechnung,b=w("eNach"),am=t("eNachAm"),bz=e.bezahlt||null,warAm=bz&&istTag(bz.am)?bz.am:"",warB=bz?(bz.betrag!=null?Math.round(+bz.betrag||0):Math.round(+e.summe||0)):Math.round(+e.summe||0);
-    if(am!==warAm||b!==warB){if(am){e.bezahlt=Object.assign({},bz||{},{am});if(e.bezahlt.art==="Kaution")e.bezahlt.art="";if(b===Math.round(+e.summe||0))delete e.bezahlt.betrag;else e.bezahlt.betrag=b}else delete e.bezahlt}}
-  setz("kaut",w("eKaut"),t("eKautAm"));
-  {const kr=v.kautionRueck||{},ein=w("eEin"),zur=w("eZur"),zurAm=t("eZurAm"),grund=t("eGrund").trim();
-    const warEin=kr.verrechnet?Math.round(+kr.einbehalt||0):0,warZur=kr.betrag!=null?Math.round(+kr.betrag||0):0,warAm=istTag(kr.am)?kr.am:"",warGrund=kr.verrechnet?String(kr.grund||""):"";
-    if(ein!==warEin||zur!==warZur||zurAm!==warAm||grund!==warGrund){const k=v.kautionRueck=Object.assign({},kr);
-      if(zur!==warZur)k.betrag=zur;if(zurAm!==warAm)k.am=zurAm;if(grund!==warGrund)k.grund=grund;
-      if(ein!==warEin){k.einbehalt=ein;if(ein){k.verrechnet=true;k.teil=false}else if(!k.posten||!k.posten.length)delete k.verrechnet}}}
-  if(JSON.stringify(v)===vorher){window.mxZu();return}   // nichts geändert
-  const m=ichMail();if(m)v.geaendert={wer:m,am:jetzt};
-  (v.verlauf=v.verlauf||[]).push({am:jetzt,was:"Zahlungen auf der Seite Monat geändert"});
-  fertig("mietixVorgaenge","nr",v.nr,vorher,l)}
-let ZURUECK=null,MT=0;
-function fertig(k,pk,id,vorher,l){if(!schreib(k,l)){const hin=$("eHin");hin.className="fhin rot";hin.textContent="Nicht gespeichert: der Speicher dieses Geräts ist voll. Bitte Seite neu laden und noch einmal versuchen.";return}
-  window.mxZu();zeichne();ZURUECK={k,pk,id,vorher};
-  const me=$("meldung");$("meldungT").textContent="✓ Gespeichert, auch im Mietvertrag";me.style.display="flex";clearTimeout(MT);MT=setTimeout(()=>{me.style.display="none";ZURUECK=null},7000)}
-$("meldungZ").onclick=()=>{const z=ZURUECK;if(!z)return;const l=lies(z.k,[]),i=l.findIndex(x=>x&&x[z.pk]===z.id);if(i>=0){l[i]=JSON.parse(z.vorher);schreib(z.k,l)}
-  ZURUECK=null;$("meldung").style.display="none";zeichne()};
+mxZahlung.setup({von:"Monat",nachher:()=>zeichne()});   // Ändern-Fenster: stil/zahlung_aendern.py
 
 const MONATE=()=>{const s=new Set();alleMieten().forEach(x=>x.p.forEach(p=>p.am&&s.add(p.am.slice(0,7))));s.delete(JETZT);
   return[...s].sort().reverse().map(m=>[m,m.slice(0,4)===JETZT.slice(0,4)?MON[+m.slice(5,7)-1]:monName(m)])};
