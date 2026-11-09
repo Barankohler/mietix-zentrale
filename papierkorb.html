@@ -386,9 +386,16 @@ function belegEinsortieren(e){try{const b=e.eintrag||{};if(!b.nr)return;const st
   const l=Array.isArray(r.liste)?r.liste.slice():[];if(l.some(y=>y&&y.nr===b.nr))return;
   const k=n=>{const m=/^SA-(\d{4})-(\d+)$/.exec(n||"");return m?m[1]+String(+m[2]).padStart(6,"0"):null},kb=k(b.nr);if(!kb)return;
   let i=l.findIndex(y=>{const ky=k(y&&y.nr);return ky&&ky>kb});if(i<0)i=l.length;l.splice(i,0,b);r.liste=l;st.schadensbelege=r;localStorage.setItem("mietixStand",JSON.stringify(st))}catch(err){}}
+// Rückgängig nach Wiederherstellen (09.11.2026, Prüfung H2): Der Eintrag verschwindet dann wieder aus der Liste und muss zurück in den Papierkorb, sonst wäre er weg.
+// Der Knopf gehört zum Baustein Abgleich, hier wird er nur ergänzt. Abgelehnte Rückfrage ändert nichts an der Liste, dann bleibt auch der Papierkorb. Mehrere Wiederherstellungen kurz nacheinander nimmt Rückgängig zusammen zurück.
+let pkZurueck=[],pkZeit=0;
+function pkRueckSchuetzen(e){const j=Date.now();if(j-pkZeit>900)pkZurueck=[];pkZeit=j;pkZurueck.push(e);const el=$("mietixRueck"),liste=pkZurueck;if(!el||!el.onclick)return;const orig=el.onclick;
+  el.onclick=function(ev){const vor=liste.map(x=>localStorage.getItem(x.ablage));orig.call(el,ev);const zur=liste.filter((x,i)=>localStorage.getItem(x.ablage)!==vor[i]);if(!zur.length)return;
+    try{const pl=lies("mietixPapierkorb",[]);zur.forEach((x,i)=>pl.push(Object.assign({},x,{id:x.ablage+":"+x.schluessel+":"+Date.now()+"-"+i})));localStorage.setItem("mietixPapierkorb",JSON.stringify(pl));pkZurueck=[];zeichne()}
+    catch(err){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Eintrag konnte nicht zurück in den Papierkorb. Seite offen lassen.")}}}
 const PK_LK=mxListenkopf("pkLK","papierkorb",{suche:"Name, Auto oder Text",felder:[{k:"ber",t:"Bereich",alle:"Alle Bereiche",werte:()=>PK_BER}],neu:()=>zeichne()});
 function zeichne(){
-  PK_LK.bauen();const pkAlle=(window.mietixPapierkorb?window.mietixPapierkorb():lies("mietixPapierkorb",[]).slice().sort((a,b)=>a.zeit<b.zeit?1:-1)),pk=pkAlle.filter(e=>PK_LK.passt(e.text||""));
+  PK_LK.bauen();const pkAlle=(window.mietixPapierkorb?window.mietixPapierkorb():lies("mietixPapierkorb",[]).slice().sort((a,b)=>a.zeit<b.zeit?1:-1)),pk=pkAlle.filter(e=>{const x=e.eintrag||{};return PK_LK.passt([e.text,x.name,x.auto,x.fahrzeug].filter(Boolean).join(" "))});
   // Ein Kasten je Bereich, immer in derselben Reihenfolge, auch wenn leer
   const BEREICHE=PK_BER.filter(b=>b[0]!=="_sonst");
   // Was keinen eigenen Kasten hat (Autos), steht unter Sonstiges, sonst wäre es unsichtbar (04.11.2026); Schadensbelege unter Schäden (06.11.2026)
@@ -404,7 +411,7 @@ function zeichne(){
   $("geloescht").innerHTML=pkZeig.map(([k,t])=>{const l=pk.filter(e=>e.ablage===k||(k==="_sonst"&&!KASTEN.includes(e.ablage))||(k==="mietixVorgaenge"&&(e.ablage==="mietixEntwurfVertrag"||e.ablage==="mietixEntwurfBuchung")));
     return '<div class="bereich"><div class="kopf"><b>'+t+'</b><span class="'+(l.length?"":"null")+'">'+l.length+'</span></div><div class="karte">'+
       (l.length?l.map(e=>'<div class="z"><div class="t"><b>'+zeileTitel(e)+'</b>'+zeileWo(e)+'<i>'+extra(e)+(/^Andere Fassung/.test(e.text||"")?'zur Seite gelegt ':'gelöscht ')+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">'+(PK_LK.aktiv()?"Nichts gefunden.":"Nichts gelöscht.")+'</div>')+'</div></div>'}).join("");
-  {const zeigN=pk.filter(e=>!PK_LK.w.ber||e.ablage===PK_LK.w.ber||(PK_LK.w.ber==="_sonst"&&!KASTEN.includes(e.ablage))||(PK_LK.w.ber==="mietixVorgaenge"&&/^mietixEntwurf/.test(e.ablage))).length;PK_LK.zeile(PK_LK.aktiv()?zeigN+" von "+pkAlle.length+" Einträgen":pkAlle.length+(pkAlle.length===1?" Eintrag":" Einträge"))}
+  {const zeigN=pk.filter(e=>!PK_LK.w.ber||e.ablage===PK_LK.w.ber||(PK_LK.w.ber==="_sonst"&&!KASTEN.includes(e.ablage))||(PK_LK.w.ber==="mietixVorgaenge"&&/^mietixEntwurf/.test(e.ablage))).length;PK_LK.zeile(PK_LK.aktiv()?zeigN+" von "+pkAlle.length+(pkAlle.length===1?" Eintrag":" Einträgen"):pkAlle.length+(pkAlle.length===1?" Eintrag":" Einträge"))}
   [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{const e=pk.find(y=>y.id===b.dataset.pk)||{},x=e.eintrag||{};
     // Belegt wieder ein Auto: lieber nachfragen (31.10.2026, Baran); Sperre auch, und vorher schauen, ob das Auto schon vergeben ist (06.11.2026)
     const belegt=e.ablage==="mietixVorgaenge"||e.ablage==="mietixSperren"||(e.ablage==="mietixAnfragen"&&x.status==="gebucht");
@@ -414,10 +421,10 @@ function zeichne(){
         if(!ja){if(e.ablage==="mietixAnfragen"&&confirm("Stattdessen als Anfrage wiederherstellen?\n\nEine Anfrage belegt kein Auto. Der "+x.auto+" bleibt bei "+(konf[0].wer||"der Sperre")+".")){
             const pl=lies("mietixPapierkorb",[]),pe=pl.find(y=>y.id===e.id);if(!pe||!pe.eintrag){meldung("Ging nicht. Seite neu laden und nochmal versuchen.");return}
             pe.eintrag=Object.assign({},pe.eintrag,{status:"offen"});(pe.eintrag.verlauf=(pe.eintrag.verlauf||[]).slice()).push({am:new Date().toISOString(),was:"Aus dem Papierkorb als Anfrage zurück, der "+x.auto+" war schon vergeben"});
-            localStorage.setItem("mietixPapierkorb",JSON.stringify(pl));if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Als Anfrage wiederhergestellt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.");return}else return}}
+            localStorage.setItem("mietixPapierkorb",JSON.stringify(pl));if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){pkRueckSchuetzen(e);meldung("Als Anfrage wiederhergestellt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.");return}else return}}
       else if(!confirm((art(e)==="Sperre"?"Sperre "+x.auto:art(e)+" von "+(x.name||"ohne Namen"))+" wiederherstellen?\n\n"+x.auto+" ist dann "+wann+" wieder "+(art(e)==="Sperre"?"gesperrt.":"belegt.")))return}
     if(e.ablage==="schadensbelege")belegEinsortieren(e);
-    if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){meldung("Wiederhergestellt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.")});
+    if(window.mietixWiederherstellen&&window.mietixWiederherstellen(b.dataset.pk)){pkRueckSchuetzen(e);meldung("Wiederhergestellt.");zeichne()}else meldung("Ging nicht. Seite neu laden und nochmal versuchen.")});
   const z=lies("mietixZustand",[]).filter(x=>x.erledigt).sort((a,b)=>(b.erledigtAm||"")<(a.erledigtAm||"")?-1:1);
   $("nZustand").textContent=z.length;$("nZustand").className=z.length?"":"null";
   $("zustand").innerHTML=z.length?z.map(x=>'<div class="z"><div class="t"><b>'+esc(x.auto)+': '+esc(x.text)+'</b><i>erledigt '+de(x.erledigtAm||x.datum)+'</i></div><button class="hell" data-z="'+esc(x.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">Nichts erledigt.</div>';
@@ -969,7 +976,7 @@ zeigen();abgleichen();auslagernBald();
     "#mxNeu{display:none;background:#1C1C1E;color:#fff;text-align:center;font:700 14px -apple-system,Inter,system-ui,sans-serif;padding:11px 16px;cursor:pointer}#mxNeu.an{display:block}#mxNeu b{color:#FF6B6B}"+
     /* Jeder Knopf mit hellgrauem, abgerundetem Hintergrund, nie nur farbiger Text (02.11.2026, Baran: „dann erkennt man den Button direkt“). Farbige Hauptknöpfe bleiben. */
     ".mxStart,.abgl a,.abgl-link,#ablNeuZugang,#ablPwNeu,#ablAus,.sZur,.buZurueck,#bZurueck,#sAlle,#mLoesch,#vOrtAendern,#mVerlBez,#mKautWeg,#mEndWeg,#mEndBez,.kurz>a,a.zu,.buVerw,.zurueckA,#kZu,a.loeschen,.aend,.n a.pdf,#entwurfLeeren,#entwurfZurueck,#weiterSpaeter,.mini,.mehr>span,.mehr>a,.unten>a,.pbTipp a[data-pb],#mVerlInfo .vz>a,#uKopf>a,.mxKlein>summary{background:#E9E9EE!important;border:0!important;border-radius:10px!important;padding:6px 12px!important;text-decoration:none!important;display:inline-flex!important;align-items:center;gap:3px;line-height:1.25!important;width:auto!important;max-width:100%;box-shadow:none!important;cursor:pointer;-webkit-tap-highlight-color:transparent}"+
-    ".buVerw,.sZur,.buZurueck,#uKopf>a{display:flex!important;width:max-content!important}.buVerw{margin-left:auto!important;margin-right:auto!important}"+
+    ".buVerw,.sZur,.buZurueck,#uKopf>a{display:flex!important;width:max-content!important}.buVerw{margin-left:auto!important;margin-right:auto!important}.buVerw.versteckt{display:none!important}"+
     ".mxStart{color:#C4161C!important;font-size:16px!important;font-weight:700!important;letter-spacing:0!important;padding:6px 12px 6px 9px!important}.mxStart b{margin-top:-1px;font-size:18px!important}"+
     /* ‹ Start überall gleich groß (05.11.2026), auch wo look.py nicht gilt */
     "html body header .mxStart,html body .topbar .mxStart{float:none!important;margin:0 10px 0 0!important;border:0!important;padding:5px 12px 5px 9px!important;background:#E9E9EE!important;border-radius:10px!important;color:#C4161C!important;opacity:1!important;font-size:16px!important;font-weight:600!important;gap:3px!important;line-height:1.2!important;min-height:44px!important;box-sizing:border-box;display:inline-flex!important;align-items:center!important}html body .mxStart b{font-size:20px!important;font-weight:400!important;line-height:16px!important;margin-top:-2px!important}"+

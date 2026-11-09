@@ -216,27 +216,51 @@ const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").rep
 const de=s=>s&&/^\d{4}-\d\d-\d\d/.test(s)?s.slice(8,10)+"."+s.slice(5,7)+".":"";
 const istTag=s=>/^\d{4}-\d\d-\d\d$/.test(String(s||""));
 const ichMail=()=>{try{return((JSON.parse(localStorage.getItem("mietixSitzung")||"null")||{}).email||"").toLowerCase()}catch(e){return""}};
-const verlInRest=v=>(v.verlaengerungen||[]).filter(y=>!!(y.imRest||y.bezahlt)).reduce((s,y)=>s+(+y.aufpreis||0),0);   // so liegt die Verlängerung im Mietvertrag im Rest
+const vorherVon=kr=>{try{return JSON.parse(kr.vorher||"")||{}}catch(e){return{}}};   // Stand vor dem Verrechnen mit der Kaution
+// Verlängerung war beim Verrechnen offen, der Rest schon bezahlt: Sie steckt im Einbehalt, nicht im Rest (kautVerrechnen im Mietvertrag)
+const verlImEinbehalt=(v,i)=>{const kr=v.kautionRueck||{};if(!kr.verrechnet)return false;const w=vorherVon(kr),y0=(w.verl||[])[i];return!!(y0&&!y0.bezahlt&&((w.zahlung||{}).rest||{}).am)};
+const verlGezahlt=y=>y.gezahlt!=null?+y.gezahlt||0:+y.aufpreis||0;   // Bezahlte Verlängerung später geändert: gezahlt ist das Geld, das wirklich im Rest steckt
+const verlInRest=v=>(v.verlaengerungen||[]).filter((y,i)=>!!(y.imRest||y.bezahlt)&&!verlImEinbehalt(v,i)).reduce((s,y)=>s+verlGezahlt(y),0);   // so liegt die Verlängerung im Mietvertrag im Rest
 /* Jede Miete in Posten: eine Rechnung für Monat und Geld (09.11.2026), gezählt im Monat der Zahlung.
    Verlängerungen stecken im Mietvertrag im Rest, sobald sie bezahlt sind oder mit dem Rest kommen; Mietpreis Rest = Rest ohne diese.
    Nachzahlung mit der Kaution verrechnet steckt im Einbehalt und zählt nur dort, nichts doppelt. */
-function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kautionRueck||{},an=z.anz||{},re=z.rest||{};
+function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kautionRueck||{},an=z.anz||{},re=z.rest||{},w=vorherVon(kr),endAlt=w.end||{},ein=+kr.einbehalt||0;
   if(n0(an.betrag))l.push({art:"miete",t:"Anzahlung",b:n0(an.betrag),am:istTag(an.am)?an.am:""});
   const mietRest=n0(re.betrag)-verlInRest(v);
   if(mietRest>0)l.push({art:"miete",t:"Mietpreis Rest",b:mietRest,am:istTag(re.am)?re.am:""});
-  (v.verlaengerungen||[]).forEach((y,i)=>{const b=+y.aufpreis||0;if(b<=0)return;
-    const am=y.imRest?(istTag(re.am)?re.am:""):y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";
-    l.push({art:"verl",t:"Verlängerung"+(v.verlaengerungen.length>1?" "+(i+1):""),b,am})});
+  // „Nach der Kaution noch offen“ bezahlt, Rest war schon bezahlt: Was die Kaution nicht deckte, zahlte der Kunde obendrauf (wie die Brücke)
+  const teilBar=!!kr.verrechnet&&!("miete" in kr)&&!!((w.zahlung||{}).rest||{}).am;
+  let ueber=teilBar?Math.max(0,ein-(endAlt.bezahlt?0:+endAlt.summe||0)):0,imEin=0,kuerzen=Math.max(0,-mietRest);
+  const vl=v.verlaengerungen||[];
+  vl.forEach((y,i)=>{const auf=+y.aufpreis||0,T="Verlängerung"+(vl.length>1?" "+(i+1):""),tag=istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:"";
+    if(verlImEinbehalt(v,i)){if(teilBar){const ab=Math.min(ueber,auf);ueber-=ab;if(auf-ab>0)l.push({art:"verl",t:T,b:auf-ab,am:tag})}else imEin+=auf;return}
+    let bez=y.bezahlt||y.imRest?verlGezahlt(y):auf;if(auf<=0&&bez<=0)return;
+    const y0=(w.verl||[])[i];if(kr.verrechnet&&y0&&!y0.bezahlt&&kuerzen>0){const ab=Math.min(kuerzen,bez);bez-=ab;kuerzen-=ab}   // über die Kaution in den Rest gewandert: nie mehr, als der Rest hergibt
+    const am=y.imRest||!y.bezahlt?(y.imRest&&istTag(re.am)?re.am:""):istTag(re.am)?tag:"";   // Rest wieder offen: Die Verlängerung steckt im Rest und ist mit ihm offen
+    if(bez>0)l.push({art:"verl",t:T,b:bez,am});
+    if(y.bezahlt&&y.gezahlt!=null&&auf>bez)l.push({art:"verl",t:T,b:auf-bez,am:""})});
   const s=+e.summe||0;
-  if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0;
-    if(bz&&bz.art==="Kaution"&&kr.verrechnet){}   // steckt im Einbehalt der Kaution
-    else if(eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:eB,am:bz.am});
-    if(!(bz&&bz.art==="Kaution"&&kr.verrechnet)&&s-eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:s-eB,am:""})}
-  if(kr.verrechnet&&+kr.einbehalt>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:+kr.einbehalt,am})}
+  if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0,N="Nachzahlung Rückgabe";
+    if(bz&&bz.art==="Kaution"&&kr.verrechnet){   // steckt im Einbehalt der Kaution. Wurde der Einbehalt danach gesenkt, ist der nicht gedeckte Teil offen
+      const gesenkt=kr.gesamt!=null?Math.max(0,(+kr.gesamt||0)-(+kr.miete||0)-ein):eB,nichtGedeckt=Math.min(gesenkt,Math.max(0,eB-Math.max(0,ein-imEin)));
+      if(nichtGedeckt+s-eB>0)l.push({art:"miete",t:N,b:nichtGedeckt+s-eB,am:""})}
+    else{const bar=bz&&bz.art!=="Kaution"&&kr.verrechnet&&w.end&&!endAlt.bezahlt?Math.max(0,eB-ein):eB;   // Der Einbehalt hat die Nachzahlung schon gedeckt: nur das Bar-Bezahlte zählt, nichts doppelt
+      if(bar>0)l.push({art:"miete",t:N,b:bar,am:bz.am});
+      if(s-eB>0)l.push({art:"miete",t:N,b:s-eB,am:""})}}
+  if(kr.teil&&ein>0){let r=ein;for(let i=l.length-1;i>=0&&r>0;i--)if(!l[i].am){const ab=Math.min(r,l[i].b);l[i].b-=ab;r-=ab}   // Kaution reichte nicht: Sie deckt zuerst die Nachzahlung, dann Verlängerung, dann Rest; nur das Übrige bleibt offen
+    for(let i=l.length-1;i>=0;i--)if(!l[i].am&&l[i].b<=0)l.splice(i,1)}
+  if((kr.verrechnet||kr.teil)&&ein>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:ein,am})}
   return l}
 /* Anzahlung einer Buchung ohne Mietvertrag (09.11.2026): zählt auch nach einem Storno, wenn sie behalten wurde. Zurückgezahltes steht als Minus mit Datum (leer: noch nicht).
    Ohne Storno-Eintrag (alte Absagen) zählt eine abgesagte Buchung wie bisher nicht. Auf eine neue Buchung übertragen zählt sie dort, hier nicht mehr. */
-function anfragePosten(a){if(!a||a._weg||a.vertrag)return[];const z=a.anzahlung||{},b=n0(z.betrag);if(!b)return[];const am=istTag(z.am)?z.am:"",P=(t,w,d)=>({art:"miete",t,b:w,am:d});
+const VC={raw:null,l:[]};
+function lebendeVertraege(){let r="";try{r=localStorage.getItem("mietixVorgaenge")||""}catch(e){}if(r!==VC.raw){VC.raw=r;VC.l=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&v.nr)}return VC.l}
+const nrGleich=t=>{const n=String(t==null?"":t).trim();return/^\d+(\.0+)?$/.test(n)?String(parseInt(n,10)):n};   // "532" und "000532" sind derselbe Mietvertrag
+const nameGleich=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
+/* Ein Mietvertrag führt die Anzahlung: verbunden über die Nummer. Ist er gelöscht, zählt sie wieder bei der Buchung. Ohne Verbindung wie die Brücke über Name mit gleichem Abholtag oder Name, Auto und überlappendem Zeitraum, aber nur, wenn der Mietvertrag selbst eine bezahlte Anzahlung zeigt. Stornierte Buchungen bleiben bei der Storno-Rechnung. */
+function hatVertrag(a){const l=lebendeVertraege();if(a.vertrag)return l.some(v=>nrGleich(v.nr)===nrGleich(a.vertrag));if(a.status==="abgesagt"||!a.name)return false;
+  return l.some(v=>{const an=(v.zahlung||{}).anz||{};if(nameGleich(v.name)!==nameGleich(a.name)||!(n0(an.betrag)&&istTag(an.am)))return false;return v.vonD===a.von||!!(v.auto===a.auto&&v.vonD&&v.bisD&&a.von&&a.bis&&v.vonD<a.bis&&v.bisD>a.von)})}
+function anfragePosten(a){if(!a||a._weg||hatVertrag(a))return[];const z=a.anzahlung||{},b=n0(z.betrag);if(!b)return[];const am=istTag(z.am)?z.am:"",P=(t,w,d)=>({art:"miete",t,b:w,am:d});
   if(a.status!=="abgesagt")return[P("Anzahlung",b,am)];const s=a.storno;if(!s||s.uebernommen)return[];
   if(s.art==="behalten")return[P("Anzahlung, nach Storno behalten",b,am)];
   if(s.art==="neu")return[P("Anzahlung, auf neue Buchung",b,am)];
@@ -253,15 +277,15 @@ function feld(id,wert,art,ph){return art==="tag"?'<input type="date" id="'+id+'"
 const zeile=(t,u,a,b)=>'<div class="fz"><label>'+t+(u?'<small>'+u+'</small>':"")+'</label>'+a+(b||"<span></span>")+'</div>';
 const kopf=t=>'<div class="mxKopf"><h3>'+esc(t)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>';
 function oeffne(schl){const f=blatt();
-  if(schl.startsWith("a:")){const a=lies("mietixAnfragen",[]).find(x=>x&&x.id===schl.slice(2));if(!a)return fehlt();const z=a.anzahlung||{};OFFEN={schl};
+  if(schl.startsWith("a:")){const a=lies("mietixAnfragen",[]).find(x=>x&&x.id===schl.slice(2));if(!a)return fehlt();const z=a.anzahlung||{};OFFEN={schl,kMiete:0};
     f.innerHTML=kopf(a.name||"Buchung")+
       '<div class="fl">'+esc(a.auto||"")+(a.status==="abgesagt"?', Buchung storniert':', Buchung noch ohne Mietvertrag')+'</div>'+
       '<div class="fk">Anzahlung</div><div class="fg">'+zeile("Anzahlung","Betrag und bezahlt am",feld("eAnz",n0(z.betrag)),feld("eAnzAm",z.am,"tag"))+'</div>'+
       (a.storno&&a.storno.art==="zurueck"?'<div class="fk">Rückzahlung</div><div class="fg">'+zeile("Zurückgezahlt","Datum leer: noch nicht",feld("eStB",+a.storno.betrag||0),feld("eStAm",a.storno.am,"tag"))+'</div>':"")+
       '<div class="fhin" id="eHin"></div><div class="fknoepfe"><a href="'+esc(ANFRAGE(a))+'">Buchung öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
-  }else{const v=lies("mietixVorgaenge",[]).find(x=>x&&x.nr===schl.slice(2));if(!v)return fehlt();OFFEN={schl};
+  }else{const v=lies("mietixVorgaenge",[]).find(x=>x&&x.nr===schl.slice(2));if(!v)return fehlt();OFFEN={schl,kMiete:(v.kautionRueck||{}).verrechnet?+(v.kautionRueck||{}).miete||0:0};
     const z=v.zahlung||{},an=z.anz||{},re=z.rest||{},ka=z.kaut||{},kr=v.kautionRueck||{},e=v.endabrechnung||{},vl=v.verlaengerungen||[];
-    const s=+e.summe||0,bz=e.bezahlt||null,mitKaution=!!(bz&&bz.art==="Kaution"&&kr.verrechnet);
+    const s=+e.summe||0,bz=e.bezahlt||null,mitKaution=!!(bz&&bz.art==="Kaution"&&kr.verrechnet),kEin=kr.verrechnet||kr.teil,nachOffen=mitKaution?posten(v).filter(p=>p.t==="Nachzahlung Rückgabe"&&!p.am).reduce((q,p)=>q+p.b,0):0;
     const teile=[e.mehrkm?"Mehr-km":"",e.tank?"Tank":"",e.versp?"Verspätung":"",(e.extra||[]).length?"Sonstiges":""].filter(Boolean).join(", ");
     let h=kopf(v.name||"Mietvertrag")+
       '<div class="fl">'+esc(v.auto||"")+(v.vonD?', '+de(v.vonD)+' bis '+de(v.bisD):"")+', Nr. '+esc(v.nr)+'. Bezahlt-Datum leer lassen heißt: noch offen.</div>'+
@@ -271,12 +295,12 @@ function oeffne(schl){const f=blatt();
     if(vl.length)h+='<div class="fk">Verlängerungen</div><div class="fg">'+vl.map((y,i)=>zeile("Verlängerung"+(vl.length>1?" "+(i+1):""),"bis "+de(y.bisNeu||"")+(y.imRest?", kommt mit dem Rest":""),feld("eV"+i,+y.aufpreis||0),
         y.imRest?'<span class="fl" style="text-align:right">wie Rest</span>':feld("eVAm"+i,y.bezahlt?(y.bezahltAm||y.am):"","tag"))).join("")+'</div>';
     if(s>0)h+='<div class="fk">Nachzahlung bei Rückgabe</div><div class="fg">'+
-      (mitKaution?zeile("Abgerechnet "+eur(s),(teile?teile+", ":"")+"mit der Kaution verrechnet",'<span></span>')
+      (mitKaution?zeile("Abgerechnet "+eur(s),(teile?teile+", ":"")+(nachOffen?eur(nachOffen)+" noch offen":"mit der Kaution verrechnet"),'<span></span>')
         :zeile("Bezahlt","abgerechnet "+eur(s)+(teile?", "+teile:""),feld("eNach",bz?(bz.betrag!=null?+bz.betrag:s):s),feld("eNachAm",bz&&bz.am,"tag")))+'</div>';
     h+='<div class="fk">Kaution</div><div class="fg">'+
       zeile("Erhalten","bei Übergabe",feld("eKaut",n0(ka.betrag)),feld("eKautAm",ka.am,"tag"))+
-      zeile("Einbehalten","bleibt bei uns",feld("eEin",kr.verrechnet?+kr.einbehalt||0:0),'<span></span>')+
-      '<div class="fz grund"><label>Grund</label>'+feld("eGrund",kr.verrechnet?kr.grund:"","text","Schaden, Reinigung, Tank")+'</div>'+
+      zeile("Einbehalten","bleibt bei uns",feld("eEin",kEin?+kr.einbehalt||0:0),'<span></span>')+
+      '<div class="fz grund"><label>Grund</label>'+feld("eGrund",kEin?kr.grund:"","text","Schaden, Reinigung, Tank")+'</div>'+
       zeile("Zurückgegeben","Datum leer: noch nicht",feld("eZur",kr.betrag!=null?+kr.betrag||0:0),feld("eZurAm",kr.am,"tag"))+'</div>'+
       '<div class="fhin" id="eHin"></div>'+
       '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Mappe öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
@@ -290,7 +314,7 @@ function pruefe(){let falsch=0;document.querySelectorAll("#fAendern input[inputm
   const hin=$("eHin");if(!hin)return!falsch;
   if(falsch){hin.className="fhin rot";hin.textContent="Bitte nur Zahlen eintragen, zum Beispiel 800. Rot markiert ist, was nicht passt.";return false}
   if($("eKaut")){const k=zahl($("eKaut").value)||0,ein=zahl($("eEin").value)||0,zur=zahl($("eZur").value)||0;
-    if(k&&ein+zur&&Math.round(ein+zur)!==Math.round(k)){hin.className="fhin gelb";hin.textContent="Kaution erhalten "+eur(k)+", einbehalten und zurück zusammen "+eur(ein+zur)+". Bitte kurz prüfen.";return true}}
+    const mi=(OFFEN&&OFFEN.kMiete)||0;if(k&&ein+zur+mi&&Math.round(ein+zur+mi)!==Math.round(k)){hin.className="fhin gelb";hin.textContent="Kaution erhalten "+eur(k)+", einbehalten und zurück zusammen "+eur(ein+zur+mi)+". Bitte kurz prüfen.";return true}}
   hin.className="fhin";hin.textContent="";return true}
 function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
   const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
@@ -302,8 +326,10 @@ function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id)
     (a.verlauf=a.verlauf||[]).push({am:jetzt,was:"Anzahlung auf der Seite "+VON+" geändert"});
     return fertig("mietixAnfragen","id",a.id,vorher,l)}
   const l=lies("mietixVorgaenge",[]),v=l.find(x=>x&&x.nr===schl.slice(2));if(!v)return weg();const vorher=JSON.stringify(v);
+  if($("eNach")&&!t("eNachAm")){const e=v.endabrechnung||{},bz=e.bezahlt||null,sU=Math.round(+e.summe||0),b=w("eNach"),warB=bz&&bz.betrag!=null?Math.round(+bz.betrag||0):sU;
+    if(b!==warB&&b!==sU){const hin=$("eHin");hin.className="fhin rot";hin.textContent="Nicht gespeichert: Bei der Nachzahlung fehlt das Datum. Ohne Datum bleibt der ganze Betrag offen.";$("eNachAm").classList.add("falsch");return}}
   // Nur was wirklich anders ist, wird geschrieben: Öffnen und Speichern ohne Änderung lässt den Mietvertrag, wie er ist
-  const z=v.zahlung=v.zahlung||{};
+  const z=v.zahlung=v.zahlung||{},vrAlt=verlInRest(v);
   const setz=(k,b,am)=>{const o=Object.assign({},z[k]||{});let neu=false;
     if(Math.round(n0(o.betrag))!==b){o.betrag=b?wie(b):"";neu=true}
     if((istTag(o.am)?o.am:"")!==am){o.am=am;if(!am&&k!=="kaut")o.art="";neu=true}
@@ -313,16 +339,16 @@ function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id)
   let preisPlus=0;(v.verlaengerungen||[]).forEach((y,i)=>{if(!$("eV"+i))return;const neu=w("eV"+i),alt=+y.aufpreis||0;if(neu!==alt){preisPlus+=neu-alt;y.aufpreis=neu}
     if(!y.imRest){const am=t("eVAm"+i),war=y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";if(am!==war){if(am){y.bezahlt=true;y.bezahltAm=am}else{y.bezahlt=false;delete y.bezahltAm}}}});
   if(preisPlus){v.preis1=wie(n0(v.preis1)+preisPlus);v.gesamt=wie(n0(v.preis1)+n0(v.preis2)+n0(v.paketPreis))}   // Mietpreis im Mietvertrag zieht mit, wie beim Verlängern
-  {const r=Math.round(n0((z.rest||{}).betrag)),vr=verlInRest(v),soll=w("eRest")+vr;   // Rest ohne Verlängerung unverändert: Rest wächst nur um die geänderte Verlängerung
-    setz("rest",soll===r?r:soll,t("eRestAm"))}
+  {const r=Math.round(n0((z.rest||{}).betrag)),vr=verlInRest(v),feldRest=w("eRest"),soll=feldRest===Math.max(0,Math.round(r-vrAlt))?Math.max(0,Math.round(r+vr-vrAlt)):feldRest+vr;   // Rest ohne Verlängerung unverändert: Rest wächst nur um die geänderte Verlängerung
+    setz("rest",soll,t("eRestAm"))}
   if($("eNach")){const e=v.endabrechnung,b=w("eNach"),am=t("eNachAm"),bz=e.bezahlt||null,warAm=bz&&istTag(bz.am)?bz.am:"",warB=bz?(bz.betrag!=null?Math.round(+bz.betrag||0):Math.round(+e.summe||0)):Math.round(+e.summe||0);
     if(am!==warAm||b!==warB){if(am){e.bezahlt=Object.assign({},bz||{},{am});if(e.bezahlt.art==="Kaution")e.bezahlt.art="";if(b===Math.round(+e.summe||0))delete e.bezahlt.betrag;else e.bezahlt.betrag=b}else delete e.bezahlt}}
   setz("kaut",w("eKaut"),t("eKautAm"));
   {const kr=v.kautionRueck||{},ein=w("eEin"),zur=w("eZur"),zurAm=t("eZurAm"),grund=t("eGrund").trim();
-    const warEin=kr.verrechnet?Math.round(+kr.einbehalt||0):0,warZur=kr.betrag!=null?Math.round(+kr.betrag||0):0,warAm=istTag(kr.am)?kr.am:"",warGrund=kr.verrechnet?String(kr.grund||""):"";
+    const kEin=kr.verrechnet||kr.teil,warEin=kEin?Math.round(+kr.einbehalt||0):0,warZur=kr.betrag!=null?Math.round(+kr.betrag||0):0,warAm=istTag(kr.am)?kr.am:"",warGrund=kEin?String(kr.grund||""):"";
     if(ein!==warEin||zur!==warZur||zurAm!==warAm||grund!==warGrund){const k=v.kautionRueck=Object.assign({},kr);
       if(zur!==warZur)k.betrag=zur;if(zurAm!==warAm)k.am=zurAm;if(grund!==warGrund)k.grund=grund;
-      if(ein!==warEin){k.einbehalt=ein;if(ein){k.verrechnet=true;k.teil=false}else if(!k.posten||!k.posten.length)delete k.verrechnet}}}
+      if(ein!==warEin){k.einbehalt=ein;if(ein){if(!k.teil)k.verrechnet=true}else if(!k.posten||!k.posten.length)delete k.verrechnet}}}
   if(JSON.stringify(v)===vorher){window.mxZu();return}   // nichts geändert
   const m=ichMail();if(m)v.geaendert={wer:m,am:jetzt};
   (v.verlauf=v.verlauf||[]).push({am:jetzt,was:"Zahlungen auf der Seite "+VON+" geändert"});
@@ -1363,7 +1389,7 @@ zeigen();abgleichen();auslagernBald();
     "#mxNeu{display:none;background:#1C1C1E;color:#fff;text-align:center;font:700 14px -apple-system,Inter,system-ui,sans-serif;padding:11px 16px;cursor:pointer}#mxNeu.an{display:block}#mxNeu b{color:#FF6B6B}"+
     /* Jeder Knopf mit hellgrauem, abgerundetem Hintergrund, nie nur farbiger Text (02.11.2026, Baran: „dann erkennt man den Button direkt“). Farbige Hauptknöpfe bleiben. */
     ".mxStart,.abgl a,.abgl-link,#ablNeuZugang,#ablPwNeu,#ablAus,.sZur,.buZurueck,#bZurueck,#sAlle,#mLoesch,#vOrtAendern,#mVerlBez,#mKautWeg,#mEndWeg,#mEndBez,.kurz>a,a.zu,.buVerw,.zurueckA,#kZu,a.loeschen,.aend,.n a.pdf,#entwurfLeeren,#entwurfZurueck,#weiterSpaeter,.mini,.mehr>span,.mehr>a,.unten>a,.pbTipp a[data-pb],#mVerlInfo .vz>a,#uKopf>a,.mxKlein>summary{background:#E9E9EE!important;border:0!important;border-radius:10px!important;padding:6px 12px!important;text-decoration:none!important;display:inline-flex!important;align-items:center;gap:3px;line-height:1.25!important;width:auto!important;max-width:100%;box-shadow:none!important;cursor:pointer;-webkit-tap-highlight-color:transparent}"+
-    ".buVerw,.sZur,.buZurueck,#uKopf>a{display:flex!important;width:max-content!important}.buVerw{margin-left:auto!important;margin-right:auto!important}"+
+    ".buVerw,.sZur,.buZurueck,#uKopf>a{display:flex!important;width:max-content!important}.buVerw{margin-left:auto!important;margin-right:auto!important}.buVerw.versteckt{display:none!important}"+
     ".mxStart{color:#C4161C!important;font-size:16px!important;font-weight:700!important;letter-spacing:0!important;padding:6px 12px 6px 9px!important}.mxStart b{margin-top:-1px;font-size:18px!important}"+
     /* ‹ Start überall gleich groß (05.11.2026), auch wo look.py nicht gilt */
     "html body header .mxStart,html body .topbar .mxStart{float:none!important;margin:0 10px 0 0!important;border:0!important;padding:5px 12px 5px 9px!important;background:#E9E9EE!important;border-radius:10px!important;color:#C4161C!important;opacity:1!important;font-size:16px!important;font-weight:600!important;gap:3px!important;line-height:1.2!important;min-height:44px!important;box-sizing:border-box;display:inline-flex!important;align-items:center!important}html body .mxStart b{font-size:20px!important;font-weight:400!important;line-height:16px!important;margin-top:-2px!important}"+
