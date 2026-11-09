@@ -138,6 +138,11 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 .lkVbZ input{display:block;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box;height:48px;margin:0!important;padding:0 12px!important;border:0!important;border-radius:12px;background:#F2F2F7;font-family:inherit;font-size:16px;font-weight:600;color:#1C1C1E;text-align:left;-webkit-appearance:none;appearance:none}
 .lkVbZ input::-webkit-date-and-time-value{text-align:left}
 .lkVbF{color:#C4161C;font-size:14px;font-weight:700;margin:8px 3px 0}.lkVbF:empty{display:none}
+.lkMon{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:10px}.mxKopf+.lkMon,.lkRad+.lkMon{margin-top:0}.lkRad+.lkMon{margin-top:10px}
+.lkMon button{position:relative;display:block;width:100%;margin:0;border:0;border-radius:12px;background:#F2F2F7;color:#1C1C1E;min-height:50px;padding:0 2px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lkMon button.an{background:#1C1C1E;color:#fff;font-weight:700}.lkMon button.da::after{content:"";position:absolute;left:50%;bottom:6px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#1B8A4B}.lkMon button.an.da::after{background:#7BE0A6}
+.lkMGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.lkJahre{display:flex;flex-direction:column;gap:8px;max-height:224px;overflow:auto}
+.lkMHin{font-size:13px;color:#8A8A8E;margin:10px 2px 0}
 .lkFertig{display:block;width:100%;margin-top:14px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
@@ -313,6 +318,28 @@ window.mxZahlung={oeffne,verlInRest,gespeichert,
   const freiTeile=w=>{const t=String(w||"").split("|");return t[0]==="frei"?{vd:t[1]||"",vu:t[2]||"10:00",bd:t[3]||"",bu:t[4]||"10:00"}:null};
   const freiText=w=>{const p=freiTeile(w),j=new Date().getFullYear(),k=x=>{const t=x.split("-");return Number(t[2])+"."+Number(t[1])+"."+(Number(t[0])===j?"":t[0].slice(2))};return p.vd&&p.bd?k(p.vd)+" bis "+k(p.bd):p.vd?"ab "+k(p.vd):"bis "+k(p.bd)};
   const vbZeile=(t,d,u)=>'<div class="lkVbZ"><div><label for="'+d+'">'+t+'</label><input type="date" id="'+d+'"></div><div><label for="'+u+'">Uhr</label><input type="time" id="'+u+'" value="10:00"></div></div>';
+  const MK_L=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],MK_K=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+  const monText=v=>/^\d{4}-\d\d$/.test(v)?MK_L[+v.slice(5,7)-1]+" "+v.slice(0,4):v;
+  const dieserMon=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")};
+  /* Monat und Jahr nebeneinander (09.11.2026, Baran): jeder Monat ist wählbar, nicht nur die mit Einträgen */
+  function monatBlatt(titel,mitAlle,alleText,mitDaten,wert,fertig){let f=document.getElementById("lkFenster");
+    if(!f){f=document.createElement("div");f.className="mxFenster";f.id="lkFenster";f.setAttribute("role","dialog");document.body.appendChild(f)}
+    const jetzt=dieserMon(),start=wert||(mitAlle?"":jetzt),da=new Set(mitDaten),j0=+jetzt.slice(0,4);
+    let J=+(start||jetzt).slice(0,4),M=start?+start.slice(5,7):0;
+    const jahre=[...new Set([j0-1,j0,j0+1,J].concat([...da].map(x=>+x.slice(0,4))))].sort((a,b)=>a-b);
+    f.setAttribute("aria-label",titel);
+    const hatDaten=(j,m)=>da.has(j+"-"+String(m).padStart(2,"0")),jahrDaten=j=>[...da].some(x=>+x.slice(0,4)===j);
+    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+
+      (mitAlle?'<div class="lkRad"><div data-alle="1"><span>'+esc(alleText)+'</span><u></u></div></div>':"")+
+      '<div class="lkMon"><div class="lkMGrid">'+MK_K.map((t,i)=>'<button type="button" data-m="'+(i+1)+'" aria-label="'+MK_L[i]+'">'+t+'</button>').join("")+'</div><div class="lkJahre">'+jahre.map(j=>'<button type="button" data-j="'+j+'">'+j+'</button>').join("")+'</div></div>'+
+      '<div class="lkMHin">Grüner Punkt: dort gibt es Einträge.</div><button type="button" class="lkFertig">Fertig</button>';
+    const zeig=()=>{f.querySelectorAll("[data-m]").forEach(b=>{b.classList.toggle("an",+b.dataset.m===M);b.classList.toggle("da",hatDaten(J,+b.dataset.m))});
+      f.querySelectorAll("[data-j]").forEach(b=>{b.classList.toggle("an",+b.dataset.j===J);b.classList.toggle("da",jahrDaten(+b.dataset.j))});
+      const a=f.querySelector("[data-alle]");if(a)a.classList.toggle("an",!M)};
+    f.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{M=+b.dataset.m;zeig()});
+    f.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{J=+b.dataset.j;if(!mitAlle&&!M)M=+jetzt.slice(5,7);zeig()});
+    const a=f.querySelector("[data-alle]");if(a)a.onclick=()=>{M=0;zeig()};
+    zeig();f.querySelector(".lkFertig").onclick=()=>{const v=M?J+"-"+String(M).padStart(2,"0"):"";window.mxZu();fertig(!mitAlle&&v===jetzt?"":v)};window.mxAuf("lkFenster")}
   function blatt(titel,werte,wert,fertig,frei){let f=document.getElementById("lkFenster");
     if(!f){f=document.createElement("div");f.className="mxFenster";f.id="lkFenster";f.setAttribute("role","dialog");document.body.appendChild(f)}
     let w=wert;f.setAttribute("aria-label",titel);
@@ -330,7 +357,7 @@ window.mxZahlung={oeffne,verlInRest,gespeichert,
     const merke=()=>{try{sessionStorage.setItem(K,JSON.stringify({q:LK.roh,w:LK.w}))}catch(e){}};
     const host=()=>document.getElementById(hostId);
     const felderZeigen=()=>{(o.felder||[]).forEach(f=>{const el=host().querySelector('[data-lk="'+f.k+'"]');if(!el)return;const v=LK.w[f.k]||"",p=(f.werte()||[]).find(x=>x[0]===v);
-      el.querySelector("b").textContent=v?(freiTeile(v)?freiText(v):p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
+      el.querySelector("b").textContent=v?(freiTeile(v)?freiText(v):f.monate?monText(v):p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
     const zeileZeigen=()=>{const z=host().querySelector(".lkZeile");if(!z)return;z.innerHTML='<span>'+esc(zeileT)+'</span>'+(LK.aktiv()?'<a role="button" tabindex="0">Filter zurücksetzen</a>':"");
       const a=z.querySelector("a");if(a)a.onclick=()=>{LK.roh="";LK.q="";LK.w={};merke();const i=host().querySelector("input");if(i)i.value="";kreuz();felderZeigen();o.neu()}};
     const kreuz=()=>{const k=host().querySelector(".lkSuche button");if(k)k.style.display=LK.roh?"":"none"};
@@ -341,7 +368,7 @@ window.mxZahlung={oeffne,verlInRest,gespeichert,
         ((o.felder||[]).length?'<div class="lkFelder">'+o.felder.map(f=>'<div class="lkFeld" role="button" tabindex="0" data-lk="'+f.k+'"><span><small>'+esc(f.t)+'</small><b></b></span><em>›</em></div>').join("")+'</div>':"")+'<div class="lkZeile"></div></div>';
       const i=h.querySelector("input");i.value=LK.roh;i.addEventListener("input",()=>{LK.roh=i.value;LK.q=norm(i.value);merke();kreuz();o.neu()});
       h.querySelector(".lkSuche button").onclick=e=>{e.preventDefault();i.value="";LK.roh="";LK.q="";merke();kreuz();o.neu();i.focus()};kreuz();
-      (o.felder||[]).forEach(f=>{h.querySelector('[data-lk="'+f.k+'"]').onclick=()=>{blatt(f.t,[["",f.alle]].concat(f.werte()||[]),LK.w[f.k]||"",w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()},f.frei)}})}
+      (o.felder||[]).forEach(f=>{h.querySelector('[data-lk="'+f.k+'"]').onclick=()=>{const nimm=w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()};if(f.monate){monatBlatt(f.t,f.monate==="alle",f.alle,(f.werte()||[]).map(x=>x[0]),LK.w[f.k]||"",nimm);return}blatt(f.t,[["",f.alle]].concat(f.werte()||[]),LK.w[f.k]||"",w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()},f.frei)}})}
       felderZeigen();zeileZeigen();return LK};
     return LK};
   const tag=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
@@ -382,7 +409,7 @@ const JETZT=heute().slice(0,7);
 const vorMon=m=>{const d=new Date(+m.slice(0,4),+m.slice(5,7)-2,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)};
 
 /* ---------- Jede Miete in Posten ----------
-   art: miete | verl | nach | kaution;  am leer = noch offen.  Nichts wird doppelt gezählt (siehe Kopf der Datei). */
+   art: miete | verl | kaution;  am leer = noch offen.  Nichts wird doppelt gezählt (siehe Kopf der Datei). */
 const verlInRest=mxZahlung.verlInRest;   // liegt im Baustein, damit Fenster und Rechnung dasselbe sagen
 function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kautionRueck||{},an=z.anz||{},re=z.rest||{};
   if(n0(an.betrag))l.push({art:"miete",t:"Anzahlung",b:n0(an.betrag),am:istTag(an.am)?an.am:""});
@@ -394,8 +421,8 @@ function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kaution
   const s=+e.summe||0;
   if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0;
     if(bz&&bz.art==="Kaution"&&kr.verrechnet){}   // steckt im Einbehalt der Kaution
-    else if(eB>0)l.push({art:"nach",t:"Nachzahlung Rückgabe",b:eB,am:bz.am});
-    if(!(bz&&bz.art==="Kaution"&&kr.verrechnet)&&s-eB>0)l.push({art:"nach",t:"Nachzahlung Rückgabe",b:s-eB,am:""})}
+    else if(eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:eB,am:bz.am});
+    if(!(bz&&bz.art==="Kaution"&&kr.verrechnet)&&s-eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:s-eB,am:""})}
   if(kr.verrechnet&&+kr.einbehalt>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:+kr.einbehalt,am})}
   return l}
 // Anzahlung einer Buchung ohne Mietvertrag zählt schon (wie Seite Geld)
@@ -416,19 +443,18 @@ function zeichne(){
   LK.zeile(passt.length+(passt.length===1?" Miete":" Mieten")+" im "+monName(M));
   const sum=a=>passt.reduce((s,x)=>s+x.drin.filter(y=>y.art===a).reduce((t,y)=>t+y.b,0),0);
   const anz=a=>passt.filter(x=>x.drin.some(y=>y.art===a)).length;
-  const miete=sum("miete"),verl=sum("verl"),kEin=sum("kaution"),nach=sum("nach"),rein=miete+verl+kEin+nach,offen=passt.reduce((s,x)=>s+x.off,0);
+  const miete=sum("miete"),verl=sum("verl"),kEin=sum("kaution"),rein=miete+verl+kEin,offen=passt.reduce((s,x)=>s+x.off,0);
   // Kaution: bei Übergabe im Monat erhalten, und was gerade bei uns liegt (erhalten, noch nicht zurückgegeben)
   const kautErh=v=>{const k=(v.zahlung||{}).kaut||{};return istTag(k.am)?n0(k.betrag):0};
   const kErh=passt.filter(x=>x.v.zahlung&&inMon(((x.v.zahlung||{}).kaut||{}).am)).reduce((s,x)=>s+kautErh(x.v),0);
   const kBei=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&(!LK.w.auto||v.auto===LK.w.auto)).reduce((s,v)=>{const kr=v.kautionRueck||{};return s+(kautErh(v)&&!istTag(kr.am)?Math.max(0,kautErh(v)-(kr.verrechnet?+kr.einbehalt||0:0)):0)},0);
   const vm=vorMon(M),reinVor=alle.reduce((s,x)=>s+x.p.filter(y=>String(y.am).slice(0,7)===vm).reduce((t,y)=>t+y.b,0),0);
-  const d=reinVor?Math.round((rein-reinVor)/reinVor*100):null,st=n=>n+(n===1?" Miete":" Mieten"),MN=MON[+M.slice(5,7)-1];
+  const d=reinVor?Math.round((rein-reinVor)/reinVor*100):null,st=n=>n+(n===1?" Miete":" Mieten"),MN=M.slice(0,4)===JETZT.slice(0,4)?MON[+M.slice(5,7)-1]:monName(M);   // anderes Jahr: immer mit Jahreszahl (09.11.2026)
   let h='<div class="drei">'+
     '<div class="gr"><i>Mietpreise</i><b>'+eur(miete)+'</b><small>'+st(anz("miete"))+'</small></div>'+
     '<div class="gr"><i>Verlängerungen</i><b>'+eur(verl)+'</b><small>'+st(anz("verl"))+'</small></div>'+
     '<div class="gr"><i>Kaution einbehalten</i><b>'+eur(kEin)+'</b><small>'+st(anz("kaution"))+'</small></div></div>';
   h+='<div class="karte gesamt">'+
-    '<div class="gz"><span>Nachzahlungen bei Rückgabe</span><b>'+eur(nach)+'</b></div>'+
     '<div class="gz summe1"><span>Zusammen im '+MN+'</span><b>'+eur(rein)+'</b></div>'+
     (d!=null&&!LK.aktiv()?'<div class="vgl '+(d>=0?"hoch":"runter")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+' % gegenüber '+MON[+vm.slice(5,7)-1]+' ('+eur(reinVor)+')</div>':"")+
     (offen?'<div class="gz offen"><span>Noch offen</span><b>'+eur(offen)+'</b></div>':"")+
@@ -441,18 +467,17 @@ function zeichne(){
       h+='<button type="button" class="tz" data-m="'+esc(schl)+'"><span class="wer"><b>'+esc(x.v.name||"Ohne Namen")+'</b><small>'+esc(x.v.auto)+(x.v.vonD?', '+de(x.v.vonD):"")+(x.anf?', Buchung':"")+'</small>'+
         (x.off?'<em class="off">'+eur(x.off)+' offen</em>':"")+'<em class="aend">Ändern</em></span>'+
         '<span>'+zelle(s("miete"))+'</span><span>'+zelle(s("verl"))+'</span><span>'+zelle(s("kaution"))+'</span><span class="ges">'+eur(x.rein)+'</span></button>'});
-    h+='<div class="tz fuss"><span class="wer"><b>Summe</b></span><span>'+eur(miete)+'</span><span>'+eur(verl)+'</span><span>'+eur(kEin)+'</span><span class="ges">'+eur(rein)+'</span></div></div>'+
-      (nach?'<div class="leise" style="margin:8px 4px 0">Gesamt enthält auch Nachzahlungen bei Rückgabe ('+eur(nach)+').</div>':"")}
+    h+='<div class="tz fuss"><span class="wer"><b>Summe</b></span><span>'+eur(miete)+'</span><span>'+eur(verl)+'</span><span>'+eur(kEin)+'</span><span class="ges">'+eur(rein)+'</span></div></div>'}
   h+='<div class="leise" style="text-align:center;margin-top:16px">Gezählt wird, was im Mietvertrag als bezahlt steht, im Monat der Zahlung. Stimmt etwas nicht, Miete antippen und ändern.</div>';
   $("inhalt").innerHTML=h;
   $("inhalt").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>mxZahlung.oeffne(b.dataset.m))}
 
 mxZahlung.setup({von:"Monat",nachher:()=>zeichne()});   // Ändern-Fenster: stil/zahlung_aendern.py
 
-const MONATE=()=>{const s=new Set();alleMieten().forEach(x=>x.p.forEach(p=>p.am&&s.add(p.am.slice(0,7))));s.delete(JETZT);
+const MONATE=()=>{const s=new Set();alleMieten().forEach(x=>x.p.forEach(p=>p.am&&s.add(p.am.slice(0,7))));
   return[...s].sort().reverse().map(m=>[m,m.slice(0,4)===JETZT.slice(0,4)?MON[+m.slice(5,7)-1]:monName(m)])};
 const LK=mxListenkopf("lk","monat",{suche:"Name, Auto oder Nummer",felder:[
-  {k:"mon",t:"Monat",alle:MON[+JETZT.slice(5,7)-1],werte:MONATE},
+  {k:"mon",t:"Monat",alle:monName(JETZT),monate:true,werte:MONATE},
   {k:"auto",t:"Fahrzeug",alle:"Alle",werte:()=>[...new Set(alleMieten().map(x=>x.v.auto).filter(Boolean))].sort().map(a=>[a,a])}],neu:zeichne}).bauen();
 zeichne();
 // Kommt vom Abgleich etwas Neues, neu zeichnen, aber nie ein offenes Ändern-Fenster überschreiben
