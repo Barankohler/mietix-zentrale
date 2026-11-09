@@ -614,9 +614,8 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     const m=L.map(x=>x.bis).sort().pop()||"",s=L.find(x=>x.sperre&&x.bis===m),mu=(L.filter(x=>x.bis===m&&x.bisU).map(x=>x.bisU).sort().pop())||"";
     return s?"selbst gesperrt bis "+s.bis.split("-").reverse().join(".").slice(0,6)+(s.grund?": "+s.grund:""):"belegt"+(m?", wieder frei "+kz(m)+(mu?" "+uhrT(mu):""):"")}
   const istUeber=(auto,von,bis)=>belegtListe(auto,von,bis).some(x=>x.ueber);
-  // Nur überfällig, sonst frei (Baran 05.11.2026, Prüfung 06.11.2026 Runde 2): wählbar mit Rückfrage wie im Angebot, zählt nicht als frei
+  // Nur überfällig, sonst frei: ohne Rückfrage wählbar, Hinweis bleibt, zählt nicht als frei (Baran 08.11.2026)
   const nurUeber=(auto,von,bis)=>{const L=belegtListe(auto,von,bis);return L.length>0&&L.every(x=>x.ueber)};
-  const ueberFrage=(n,txt)=>confirm(n+" ist "+txt+". Trotzdem anbieten?");
   function anbAngebote(){if(!PREISE||!ANB.vonD||!ANB.bisD)return[];const d=anbTage(),start=(new Date(ANB.vonD+"T12:00").getDay()+6)%7,r=Math.max(0,Math.min(90,+ANB.rabatt||0));
     return PREISE.cars.map(c=>{const name=c.anzeige||c.n,u=nurUeber(name,ANB.vonD,ANB.bisD);if(!u&&belegt(name,ANB.vonD,ANB.bisD))return null;const roh=listenMiete(c,start,d),L=Math.round(roh);
       const P=Math.round(roh*(1-r/100));return{name,L,P,km:(PREISE.freiKm||150)*d,ueb:u?wegText(name,ANB.vonD,ANB.bisD):""}}).filter(Boolean)}
@@ -652,7 +651,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     const weg=PREISE.cars.map(c=>c.anzeige||c.n).filter(n=>!alleA.some(a=>a.name===n)).map(n=>({n,txt:wegText(n,ANB.vonD,ANB.bisD)}));
     $a("anbAutos").innerHTML=!ANB.vonD||!ANB.bisD?"":freiA.concat(alleA.filter(a=>a.ueb)).map(a=>{const an=ANB.autos.includes(a.name);return '<div class="auto'+(an?" an":"")+'" data-a="'+esc(a.name)+'"'+(a.ueb?' data-ueb="'+esc(a.ueb)+'"':"")+'><span class="n"><b>'+(an?'<span class="haken">✓</span>':"")+esc(a.name)+'</b><i>'+eur2(Math.round(a.P/d))+' € pro Tag, '+a.km.toLocaleString("de-DE")+' km inklusive</i>'+(a.ueb?'<i style="color:#9A6400;font-weight:700">'+esc(a.ueb)+'</i>':"")+'</span><span class="p">'+eur2(a.P)+' €'+(a.P<a.L?'<i>statt '+eur2(a.L)+' €</i>':"")+'</span></div>'}).join("")+
       weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>'+esc(x.txt)+'</i></span><span class="p"></span></div>').join("")||'<div class="leer">Keine Autos</div>';
-    document.querySelectorAll("#anbAutos [data-a]").forEach(e=>e.onclick=()=>{const n=e.dataset.a,i=ANB.autos.indexOf(n);if(i<0&&e.dataset.ueb&&!ueberFrage(n,e.dataset.ueb))return;if(i<0)ANB.autos.push(n);else ANB.autos.splice(i,1);anbZeichnen()});
+    document.querySelectorAll("#anbAutos [data-a]").forEach(e=>e.onclick=()=>{const n=e.dataset.a,i=ANB.autos.indexOf(n);if(i<0)ANB.autos.push(n);else ANB.autos.splice(i,1);anbZeichnen()});
     const ks=ang.length?anbKunden(ang.map(a=>a.name)):[],zeig=ANB.alle?ks:ks.slice(0,8),hi=iso(new Date());
     $a("anbWeiter").disabled=!ang.length;$a("anbWeiter").textContent=ang.length?"Weiter zu den Kunden ›":"Erst ein Auto antippen";
     $a("anbSchrittT").textContent=s2?ang.length+(ang.length===1?" Auto":" Autos")+((+ANB.rabatt||0)?", "+ANB.rabatt+" % Rabatt":", kein Rabatt")+". Schritt 2 von 2: Wen anschreiben?":"Schritt 1 von 2: Welche Autos sollen rein?";
@@ -706,7 +705,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     $a("anbStart").disabled=!frei.length||!kn;
     el.innerHTML=frei.map(x=>'<span data-a="'+esc(x.n)+'" title="'+esc(x.n)+', '+eur2(x.L)+' €">'+esc(kurzA(x.n))+'</span>').join("")+
       weg.map(x=>'<span class="weg'+(x.ueb?" ueb":"")+'"'+(x.wahl?' data-a="'+esc(x.n)+'" data-ueb="'+esc(x.txt)+'"':"")+' title="'+esc(x.n)+", "+esc(x.txt)+'">'+esc(kurzA(x.n))+(x.ueb?" überfällig":"")+'</span>').join("");
-    el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>{if(z.dataset.ueb&&!ueberFrage(z.dataset.a,z.dataset.ueb))return;anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a)});return;
+    el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>{anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a)});return;
     el.innerHTML=frei.map(x=>'<div class="auto" data-a="'+esc(x.n)+'"><span class="n"><b>'+esc(x.n)+'</b><i>'+eur2(Math.round(x.L/d))+' € pro Tag</i></span><span class="p">'+eur2(x.L)+' €</span></div>').join("")+
       weg.map(x=>'<div class="auto belegt"><span class="n"><b>'+esc(x.n)+'</b><i>'+esc(x.txt)+'</i></span><span class="p"></span></div>').join("");
     el.querySelectorAll("[data-a]").forEach(z=>z.onclick=()=>anbOeffnen(ANB.vonD,ANB.bisD,z.dataset.a))}
