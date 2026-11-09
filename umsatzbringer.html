@@ -166,7 +166,7 @@ body.nurUmsatz #uKopf{display:block;background:#fff;border-bottom:3px solid var(
 body:not(.nurUmsatz) #umsatzTeil{display:none}
 /* Seite WhatsApp (09.11.2026, Baran): dieselbe Seite mit body.nurWa, Kopf, Listenkopf, Gruppen und Knöpfe wie auf den anderen Seiten */
 .waGr+.waGr .waGk:first-child{margin-top:14px}
-body:not(.nurWa) #waLK{display:none}
+body:not(.nurWa) #waLK,body:not(.nurWa) #waTitel,body:not(.nurWa) #waK{display:none!important}   /* Startseite: nur noch die Kachel WhatsApp (09.11.2026, Baran: „brauche nix doppelt“) */
 body.nurWa .app>*:not(#waLK):not(#waK):not(.mxFenster):not(script):not(style):not(#stand){display:none!important}
 body.nurWa #stand{display:none}body.nurWa #stand.auf{display:block}
 body.nurWa #uKopf{display:block;background:#fff;border-bottom:3px solid var(--rot);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;position:sticky;top:0;z-index:5;margin:0 0 14px}
@@ -270,6 +270,9 @@ html body header .mxStart,html body .topbar .mxStart,html body .kTop #kZu{min-he
   main,.app{max-width:680px!important;margin-left:auto!important;margin-right:auto!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}
 #sortierung{font-size:16px!important}   /* sonst zoomt das iPhone beim Antippen */
 input[type=date],input[type=time]{min-width:0;max-width:100%}
+
+/* Überschriften sofort erkennbar (09.11.2026, Baran: „dicker geschrieben, dann erkennt man sie direkt“): nur Gruppenüberschriften, keine Feld-Etiketten */
+html body .buGk,html body .alK,html body .uGk,html body h2.hT,html body #s_unterwegs h2.hT,html body p.feldname,html body main h2.gruppe,html body .gruppe,html body .app>h2,html body main>h2,html body h2.thema,html body .bereich>.kopf>b,html body .ab,html body main .karte>h2,html body .karte>h2,html body .kGruppe,html body .abschnitt,html body .mxZa .fk,html body .gk,html body .lbl,html body .anbLbl,html body .waGr .waGk:first-child{font-size:15px!important;font-weight:800!important;color:#1C1C1E!important;letter-spacing:.2px!important}
 </style><style>
 /* Knopf-Paar je Nachricht (02.11.2026) */
 .nkPaar{display:flex;justify-content:flex-end;gap:6px;margin-top:6px;flex:1 0 100%}
@@ -309,6 +312,214 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 .lkMGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.lkJahre{display:flex;flex-direction:column;gap:8px;max-height:224px;overflow:auto}
 .lkMHin{font-size:13px;color:#8A8A8E;margin:10px 2px 0}
 .lkFertig{display:block;width:100%;margin-top:14px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
+</style><script>
+(function(){
+const $=id=>document.getElementById(id);
+const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+const schreib=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}};
+const zahl=v=>{if(v===null||v===undefined)return null;const s=String(v).replace(/€/g,"").trim();if(!s)return null;
+  const n=parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""));return isNaN(n)?null:n};
+const n0=v=>zahl(v)||0;
+const eur=n=>Math.round(n||0).toLocaleString("de-DE")+" €";
+const wie=n=>{n=Math.round(+n||0);return n.toLocaleString("de-DE")};   // so steht ein Betrag im Mietvertrag (ohne €)
+const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const de=s=>s&&/^\d{4}-\d\d-\d\d/.test(s)?s.slice(8,10)+"."+s.slice(5,7)+".":"";
+const istTag=s=>/^\d{4}-\d\d-\d\d$/.test(String(s||""));
+const ichMail=()=>{try{return((JSON.parse(localStorage.getItem("mietixSitzung")||"null")||{}).email||"").toLowerCase()}catch(e){return""}};
+const verlInRest=v=>(v.verlaengerungen||[]).filter(y=>!!(y.imRest||y.bezahlt)).reduce((s,y)=>s+(+y.aufpreis||0),0);   // so liegt die Verlängerung im Mietvertrag im Rest
+/* Jede Miete in Posten: eine Rechnung für Monat und Geld (09.11.2026), gezählt im Monat der Zahlung.
+   Verlängerungen stecken im Mietvertrag im Rest, sobald sie bezahlt sind oder mit dem Rest kommen; Mietpreis Rest = Rest ohne diese.
+   Nachzahlung mit der Kaution verrechnet steckt im Einbehalt und zählt nur dort, nichts doppelt. */
+function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kautionRueck||{},an=z.anz||{},re=z.rest||{};
+  if(n0(an.betrag))l.push({art:"miete",t:"Anzahlung",b:n0(an.betrag),am:istTag(an.am)?an.am:""});
+  const mietRest=n0(re.betrag)-verlInRest(v);
+  if(mietRest>0)l.push({art:"miete",t:"Mietpreis Rest",b:mietRest,am:istTag(re.am)?re.am:""});
+  (v.verlaengerungen||[]).forEach((y,i)=>{const b=+y.aufpreis||0;if(b<=0)return;
+    const am=y.imRest?(istTag(re.am)?re.am:""):y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";
+    l.push({art:"verl",t:"Verlängerung"+(v.verlaengerungen.length>1?" "+(i+1):""),b,am})});
+  const s=+e.summe||0;
+  if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0;
+    if(bz&&bz.art==="Kaution"&&kr.verrechnet){}   // steckt im Einbehalt der Kaution
+    else if(eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:eB,am:bz.am});
+    if(!(bz&&bz.art==="Kaution"&&kr.verrechnet)&&s-eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:s-eB,am:""})}
+  if(kr.verrechnet&&+kr.einbehalt>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:+kr.einbehalt,am})}
+  return l}
+/* Anzahlung einer Buchung ohne Mietvertrag (09.11.2026): zählt auch nach einem Storno, wenn sie behalten wurde. Zurückgezahltes steht als Minus mit Datum (leer: noch nicht).
+   Ohne Storno-Eintrag (alte Absagen) zählt eine abgesagte Buchung wie bisher nicht. Auf eine neue Buchung übertragen zählt sie dort, hier nicht mehr. */
+function anfragePosten(a){if(!a||a._weg||a.vertrag)return[];const z=a.anzahlung||{},b=n0(z.betrag);if(!b)return[];const am=istTag(z.am)?z.am:"",P=(t,w,d)=>({art:"miete",t,b:w,am:d});
+  if(a.status!=="abgesagt")return[P("Anzahlung",b,am)];const s=a.storno;if(!s||s.uebernommen)return[];
+  if(s.art==="behalten")return[P("Anzahlung, nach Storno behalten",b,am)];
+  if(s.art==="neu")return[P("Anzahlung, auf neue Buchung",b,am)];
+  if(s.art==="zurueck"){const r=[P("Anzahlung, Buchung storniert",b,am)],m=Math.round(+s.betrag||0);if(m>0&&istTag(s.am))r.push(P("Anzahlung zurückgezahlt",-m,s.am));return r}
+  return[]}
+let VON="Monat",NACHHER=()=>{},UNTEN=24,OFFEN=null,ZURUECK=null,MT=0;
+const zu=()=>encodeURIComponent(VON);
+const MAPPE=nr=>"https://barankohler.github.io/mietix-vertrag/?nr="+encodeURIComponent(nr)+"&zeige=mappe&von="+zu();
+const ANFRAGE=a=>a.status==="gebucht"?"https://barankohler.github.io/mietix-vertrag/?buchung="+encodeURIComponent(a.id)+"&von="+zu():"https://barankohler.github.io/mietix-anfragen/?zeige="+encodeURIComponent(a.id);
+function blatt(){let f=$("fAendern");if(!f){f=document.createElement("div");f.id="fAendern";f.setAttribute("role","dialog");f.setAttribute("aria-label","Zahlungen ändern");document.body.appendChild(f)}f.classList.add("mxFenster","mxZa");return f}
+function feld(id,wert,art,ph){return art==="tag"?'<input type="date" id="'+id+'" value="'+esc(istTag(wert)?wert:"")+'" aria-label="Bezahlt am">'
+  :art==="text"?'<input id="'+id+'" value="'+esc(wert||"")+'" placeholder="'+esc(ph||"")+'" data-einheit="">'
+  :'<input id="'+id+'" inputmode="decimal" data-einheit="€" value="'+(wert?wie(wert):"")+'" placeholder="0">'}
+const zeile=(t,u,a,b)=>'<div class="fz"><label>'+t+(u?'<small>'+u+'</small>':"")+'</label>'+a+(b||"<span></span>")+'</div>';
+const kopf=t=>'<div class="mxKopf"><h3>'+esc(t)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>';
+function oeffne(schl){const f=blatt();
+  if(schl.startsWith("a:")){const a=lies("mietixAnfragen",[]).find(x=>x&&x.id===schl.slice(2));if(!a)return fehlt();const z=a.anzahlung||{};OFFEN={schl};
+    f.innerHTML=kopf(a.name||"Buchung")+
+      '<div class="fl">'+esc(a.auto||"")+(a.status==="abgesagt"?', Buchung storniert':', Buchung noch ohne Mietvertrag')+'</div>'+
+      '<div class="fk">Anzahlung</div><div class="fg">'+zeile("Anzahlung","Betrag und bezahlt am",feld("eAnz",n0(z.betrag)),feld("eAnzAm",z.am,"tag"))+'</div>'+
+      (a.storno&&a.storno.art==="zurueck"?'<div class="fk">Rückzahlung</div><div class="fg">'+zeile("Zurückgezahlt","Datum leer: noch nicht",feld("eStB",+a.storno.betrag||0),feld("eStAm",a.storno.am,"tag"))+'</div>':"")+
+      '<div class="fhin" id="eHin"></div><div class="fknoepfe"><a href="'+esc(ANFRAGE(a))+'">Buchung öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
+  }else{const v=lies("mietixVorgaenge",[]).find(x=>x&&x.nr===schl.slice(2));if(!v)return fehlt();OFFEN={schl};
+    const z=v.zahlung||{},an=z.anz||{},re=z.rest||{},ka=z.kaut||{},kr=v.kautionRueck||{},e=v.endabrechnung||{},vl=v.verlaengerungen||[];
+    const s=+e.summe||0,bz=e.bezahlt||null,mitKaution=!!(bz&&bz.art==="Kaution"&&kr.verrechnet);
+    const teile=[e.mehrkm?"Mehr-km":"",e.tank?"Tank":"",e.versp?"Verspätung":"",(e.extra||[]).length?"Sonstiges":""].filter(Boolean).join(", ");
+    let h=kopf(v.name||"Mietvertrag")+
+      '<div class="fl">'+esc(v.auto||"")+(v.vonD?', '+de(v.vonD)+' bis '+de(v.bisD):"")+', Nr. '+esc(v.nr)+'. Bezahlt-Datum leer lassen heißt: noch offen.</div>'+
+      '<div class="fk">Mietpreis</div><div class="fg">'+
+        zeile("Anzahlung","",feld("eAnz",n0(an.betrag)),feld("eAnzAm",an.am,"tag"))+
+        zeile("Rest","ohne Verlängerung",feld("eRest",Math.max(0,n0(re.betrag)-verlInRest(v))),feld("eRestAm",re.am,"tag"))+'</div>';
+    if(vl.length)h+='<div class="fk">Verlängerungen</div><div class="fg">'+vl.map((y,i)=>zeile("Verlängerung"+(vl.length>1?" "+(i+1):""),"bis "+de(y.bisNeu||"")+(y.imRest?", kommt mit dem Rest":""),feld("eV"+i,+y.aufpreis||0),
+        y.imRest?'<span class="fl" style="text-align:right">wie Rest</span>':feld("eVAm"+i,y.bezahlt?(y.bezahltAm||y.am):"","tag"))).join("")+'</div>';
+    if(s>0)h+='<div class="fk">Nachzahlung bei Rückgabe</div><div class="fg">'+
+      (mitKaution?zeile("Abgerechnet "+eur(s),(teile?teile+", ":"")+"mit der Kaution verrechnet",'<span></span>')
+        :zeile("Bezahlt","abgerechnet "+eur(s)+(teile?", "+teile:""),feld("eNach",bz?(bz.betrag!=null?+bz.betrag:s):s),feld("eNachAm",bz&&bz.am,"tag")))+'</div>';
+    h+='<div class="fk">Kaution</div><div class="fg">'+
+      zeile("Erhalten","bei Übergabe",feld("eKaut",n0(ka.betrag)),feld("eKautAm",ka.am,"tag"))+
+      zeile("Einbehalten","bleibt bei uns",feld("eEin",kr.verrechnet?+kr.einbehalt||0:0),'<span></span>')+
+      '<div class="fz grund"><label>Grund</label>'+feld("eGrund",kr.verrechnet?kr.grund:"","text","Schaden, Reinigung, Tank")+'</div>'+
+      zeile("Zurückgegeben","Datum leer: noch nicht",feld("eZur",kr.betrag!=null?+kr.betrag||0:0),feld("eZurAm",kr.am,"tag"))+'</div>'+
+      '<div class="fhin" id="eHin"></div>'+
+      '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Mappe öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
+    f.innerHTML=h}
+  f.querySelectorAll("input").forEach(i=>i.addEventListener("input",pruefe));
+  $("eSp").onclick=speichern;
+  window.mxAuf("fAendern");if(typeof window.mxEinheit==="function")window.mxEinheit();pruefe()}
+function fehlt(){if(window.mxFehler)window.mxFehler("Diese Miete ist hier nicht mehr vorhanden. Bitte Seite neu laden.",4000);else alert("Diese Miete ist hier nicht mehr vorhanden. Bitte Seite neu laden.")}
+// Prüft beim Tippen: rote Felder, wenn keine Zahl; gelber Hinweis, wenn die Kaution nicht aufgeht (nur Hinweis, Speichern geht trotzdem)
+function pruefe(){let falsch=0;document.querySelectorAll("#fAendern input[inputmode=decimal]").forEach(i=>{const bad=i.value.trim()!==""&&zahl(i.value)===null||(zahl(i.value)||0)<0;i.classList.toggle("falsch",bad);if(bad)falsch++});
+  const hin=$("eHin");if(!hin)return!falsch;
+  if(falsch){hin.className="fhin rot";hin.textContent="Bitte nur Zahlen eintragen, zum Beispiel 800. Rot markiert ist, was nicht passt.";return false}
+  if($("eKaut")){const k=zahl($("eKaut").value)||0,ein=zahl($("eEin").value)||0,zur=zahl($("eZur").value)||0;
+    if(k&&ein+zur&&Math.round(ein+zur)!==Math.round(k)){hin.className="fhin gelb";hin.textContent="Kaution erhalten "+eur(k)+", einbehalten und zurück zusammen "+eur(ein+zur)+". Bitte kurz prüfen.";return true}}
+  hin.className="fhin";hin.textContent="";return true}
+function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
+  const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
+  if(schl.startsWith("a:")){const l=lies("mietixAnfragen",[]),a=l.find(x=>x&&x.id===schl.slice(2));if(!a)return weg();const vorher=JSON.stringify(a);
+    const za=a.anzahlung||{},st=a.storno,gleich=Math.round(n0(za.betrag))===w("eAnz")&&(istTag(za.am)?za.am:"")===t("eAnzAm"),stNeu=!!(st&&$("eStB")&&(Math.round(+st.betrag||0)!==w("eStB")||(istTag(st.am)?st.am:"")!==t("eStAm")));
+    if(gleich&&!stNeu){window.mxZu();return}   // nichts geändert
+    if(!gleich)a.anzahlung=Object.assign({},za,{betrag:w("eAnz"),am:t("eAnzAm")});
+    if(stNeu)a.storno=Object.assign({},st,{betrag:w("eStB"),am:t("eStAm")});
+    (a.verlauf=a.verlauf||[]).push({am:jetzt,was:"Anzahlung auf der Seite "+VON+" geändert"});
+    return fertig("mietixAnfragen","id",a.id,vorher,l)}
+  const l=lies("mietixVorgaenge",[]),v=l.find(x=>x&&x.nr===schl.slice(2));if(!v)return weg();const vorher=JSON.stringify(v);
+  // Nur was wirklich anders ist, wird geschrieben: Öffnen und Speichern ohne Änderung lässt den Mietvertrag, wie er ist
+  const z=v.zahlung=v.zahlung||{};
+  const setz=(k,b,am)=>{const o=Object.assign({},z[k]||{});let neu=false;
+    if(Math.round(n0(o.betrag))!==b){o.betrag=b?wie(b):"";neu=true}
+    if((istTag(o.am)?o.am:"")!==am){o.am=am;if(!am&&k!=="kaut")o.art="";neu=true}
+    if(neu)z[k]=o};
+  setz("anz",w("eAnz"),t("eAnzAm"));
+  // Verlängerungen zuerst, dann der Rest: im Mietvertrag steckt die Verlängerung im Rest
+  let preisPlus=0;(v.verlaengerungen||[]).forEach((y,i)=>{if(!$("eV"+i))return;const neu=w("eV"+i),alt=+y.aufpreis||0;if(neu!==alt){preisPlus+=neu-alt;y.aufpreis=neu}
+    if(!y.imRest){const am=t("eVAm"+i),war=y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";if(am!==war){if(am){y.bezahlt=true;y.bezahltAm=am}else{y.bezahlt=false;delete y.bezahltAm}}}});
+  if(preisPlus){v.preis1=wie(n0(v.preis1)+preisPlus);v.gesamt=wie(n0(v.preis1)+n0(v.preis2)+n0(v.paketPreis))}   // Mietpreis im Mietvertrag zieht mit, wie beim Verlängern
+  {const r=Math.round(n0((z.rest||{}).betrag)),vr=verlInRest(v),soll=w("eRest")+vr;   // Rest ohne Verlängerung unverändert: Rest wächst nur um die geänderte Verlängerung
+    setz("rest",soll===r?r:soll,t("eRestAm"))}
+  if($("eNach")){const e=v.endabrechnung,b=w("eNach"),am=t("eNachAm"),bz=e.bezahlt||null,warAm=bz&&istTag(bz.am)?bz.am:"",warB=bz?(bz.betrag!=null?Math.round(+bz.betrag||0):Math.round(+e.summe||0)):Math.round(+e.summe||0);
+    if(am!==warAm||b!==warB){if(am){e.bezahlt=Object.assign({},bz||{},{am});if(e.bezahlt.art==="Kaution")e.bezahlt.art="";if(b===Math.round(+e.summe||0))delete e.bezahlt.betrag;else e.bezahlt.betrag=b}else delete e.bezahlt}}
+  setz("kaut",w("eKaut"),t("eKautAm"));
+  {const kr=v.kautionRueck||{},ein=w("eEin"),zur=w("eZur"),zurAm=t("eZurAm"),grund=t("eGrund").trim();
+    const warEin=kr.verrechnet?Math.round(+kr.einbehalt||0):0,warZur=kr.betrag!=null?Math.round(+kr.betrag||0):0,warAm=istTag(kr.am)?kr.am:"",warGrund=kr.verrechnet?String(kr.grund||""):"";
+    if(ein!==warEin||zur!==warZur||zurAm!==warAm||grund!==warGrund){const k=v.kautionRueck=Object.assign({},kr);
+      if(zur!==warZur)k.betrag=zur;if(zurAm!==warAm)k.am=zurAm;if(grund!==warGrund)k.grund=grund;
+      if(ein!==warEin){k.einbehalt=ein;if(ein){k.verrechnet=true;k.teil=false}else if(!k.posten||!k.posten.length)delete k.verrechnet}}}
+  if(JSON.stringify(v)===vorher){window.mxZu();return}   // nichts geändert
+  const m=ichMail();if(m)v.geaendert={wer:m,am:jetzt};
+  (v.verlauf=v.verlauf||[]).push({am:jetzt,was:"Zahlungen auf der Seite "+VON+" geändert"});
+  fertig("mietixVorgaenge","nr",v.nr,vorher,l)}
+function weg(){const h=$("eHin");h.className="fhin rot";h.textContent="Nicht gespeichert: Diese Miete ist hier nicht mehr vorhanden. Bitte Seite neu laden."}
+function fertig(k,pk,id,vorher,l){if(!schreib(k,l)){const hin=$("eHin");hin.className="fhin rot";hin.textContent="Nicht gespeichert: der Speicher dieses Geräts ist voll. Bitte Seite neu laden und noch einmal versuchen.";return}
+  window.mxZu();NACHHER();
+  gespeichert("✓ Gespeichert, auch im Mietvertrag",()=>{const l2=lies(k,[]),i=l2.findIndex(x=>x&&x[pk]===id);if(i>=0){l2[i]=JSON.parse(vorher);schreib(k,l2)}NACHHER()})}
+// Das Speichern zeigt sonst zusätzlich den allgemeinen Knopf „Rückgängig“ oben: hier reicht der eine im grünen Hinweis
+function einKnopf(){const e=$("mietixRueck");if(e){e.mxWill=false;e.classList.remove("an");clearTimeout(e.mxT)}}
+function gespeichert(text,rueck){let me=$("mxZaMeld");if(!me){me=document.createElement("div");me.id="mxZaMeld";me.innerHTML='<span></span><button type="button">Rückgängig</button>';document.body.appendChild(me);
+    me.querySelector("button").onclick=()=>{const r=ZURUECK;ZURUECK=null;clearTimeout(MT);me.style.display="none";if(r)r();einKnopf()}}
+  einKnopf();me.style.bottom=UNTEN+"px";me.querySelector("span").textContent=text;ZURUECK=rueck;me.style.display="flex";clearTimeout(MT);MT=setTimeout(()=>{me.style.display="none";ZURUECK=null},7000)}
+/* Storno mit Anzahlung (09.11.2026, Bild freigegeben): die Frage kommt nur, wenn wirklich eine Anzahlung da ist */
+const heuteTag=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())};
+const deJ=s=>istTag(s)?s.slice(8,10)+"."+s.slice(5,7)+"."+s.slice(0,4):"";
+function stornoText(a,art,b,voll,am){const zr=(a.von?" vom "+de(a.von)+(a.bis?" bis "+deJ(a.bis):""):"");const t="Ihre Buchung"+(a.auto?" für den "+a.auto:"")+zr+" ist storniert.";
+  if(art==="zurueck")return t+(b<voll?" Von Ihrer Anzahlung über "+eur(voll)+" haben wir Ihnen am "+deJ(am)+" "+eur(b)+" zurückgezahlt.":" Die Anzahlung von "+eur(b)+" haben wir Ihnen am "+deJ(am)+" zurückgezahlt.");
+  return t+" Die Anzahlung von "+eur(voll)+" behalten wir ein."}
+function storno(id,o){o=o||{};const f=blatt(),a=lies("mietixAnfragen",[]).find(x=>x&&x.id===id);if(!a)return fehlt();
+  const z=a.anzahlung||{},voll=Math.round(n0(z.betrag));let art="";
+  const zr=[a.auto,a.von?de(a.von)+(a.bis?" bis "+de(a.bis):""):""].filter(Boolean).join(", ");
+  const opt=(w,t,u)=>'<button type="button" data-st="'+w+'"><span>'+t+'<small>'+u+'</small></span><b hidden>✓</b></button>';
+  f.innerHTML=kopf(o.titel||"Buchung stornieren")+'<div class="fl">'+esc([a.name,zr].filter(Boolean).join(", ")).replace(/\.$/,"")+'. Anzahlung '+eur(voll)+(istTag(z.am)?' am '+de(z.am):"")+' erhalten.</div>'+
+    '<div class="fk">Was passiert mit der Anzahlung?</div><div class="wl">'+opt("behalten","Behalten","Zählt weiter als Einnahme")+opt("zurueck","Zurückzahlen","Steht als Minus mit Datum in Geld und Monat")+
+    '<div class="fg stF" id="eStF" hidden>'+zeile("Betrag","",feld("eStB",voll),feld("eStAm",heuteTag(),"tag"))+'</div>'+opt("neu","Auf neue Buchung","Neue Buchung öffnet sich, "+eur(voll)+" sind schon drin")+'</div>'+
+    '<div class="fhin" id="eHin"></div><div class="fknoepfe"><button type="button" class="g" id="eStZ">Zurück</button><button type="button" class="r" id="eStOk">Stornieren</button></div>';
+  const rot=(t,el)=>{const h=$("eHin");h.className="fhin rot";h.textContent=t;if(el)el.classList.add("falsch")};
+  f.querySelectorAll("[data-st]").forEach(k=>k.onclick=()=>{art=k.dataset.st;f.querySelectorAll("[data-st]").forEach(y=>{const an=y===k;y.classList.toggle("an",an);y.querySelector("b").hidden=!an});$("eStF").hidden=art!=="zurueck";$("eHin").className="fhin"});
+  f.querySelectorAll("#eStF input").forEach(i=>i.addEventListener("input",()=>{i.classList.remove("falsch");$("eHin").className="fhin"}));
+  $("eStZ").onclick=()=>window.mxZu();
+  $("eStOk").onclick=()=>{if(!art)return rot("Bitte wählen, was mit der Anzahlung passiert.");let b=voll,am=heuteTag();
+    if(art==="zurueck"){b=Math.round(zahl($("eStB").value)||0);am=$("eStAm").value;if(!(b>0)||b>voll)return rot("Bitte einen Betrag bis "+eur(voll)+" eintragen.",$("eStB"));if(!istTag(am))return rot("Bitte das Datum eintragen.",$("eStAm"))}
+    const l=lies("mietixAnfragen",[]),y=l.find(x=>x&&x.id===id);if(!y)return weg();const vorher=JSON.stringify(y),jetzt=new Date().toISOString();
+    y.status="abgesagt";y.storno={art,betrag:b,am,wann:jetzt};(y.verlauf=Array.isArray(y.verlauf)?y.verlauf:[]).push({am:jetzt,was:"storniert, Anzahlung "+{behalten:"behalten",zurueck:"zurückgezahlt",neu:"auf neue Buchung"}[art]});
+    if(!schreib("mietixAnfragen",l))return rot("Nicht gespeichert: der Speicher dieses Geräts ist voll. Bitte Seite neu laden und noch einmal versuchen.");
+    einKnopf();if(art==="neu"){window.mxZahlung.geh("https://barankohler.github.io/mietix-vertrag/?neu=1&name="+encodeURIComponent(a.name||"")+"&tel="+encodeURIComponent(a.nummer||"")+"&anzVon="+encodeURIComponent(id)+(VON==="Buchungen"?"":"&von="+zu()));return}
+    NACHHER();if(o.fertig)o.fertig();
+    f.innerHTML=kopf("Storniert")+'<div class="stOk">✓ Storniert'+(a.auto?", "+esc(a.auto)+" ist wieder frei":"")+'</div><textarea id="eStT" aria-label="Nachricht an den Kunden">'+esc(stornoText(a,art,b,voll,am))+'</textarea>'+
+      '<div class="stZw"><button type="button" class="gt" id="eStWa">Per WhatsApp senden</button><button type="button" class="rt" id="eStKo">Kopieren</button></div><div class="stUnten"><button type="button" class="mxAe" id="eStR">Rückgängig</button></div>';
+    $("eStWa").onclick=()=>window.nkWa(a.nummer,$("eStT").value);
+    $("eStKo").onclick=()=>window.nkKopieren($("eStT").value);
+    $("eStR").onclick=()=>{const l2=lies("mietixAnfragen",[]),i=l2.findIndex(x=>x&&x.id===id);if(i>=0){l2[i]=JSON.parse(vorher);if(!schreib("mietixAnfragen",l2))return;einKnopf()}window.mxZu();NACHHER();if(o.fertig)o.fertig()}};
+  window.mxAuf("fAendern");if(typeof window.mxEinheit==="function")window.mxEinheit()}
+// Knopf „Ändern“: auch innerhalb einer Zeile, die sonst in die Mappe führt
+function auslesen(e){const k=e.target.closest&&e.target.closest("[data-mxza]");if(!k)return null;e.preventDefault();e.stopPropagation();return k.dataset.mxza}
+document.addEventListener("click",e=>{const s=auslesen(e);if(s)oeffne(s)},true);
+document.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const s=auslesen(e);if(s)oeffne(s)},true);
+window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRest,posten,gespeichert,
+  setup(o){VON=o.von||VON;NACHHER=o.nachher||NACHHER;UNTEN=o.unten||UNTEN},
+  knopf:schl=>'<span class="mxAe" role="button" tabindex="0" data-mxza="'+esc(schl)+'">Ändern</span>'};
+})();
+</script><style>
+/* Zahlungen ändern (08.11.2026) */
+.mxAe{position:relative;display:inline-block;flex:none;border:0;background:#EFEFF1;color:#1C1C1E;border-radius:9px;padding:6px 11px;font-size:13px;font-weight:600;font-family:inherit;line-height:1.2;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;text-decoration:none}
+.mxAe::after{content:"";position:absolute;inset:-8px -5px}.mxAe:active{background:#E0E0E5}
+.mxZa .fl{font-size:13px;color:#8E8E93;line-height:1.4}
+.mxZa .fk{font-size:13px;font-weight:600;color:#8E8E93;text-transform:uppercase;letter-spacing:.4px;margin:18px 2px 6px}
+.mxZa .fg{background:#F7F7F9;border-radius:12px;padding:4px 12px}
+.mxZa .fz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1.4fr);gap:6px;align-items:center;padding:8px 0;border-bottom:.5px solid #E5E5EA}
+.mxZa .fz:last-child{border-bottom:0}
+.mxZa .fz>label{display:block;margin:0;font-size:15px;font-weight:600;color:#1C1C1E}.mxZa .fz>label small{display:block;font-size:12px;color:#8E8E93;font-weight:500}
+.mxZa .fz input{width:100%;margin:0;border:0;border-radius:10px;background:#fff;padding:9px 10px;font-size:16px;font-weight:600;color:#1C1C1E;min-height:44px}
+.mxZa .fz input:focus{outline:2px solid #C4161C;outline-offset:-2px}
+.mxZa .fz input.falsch{outline:2px solid #C4161C;background:#FDECEC}
+.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr) minmax(0,2.25fr)}
+.mxZa .fz input[type=date]{padding:9px 6px;font-size:15px}
+.mxZa .fz .aw{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;background:#fff;border:0;border-radius:10px;padding:9px 10px;min-height:44px;font-size:16px;font-weight:600;font-family:inherit;color:#1C1C1E;text-align:left;cursor:pointer}
+.mxZa .fz .aw span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mxZa .fz .aw em{flex:none;font-style:normal;color:#C7C7CC;font-size:20px;line-height:1}
+.mxZa .fhin{font-size:13px;line-height:1.4;margin-top:8px;padding:8px 10px;border-radius:10px;display:none}
+.mxZa .fhin.gelb{display:block;background:#FDF3E1;color:#7A5212}.mxZa .fhin.rot{display:block;background:#FDECEC;color:#C4161C;font-weight:600}
+.mxZa .fknoepfe{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px}
+.mxZa .fknoepfe a,.mxZa .fknoepfe button{display:flex;align-items:center;justify-content:center;border:0;border-radius:14px;padding:14px;margin:0;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none}
+.mxZa .fknoepfe a,.mxZa .fknoepfe .g{background:#E9E9EE;color:#1C1C1E}.mxZa .fknoepfe .r{background:#C4161C;color:#fff}
+.mxZa .wl{background:#F7F7F9;border-radius:12px;overflow:hidden}
+.mxZa .wl button{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;margin:0;border:0;border-top:.5px solid #E5E5EA;background:none;padding:13px 14px;min-height:48px;font-size:16px;font-weight:600;font-family:inherit;color:#1C1C1E;text-align:left;cursor:pointer}
+.mxZa .wl button:first-child{border-top:0}.mxZa .wl button b{flex:none;color:#1B8A4B;font-size:18px;line-height:1}
+.mxZa .wl button.an{background:#EDF7F1}
+.mxZa [hidden]{display:none!important}.mxZa .wl button span{min-width:0}.mxZa .wl button small{display:block;font-size:13px;font-weight:500;color:#8E8E93;margin-top:1px}.mxZa .wl .stF{background:#EDF7F1;border-radius:0;border-top:.5px solid #DCEFE3}
+.mxZa .stOk{background:#EDF7F1;color:#1B8A4B;font-weight:700;border-radius:12px;padding:12px 14px;font-size:16px;margin-bottom:10px}
+.mxZa textarea{display:block;width:100%;min-height:118px;margin:0;border:0;border-radius:12px;background:#F7F7F9;padding:12px;font-size:16px;font-family:inherit;line-height:1.4;color:#1C1C1E;resize:vertical}.mxZa textarea:focus{outline:2px solid #C4161C;outline-offset:-2px}
+.mxZa .stZw{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.mxZa .stZw button{border:0;border-radius:12px;background:#EFEFF1;padding:13px 8px;margin:0;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer}.mxZa .stZw .gt{color:#1B8A4B}.mxZa .stZw .rt{color:#C4161C}.mxZa .stUnten{text-align:center;margin-top:14px}
+#mxZaMeld{position:fixed;left:16px;right:16px;bottom:24px;max-width:520px;margin:0 auto;background:#1B8A4B;color:#fff;border-radius:14px;padding:12px 14px;font-weight:700;z-index:99;display:none;align-items:center;justify-content:space-between;gap:12px}
+#mxZaMeld button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:10px;padding:8px 12px;margin:0;font:inherit;font-weight:700;cursor:pointer;flex:none}
+/* iPhone: Betrag und Datum sind immer ganz zu lesen (08.11.2026, stand „2.00“ statt 2.000) */
+@media(max-width:560px){.mxZa .fz{grid-template-columns:104px minmax(0,1fr) 116px}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:104px minmax(0,1fr)}.mxZa .fz>label{font-size:13.5px}.mxZa .fz input[type=date]{padding:9px 4px}.mxZa .fz input[inputmode=decimal]{padding-left:8px}}
+@media(max-width:389px){.mxZa .fz{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);row-gap:6px}.mxZa .fz>label{grid-column:1/-1}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr)}}
 </style></head><body class="nurUmsatz"><script>
 /* Listenkopf: Suche, Auswahlfelder, Trefferzahl, Filter zurücksetzen (04.11.2026) */
 (function(){if(window.mxListenkopf)return;
@@ -415,7 +626,7 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 <div id="stand"><div id="abgleich"></div><div id="bruecke" class="tipp" style="text-align:left;margin:0 4px 6px"></div></div>
 
 <div id="gruss" class="versteckt"></div>   <!-- Begrüßung weg (01.11.2026, Baran: „das kann weg“) -->
-<div class="zk" id="zk"><a class="gr" href="https://barankohler.github.io/mietix-belegung/"><b id="zkU">&nbsp;</b><i>Unterwegs</i><em>bei Kunden</em></a><a id="zkSt" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot"><b id="zkS">&nbsp;</b><i>Stehen</i><em id="zkST">jetzt vermieten</em></a><a class="gr" href="https://barankohler.github.io/mietix-vertrag/?zeige=heute"><b id="zkUe">&nbsp;</b><i>Übergabe</i><em id="zkUeT">heute</em></a><a class="rt" href="https://barankohler.github.io/mietix-vertrag/?zeige=unterwegs"><b id="zkR">&nbsp;</b><i>Rückgabe</i><em id="zkRT">heute</em></a></div><a class="um versteckt" id="um" href="https://barankohler.github.io/mietix-zentrale/statistik.html"><span class="umz"><span class="umt" id="umT">Mietumsatz</span><span class="umm" id="umM"></span></span><span class="umg" id="umG"></span><span class="umb"><span class="umv" id="umV"></span><span class="umf"></span></span><span class="umu"><span id="umP"></span><span id="umF"></span></span><span class="umzl" id="umZ"></span></a>
+<div class="zk" id="zk"><a class="gr" href="https://barankohler.github.io/mietix-belegung/"><b id="zkU">&nbsp;</b><i>Unterwegs</i><em>bei Kunden</em></a><a id="zkSt" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot"><b id="zkS">&nbsp;</b><i>Stehen</i><em id="zkST">jetzt vermieten</em></a><a class="gr" href="https://barankohler.github.io/mietix-vertrag/?zeige=heute"><b id="zkUe">&nbsp;</b><i>Übergabe</i><em id="zkUeT">heute</em></a><a class="rt" href="https://barankohler.github.io/mietix-vertrag/?zeige=unterwegs"><b id="zkR">&nbsp;</b><i>Rückgabe</i><em id="zkRT">heute</em></a></div><a class="um versteckt" id="um" href="https://barankohler.github.io/mietix-zentrale/statistik.html"><span class="umz"><span class="umt" id="umT">Umsatz</span><span class="umm" id="umM"></span></span><span class="umg" id="umG"></span><span class="umb"><span class="umv" id="umV"></span><span class="umf"></span></span><span class="umu"><span id="umP"></span><span id="umF"></span></span><span class="umzl" id="umZ"></span></a>
 <div class="such versteckt"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="suche" type="search" placeholder="Kunde, Auto, Nummer, Telefon" autocomplete="off" enterkeyhint="search"></div>
 <div id="treffer"></div>
 <div style="margin-top:6px"><div class="kGruppe">Jeden Tag</div><div class="kacheln"><a class="kachel breit" href="https://barankohler.github.io/mietix-belegung/"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Kalender</a><a class="kachel" href="https://barankohler.github.io/mietix-vertrag/" data-zaehler="vertraege"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Buchungen</a><a class="kachel" href="https://barankohler.github.io/mietix-anfragen/" data-zaehler="anfragen"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>Anfragen</a><a class="kachel" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 12h3M13 12h3M8 16h3M13 16h3"/></svg>Angebot</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/umsatzbringer.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Umsatzbringer</a><a class="kachel breit" href="https://barankohler.github.io/mietix-zentrale/whatsapp.html" data-zaehler="whatsapp"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>WhatsApp</a></div><div class="kGruppe">Verwaltung</div><div class="kacheln"><a class="kachel breit" href="https://barankohler.github.io/mietix-zentrale/monat.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Monat</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/kunden.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Kunden</a><a class="kachel" href="https://barankohler.github.io/mietix-autos/" data-zaehler="autos"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M3 13l2-5h14l2 5v5H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/></svg>Autos</a><a class="kachel" href="https://barankohler.github.io/mietix-geld/"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="12" cy="12" r="2.5"/></svg>Geld</a><a class="kachel" href="https://barankohler.github.io/mietix-schadensabrechnung/" data-zaehler="schaeden"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h0"/></svg>Schäden</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/statistik.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Zahlen</a><a class="kachel" href="https://barankohler.github.io/mietix-zentrale/nachrichten.html"><span class="zahl versteckt"></span><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>Nachrichten</a></div></div>
@@ -601,13 +812,6 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     else{p.className="gruen";text="Angemeldet, alles gesichert."}
     document.getElementById("bruecke").textContent=text;
   }
-  // Prozent beim Vormonat nur, wenn die Grundlage etwas aussagt (09.11.2026). Sonst nur die Euro-Zahl, keine erfundene Aussage:
-  // 1. gleiche Tage: die Excel-Auswertung vergleicht wirklich mit dem Kalender-Vormonat, 1. bis gleicher Tag
-  // 2. voller Erfassungsmonat: die erste erfasste Einnahme liegt vor dem Monatsersten des Vormonats, also in einem früheren Monat
-  // 3. der Vergleichswert ist mindestens 500 €
-  function prozentSagtEtwas(st,mon,vm){const v=st.vergleich||{},j=+mon.slice(0,4),m=+mon.slice(5,7),vk=(m===1?(j-1)+"-12":j+"-"+pad(m-1)),MN=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-    const gleicheTage=v.vormonat===MN[+vk.slice(5)-1]&&+v.tag>=1,erste=(st.monate||[]).filter(x=>(+x.rein||0)>0).map(x=>x.m).sort()[0],vollerMonat=!!erste&&erste<vk;
-    return gleicheTage&&vollerMonat&&vm>=500}
   // Vier Zahlen und Umsatz-Karte (31.10.2026, Baran: „4 Autos stehen, wir müssen Gas geben“)
   function zahlenZeichnen(alle,anf,hi){
     const lebt=x=>x.status!=="storniert"&&!x._weg,nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
@@ -621,17 +825,19 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
     const ue=alle.filter(x=>lebt(x)&&x.vonD===hi),ueA=anf.filter(a=>a.status==="gebucht"&&a.von===hi&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von));
     const ueE=ue.filter(x=>x.ueb).length,ueN=ue.length+ueA.length;set("zkUe",ueN);set("zkUeT",ueN&&ueE?ueE+" erledigt":"heute");
     const ru=alle.filter(x=>lebt(x)&&x.bisD===hi&&x.ueb),ruE=ru.filter(x=>x.status==="zurück").length;set("zkR",ru.length);set("zkRT",ru.length&&ruE?ruE+" erledigt":"heute");
-    // Umsatz-Karte: Mietumsatz des Monats aus der Excel (Brücke), gegen Fixkosten und Vormonat bis zum selben Tag
+    // Umsatz-Karte (09.11.2026, Baran: „den ganzen Umsatz, der diesen Monat reingekommen ist“): alles, was im Monat bezahlt wurde, dieselbe Rechnung wie „Zusammen“ auf der Seite Monat. Fixkosten kommen aus der Excel.
     const st=(lies("mietixStand",{})||{}).statistik||{},mon=hi.slice(0,7),M=(st.monate||[]).find(x=>x.m===mon),fix=+((st.fix||{}).gesamt)||0;
-    const um=document.getElementById("um");um.classList.toggle("versteckt",!M);if(!M)return;
+    const pListen=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&v.nr).map(v=>mxZahlung.posten(v)).concat(lies("mietixAnfragen",[]).map(a=>mxZahlung.anfragePosten(a))).filter(l=>l.length),imMon=(l,m,bis)=>l.filter(p=>p.am&&p.am.slice(0,7)===m&&(!bis||p.am<=bis)).reduce((s,p)=>s+p.b,0);
+    const miete=pListen.reduce((s,l)=>s+imMon(l,mon),0),mieten=pListen.filter(l=>l.some(p=>p.am&&p.am.slice(0,7)===mon&&p.b>0)).length;
+    const um=document.getElementById("um");um.classList.toggle("versteckt",!M&&!miete);if(!M&&!miete)return;
     const MN=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],e0=n=>Math.round(+n||0).toLocaleString("de-DE")+" €";
-    const miete=+M.miete||0;set("umT","Mietumsatz "+MN[+mon.slice(5)-1]);set("umM",(+M.mieten||0)+((+M.mieten||0)===1?" Miete":" Mieten"));set("umG",e0(miete));
+    set("umT","Umsatz "+MN[+mon.slice(5)-1]);set("umM",mieten+(mieten===1?" Miete":" Mieten"));set("umG",e0(miete));
     const pr=fix?Math.min(100,Math.round(miete/fix*100)):0,v=document.getElementById("umV");v.style.width=(fix?pr:0)+"%";v.classList.toggle("gut",fix>0&&miete>=fix);
     document.getElementById("umP").textContent=fix?(miete>=fix?"Fixkosten gedeckt":pr+" % der Fixkosten"):"";
     document.getElementById("umF").innerHTML=fix?"Fixkosten <b>"+e0(fix)+"</b>":"";
-    const vg=st.vergleich||{},vm=+vg.vormonatMieteBisTag||0,z=[];
+    const mJ=+mon.slice(0,4),mM=+mon.slice(5,7),vk=mM===1?(mJ-1)+"-12":mJ+"-"+pad(mM-1),tagH=hi.slice(8,10),vm=pListen.reduce((s,l)=>s+imMon(l,vk,vk+"-"+tagH),0),erste=pListen.flat().filter(p=>p.am&&p.b>0).map(p=>p.am).sort()[0],vollerMonat=!!erste&&erste<vk+"-01",z=[];   // Prozent nur bei vollem Erfassungsmonat und mindestens 500 €, sonst nur Euro
     if(fix)z.push(miete>=fix?["Über den Fixkosten","+"+e0(miete-fix),"pos"]:["Bis zu den Fixkosten fehlen",e0(fix-miete),"neg"]);
-    if(vm>0&&vg.vormonat){const d=Math.round((miete/vm-1)*100);z.push([vg.vormonat+" bis zum "+vg.tag+".",e0(vm)+(prozentSagtEtwas(st,mon,vm)?'  <span class="'+(d>=0?"pos":"neg")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+" %</span>":""),""])}
+    if(vm>0){const d=Math.round((miete/vm-1)*100);z.push([MN[+vk.slice(5)-1]+" bis zum "+(+tagH)+".",e0(vm)+(vollerMonat&&vm>=500?'  <span class="'+(d>=0?"pos":"neg")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+" %</span>":""),""])}
     if(+((st.fix||{}).proTag))z.push(["Jeder Tag kostet",e0(st.fix.proTag),""]);
     document.getElementById("umZ").innerHTML=z.map(x=>'<span><span>'+esc(x[0])+'</span><b class="'+x[2]+'">'+x[1]+'</b></span>').join("")}
   // WhatsApp heute (31.10.2026, Baran: „morgens alle Nachrichten auf einmal“, Verlängerung und km-Paket als Umsatzbringer)

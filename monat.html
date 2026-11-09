@@ -118,6 +118,9 @@ html body header .mxStart,html body .topbar .mxStart,html body .kTop #kZu{min-he
   main,.app{max-width:680px!important;margin-left:auto!important;margin-right:auto!important}header .plus{right:max(16px,calc((100% - 680px)/2))!important}}
 #sortierung{font-size:16px!important}   /* sonst zoomt das iPhone beim Antippen */
 input[type=date],input[type=time]{min-width:0;max-width:100%}
+
+/* Überschriften sofort erkennbar (09.11.2026, Baran: „dicker geschrieben, dann erkennt man sie direkt“): nur Gruppenüberschriften, keine Feld-Etiketten */
+html body .buGk,html body .alK,html body .uGk,html body h2.hT,html body #s_unterwegs h2.hT,html body p.feldname,html body main h2.gruppe,html body .gruppe,html body .app>h2,html body main>h2,html body h2.thema,html body .bereich>.kopf>b,html body .ab,html body main .karte>h2,html body .karte>h2,html body .kGruppe,html body .abschnitt,html body .mxZa .fk,html body .gk,html body .lbl,html body .anbLbl,html body .waGr .waGk:first-child{font-size:15px!important;font-weight:800!important;color:#1C1C1E!important;letter-spacing:.2px!important}
 </style><style>
 /* Listenkopf (04.11.2026) */
 .lkKopf{margin:12px 0 10px}.lkSuche{display:flex;align-items:center;gap:8px;background:#E4E4E9;border-radius:12px;padding:0 12px;height:44px;box-sizing:border-box}
@@ -166,37 +169,6 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 .mxKlein{margin-top:8px}.mxKlein>summary{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:14px;font-weight:800;color:#1C1C1E;background:#F2F2F4;border-radius:999px;padding:9px 14px;min-height:40px;box-sizing:border-box}
 .mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
 .mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
-</style><style>
-/* Zahlungen ändern (08.11.2026) */
-.mxAe{position:relative;display:inline-block;flex:none;border:0;background:#EFEFF1;color:#1C1C1E;border-radius:9px;padding:6px 11px;font-size:13px;font-weight:600;font-family:inherit;line-height:1.2;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;text-decoration:none}
-.mxAe::after{content:"";position:absolute;inset:-8px -5px}.mxAe:active{background:#E0E0E5}
-.mxZa .fl{font-size:13px;color:#8E8E93;line-height:1.4}
-.mxZa .fk{font-size:13px;font-weight:600;color:#8E8E93;text-transform:uppercase;letter-spacing:.4px;margin:18px 2px 6px}
-.mxZa .fg{background:#F7F7F9;border-radius:12px;padding:4px 12px}
-.mxZa .fz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1.4fr);gap:6px;align-items:center;padding:8px 0;border-bottom:.5px solid #E5E5EA}
-.mxZa .fz:last-child{border-bottom:0}
-.mxZa .fz>label{display:block;margin:0;font-size:15px;font-weight:600;color:#1C1C1E}.mxZa .fz>label small{display:block;font-size:12px;color:#8E8E93;font-weight:500}
-.mxZa .fz input{width:100%;margin:0;border:0;border-radius:10px;background:#fff;padding:9px 10px;font-size:16px;font-weight:600;color:#1C1C1E;min-height:44px}
-.mxZa .fz input:focus{outline:2px solid #C4161C;outline-offset:-2px}
-.mxZa .fz input.falsch{outline:2px solid #C4161C;background:#FDECEC}
-.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr) minmax(0,2.25fr)}
-.mxZa .fz input[type=date]{padding:9px 6px;font-size:15px}
-.mxZa .fz .aw{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;background:#fff;border:0;border-radius:10px;padding:9px 10px;min-height:44px;font-size:16px;font-weight:600;font-family:inherit;color:#1C1C1E;text-align:left;cursor:pointer}
-.mxZa .fz .aw span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mxZa .fz .aw em{flex:none;font-style:normal;color:#C7C7CC;font-size:20px;line-height:1}
-.mxZa .fhin{font-size:13px;line-height:1.4;margin-top:8px;padding:8px 10px;border-radius:10px;display:none}
-.mxZa .fhin.gelb{display:block;background:#FDF3E1;color:#7A5212}.mxZa .fhin.rot{display:block;background:#FDECEC;color:#C4161C;font-weight:600}
-.mxZa .fknoepfe{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px}
-.mxZa .fknoepfe a,.mxZa .fknoepfe button{display:flex;align-items:center;justify-content:center;border:0;border-radius:14px;padding:14px;margin:0;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none}
-.mxZa .fknoepfe a,.mxZa .fknoepfe .g{background:#E9E9EE;color:#1C1C1E}.mxZa .fknoepfe .r{background:#C4161C;color:#fff}
-.mxZa .wl{background:#F7F7F9;border-radius:12px;overflow:hidden}
-.mxZa .wl button{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;margin:0;border:0;border-top:.5px solid #E5E5EA;background:none;padding:13px 14px;min-height:48px;font-size:16px;font-weight:600;font-family:inherit;color:#1C1C1E;text-align:left;cursor:pointer}
-.mxZa .wl button:first-child{border-top:0}.mxZa .wl button b{flex:none;color:#1B8A4B;font-size:18px;line-height:1}
-.mxZa .wl button.an{background:#EDF7F1}
-#mxZaMeld{position:fixed;left:16px;right:16px;bottom:24px;max-width:520px;margin:0 auto;background:#1B8A4B;color:#fff;border-radius:14px;padding:12px 14px;font-weight:700;z-index:99;display:none;align-items:center;justify-content:space-between;gap:12px}
-#mxZaMeld button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:10px;padding:8px 12px;margin:0;font:inherit;font-weight:700;cursor:pointer;flex:none}
-/* iPhone: Betrag und Datum sind immer ganz zu lesen (08.11.2026, stand „2.00“ statt 2.000) */
-@media(max-width:560px){.mxZa .fz{grid-template-columns:104px minmax(0,1fr) 116px}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:104px minmax(0,1fr)}.mxZa .fz>label{font-size:13.5px}.mxZa .fz input[type=date]{padding:9px 4px}.mxZa .fz input[inputmode=decimal]{padding-left:8px}}
-@media(max-width:389px){.mxZa .fz{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);row-gap:6px}.mxZa .fz>label{grid-column:1/-1}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr)}}
 </style><script>
 (function(){
 const $=id=>document.getElementById(id);
@@ -229,6 +201,14 @@ function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kaution
     if(!(bz&&bz.art==="Kaution"&&kr.verrechnet)&&s-eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:s-eB,am:""})}
   if(kr.verrechnet&&+kr.einbehalt>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:+kr.einbehalt,am})}
   return l}
+/* Anzahlung einer Buchung ohne Mietvertrag (09.11.2026): zählt auch nach einem Storno, wenn sie behalten wurde. Zurückgezahltes steht als Minus mit Datum (leer: noch nicht).
+   Ohne Storno-Eintrag (alte Absagen) zählt eine abgesagte Buchung wie bisher nicht. Auf eine neue Buchung übertragen zählt sie dort, hier nicht mehr. */
+function anfragePosten(a){if(!a||a._weg||a.vertrag)return[];const z=a.anzahlung||{},b=n0(z.betrag);if(!b)return[];const am=istTag(z.am)?z.am:"",P=(t,w,d)=>({art:"miete",t,b:w,am:d});
+  if(a.status!=="abgesagt")return[P("Anzahlung",b,am)];const s=a.storno;if(!s||s.uebernommen)return[];
+  if(s.art==="behalten")return[P("Anzahlung, nach Storno behalten",b,am)];
+  if(s.art==="neu")return[P("Anzahlung, auf neue Buchung",b,am)];
+  if(s.art==="zurueck"){const r=[P("Anzahlung, Buchung storniert",b,am)],m=Math.round(+s.betrag||0);if(m>0&&istTag(s.am))r.push(P("Anzahlung zurückgezahlt",-m,s.am));return r}
+  return[]}
 let VON="Monat",NACHHER=()=>{},UNTEN=24,OFFEN=null,ZURUECK=null,MT=0;
 const zu=()=>encodeURIComponent(VON);
 const MAPPE=nr=>"https://barankohler.github.io/mietix-vertrag/?nr="+encodeURIComponent(nr)+"&zeige=mappe&von="+zu();
@@ -242,8 +222,9 @@ const kopf=t=>'<div class="mxKopf"><h3>'+esc(t)+'</h3><button class="mxZu" type=
 function oeffne(schl){const f=blatt();
   if(schl.startsWith("a:")){const a=lies("mietixAnfragen",[]).find(x=>x&&x.id===schl.slice(2));if(!a)return fehlt();const z=a.anzahlung||{};OFFEN={schl};
     f.innerHTML=kopf(a.name||"Buchung")+
-      '<div class="fl">'+esc(a.auto||"")+', Buchung noch ohne Mietvertrag</div>'+
+      '<div class="fl">'+esc(a.auto||"")+(a.status==="abgesagt"?', Buchung storniert':', Buchung noch ohne Mietvertrag')+'</div>'+
       '<div class="fk">Anzahlung</div><div class="fg">'+zeile("Anzahlung","Betrag und bezahlt am",feld("eAnz",n0(z.betrag)),feld("eAnzAm",z.am,"tag"))+'</div>'+
+      (a.storno&&a.storno.art==="zurueck"?'<div class="fk">Rückzahlung</div><div class="fg">'+zeile("Zurückgezahlt","Datum leer: noch nicht",feld("eStB",+a.storno.betrag||0),feld("eStAm",a.storno.am,"tag"))+'</div>':"")+
       '<div class="fhin" id="eHin"></div><div class="fknoepfe"><a href="'+esc(ANFRAGE(a))+'">Buchung öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
   }else{const v=lies("mietixVorgaenge",[]).find(x=>x&&x.nr===schl.slice(2));if(!v)return fehlt();OFFEN={schl};
     const z=v.zahlung||{},an=z.anz||{},re=z.rest||{},ka=z.kaut||{},kr=v.kautionRueck||{},e=v.endabrechnung||{},vl=v.verlaengerungen||[];
@@ -281,8 +262,10 @@ function pruefe(){let falsch=0;document.querySelectorAll("#fAendern input[inputm
 function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
   const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
   if(schl.startsWith("a:")){const l=lies("mietixAnfragen",[]),a=l.find(x=>x&&x.id===schl.slice(2));if(!a)return weg();const vorher=JSON.stringify(a);
-    const za=a.anzahlung||{};if(Math.round(n0(za.betrag))===w("eAnz")&&(istTag(za.am)?za.am:"")===t("eAnzAm")){window.mxZu();return}   // nichts geändert
-    a.anzahlung=Object.assign({},za,{betrag:w("eAnz"),am:t("eAnzAm")});
+    const za=a.anzahlung||{},st=a.storno,gleich=Math.round(n0(za.betrag))===w("eAnz")&&(istTag(za.am)?za.am:"")===t("eAnzAm"),stNeu=!!(st&&$("eStB")&&(Math.round(+st.betrag||0)!==w("eStB")||(istTag(st.am)?st.am:"")!==t("eStAm")));
+    if(gleich&&!stNeu){window.mxZu();return}   // nichts geändert
+    if(!gleich)a.anzahlung=Object.assign({},za,{betrag:w("eAnz"),am:t("eAnzAm")});
+    if(stNeu)a.storno=Object.assign({},st,{betrag:w("eStB"),am:t("eStAm")});
     (a.verlauf=a.verlauf||[]).push({am:jetzt,was:"Anzahlung auf der Seite "+VON+" geändert"});
     return fertig("mietixAnfragen","id",a.id,vorher,l)}
   const l=lies("mietixVorgaenge",[]),v=l.find(x=>x&&x.nr===schl.slice(2));if(!v)return weg();const vorher=JSON.stringify(v);
@@ -320,15 +303,81 @@ function einKnopf(){const e=$("mietixRueck");if(e){e.mxWill=false;e.classList.re
 function gespeichert(text,rueck){let me=$("mxZaMeld");if(!me){me=document.createElement("div");me.id="mxZaMeld";me.innerHTML='<span></span><button type="button">Rückgängig</button>';document.body.appendChild(me);
     me.querySelector("button").onclick=()=>{const r=ZURUECK;ZURUECK=null;clearTimeout(MT);me.style.display="none";if(r)r();einKnopf()}}
   einKnopf();me.style.bottom=UNTEN+"px";me.querySelector("span").textContent=text;ZURUECK=rueck;me.style.display="flex";clearTimeout(MT);MT=setTimeout(()=>{me.style.display="none";ZURUECK=null},7000)}
+/* Storno mit Anzahlung (09.11.2026, Bild freigegeben): die Frage kommt nur, wenn wirklich eine Anzahlung da ist */
+const heuteTag=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())};
+const deJ=s=>istTag(s)?s.slice(8,10)+"."+s.slice(5,7)+"."+s.slice(0,4):"";
+function stornoText(a,art,b,voll,am){const zr=(a.von?" vom "+de(a.von)+(a.bis?" bis "+deJ(a.bis):""):"");const t="Ihre Buchung"+(a.auto?" für den "+a.auto:"")+zr+" ist storniert.";
+  if(art==="zurueck")return t+(b<voll?" Von Ihrer Anzahlung über "+eur(voll)+" haben wir Ihnen am "+deJ(am)+" "+eur(b)+" zurückgezahlt.":" Die Anzahlung von "+eur(b)+" haben wir Ihnen am "+deJ(am)+" zurückgezahlt.");
+  return t+" Die Anzahlung von "+eur(voll)+" behalten wir ein."}
+function storno(id,o){o=o||{};const f=blatt(),a=lies("mietixAnfragen",[]).find(x=>x&&x.id===id);if(!a)return fehlt();
+  const z=a.anzahlung||{},voll=Math.round(n0(z.betrag));let art="";
+  const zr=[a.auto,a.von?de(a.von)+(a.bis?" bis "+de(a.bis):""):""].filter(Boolean).join(", ");
+  const opt=(w,t,u)=>'<button type="button" data-st="'+w+'"><span>'+t+'<small>'+u+'</small></span><b hidden>✓</b></button>';
+  f.innerHTML=kopf(o.titel||"Buchung stornieren")+'<div class="fl">'+esc([a.name,zr].filter(Boolean).join(", ")).replace(/\.$/,"")+'. Anzahlung '+eur(voll)+(istTag(z.am)?' am '+de(z.am):"")+' erhalten.</div>'+
+    '<div class="fk">Was passiert mit der Anzahlung?</div><div class="wl">'+opt("behalten","Behalten","Zählt weiter als Einnahme")+opt("zurueck","Zurückzahlen","Steht als Minus mit Datum in Geld und Monat")+
+    '<div class="fg stF" id="eStF" hidden>'+zeile("Betrag","",feld("eStB",voll),feld("eStAm",heuteTag(),"tag"))+'</div>'+opt("neu","Auf neue Buchung","Neue Buchung öffnet sich, "+eur(voll)+" sind schon drin")+'</div>'+
+    '<div class="fhin" id="eHin"></div><div class="fknoepfe"><button type="button" class="g" id="eStZ">Zurück</button><button type="button" class="r" id="eStOk">Stornieren</button></div>';
+  const rot=(t,el)=>{const h=$("eHin");h.className="fhin rot";h.textContent=t;if(el)el.classList.add("falsch")};
+  f.querySelectorAll("[data-st]").forEach(k=>k.onclick=()=>{art=k.dataset.st;f.querySelectorAll("[data-st]").forEach(y=>{const an=y===k;y.classList.toggle("an",an);y.querySelector("b").hidden=!an});$("eStF").hidden=art!=="zurueck";$("eHin").className="fhin"});
+  f.querySelectorAll("#eStF input").forEach(i=>i.addEventListener("input",()=>{i.classList.remove("falsch");$("eHin").className="fhin"}));
+  $("eStZ").onclick=()=>window.mxZu();
+  $("eStOk").onclick=()=>{if(!art)return rot("Bitte wählen, was mit der Anzahlung passiert.");let b=voll,am=heuteTag();
+    if(art==="zurueck"){b=Math.round(zahl($("eStB").value)||0);am=$("eStAm").value;if(!(b>0)||b>voll)return rot("Bitte einen Betrag bis "+eur(voll)+" eintragen.",$("eStB"));if(!istTag(am))return rot("Bitte das Datum eintragen.",$("eStAm"))}
+    const l=lies("mietixAnfragen",[]),y=l.find(x=>x&&x.id===id);if(!y)return weg();const vorher=JSON.stringify(y),jetzt=new Date().toISOString();
+    y.status="abgesagt";y.storno={art,betrag:b,am,wann:jetzt};(y.verlauf=Array.isArray(y.verlauf)?y.verlauf:[]).push({am:jetzt,was:"storniert, Anzahlung "+{behalten:"behalten",zurueck:"zurückgezahlt",neu:"auf neue Buchung"}[art]});
+    if(!schreib("mietixAnfragen",l))return rot("Nicht gespeichert: der Speicher dieses Geräts ist voll. Bitte Seite neu laden und noch einmal versuchen.");
+    einKnopf();if(art==="neu"){window.mxZahlung.geh("https://barankohler.github.io/mietix-vertrag/?neu=1&name="+encodeURIComponent(a.name||"")+"&tel="+encodeURIComponent(a.nummer||"")+"&anzVon="+encodeURIComponent(id)+(VON==="Buchungen"?"":"&von="+zu()));return}
+    NACHHER();if(o.fertig)o.fertig();
+    f.innerHTML=kopf("Storniert")+'<div class="stOk">✓ Storniert'+(a.auto?", "+esc(a.auto)+" ist wieder frei":"")+'</div><textarea id="eStT" aria-label="Nachricht an den Kunden">'+esc(stornoText(a,art,b,voll,am))+'</textarea>'+
+      '<div class="stZw"><button type="button" class="gt" id="eStWa">Per WhatsApp senden</button><button type="button" class="rt" id="eStKo">Kopieren</button></div><div class="stUnten"><button type="button" class="mxAe" id="eStR">Rückgängig</button></div>';
+    $("eStWa").onclick=()=>window.nkWa(a.nummer,$("eStT").value);
+    $("eStKo").onclick=()=>window.nkKopieren($("eStT").value);
+    $("eStR").onclick=()=>{const l2=lies("mietixAnfragen",[]),i=l2.findIndex(x=>x&&x.id===id);if(i>=0){l2[i]=JSON.parse(vorher);if(!schreib("mietixAnfragen",l2))return;einKnopf()}window.mxZu();NACHHER();if(o.fertig)o.fertig()}};
+  window.mxAuf("fAendern");if(typeof window.mxEinheit==="function")window.mxEinheit()}
 // Knopf „Ändern“: auch innerhalb einer Zeile, die sonst in die Mappe führt
-function auslesen(e){const k=e.target.closest&&e.target.closest("[data-za]");if(!k)return null;e.preventDefault();e.stopPropagation();return k.dataset.za}
+function auslesen(e){const k=e.target.closest&&e.target.closest("[data-mxza]");if(!k)return null;e.preventDefault();e.stopPropagation();return k.dataset.mxza}
 document.addEventListener("click",e=>{const s=auslesen(e);if(s)oeffne(s)},true);
 document.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const s=auslesen(e);if(s)oeffne(s)},true);
-window.mxZahlung={oeffne,verlInRest,posten,gespeichert,
+window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRest,posten,gespeichert,
   setup(o){VON=o.von||VON;NACHHER=o.nachher||NACHHER;UNTEN=o.unten||UNTEN},
-  knopf:schl=>'<span class="mxAe" role="button" tabindex="0" data-za="'+esc(schl)+'">Ändern</span>'};
+  knopf:schl=>'<span class="mxAe" role="button" tabindex="0" data-mxza="'+esc(schl)+'">Ändern</span>'};
 })();
-</script></head><body><script>
+</script><style>
+/* Zahlungen ändern (08.11.2026) */
+.mxAe{position:relative;display:inline-block;flex:none;border:0;background:#EFEFF1;color:#1C1C1E;border-radius:9px;padding:6px 11px;font-size:13px;font-weight:600;font-family:inherit;line-height:1.2;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;text-decoration:none}
+.mxAe::after{content:"";position:absolute;inset:-8px -5px}.mxAe:active{background:#E0E0E5}
+.mxZa .fl{font-size:13px;color:#8E8E93;line-height:1.4}
+.mxZa .fk{font-size:13px;font-weight:600;color:#8E8E93;text-transform:uppercase;letter-spacing:.4px;margin:18px 2px 6px}
+.mxZa .fg{background:#F7F7F9;border-radius:12px;padding:4px 12px}
+.mxZa .fz{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr) minmax(0,1.4fr);gap:6px;align-items:center;padding:8px 0;border-bottom:.5px solid #E5E5EA}
+.mxZa .fz:last-child{border-bottom:0}
+.mxZa .fz>label{display:block;margin:0;font-size:15px;font-weight:600;color:#1C1C1E}.mxZa .fz>label small{display:block;font-size:12px;color:#8E8E93;font-weight:500}
+.mxZa .fz input{width:100%;margin:0;border:0;border-radius:10px;background:#fff;padding:9px 10px;font-size:16px;font-weight:600;color:#1C1C1E;min-height:44px}
+.mxZa .fz input:focus{outline:2px solid #C4161C;outline-offset:-2px}
+.mxZa .fz input.falsch{outline:2px solid #C4161C;background:#FDECEC}
+.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr) minmax(0,2.25fr)}
+.mxZa .fz input[type=date]{padding:9px 6px;font-size:15px}
+.mxZa .fz .aw{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;background:#fff;border:0;border-radius:10px;padding:9px 10px;min-height:44px;font-size:16px;font-weight:600;font-family:inherit;color:#1C1C1E;text-align:left;cursor:pointer}
+.mxZa .fz .aw span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mxZa .fz .aw em{flex:none;font-style:normal;color:#C7C7CC;font-size:20px;line-height:1}
+.mxZa .fhin{font-size:13px;line-height:1.4;margin-top:8px;padding:8px 10px;border-radius:10px;display:none}
+.mxZa .fhin.gelb{display:block;background:#FDF3E1;color:#7A5212}.mxZa .fhin.rot{display:block;background:#FDECEC;color:#C4161C;font-weight:600}
+.mxZa .fknoepfe{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px}
+.mxZa .fknoepfe a,.mxZa .fknoepfe button{display:flex;align-items:center;justify-content:center;border:0;border-radius:14px;padding:14px;margin:0;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none}
+.mxZa .fknoepfe a,.mxZa .fknoepfe .g{background:#E9E9EE;color:#1C1C1E}.mxZa .fknoepfe .r{background:#C4161C;color:#fff}
+.mxZa .wl{background:#F7F7F9;border-radius:12px;overflow:hidden}
+.mxZa .wl button{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;margin:0;border:0;border-top:.5px solid #E5E5EA;background:none;padding:13px 14px;min-height:48px;font-size:16px;font-weight:600;font-family:inherit;color:#1C1C1E;text-align:left;cursor:pointer}
+.mxZa .wl button:first-child{border-top:0}.mxZa .wl button b{flex:none;color:#1B8A4B;font-size:18px;line-height:1}
+.mxZa .wl button.an{background:#EDF7F1}
+.mxZa [hidden]{display:none!important}.mxZa .wl button span{min-width:0}.mxZa .wl button small{display:block;font-size:13px;font-weight:500;color:#8E8E93;margin-top:1px}.mxZa .wl .stF{background:#EDF7F1;border-radius:0;border-top:.5px solid #DCEFE3}
+.mxZa .stOk{background:#EDF7F1;color:#1B8A4B;font-weight:700;border-radius:12px;padding:12px 14px;font-size:16px;margin-bottom:10px}
+.mxZa textarea{display:block;width:100%;min-height:118px;margin:0;border:0;border-radius:12px;background:#F7F7F9;padding:12px;font-size:16px;font-family:inherit;line-height:1.4;color:#1C1C1E;resize:vertical}.mxZa textarea:focus{outline:2px solid #C4161C;outline-offset:-2px}
+.mxZa .stZw{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.mxZa .stZw button{border:0;border-radius:12px;background:#EFEFF1;padding:13px 8px;margin:0;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer}.mxZa .stZw .gt{color:#1B8A4B}.mxZa .stZw .rt{color:#C4161C}.mxZa .stUnten{text-align:center;margin-top:14px}
+#mxZaMeld{position:fixed;left:16px;right:16px;bottom:24px;max-width:520px;margin:0 auto;background:#1B8A4B;color:#fff;border-radius:14px;padding:12px 14px;font-weight:700;z-index:99;display:none;align-items:center;justify-content:space-between;gap:12px}
+#mxZaMeld button{border:0;background:rgba(255,255,255,.22);color:#fff;border-radius:10px;padding:8px 12px;margin:0;font:inherit;font-weight:700;cursor:pointer;flex:none}
+/* iPhone: Betrag und Datum sind immer ganz zu lesen (08.11.2026, stand „2.00“ statt 2.000) */
+@media(max-width:560px){.mxZa .fz{grid-template-columns:104px minmax(0,1fr) 116px}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:104px minmax(0,1fr)}.mxZa .fz>label{font-size:13.5px}.mxZa .fz input[type=date]{padding:9px 4px}.mxZa .fz input[inputmode=decimal]{padding-left:8px}}
+@media(max-width:389px){.mxZa .fz{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);row-gap:6px}.mxZa .fz>label{grid-column:1/-1}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr)}}
+</style></head><body><script>
 /* Listenkopf: Suche, Auswahlfelder, Trefferzahl, Filter zurücksetzen (04.11.2026) */
 (function(){if(window.mxListenkopf)return;
   const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -428,9 +477,8 @@ const vorMon=m=>{const d=new Date(+m.slice(0,4),+m.slice(5,7)-2,1);return d.getF
 
 /* ---------- Jede Miete in Posten ---------- art: miete | verl | kaution;  am leer = noch offen.  Die Rechnung liegt in stil/zahlung_aendern.py (mxZahlung.posten), Geld benutzt dieselbe. */
 // Anzahlung einer Buchung ohne Mietvertrag zählt schon (wie Seite Geld)
-function anfrageZeilen(){return lies("mietixAnfragen",[]).filter(a=>a&&!a._weg&&a.status!=="abgesagt"&&!a.vertrag&&a.anzahlung&&n0(a.anzahlung.betrag)).map(a=>({
-  anf:a,v:{nr:"",name:a.name||"",auto:a.auto||"",vonD:a.von||a.vonD||"",bisD:a.bis||a.bisD||""},
-  p:[{art:"miete",t:"Anzahlung",b:n0(a.anzahlung.betrag),am:istTag(a.anzahlung.am)?a.anzahlung.am:""}]}))}
+function anfrageZeilen(){return lies("mietixAnfragen",[]).map(a=>({a,p:mxZahlung.anfragePosten(a)})).filter(x=>x.p.length).map(({a,p})=>({
+  anf:a,v:{nr:"",name:a.name||"",auto:a.auto||"",vonD:a.von||a.vonD||"",bisD:a.bis||a.bisD||""},p}))}
 function alleMieten(){return lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&v.nr).map(v=>({v,p:mxZahlung.posten(v)})).concat(anfrageZeilen())}
 
 /* ---------- Seite ---------- */
