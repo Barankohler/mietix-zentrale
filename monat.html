@@ -29,6 +29,7 @@ main{max-width:680px;margin:0 auto;padding:4px 16px 90px}
 .gz b{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
 .gz.summe1{font-weight:700;font-size:17px;border-bottom:0;padding-bottom:2px}.gz.summe1 b{font-size:24px;color:var(--gruen);font-weight:700}
 .gz.offen{border-top:.5px solid #E5E5EA;border-bottom:0;margin-top:8px}.gz.offen b,.gz.offen span{color:var(--rot);font-weight:700}
+.gz.offen+.gz.offen{margin-top:0}a.gz{align-items:center;min-height:44px;color:inherit;text-decoration:none;cursor:pointer}a.gz:active{background:#F2F2F7}a.gz b{display:inline-flex;align-items:center;gap:8px}a.gz em{font-style:normal;font-weight:400;color:#C7C7CC;font-size:22px;line-height:1}   /* Aus früheren Monaten noch offen, führt zu den Mietverträgen (09.11.2026) */
 .vgl{font-size:13px;font-weight:600}
 .kz{font-size:13px;color:var(--grau);margin-top:8px;padding-top:10px;border-top:.5px solid #E5E5EA}
 /* Jede Miete als Tabelle */
@@ -211,6 +212,23 @@ const de=s=>s&&/^\d{4}-\d\d-\d\d/.test(s)?s.slice(8,10)+"."+s.slice(5,7)+".":"";
 const istTag=s=>/^\d{4}-\d\d-\d\d$/.test(String(s||""));
 const ichMail=()=>{try{return((JSON.parse(localStorage.getItem("mietixSitzung")||"null")||{}).email||"").toLowerCase()}catch(e){return""}};
 const verlInRest=v=>(v.verlaengerungen||[]).filter(y=>!!(y.imRest||y.bezahlt)).reduce((s,y)=>s+(+y.aufpreis||0),0);   // so liegt die Verlängerung im Mietvertrag im Rest
+/* Jede Miete in Posten: eine Rechnung für Monat und Geld (09.11.2026), gezählt im Monat der Zahlung.
+   Verlängerungen stecken im Mietvertrag im Rest, sobald sie bezahlt sind oder mit dem Rest kommen; Mietpreis Rest = Rest ohne diese.
+   Nachzahlung mit der Kaution verrechnet steckt im Einbehalt und zählt nur dort, nichts doppelt. */
+function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kautionRueck||{},an=z.anz||{},re=z.rest||{};
+  if(n0(an.betrag))l.push({art:"miete",t:"Anzahlung",b:n0(an.betrag),am:istTag(an.am)?an.am:""});
+  const mietRest=n0(re.betrag)-verlInRest(v);
+  if(mietRest>0)l.push({art:"miete",t:"Mietpreis Rest",b:mietRest,am:istTag(re.am)?re.am:""});
+  (v.verlaengerungen||[]).forEach((y,i)=>{const b=+y.aufpreis||0;if(b<=0)return;
+    const am=y.imRest?(istTag(re.am)?re.am:""):y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";
+    l.push({art:"verl",t:"Verlängerung"+(v.verlaengerungen.length>1?" "+(i+1):""),b,am})});
+  const s=+e.summe||0;
+  if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0;
+    if(bz&&bz.art==="Kaution"&&kr.verrechnet){}   // steckt im Einbehalt der Kaution
+    else if(eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:eB,am:bz.am});
+    if(!(bz&&bz.art==="Kaution"&&kr.verrechnet)&&s-eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:s-eB,am:""})}
+  if(kr.verrechnet&&+kr.einbehalt>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:+kr.einbehalt,am})}
+  return l}
 let VON="Monat",NACHHER=()=>{},UNTEN=24,OFFEN=null,ZURUECK=null,MT=0;
 const zu=()=>encodeURIComponent(VON);
 const MAPPE=nr=>"https://barankohler.github.io/mietix-vertrag/?nr="+encodeURIComponent(nr)+"&zeige=mappe&von="+zu();
@@ -306,7 +324,7 @@ function gespeichert(text,rueck){let me=$("mxZaMeld");if(!me){me=document.create
 function auslesen(e){const k=e.target.closest&&e.target.closest("[data-za]");if(!k)return null;e.preventDefault();e.stopPropagation();return k.dataset.za}
 document.addEventListener("click",e=>{const s=auslesen(e);if(s)oeffne(s)},true);
 document.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const s=auslesen(e);if(s)oeffne(s)},true);
-window.mxZahlung={oeffne,verlInRest,gespeichert,
+window.mxZahlung={oeffne,verlInRest,posten,gespeichert,
   setup(o){VON=o.von||VON;NACHHER=o.nachher||NACHHER;UNTEN=o.unten||UNTEN},
   knopf:schl=>'<span class="mxAe" role="button" tabindex="0" data-za="'+esc(schl)+'">Ändern</span>'};
 })();
@@ -373,7 +391,7 @@ window.mxZahlung={oeffne,verlInRest,gespeichert,
     return LK};
   const tag=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   window.mxListenkopf.zeit=[["heute","Heute"],["woche","Diese Woche"],["naechsteW","Nächste Woche"],["monat","Dieser Monat"],["vormonat","Letzter Monat"],["naechsterM","Nächster Monat"],["jahr","Dieses Jahr"]];
-  window.mxListenkopf.freiText=freiText;
+  window.mxListenkopf.freiText=freiText;window.mxListenkopf.monatWahl=monatBlatt;   // Monat und Jahr auch ohne Filterfeld: monatWahl(titel,false,"",[datenMonate],"JJJJ-MM",w=>…), leer = aktueller Monat
   /* Liegt eine Miete im Zeitraum? Bei von/bis mit Uhrzeit minutengenau, bei den festen Knöpfen wie bisher nach Tagen */
   window.mxListenkopf.ueberlappt=function(w,vd,vu,bd,bu){const s=window.mxListenkopf.spanne(w);if(!s)return true;
     if(freiTeile(w)){const an=vd?vd+"T"+(vu||"00:00"):"",en=(bd||vd)?(bd||vd)+"T"+(bu||"23:59"):"";return an<=s[1]&&en>=s[0]}
@@ -408,28 +426,12 @@ const heute=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+
 const JETZT=heute().slice(0,7);
 const vorMon=m=>{const d=new Date(+m.slice(0,4),+m.slice(5,7)-2,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)};
 
-/* ---------- Jede Miete in Posten ----------
-   art: miete | verl | kaution;  am leer = noch offen.  Nichts wird doppelt gezählt (siehe Kopf der Datei). */
-const verlInRest=mxZahlung.verlInRest;   // liegt im Baustein, damit Fenster und Rechnung dasselbe sagen
-function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kautionRueck||{},an=z.anz||{},re=z.rest||{};
-  if(n0(an.betrag))l.push({art:"miete",t:"Anzahlung",b:n0(an.betrag),am:istTag(an.am)?an.am:""});
-  const mietRest=n0(re.betrag)-verlInRest(v);
-  if(mietRest>0)l.push({art:"miete",t:"Mietpreis Rest",b:mietRest,am:istTag(re.am)?re.am:""});
-  (v.verlaengerungen||[]).forEach((y,i)=>{const b=+y.aufpreis||0;if(b<=0)return;
-    const am=y.imRest?(istTag(re.am)?re.am:""):y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";
-    l.push({art:"verl",t:"Verlängerung"+(v.verlaengerungen.length>1?" "+(i+1):""),b,am})});
-  const s=+e.summe||0;
-  if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0;
-    if(bz&&bz.art==="Kaution"&&kr.verrechnet){}   // steckt im Einbehalt der Kaution
-    else if(eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:eB,am:bz.am});
-    if(!(bz&&bz.art==="Kaution"&&kr.verrechnet)&&s-eB>0)l.push({art:"miete",t:"Nachzahlung Rückgabe",b:s-eB,am:""})}
-  if(kr.verrechnet&&+kr.einbehalt>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:+kr.einbehalt,am})}
-  return l}
+/* ---------- Jede Miete in Posten ---------- art: miete | verl | kaution;  am leer = noch offen.  Die Rechnung liegt in stil/zahlung_aendern.py (mxZahlung.posten), Geld benutzt dieselbe. */
 // Anzahlung einer Buchung ohne Mietvertrag zählt schon (wie Seite Geld)
 function anfrageZeilen(){return lies("mietixAnfragen",[]).filter(a=>a&&!a._weg&&a.status!=="abgesagt"&&!a.vertrag&&a.anzahlung&&n0(a.anzahlung.betrag)).map(a=>({
   anf:a,v:{nr:"",name:a.name||"",auto:a.auto||"",vonD:a.von||a.vonD||"",bisD:a.bis||a.bisD||""},
   p:[{art:"miete",t:"Anzahlung",b:n0(a.anzahlung.betrag),am:istTag(a.anzahlung.am)?a.anzahlung.am:""}]}))}
-function alleMieten(){return lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&v.nr).map(v=>({v,p:posten(v)})).concat(anfrageZeilen())}
+function alleMieten(){return lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&v.nr).map(v=>({v,p:mxZahlung.posten(v)})).concat(anfrageZeilen())}
 
 /* ---------- Seite ---------- */
 function zeichne(){
@@ -448,16 +450,25 @@ function zeichne(){
   const kautErh=v=>{const k=(v.zahlung||{}).kaut||{};return istTag(k.am)?n0(k.betrag):0};
   const kErh=passt.filter(x=>x.v.zahlung&&inMon(((x.v.zahlung||{}).kaut||{}).am)).reduce((s,x)=>s+kautErh(x.v),0);
   const kBei=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&(!LK.w.auto||v.auto===LK.w.auto)).reduce((s,v)=>{const kr=v.kautionRueck||{};return s+(kautErh(v)&&!istTag(kr.am)?Math.max(0,kautErh(v)-(kr.verrechnet?+kr.einbehalt||0:0)):0)},0);
-  const vm=vorMon(M),reinVor=alle.reduce((s,x)=>s+x.p.filter(y=>String(y.am).slice(0,7)===vm).reduce((t,y)=>t+y.b,0),0);
-  const d=reinVor?Math.round((rein-reinVor)/reinVor*100):null,st=n=>n+(n===1?" Miete":" Mieten"),MN=M.slice(0,4)===JETZT.slice(0,4)?MON[+M.slice(5,7)-1]:monName(M);   // anderes Jahr: immer mit Jahreszahl (09.11.2026)
+  // Vergleich nur, wenn er etwas aussagt (09.11.2026, stand „▲ 765 %“): laufender Monat 1. bis heute gegen dieselben Tage im Vormonat, vergangener Monat voll gegen voll.
+  // Der Vormonat muss ganz erfasst sein (früheste Zahlung davor) und mindestens 500 € haben, sonst nur sein Betrag.
+  const vm=vorMon(M),summeIn=(m,bis)=>alle.reduce((s,x)=>s+x.p.filter(y=>String(y.am).slice(0,7)===m&&(!bis||y.am<=bis)).reduce((t,y)=>t+y.b,0),0),reinVor=summeIn(vm);
+  const laeuft=M===JETZT,tagVor=Math.min(+heute().slice(8,10),new Date(+vm.slice(0,4),+vm.slice(5,7),0).getDate());
+  const basis=laeuft?summeIn(vm,vm+"-"+pad(tagVor)):reinVor,frueh=alle.reduce((m,x)=>x.p.reduce((n,y)=>y.am&&(!n||y.am<n)?y.am:n,m),"");
+  const d=M<=JETZT&&frueh&&frueh<vm+"-01"&&reinVor>=500&&basis>=500?Math.round((summeIn(M,laeuft?heute():"")-basis)/basis*100):null,st=n=>n+(n===1?" Miete":" Mieten"),MN=M.slice(0,4)===JETZT.slice(0,4)?MON[+M.slice(5,7)-1]:monName(M);   // anderes Jahr: immer mit Jahreszahl (09.11.2026)
+  const MV=vm.slice(0,4)===JETZT.slice(0,4)?MON[+vm.slice(5,7)-1]:monName(vm),VT=laeuft?(tagVor===1?"1. ":"1. bis "+tagVor+". ")+MV:MV;
+  // Offen aus früheren Monaten: Mietverträge, die schon vorbei sind und im Monat oben nicht stehen. Übergeben oder zurück, Buchungen und nie angetretene Mieten zählen nicht
+  const auch=x=>(!LK.w.auto||x.v.auto===LK.w.auto)&&LK.passt(x.v.name+" "+x.v.auto+" "+x.v.nr);
+  const offenFrueher=laeuft?alle.filter(x=>!x.anf&&x.off>0&&!x.zeigen&&(x.v.ueb||x.v.status==="zurück")&&String(x.v.bisD||x.v.vonD||"9999").slice(0,7)<M&&auch(x)).reduce((s,x)=>s+x.off,0):0;
   let h='<div class="drei">'+
     '<div class="gr"><i>Mietpreise</i><b>'+eur(miete)+'</b><small>'+st(anz("miete"))+'</small></div>'+
     '<div class="gr"><i>Verlängerungen</i><b>'+eur(verl)+'</b><small>'+st(anz("verl"))+'</small></div>'+
     '<div class="gr"><i>Kaution einbehalten</i><b>'+eur(kEin)+'</b><small>'+st(anz("kaution"))+'</small></div></div>';
   h+='<div class="karte gesamt">'+
     '<div class="gz summe1"><span>Zusammen im '+MN+'</span><b>'+eur(rein)+'</b></div>'+
-    (d!=null&&!LK.aktiv()?'<div class="vgl '+(d>=0?"hoch":"runter")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+' % gegenüber '+MON[+vm.slice(5,7)-1]+' ('+eur(reinVor)+')</div>':"")+
+    (LK.q||LK.w.auto||M>JETZT?"":d!=null?'<div class="vgl '+(d>=0?"hoch":"runter")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+' % gegenüber '+VT+' ('+eur(basis)+')</div>':reinVor?'<div class="vgl leise">'+MV+': '+eur(reinVor)+'</div>':"")+
     (offen?'<div class="gz offen"><span>Noch offen</span><b>'+eur(offen)+'</b></div>':"")+
+    (offenFrueher?'<a class="gz offen" id="offenFrueher" href="https://barankohler.github.io/mietix-vertrag/?zeige=abgeschlossen&amp;von=Monat"><span>Aus früheren Monaten noch offen</span><b>'+eur(offenFrueher)+'<em>›</em></b></a>':"")+
     '<div class="kz">Kaution: '+eur(kErh)+' im '+MN+' bei Übergabe erhalten, '+eur(kBei)+' liegen gerade bei uns.</div></div>';
   h+='<div class="abschnitt">Jede Miete im '+MN+'</div>';
   if(!passt.length)h+='<div class="karte leer">Keine Miete im '+monName(M)+(LK.aktiv()?" mit diesem Filter":"")+'.</div>';

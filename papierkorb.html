@@ -120,6 +120,16 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 .lkZeile a{color:#C4161C;font-weight:700;text-decoration:none;white-space:nowrap;cursor:pointer}
 .lkRad{background:#F7F7F9;border-radius:14px;overflow:hidden}.lkRad div{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:.5px solid #E5E5EA;cursor:pointer}.lkRad div:first-child{border-top:0}
 .lkRad div span{flex:1;min-width:0;font-size:16px;font-weight:600}.lkRad div u{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:2px solid #C7C7CC;box-sizing:border-box}.lkRad div.an u{border:7px solid #C4161C}
+.lkVb{margin-top:14px;display:grid;gap:10px}.mxKopf+.lkVb{margin-top:0}.lkVbZ{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px}.lkVbZ>div{min-width:0}
+.lkVbZ label{display:block;margin:0 0 5px 3px!important;font-size:14px;font-weight:700;color:#6E6E73}
+.lkVbZ input{display:block;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box;height:48px;margin:0!important;padding:0 12px!important;border:0!important;border-radius:12px;background:#F2F2F7;font-family:inherit;font-size:16px;font-weight:600;color:#1C1C1E;text-align:left;-webkit-appearance:none;appearance:none}
+.lkVbZ input::-webkit-date-and-time-value{text-align:left}
+.lkVbF{color:#C4161C;font-size:14px;font-weight:700;margin:8px 3px 0}.lkVbF:empty{display:none}
+.lkMon{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:10px}.mxKopf+.lkMon,.lkRad+.lkMon{margin-top:0}.lkRad+.lkMon{margin-top:10px}
+.lkMon button{position:relative;display:block;width:100%;margin:0;border:0;border-radius:12px;background:#F2F2F7;color:#1C1C1E;min-height:50px;padding:0 2px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lkMon button.an{background:#1C1C1E;color:#fff;font-weight:700}.lkMon button.da::after{content:"";position:absolute;left:50%;bottom:6px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#1B8A4B}.lkMon button.an.da::after{background:#7BE0A6}
+.lkMGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.lkJahre{display:flex;flex-direction:column;gap:8px;max-height:224px;overflow:auto}
+.lkMHin{font-size:13px;color:#8A8A8E;margin:10px 2px 0}
 .lkFertig{display:block;width:100%;margin-top:14px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
@@ -147,19 +157,49 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
 (function(){if(window.mxListenkopf)return;
   const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
   const norm=t=>String(t==null?"":t).toLowerCase().replace(/\s+/g," ").trim();
-  function blatt(titel,werte,wert,fertig){let f=document.getElementById("lkFenster");
+  const freiTeile=w=>{const t=String(w||"").split("|");return t[0]==="frei"?{vd:t[1]||"",vu:t[2]||"10:00",bd:t[3]||"",bu:t[4]||"10:00"}:null};
+  const freiText=w=>{const p=freiTeile(w),j=new Date().getFullYear(),k=x=>{const t=x.split("-");return Number(t[2])+"."+Number(t[1])+"."+(Number(t[0])===j?"":t[0].slice(2))};return p.vd&&p.bd?k(p.vd)+" bis "+k(p.bd):p.vd?"ab "+k(p.vd):"bis "+k(p.bd)};
+  const vbZeile=(t,d,u)=>'<div class="lkVbZ"><div><label for="'+d+'">'+t+'</label><input type="date" id="'+d+'"></div><div><label for="'+u+'">Uhr</label><input type="time" id="'+u+'" value="10:00"></div></div>';
+  const MK_L=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],MK_K=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+  const monText=v=>/^\d{4}-\d\d$/.test(v)?MK_L[+v.slice(5,7)-1]+" "+v.slice(0,4):v;
+  const dieserMon=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")};
+  /* Monat und Jahr nebeneinander (09.11.2026, Baran): jeder Monat ist wählbar, nicht nur die mit Einträgen */
+  function monatBlatt(titel,mitAlle,alleText,mitDaten,wert,fertig){let f=document.getElementById("lkFenster");
+    if(!f){f=document.createElement("div");f.className="mxFenster";f.id="lkFenster";f.setAttribute("role","dialog");document.body.appendChild(f)}
+    const jetzt=dieserMon(),start=wert||(mitAlle?"":jetzt),da=new Set(mitDaten),j0=+jetzt.slice(0,4);
+    let J=+(start||jetzt).slice(0,4),M=start?+start.slice(5,7):0;
+    const jahre=[...new Set([j0-1,j0,j0+1,J].concat([...da].map(x=>+x.slice(0,4))))].sort((a,b)=>a-b);
+    f.setAttribute("aria-label",titel);
+    const hatDaten=(j,m)=>da.has(j+"-"+String(m).padStart(2,"0")),jahrDaten=j=>[...da].some(x=>+x.slice(0,4)===j);
+    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+
+      (mitAlle?'<div class="lkRad"><div data-alle="1"><span>'+esc(alleText)+'</span><u></u></div></div>':"")+
+      '<div class="lkMon"><div class="lkMGrid">'+MK_K.map((t,i)=>'<button type="button" data-m="'+(i+1)+'" aria-label="'+MK_L[i]+'">'+t+'</button>').join("")+'</div><div class="lkJahre">'+jahre.map(j=>'<button type="button" data-j="'+j+'">'+j+'</button>').join("")+'</div></div>'+
+      '<div class="lkMHin">Grüner Punkt: dort gibt es Einträge.</div><button type="button" class="lkFertig">Fertig</button>';
+    const zeig=()=>{f.querySelectorAll("[data-m]").forEach(b=>{b.classList.toggle("an",+b.dataset.m===M);b.classList.toggle("da",hatDaten(J,+b.dataset.m))});
+      f.querySelectorAll("[data-j]").forEach(b=>{b.classList.toggle("an",+b.dataset.j===J);b.classList.toggle("da",jahrDaten(+b.dataset.j))});
+      const a=f.querySelector("[data-alle]");if(a)a.classList.toggle("an",!M)};
+    f.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{M=+b.dataset.m;zeig()});
+    f.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{J=+b.dataset.j;if(!mitAlle&&!M)M=+jetzt.slice(5,7);zeig()});
+    const a=f.querySelector("[data-alle]");if(a)a.onclick=()=>{M=0;zeig()};
+    zeig();f.querySelector(".lkFertig").onclick=()=>{const v=M?J+"-"+String(M).padStart(2,"0"):"";window.mxZu();fertig(!mitAlle&&v===jetzt?"":v)};window.mxAuf("lkFenster")}
+  function blatt(titel,werte,wert,fertig,frei){let f=document.getElementById("lkFenster");
     if(!f){f=document.createElement("div");f.className="mxFenster";f.id="lkFenster";f.setAttribute("role","dialog");document.body.appendChild(f)}
     let w=wert;f.setAttribute("aria-label",titel);
-    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div><div class="lkRad">'+
-      werte.map(([v,t],i)=>'<div data-i="'+i+'" class="'+(v===w?"an":"")+'"><span>'+esc(t)+'</span><u></u></div>').join("")+'</div><button type="button" class="lkFertig">Fertig</button>';
-    f.querySelectorAll("[data-i]").forEach(z=>z.onclick=()=>{w=werte[+z.dataset.i][0];f.querySelectorAll("[data-i]").forEach(y=>y.classList.toggle("an",y===z))});
-    f.querySelector(".lkFertig").onclick=()=>{window.mxZu();fertig(w)};window.mxAuf("lkFenster")}
+    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+(frei==="nur"?"":'<div class="lkRad">'+
+      werte.map(([v,t],i)=>'<div data-i="'+i+'" class="'+(v===w?"an":"")+'"><span>'+esc(t)+'</span><u></u></div>').join("")+'</div>')+(frei?'<div class="lkVb">'+vbZeile("von","lkVonD","lkVonU")+vbZeile("bis","lkBisD","lkBisU")+'</div><div class="lkVbF" role="alert"></div>':"")+'<button type="button" class="lkFertig">Fertig</button>';
+    const fld=i=>document.getElementById(i),feh=f.querySelector(".lkVbF"),rad=z=>f.querySelectorAll("[data-i]").forEach(y=>y.classList.toggle("an",y===z));
+    f.querySelectorAll("[data-i]").forEach(z=>z.onclick=()=>{w=werte[+z.dataset.i][0];rad(z);if(frei){fld("lkVonD").value="";fld("lkBisD").value="";fld("lkVonU").value="10:00";fld("lkBisU").value="10:00";feh.textContent=""}});
+    if(frei){const p=freiTeile(w);if(p){fld("lkVonD").value=p.vd;fld("lkVonU").value=p.vu;fld("lkBisD").value=p.bd;fld("lkBisU").value=p.bu}
+      const neu=()=>{feh.textContent="";const vd=fld("lkVonD").value,bd=fld("lkBisD").value;if(vd||bd){w=["frei",vd,fld("lkVonU").value||"10:00",bd,fld("lkBisU").value||"10:00"].join("|");rad(null)}else if(freiTeile(w)){w="";rad(f.querySelector('[data-i="0"]'))}};
+      ["lkVonD","lkVonU","lkBisD","lkBisU"].forEach(i=>{fld(i).addEventListener("input",neu);fld(i).addEventListener("change",neu)})}
+    f.querySelector(".lkFertig").onclick=()=>{const p=frei&&freiTeile(w);if(p&&p.vd&&p.bd&&p.vd+"T"+p.vu>p.bd+"T"+p.bu){feh.textContent="„bis“ liegt vor „von“. Bitte Datum oder Uhrzeit ändern.";return}window.mxZu();fertig(w)};window.mxAuf("lkFenster")}
   window.mxListenkopf=function(hostId,schluessel,o){const K="mietixLK:"+schluessel;let st={};try{st=JSON.parse(sessionStorage.getItem(K)||"{}")}catch(e){}
     const LK={q:norm(st.q),w:Object.assign({},st.w||{}),roh:st.q||""};let bau=false,zeileT="";
+    (o.felder||[]).forEach(f=>{if(f.frei==="nur"&&LK.w[f.k]&&!freiTeile(LK.w[f.k]))delete LK.w[f.k]});
     const merke=()=>{try{sessionStorage.setItem(K,JSON.stringify({q:LK.roh,w:LK.w}))}catch(e){}};
     const host=()=>document.getElementById(hostId);
     const felderZeigen=()=>{(o.felder||[]).forEach(f=>{const el=host().querySelector('[data-lk="'+f.k+'"]');if(!el)return;const v=LK.w[f.k]||"",p=(f.werte()||[]).find(x=>x[0]===v);
-      el.querySelector("b").textContent=v?(p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
+      el.querySelector("b").textContent=v?(freiTeile(v)?freiText(v):f.monate?monText(v):p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
     const zeileZeigen=()=>{const z=host().querySelector(".lkZeile");if(!z)return;z.innerHTML='<span>'+esc(zeileT)+'</span>'+(LK.aktiv()?'<a role="button" tabindex="0">Filter zurücksetzen</a>':"");
       const a=z.querySelector("a");if(a)a.onclick=()=>{LK.roh="";LK.q="";LK.w={};merke();const i=host().querySelector("input");if(i)i.value="";kreuz();felderZeigen();o.neu()}};
     const kreuz=()=>{const k=host().querySelector(".lkSuche button");if(k)k.style.display=LK.roh?"":"none"};
@@ -170,12 +210,17 @@ input[type=date],input[type=time]{min-width:0;max-width:100%}
         ((o.felder||[]).length?'<div class="lkFelder">'+o.felder.map(f=>'<div class="lkFeld" role="button" tabindex="0" data-lk="'+f.k+'"><span><small>'+esc(f.t)+'</small><b></b></span><em>›</em></div>').join("")+'</div>':"")+'<div class="lkZeile"></div></div>';
       const i=h.querySelector("input");i.value=LK.roh;i.addEventListener("input",()=>{LK.roh=i.value;LK.q=norm(i.value);merke();kreuz();o.neu()});
       h.querySelector(".lkSuche button").onclick=e=>{e.preventDefault();i.value="";LK.roh="";LK.q="";merke();kreuz();o.neu();i.focus()};kreuz();
-      (o.felder||[]).forEach(f=>{h.querySelector('[data-lk="'+f.k+'"]').onclick=()=>{blatt(f.t,[["",f.alle]].concat(f.werte()||[]),LK.w[f.k]||"",w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()})}})}
+      (o.felder||[]).forEach(f=>{h.querySelector('[data-lk="'+f.k+'"]').onclick=()=>{const nimm=w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()};if(f.monate){monatBlatt(f.t,f.monate==="alle",f.alle,(f.werte()||[]).map(x=>x[0]),LK.w[f.k]||"",nimm);return}blatt(f.t,[["",f.alle]].concat(f.werte()||[]),LK.w[f.k]||"",w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()},f.frei)}})}
       felderZeigen();zeileZeigen();return LK};
     return LK};
   const tag=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   window.mxListenkopf.zeit=[["heute","Heute"],["woche","Diese Woche"],["naechsteW","Nächste Woche"],["monat","Dieser Monat"],["vormonat","Letzter Monat"],["naechsterM","Nächster Monat"],["jahr","Dieses Jahr"]];
-  window.mxListenkopf.spanne=function(w){const n=new Date(),j=n.getFullYear(),m=n.getMonth(),mo=new Date(j,m,n.getDate()-((n.getDay()+6)%7));
+  window.mxListenkopf.freiText=freiText;window.mxListenkopf.monatWahl=monatBlatt;   // Monat und Jahr auch ohne Filterfeld: monatWahl(titel,false,"",[datenMonate],"JJJJ-MM",w=>…), leer = aktueller Monat
+  /* Liegt eine Miete im Zeitraum? Bei von/bis mit Uhrzeit minutengenau, bei den festen Knöpfen wie bisher nach Tagen */
+  window.mxListenkopf.ueberlappt=function(w,vd,vu,bd,bu){const s=window.mxListenkopf.spanne(w);if(!s)return true;
+    if(freiTeile(w)){const an=vd?vd+"T"+(vu||"00:00"):"",en=(bd||vd)?(bd||vd)+"T"+(bu||"23:59"):"";return an<=s[1]&&en>=s[0]}
+    return String(vd||"")<=s[1]&&String(bd||vd||"")>=s[0]};
+  window.mxListenkopf.spanne=function(w){const p=freiTeile(w);if(p)return[p.vd?p.vd+"T"+p.vu:"0000-01-01T00:00",p.bd?p.bd+"T"+p.bu:"9999-12-31T23:59"];const n=new Date(),j=n.getFullYear(),m=n.getMonth(),mo=new Date(j,m,n.getDate()-((n.getDay()+6)%7));
     const pl=(d,x)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+x);
     return{heute:[tag(n),tag(n)],woche:[tag(mo),tag(pl(mo,6))],naechsteW:[tag(pl(mo,7)),tag(pl(mo,13))],monat:[tag(new Date(j,m,1)),tag(new Date(j,m+1,0))],vormonat:[tag(new Date(j,m-1,1)),tag(new Date(j,m,0))],naechsterM:[tag(new Date(j,m+1,1)),tag(new Date(j,m+2,0))],jahr:[j+"-01-01",j+"-12-31"]}[w]||null};
 })();
@@ -226,8 +271,12 @@ function alle(){
   V.forEach(v=>{if(!v||!v.name)return;const e=hol(v.name,"vertrag");if(!e)return;
     if(!e.gesperrt){["telefon","anschrift","geb","gebort","email"].forEach(f=>{if(!e[f]&&v[f])e[f]=String(v[f])});if(v.telefon)e._tels.push(ziffern(v.telefon))}
     const z=v.zahlung||{},rest=z.rest||{};
+    // Offene Endabrechnung (09.11.2026): Summe minus bezahlt, teilbezahlt zählt die Differenz, mit der Kaution verrechnet zählt als bezahlt
+    const ea=v.endabrechnung||{},kr=v.kautionRueck||{},eS=v._weg?0:zahl(ea.summe),eBz=ea.bezahlt&&ea.bezahlt.am?ea.bezahlt:null;
+    const kautNochDa=!!(z.kaut&&z.kaut.am&&!v.kautionRueck);   // Kaution liegt noch bei uns und ist nicht abgerechnet: wie im Mietvertrag noch keine Schuld (09.11.2026)
+    const nachOffen=kautNochDa||(eBz&&eBz.art==="Kaution"&&kr.verrechnet)?0:Math.max(0,Math.round(eS-(eBz?(eBz.betrag!=null?zahl(eBz.betrag):eS):kr.verrechnet?zahl(kr.einbehalt):0)));
     e.vertraege.push({nr:v.nr,auto:v.auto||"",von:v.vonD||"",bis:v.bisD||"",preis:zahl(v.gesamt||v.preis1),status:v.status||"",
-      mieteOffen:!!(v.vonD&&v.vonD<h&&((!rest.am&&zahl(rest.betrag))||(v.verlaengerungen||[]).some(y=>!y.bezahlt?+y.aufpreis>0:y.gezahlt!=null&&(+y.aufpreis||0)>y.gezahlt)))})});   // wie offenBetrag im Mietvertrag (05.11.2026)
+      mieteOffen:!!(v.vonD&&v.vonD<h&&((!rest.am&&zahl(rest.betrag))||(v.verlaengerungen||[]).some(y=>!y.bezahlt?+y.aufpreis>0:y.gezahlt!=null&&(+y.aufpreis||0)>y.gezahlt))),nachOffen})});   // wie offenBetrag im Mietvertrag (05.11.2026)
   A.forEach(a=>{if(!a||!a.name)return;const e=hol(a.name,"anfrage");if(!e)return;
     if(!e.gesperrt){if(!e.telefon&&a.nummer)e.telefon=String(a.nummer);if(!e.ort&&a.ort)e.ort=String(a.ort);if(a.nummer)e._tels.push(ziffern(a.nummer))}
     e.anfragen.push({tag:a.tag||"",auto:a.auto||"",von:a.von||"",bis:a.bis||"",status:a.status||""})});
@@ -261,6 +310,7 @@ function alle(){
     if(!e.ort&&e.anschrift){const t=e.anschrift.match(/\b\d{5}\s+(.+)$/);if(t)e.ort=t[1].trim()}
     const w=[];if(e.rechtsstreit)w.push("Rechtsstreit");if(e.schadenOffen)w.push("Schaden offen "+e.schadenOffen.toLocaleString("de-DE",{style:"currency",currency:"EUR"}));
     const mo=e.vertraege.filter(v=>v.mieteOffen);if(mo.length)w.push("Miete nicht bezahlt ("+mo.map(v=>v.auto).join(", ")+")");
+    const na=e.vertraege.filter(v=>v.nachOffen>0);if(na.length)w.push("Nachzahlung offen "+na.reduce((s,v)=>s+v.nachOffen,0).toLocaleString("de-DE")+" € ("+na.map(v=>v.auto).join(", ")+")");
     e.warn=w;e.alter=alter(e.geb);return e})}
 function alter(geb){if(!/^\d{4}-\d{2}-\d{2}$/.test(geb||""))return null;const g=new Date(geb),h=new Date();
   let a=h.getFullYear()-g.getFullYear();if(h.getMonth()<g.getMonth()||(h.getMonth()===g.getMonth()&&h.getDate()<g.getDate()))a--;return a>0&&a<120?a:null}
