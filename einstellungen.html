@@ -119,7 +119,7 @@ html body .buGk,html body .alK,html body .uGk,html body h2.hT,html body #s_unter
 <div class="hinweis">Sicherungspunkte der ganzen Zentrale liegen auf dem Mac (Personal-OS, projects, mietix, staende) und in iCloud (Excel Archiv, Mietix, Stände). Zu Claude sagen: „Hol Stand 4 zurück.“</div>
 </div>
 <script>
-const WA="*Mietix*\n\nZentrale: https://barankohler.github.io/mietix-zentrale/\nAnfragen: https://barankohler.github.io/mietix-anfragen/\nKalender: https://barankohler.github.io/mietix-belegung/\nAngebot: https://barankohler.github.io/mietix-belegung/?zeige=angebot\nBuchungen: https://barankohler.github.io/mietix-vertrag/\nKunden: https://barankohler.github.io/mietix-zentrale/kunden.html\nAutos: https://barankohler.github.io/mietix-autos/\nGeld: https://barankohler.github.io/mietix-geld/\nMonat: https://barankohler.github.io/mietix-zentrale/monat.html\nZahlen: https://barankohler.github.io/mietix-zentrale/statistik.html\nSchäden: https://barankohler.github.io/mietix-schadensabrechnung/\nNachrichten: https://barankohler.github.io/mietix-zentrale/nachrichten.html\nWhatsApp: https://barankohler.github.io/mietix-zentrale/whatsapp.html\nUmsatzbringer: https://barankohler.github.io/mietix-zentrale/umsatzbringer.html\nStory: https://barankohler.github.io/mietix-story/\nUmsatz-Radar: https://barankohler.github.io/mietix-umsatz-radar/\nPapierkorb: https://barankohler.github.io/mietix-zentrale/papierkorb.html\nEinstellungen: https://barankohler.github.io/mietix-zentrale/einstellungen.html";
+const WA="*Mietix*\n\nZentrale: https://barankohler.github.io/mietix-zentrale/\nAnfragen: https://barankohler.github.io/mietix-anfragen/\nKalender: https://barankohler.github.io/mietix-belegung/\nAngebot: https://barankohler.github.io/mietix-belegung/?zeige=angebot\nBuchungen: https://barankohler.github.io/mietix-vertrag/\nKunden: https://barankohler.github.io/mietix-zentrale/kunden.html\nAutos: https://barankohler.github.io/mietix-autos/\nGeld: https://barankohler.github.io/mietix-geld/\nMonat: https://barankohler.github.io/mietix-zentrale/monat.html\nZahlen: https://barankohler.github.io/mietix-zentrale/statistik.html\nSchäden: https://barankohler.github.io/mietix-schadensabrechnung/\nNachrichten: https://barankohler.github.io/mietix-zentrale/nachrichten.html\nWhatsApp: https://barankohler.github.io/mietix-zentrale/whatsapp.html\nUmsatzbringer: https://barankohler.github.io/mietix-zentrale/umsatzbringer.html\nTermine: https://barankohler.github.io/mietix-zentrale/termine.html\nStory: https://barankohler.github.io/mietix-story/\nUmsatz-Radar: https://barankohler.github.io/mietix-umsatz-radar/\nPapierkorb: https://barankohler.github.io/mietix-zentrale/papierkorb.html\nEinstellungen: https://barankohler.github.io/mietix-zentrale/einstellungen.html";
 document.getElementById("kopieren").onclick=async function(){const k=this,alt=k.textContent;
   try{await navigator.clipboard.writeText(WA);k.textContent="Kopiert"}catch(e){try{await navigator.share({text:WA});return}catch(e2){k.textContent="Kopieren nicht möglich"}}
   setTimeout(()=>{k.textContent=alt},1600)};
@@ -680,12 +680,19 @@ zeigen();abgleichen();auslagernBald();
       "main{max-width:680px!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box;padding-left:16px!important;padding-right:16px!important}header .plus{right:max(16px,calc((100% - 680px)/2 + 16px))!important}}");
   document.head.appendChild(st);
 
+  // Eigene Schritte zählen (mxI im Verlauf), damit „‹ Start“ genau bis zur Startseite zurückgehen kann
+  (function(){try{const ps=history.pushState.bind(history),rs=history.replaceState.bind(history);
+    if(!(history.state&&"mxI" in history.state))rs(Object.assign({},history.state||{},{mxI:0}),"");
+    history.pushState=function(st,t,u){const i=((history.state&&history.state.mxI)||0)+1;return ps(Object.assign({},st||{},{mxI:i}),t,u)};
+    history.replaceState=function(st,t,u){const i=(history.state&&history.state.mxI)||0;return rs(Object.assign({},st||{},{mxI:(st&&"mxI" in st)?st.mxI:i}),t,u)}}catch(e){}})();
+  window.mxZurStart=function(){try{const r=document.referrer||"",start="https://barankohler.github.io/mietix-zentrale/";if(r&&r.split("#")[0].replace(/index\.html$/,"")===start.split("#")[0].replace(/index\.html$/,"")){history.go(-(((history.state&&history.state.mxI)||0)+1));return true}}catch(e){}return false};
   // ‹ Start und Symbol in der Kopfzeile
   const ziel=document.querySelector("header h1")||document.querySelector(".topbar");
   const TITEL={anfragen:"Anfragen",angebot:"Angebot",kalender:"Kalender",vertrag:"Buchungen",kunden:"Kunden",autos:"Autos",geld:"Geld",
     schaeden:/schadensformular/.test(pfad)?"Schadensmeldung":/schadensklaerung/.test(pfad)?"Schadensklärung":"Schäden",nachrichten:"Nachrichten",zahlen:"Zahlen",story:"Story",papierkorb:"Papierkorb",einstellungen:"Einstellungen"};
   if(ziel&&!istStart&&!document.querySelector(".mxStart")){
     const a=document.createElement("a");a.className="mxStart";a.href="https://barankohler.github.io/mietix-zentrale/";a.innerHTML="<b>‹</b>Start";a.setAttribute("aria-label","Zur Startseite");
+    a.addEventListener("click",function(e){if(mxZurStart()){e.preventDefault()}});   // zurück statt vorwärts: kein Kreis im Verlauf (10.11.2026)
     const top=document.createElement("div");top.className="mxTop";top.appendChild(a);
     const punkt=ziel.querySelector("#abgleichPunkt"),titel=TITEL[art]||(ziel.textContent||"").replace(/^\s*MIETIX\s*/i,"").trim();
     let h=ziel;if(ziel.tagName!=="H1"){h=document.createElement("h1");ziel.appendChild(h)}
@@ -693,15 +700,13 @@ zeigen();abgleichen();auslagernBald();
     h.parentNode.insertBefore(top,h);
     addEventListener("scroll",()=>document.documentElement.classList.toggle("mxKlein",scrollY>40),{passive:true})}
 
-  // Wischen vom linken Rand = zurück (nur als App, im Browser macht das Safari)
+  // Wischen vom linken Rand = genau dasselbe wie Zurück (10.11.2026, Prüfung: eigener Weg sprang zu weit)
   const alsApp=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
   if(alsApp){let x0=null,y0=0;
     document.addEventListener("touchstart",e=>{const t=e.touches[0];x0=(t.clientX<=24&&e.touches.length===1&&!e.target.closest("canvas,.pad,#ug,input,textarea,select"))?t.clientX:null;y0=t.clientY},{passive:true});
     document.addEventListener("touchend",e=>{if(x0===null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=Math.abs(t.clientY-y0);x0=null;if(dx<80||dy>60)return;
-      if(document.querySelector(".mxFenster.auf")&&window.mxZu){mxZu();return}
-      if(typeof window.mxZurueck==="function"&&window.mxZurueck())return;
-      if(istStart)return;
-      if(history.length>1&&document.referrer.indexOf(location.origin)===0)history.back();else location.href="https://barankohler.github.io/mietix-zentrale/"},{passive:true})}
+      if(istStart&&!(history.state&&(history.state.mxI||history.state.mxF)))return;
+      if(history.length>1)history.back();else location.href="https://barankohler.github.io/mietix-zentrale/"},{passive:true})}
 
   // Neue Version: die Seite aus dem Netz mit der geladenen vergleichen (ohne Daten, nur der Text der Seite)
   // Seit 05.11.2026: nur die Kopfzeile abfragen (Stand der Seite im Netz gegen Stand der geladenen Seite), nicht jedes Mal die ganze Seite. Kennt der Server keinen Stand, wie bisher über den Text.
@@ -763,7 +768,7 @@ zeigen();abgleichen();auslagernBald();
 (function(){if(window.mxAnschrift)return;
   const desc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
   const st=document.createElement("style");st.textContent=".mxAZ{display:grid;grid-template-columns:minmax(90px,32%) 1fr;gap:10px}.mxAZ>div{min-width:0}.mxAZ input{width:100%;box-sizing:border-box}";document.head.appendChild(st);
-  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/);
+  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{4,5})\s+(.+)$/);   // 4 Stellen: Österreich, Schweiz (10.11.2026)
     if(m){s=m[1].trim().replace(/,$/,"");p=m[2];o=m[3].trim()}else if(voll&&/\d/.test(v))s=v;else o=v.replace(/^,\s*/,"");return{s,p,o}}   // ohne Hausnummer ist es ein Ort (31.10.2026)
   function setzen(inp){if(inp.dataset.mxA)return;inp.dataset.mxA="1";const voll=inp.dataset.anschrift!=="plzort";
     const lab=inp.previousElementSibling&&inp.previousElementSibling.tagName==="LABEL"?inp.previousElementSibling:null;
