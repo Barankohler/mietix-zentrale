@@ -248,6 +248,17 @@ body.nurTermine #uKopf{display:block;background:#fff;border-bottom:3px solid var
 #fAufgabe .tmFehler{color:#C4161C;font-size:15px;font-weight:700;margin:4px 4px 10px}#fAufgabe .tmFehler:empty{display:none}
 #fAufgabe .tmFertig{display:block;width:100%;margin-top:6px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-family:inherit;font-size:17px;font-weight:700;cursor:pointer}
 #fAufgabe .tmZwei{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}#fAufgabe .tmZwei:empty{display:none}
+#fAufgabe .tmRk{display:flex;gap:8px;margin-top:6px}#fAufgabe .tmRk button{border:0;border-radius:999px;padding:9px 18px;font-family:inherit;font-size:15px;font-weight:700;background:#EFEFF1;color:#1C1C1E;cursor:pointer}#fAufgabe .tmRk button.an{background:#1C1C1E;color:#fff}
+#fAufgabe .tmFl select{display:block;width:100%!important;box-sizing:border-box;margin:0!important;padding:2px 20px 2px 0!important;border:0!important;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Cpath d='M1.5 1.5l5 5.5-5 5.5' stroke='%23C7C7CC' stroke-width='2.4' fill='none'/%3E%3C/svg%3E") no-repeat right 2px center!important;font-family:inherit;font-size:17px!important;font-weight:600;color:#1C1C1E;min-height:30px;-webkit-appearance:none;appearance:none;outline:0}
+.taKn{display:grid;grid-template-columns:1fr 1fr;gap:10px}.taKn .tmNeu{margin:12px 0 4px}
+.tmGk.plan{color:#1E8E4E}
+#fPlan{background:#F2F2F7}.plTage{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px;align-items:center}.plTage button{border:0;border-radius:999px;padding:9px 16px;font-family:inherit;font-size:15px;font-weight:700;background:#E5E5EA;color:#1C1C1E;cursor:pointer}.plTage button.an{background:#1C1C1E;color:#fff}
+#fPlan .plTage input#plDatum,.plTage input{border:0!important;border-radius:999px!important;padding:0 12px!important;background:#E5E5EA!important;font-family:inherit;font-size:15px!important;font-weight:700;color:#1C1C1E;height:38px!important;min-height:38px!important;width:170px!important;max-width:170px!important;box-shadow:none!important;margin:0!important}
+#fPlan .taHin{font-size:13px;font-weight:600;color:#6E6E73;margin:0 4px 8px}
+#fPlan .tmFertig{display:block;width:100%;margin-top:6px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-family:inherit;font-size:17px;font-weight:700;cursor:pointer}
+.plL{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:10px}.plZ{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:.5px solid #D1D1D6;cursor:pointer}.plZ:first-child{border-top:0}
+.plZ u{flex:0 0 26px;width:26px;height:26px;border-radius:50%;border:2px solid #C7C7CC;box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900;text-decoration:none}.plZ.an u{background:#34C759;border-color:#34C759}
+.plZ span{flex:1;min-width:0}.plZ b{display:block;font-size:16px;font-weight:700;color:#1C1C1E}.plZ i{display:block;font-style:normal;font-size:13px;font-weight:600;color:#6E6E73;margin-top:1px}
 #fAufgabe .tmZwei button{border:0;border-radius:12px;padding:12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
@@ -745,17 +756,25 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
 <div id="tmTeil"><div class="tmSeg" id="tmSeg" role="tablist"><button type="button" data-tab="t" class="an">Termine<span id="tmSegT"></span></button><button type="button" data-tab="a">Aufgaben<span id="tmSegA"></span></button></div>
 <div id="tmTerm"><div id="tmLK"></div><button type="button" class="tmNeu" id="tmNeu">+ Neuer Termin</button><div id="tmListe"></div></div>
-<div id="tmAufg" hidden><button type="button" class="tmNeu" id="taNeu">+ Neue Aufgabe</button><div id="taListe"></div></div></div>
+<div id="tmAufg" hidden><div class="taKn"><button type="button" class="tmNeu" id="taNeu">+ Neue Aufgabe</button><button type="button" class="tmNeu" id="taPlan">Tag planen</button></div><div id="taListe"></div></div></div>
 <div class="mxFenster" id="fAufgabe" role="dialog" aria-label="Aufgabe"><div class="mxKopf"><h3 id="taKopf">Neue Aufgabe</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
 <div class="tmGl">
  <label class="tmFl"><span>Was ist zu tun *</span><input id="taText" type="text" autocomplete="off" enterkeyhint="done" placeholder="Reifen bestellen, Versicherung anrufen"></label>
+ <div class="tmFl"><span>Für</span><div class="tmRk"><button type="button" data-afuer="fahrzeug">Fahrzeug</button><button type="button" data-afuer="firma">Firma</button></div></div>
+ <label class="tmFl" id="taAutoZ"><span>Fahrzeug</span><select id="taAuto"></select></label>
  <label class="tmFl"><span>Bis wann</span><input id="taBis" type="date"></label>
- <label class="tmFl"><span>Notiz</span><textarea id="taNotiz" rows="2" placeholder="Notiz"></textarea></label>
 </div>
+<div class="tmGl"><label class="tmFl"><span>Notizen</span><textarea id="taNotiz" rows="5" placeholder="Alles Wichtige dazu: Nummern, Ansprechpartner, Stand"></textarea></label></div>
 <div class="taHin" id="taHin">Kommt in 15 Minuten auch in die Excel.</div>
 <div class="tmFehler" id="taFehler" role="alert"></div>
 <button type="button" class="tmFertig" id="taFertig">Fertig</button>
 <div class="tmZwei" id="taZwei"></div>
+</div>
+<div class="mxFenster" id="fPlan" role="dialog" aria-label="Tag planen"><div class="mxKopf"><h3>Tag planen</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+<div class="plTage" id="plTage"></div>
+<div class="taHin">Antippen, was du an dem Tag angehst. Grüner Haken = im Plan.</div>
+<div class="plL" id="plListe"></div>
+<button type="button" class="tmFertig" id="plFertig">Fertig</button>
 </div>
 <div class="mxFenster" id="fTermin" role="dialog" aria-label="Termin"><div class="mxKopf"><h3 id="tmKopf">Neuer Termin</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
 <div class="tmGl">
@@ -2047,19 +2066,30 @@ zeigen();abgleichen();auslagernBald();
   // ---------- Aufgaben (10.11.2026): dieselben Aufgaben wie bei Autos und in der Excel (mietixAufgaben, die Brücke gleicht ab) ----------
   let TAB="t";try{TAB=sessionStorage.getItem("mietixTermineTab")||"t"}catch(e){}
   const aufg=()=>lies("mietixAufgaben",[]).filter(a=>a&&a.id&&!a._weg&&a.aufgabe);
+  // Für, Fahrzeug, Notizen und Tagesplan je Aufgabe in mietixStand.aufgabenInfo (gemeinsamer Speicher). Schlüssel Text und „seit“, so bleibt es,
+  // wenn die Brücke eine neue Aufgabe in die Excel übernimmt und sie dort eine neue Kennung bekommt (10.11.2026)
+  const iKey=a=>String(a.aufgabe||"").trim()+"|"+String(a.seit||"").slice(0,10);
+  const infoAlle=()=>{const st=lies("mietixStand",{})||{},m=st.aufgabenInfo;return m&&typeof m==="object"&&!Array.isArray(m)?m:{}};
+  const info=a=>infoAlle()[iKey(a)]||{};
+  function infoSetzen(a,neu){const st=lies("mietixStand",{})||{},m=Object.assign({},st.aufgabenInfo&&typeof st.aufgabenInfo==="object"&&!Array.isArray(st.aufgabenInfo)?st.aufgabenInfo:{});
+    const k=iKey(a),x=Object.assign({},m[k]||{},neu);Object.keys(x).forEach(n=>{if(x[n]===""||x[n]==null)delete x[n]});if(Object.keys(x).length)m[k]=x;else delete m[k];st.aufgabenInfo=m;schreib("mietixStand",st)}
   function tabZeigen(){document.querySelectorAll("#tmSeg [data-tab]").forEach(b=>{b.classList.toggle("an",b.dataset.tab===TAB);b.setAttribute("aria-selected",b.dataset.tab===TAB)});$("tmTerm").hidden=TAB!=="t";$("tmAufg").hidden=TAB!=="a";
     const nT=Object.values(alle()).filter(t=>t&&!t._weg&&!t.erledigt&&t.vonD).length,nA=aufg().filter(a=>!a.erledigt).length;$("tmSegT").textContent=nT||"";$("tmSegA").textContent=nA||"";
     try{const h=document.querySelector("#uKopf h1");if(h)h.textContent=TAB==="a"?"Aufgaben":"Termine";document.title=TAB==="a"?"Aufgaben":"Termine"}catch(e){}}
   document.querySelectorAll("#tmSeg [data-tab]").forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;try{sessionStorage.setItem("mietixTermineTab",TAB)}catch(e){}tabZeigen();if(TAB==="a")taZeichnen();scrollTo(0,0)});
   function taWann(a,hi){if(!a.bis)return["",""];const d=a.bis,t=Math.round((new Date(d+"T12:00")-new Date(hi+"T12:00"))/864e5);
     return[t<0?"überfällig seit "+kurz(d):t===0?"heute fällig":t===1?"morgen fällig, "+kurz(d):"bis "+kurz(d),t<0||t===0?"rot":""]}
-  function taZeile(a,hi){const w=taWann(a,hi),u=[w[0],a.tun].filter(Boolean).join(", ");
+  function taZeile(a,hi){const w=taWann(a,hi),f=info(a),no=String(f.notiz||a.tun||"").split("\n")[0],u=[w[0],f.fuer==="firma"?"Firma":f.auto?autoAnz(f.auto):"",no].filter(Boolean).join(", ");
     return'<div class="taZ" data-ta="'+esc(a.id)+'"><button type="button" class="taBox'+(a.erledigt?" erl":"")+'" aria-label="'+(a.erledigt?"Wieder offen":"Erledigt")+'">'+(a.erledigt?"✓":"")+'</button><div class="taT"><b>'+esc(a.aufgabe)+'</b>'+(u?'<i class="'+(a.erledigt?"":w[1])+'">'+esc(a.erledigt?"erledigt "+kurz(a.erledigt):u)+'</i>':(a.erledigt?'<i>erledigt '+kurz(a.erledigt)+'</i>':''))+'</div><span class="tmP">›</span></div>'}
   let TA_ERL_AUF=false;
   function taZeichnen(){const hi=iso(new Date()),mo=plus(hi,1),wd=(new Date(hi+"T12:00").getDay()+6)%7,soEnde=plus(hi,6-wd);
     const L=aufg(),offen=L.filter(a=>!a.erledigt).sort((x,y)=>((x.bis||"9")+(x.seit||"")).localeCompare((y.bis||"9")+(y.seit||""))),erl=L.filter(a=>a.erledigt).sort((x,y)=>String(y.erledigt).localeCompare(String(x.erledigt))).slice(0,30);
     const G=[["vorbei","Überfällig",a=>a.bis&&a.bis<hi],["heute","Heute, "+kurz(hi),a=>a.bis===hi],["","Morgen, "+kurz(mo),a=>a.bis===mo],["","Diese Woche",a=>a.bis>mo&&a.bis<=soEnde],["","Später",a=>a.bis>soEnde],["","Ohne Datum",a=>!a.bis]];
-    let h="";G.forEach(([k,t,f])=>{const z=offen.filter(f);if(z.length)h+='<div class="tmGk'+(k?" "+k:"")+'">'+esc(t)+'</div><div class="tmL">'+z.map(a=>taZeile(a,hi)).join("")+'</div>'});
+    let h="";const imPlan=new Set();
+    // Tagesplan (10.11.2026, Baran: „auswählen, welche Aufgaben ich morgen angehe“): geplante Aufgaben stehen oben, nicht doppelt
+    [...new Set(offen.map(a=>info(a).plan).filter(d=>d&&d>=hi))].sort().forEach(d=>{const z=offen.filter(a=>info(a).plan===d);z.forEach(a=>imPlan.add(a.id));
+      h+='<div class="tmGk plan">Plan '+(d===hi?"heute, ":d===mo?"morgen, ":"")+esc(kurz(d))+'</div><div class="tmL">'+z.map(a=>taZeile(a,hi)).join("")+'</div>'});
+    G.forEach(([k,t,f])=>{const z=offen.filter(a=>!imPlan.has(a.id)&&f(a));if(z.length)h+='<div class="tmGk'+(k?" "+k:"")+'">'+esc(t)+'</div><div class="tmL">'+z.map(a=>taZeile(a,hi)).join("")+'</div>'});
     if(!offen.length)h='<div class="tmLeer">Keine offenen Aufgaben. Mit „+ Neue Aufgabe“ eintragen.</div>';
     if(erl.length)h+='<details class="tmErl"'+(TA_ERL_AUF?" open":"")+'><summary><span>Erledigt ('+erl.length+')</span><em>⌄</em></summary><div class="tmL">'+erl.map(a=>taZeile(a,hi)).join("")+'</div></details>';
     $("taListe").innerHTML=h;const d=$("taListe").querySelector(".tmErl");if(d)d.addEventListener("toggle",()=>{TA_ERL_AUF=d.open});
@@ -2068,18 +2098,32 @@ zeigen();abgleichen();auslagernBald();
   // Abhaken mit einem Tipp, Rückgängig direkt danach (Erledigt geht mit der Brücke in die Excel)
   function abhaken(id){const war=(aufg().find(x=>x.id===id)||{}).erledigt||"";const a=taAendern(id,x=>{if(x.erledigt)delete x.erledigt;else x.erledigt=iso(new Date())});if(!a)return;taZeichnen();
     if(a.erledigt&&window.mxRueckBar)mxRueckBar("„"+a.aufgabe+"“ erledigt",()=>{taAendern(id,x=>{if(war)x.erledigt=war;else delete x.erledigt});taZeichnen()},8000);else if(window.nkMeldung)nkMeldung(a.erledigt?"Erledigt":"Wieder offen")}
-  let TA=null;
-  function taOeffnen(id){const a=id&&aufg().find(x=>x.id===id);TA=a?a.id:null;$("taKopf").textContent=a?"Aufgabe":"Neue Aufgabe";$("taText").value=a?a.aufgabe:"";$("taText").readOnly=!!a&&a.quelle!=="handy";
-    $("taBis").value=a?(a.bis||""):"";$("taNotiz").value=a?(a.tun||""):"";$("taFehler").textContent="";
+  let TA=null,TA_FUER="firma";
+  function taFuer(){document.querySelectorAll("#fAufgabe [data-afuer]").forEach(b=>b.classList.toggle("an",b.dataset.afuer===TA_FUER));$("taAutoZ").style.display=TA_FUER==="fahrzeug"?"":"none"}
+  document.querySelectorAll("#fAufgabe [data-afuer]").forEach(b=>b.onclick=()=>{TA_FUER=b.dataset.afuer;taFuer()});
+  function taOeffnen(id){const a=id&&aufg().find(x=>x.id===id);TA=a?a.id:null;const f=a?info(a):{};TA_FUER=f.fuer||(f.auto?"fahrzeug":"firma");
+    $("taAuto").innerHTML='<option value="">Fahrzeug wählen</option>'+AUTOS.map(x=>'<option value="'+esc(x[0])+'">'+esc(x[1])+'</option>').join("");if(f.auto&&!AUTOS.some(x=>x[0]===f.auto))$("taAuto").insertAdjacentHTML("beforeend",'<option value="'+esc(f.auto)+'">'+esc(f.auto)+'</option>');$("taAuto").value=f.auto||"";taFuer();$("taKopf").textContent=a?"Aufgabe":"Neue Aufgabe";$("taText").value=a?a.aufgabe:"";$("taText").readOnly=!!a&&a.quelle!=="handy";
+    $("taBis").value=a?(a.bis||""):"";$("taNotiz").value=a?(f.notiz!=null?f.notiz:(a.tun||"")):"";$("taFehler").textContent="";
     $("taHin").textContent=a&&a.quelle!=="handy"?"Aus der Excel: Text dort ändern. Datum und Erledigt gehen von hier in die Excel.":"Kommt in 15 Minuten auch in die Excel.";
     $("taZwei").innerHTML=a?'<button type="button" id="taErlK">'+(a.erledigt?"Wieder offen":"Erledigt")+'</button>':"";if(a)$("taErlK").onclick=()=>{window.mxZu();abhaken(a.id)};
     window.mxAuf("fAufgabe");if(!a)setTimeout(()=>{try{$("taText").focus()}catch(e){}},250)}
-  function taFertig(){const t=$("taText").value.trim(),bis=$("taBis").value,no=$("taNotiz").value.trim();
+  function taFertig(){const t=$("taText").value.trim(),bis=$("taBis").value,no=$("taNotiz").value.trim(),au=TA_FUER==="fahrzeug"?$("taAuto").value:"";
     if(!t){$("taFehler").textContent="Bitte eintragen, was zu tun ist.";return}
-    if(TA){taAendern(TA,a=>{if(a.quelle==="handy")a.aufgabe=t;if((a.bis||"")!==bis){a.bis=bis;if(bis)a.bisNeu={bis,am:new Date().toISOString()}}a.tun=no})}
-    else{const l=lies("mietixAufgaben",[]);l.push({id:"h"+String(Date.now())+Math.random().toString(36).slice(2,6),aufgabe:t,status:"Offen",bis:bis||"",tun:no,seit:iso(new Date()),quelle:"handy"});schreib("mietixAufgaben",l)}
+    if(TA){const alt=aufg().find(x=>x.id===TA),fAlt=alt?info(alt):{};if(alt&&alt.quelle==="handy"&&alt.aufgabe!==t&&Object.keys(fAlt).length)infoSetzen(alt,{fuer:"",auto:"",notiz:"",plan:""});   // Text geändert: Info zieht mit
+      const a=taAendern(TA,a=>{if(a.quelle==="handy")a.aufgabe=t;if((a.bis||"")!==bis){a.bis=bis;if(bis)a.bisNeu={bis,am:new Date().toISOString()}}});if(a)infoSetzen(a,{fuer:TA_FUER,auto:au,notiz:no,plan:fAlt.plan||""})}
+    else{const l=lies("mietixAufgaben",[]),a={id:"h"+String(Date.now())+Math.random().toString(36).slice(2,6),aufgabe:t,status:"Offen",bis:bis||"",seit:iso(new Date()),quelle:"handy"};l.push(a);schreib("mietixAufgaben",l);infoSetzen(a,{fuer:TA_FUER,auto:au,notiz:no})}
     const neu=!TA;TA=null;window.mxZu();taZeichnen();if(window.nkMeldung)nkMeldung(neu?"Aufgabe eingetragen":"Gespeichert")}
   $("taFertig").onclick=taFertig;$("taNeu").onclick=()=>taOeffnen("");
+  // Tag planen: Tag wählen, dann aus den offenen Aufgaben antippen, was an dem Tag drankommt (gespeichert sofort)
+  let PL_TAG="";
+  function plZeichnen(){const hi=iso(new Date()),mo=plus(hi,1);if(!PL_TAG)PL_TAG=mo;
+    $("plTage").innerHTML='<button type="button" data-pt="'+hi+'" class="'+(PL_TAG===hi?"an":"")+'">Heute, '+esc(kurz(hi))+'</button><button type="button" data-pt="'+mo+'" class="'+(PL_TAG===mo?"an":"")+'">Morgen, '+esc(kurz(mo))+'</button><input type="date" id="plDatum" aria-label="Anderer Tag" value="'+(PL_TAG!==hi&&PL_TAG!==mo?PL_TAG:"")+'">';
+    $("plTage").querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>{PL_TAG=b.dataset.pt;plZeichnen()});$("plDatum").onchange=e=>{if(e.target.value){PL_TAG=e.target.value;plZeichnen()}};
+    const L=aufg().filter(a=>!a.erledigt).sort((x,y)=>((x.bis||"9")+(x.seit||"")).localeCompare((y.bis||"9")+(y.seit||"")));
+    $("plListe").innerHTML=L.length?L.map(a=>{const f=info(a),an=f.plan===PL_TAG,w=taWann(a,hi)[0],anders=f.plan&&f.plan!==PL_TAG&&f.plan>=hi?"geplant "+kurz(f.plan):"";
+      return'<div class="plZ'+(an?" an":"")+'" data-pl="'+esc(a.id)+'" role="button" tabindex="0"><u>'+(an?"✓":"")+'</u><span><b>'+esc(a.aufgabe)+'</b>'+(w||anders?'<i>'+esc([w,anders].filter(Boolean).join(", "))+'</i>':'')+'</span></div>'}).join(""):'<div class="tmLeer" style="margin:0">Keine offenen Aufgaben.</div>';
+    $("plListe").querySelectorAll("[data-pl]").forEach(z=>z.onclick=()=>{const a=aufg().find(x=>x.id===z.dataset.pl);if(!a)return;infoSetzen(a,{plan:info(a).plan===PL_TAG?"":PL_TAG});plZeichnen();taZeichnen()})}
+  $("taPlan").onclick=()=>{PL_TAG="";plZeichnen();window.mxAuf("fPlan")};$("plFertig").onclick=()=>{window.mxZu();taZeichnen()};
   $("taText").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();taFertig()}});
   window.addEventListener("mietix-abgleich",()=>{if(TAB==="a")taZeichnen();else tabZeigen()});
   tabZeigen();if(TAB==="a")taZeichnen();

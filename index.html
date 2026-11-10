@@ -248,6 +248,17 @@ body.nurTermine #uKopf{display:block;background:#fff;border-bottom:3px solid var
 #fAufgabe .tmFehler{color:#C4161C;font-size:15px;font-weight:700;margin:4px 4px 10px}#fAufgabe .tmFehler:empty{display:none}
 #fAufgabe .tmFertig{display:block;width:100%;margin-top:6px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-family:inherit;font-size:17px;font-weight:700;cursor:pointer}
 #fAufgabe .tmZwei{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}#fAufgabe .tmZwei:empty{display:none}
+#fAufgabe .tmRk{display:flex;gap:8px;margin-top:6px}#fAufgabe .tmRk button{border:0;border-radius:999px;padding:9px 18px;font-family:inherit;font-size:15px;font-weight:700;background:#EFEFF1;color:#1C1C1E;cursor:pointer}#fAufgabe .tmRk button.an{background:#1C1C1E;color:#fff}
+#fAufgabe .tmFl select{display:block;width:100%!important;box-sizing:border-box;margin:0!important;padding:2px 20px 2px 0!important;border:0!important;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Cpath d='M1.5 1.5l5 5.5-5 5.5' stroke='%23C7C7CC' stroke-width='2.4' fill='none'/%3E%3C/svg%3E") no-repeat right 2px center!important;font-family:inherit;font-size:17px!important;font-weight:600;color:#1C1C1E;min-height:30px;-webkit-appearance:none;appearance:none;outline:0}
+.taKn{display:grid;grid-template-columns:1fr 1fr;gap:10px}.taKn .tmNeu{margin:12px 0 4px}
+.tmGk.plan{color:#1E8E4E}
+#fPlan{background:#F2F2F7}.plTage{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px;align-items:center}.plTage button{border:0;border-radius:999px;padding:9px 16px;font-family:inherit;font-size:15px;font-weight:700;background:#E5E5EA;color:#1C1C1E;cursor:pointer}.plTage button.an{background:#1C1C1E;color:#fff}
+#fPlan .plTage input#plDatum,.plTage input{border:0!important;border-radius:999px!important;padding:0 12px!important;background:#E5E5EA!important;font-family:inherit;font-size:15px!important;font-weight:700;color:#1C1C1E;height:38px!important;min-height:38px!important;width:170px!important;max-width:170px!important;box-shadow:none!important;margin:0!important}
+#fPlan .taHin{font-size:13px;font-weight:600;color:#6E6E73;margin:0 4px 8px}
+#fPlan .tmFertig{display:block;width:100%;margin-top:6px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-family:inherit;font-size:17px;font-weight:700;cursor:pointer}
+.plL{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:10px}.plZ{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:.5px solid #D1D1D6;cursor:pointer}.plZ:first-child{border-top:0}
+.plZ u{flex:0 0 26px;width:26px;height:26px;border-radius:50%;border:2px solid #C7C7CC;box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900;text-decoration:none}.plZ.an u{background:#34C759;border-color:#34C759}
+.plZ span{flex:1;min-width:0}.plZ b{display:block;font-size:16px;font-weight:700;color:#1C1C1E}.plZ i{display:block;font-style:normal;font-size:13px;font-weight:600;color:#6E6E73;margin-top:1px}
 #fAufgabe .tmZwei button{border:0;border-radius:12px;padding:12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
@@ -745,17 +756,25 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
 <div id="tmTeil"><div class="tmSeg" id="tmSeg" role="tablist"><button type="button" data-tab="t" class="an">Termine<span id="tmSegT"></span></button><button type="button" data-tab="a">Aufgaben<span id="tmSegA"></span></button></div>
 <div id="tmTerm"><div id="tmLK"></div><button type="button" class="tmNeu" id="tmNeu">+ Neuer Termin</button><div id="tmListe"></div></div>
-<div id="tmAufg" hidden><button type="button" class="tmNeu" id="taNeu">+ Neue Aufgabe</button><div id="taListe"></div></div></div>
+<div id="tmAufg" hidden><div class="taKn"><button type="button" class="tmNeu" id="taNeu">+ Neue Aufgabe</button><button type="button" class="tmNeu" id="taPlan">Tag planen</button></div><div id="taListe"></div></div></div>
 <div class="mxFenster" id="fAufgabe" role="dialog" aria-label="Aufgabe"><div class="mxKopf"><h3 id="taKopf">Neue Aufgabe</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
 <div class="tmGl">
  <label class="tmFl"><span>Was ist zu tun *</span><input id="taText" type="text" autocomplete="off" enterkeyhint="done" placeholder="Reifen bestellen, Versicherung anrufen"></label>
+ <div class="tmFl"><span>Für</span><div class="tmRk"><button type="button" data-afuer="fahrzeug">Fahrzeug</button><button type="button" data-afuer="firma">Firma</button></div></div>
+ <label class="tmFl" id="taAutoZ"><span>Fahrzeug</span><select id="taAuto"></select></label>
  <label class="tmFl"><span>Bis wann</span><input id="taBis" type="date"></label>
- <label class="tmFl"><span>Notiz</span><textarea id="taNotiz" rows="2" placeholder="Notiz"></textarea></label>
 </div>
+<div class="tmGl"><label class="tmFl"><span>Notizen</span><textarea id="taNotiz" rows="5" placeholder="Alles Wichtige dazu: Nummern, Ansprechpartner, Stand"></textarea></label></div>
 <div class="taHin" id="taHin">Kommt in 15 Minuten auch in die Excel.</div>
 <div class="tmFehler" id="taFehler" role="alert"></div>
 <button type="button" class="tmFertig" id="taFertig">Fertig</button>
 <div class="tmZwei" id="taZwei"></div>
+</div>
+<div class="mxFenster" id="fPlan" role="dialog" aria-label="Tag planen"><div class="mxKopf"><h3>Tag planen</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+<div class="plTage" id="plTage"></div>
+<div class="taHin">Antippen, was du an dem Tag angehst. Grüner Haken = im Plan.</div>
+<div class="plL" id="plListe"></div>
+<button type="button" class="tmFertig" id="plFertig">Fertig</button>
 </div>
 <div class="mxFenster" id="fTermin" role="dialog" aria-label="Termin"><div class="mxKopf"><h3 id="tmKopf">Neuer Termin</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
 <div class="tmGl">
