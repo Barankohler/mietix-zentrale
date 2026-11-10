@@ -249,9 +249,15 @@ function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kaution
       if(s-eB>0)l.push({art:"miete",t:N,b:s-eB,am:""})}}
   if(kr.teil&&ein>0){let r=ein;for(let i=l.length-1;i>=0&&r>0;i--)if(!l[i].am){const ab=Math.min(r,l[i].b);l[i].b-=ab;r-=ab}   // Kaution reichte nicht: Sie deckt zuerst die Nachzahlung, dann Verlängerung, dann Rest; nur das Übrige bleibt offen
     for(let i=l.length-1;i>=0;i--)if(!l[i].am&&l[i].b<=0)l.splice(i,1)}
-  // Teilzahlungen (10.11.2026): zählen am Tag der Zahlung. Um so viel ist weniger offen; wurde der Rest später mit „Bezahlt“ beglichen, kam dort um so viel weniger rein. Nichts doppelt.
-  {const tz=(v.teilzahlungen||[]).filter(t=>t&&+t.betrag>0);if(tz.length){let T=tz.reduce((q,t)=>q+Math.round(+t.betrag||0),0);const teile=l.filter(p=>p.t!=="Anzahlung");
-    teile.filter(p=>!p.am).concat(teile.filter(p=>p.am).sort((a,b)=>b.am.localeCompare(a.am))).forEach(p=>{if(T<=0)return;const d=Math.min(T,p.b);p.b-=d;T-=d});
+  // Teilzahlungen (10.11.2026): zählen am Tag der Zahlung. Noch offene gehen vom Offenen ab. Ist die Teilzahlung mit „Bezahlt“ abgeschlossen (verrechnet),
+  // steckt ihr Betrag auch in dem, womit abgeschlossen wurde (Rest, Verlängerung, Endabrechnung, Rest aus der Kaution): dort abziehen, nichts doppelt.
+  // Wird das zurückgenommen, gilt die Teilzahlung von selbst wieder als offen. Gleiche Regel wie im Mietvertrag (teilAktiv) und in der Brücke.
+  {const tz=(v.teilzahlungen||[]).filter(t=>t&&+t.betrag>0);if(tz.length){
+    const aktiv=t=>{const w=t.verrechnet;if(!w)return true;if(w==="verl")return vl.some(y=>!y.bezahlt||(y.gezahlt!=null&&(+y.aufpreis||0)>y.gezahlt));if(w==="kaution")return!v.kautionRueck;if(w==="end")return!(e.bezahlt&&e.bezahlt.am);return!re.am};
+    const ab=(rows,T)=>{rows.forEach(p=>{if(T<=0)return;const d=Math.min(T,p.b);p.b-=d;T-=d})},spaet=r=>r.sort((a,b)=>String(b.am).localeCompare(String(a.am)));
+    ab(l.filter(p=>!p.am&&p.t!=="Anzahlung"&&p.art!=="kaution"),tz.filter(aktiv).reduce((q,t)=>q+Math.round(+t.betrag||0),0));
+    tz.filter(t=>!aktiv(t)).forEach(t=>{const w=t.verrechnet,b=Math.round(+t.betrag||0);
+      ab(w==="kaution"?(re.art==="Kaution"?l.filter(p=>p.t==="Mietpreis Rest"&&p.am):[]):w==="end"?l.filter(p=>p.t==="Nachzahlung Rückgabe"&&p.am):w==="verl"?spaet(l.filter(p=>p.art==="verl"&&p.am)):spaet(l.filter(p=>p.am&&(p.t==="Mietpreis Rest"||p.art==="verl"))),b)});
     for(let i=l.length-1;i>=0;i--)if(l[i].b<=0&&l[i].t!=="Anzahlung")l.splice(i,1);
     tz.forEach(t=>l.push({art:"miete",t:"Teilzahlung",b:Math.round(+t.betrag||0),am:istTag(t.am)?t.am:""}))}}
   if((kr.verrechnet||kr.teil)&&ein>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:ein,am})}
