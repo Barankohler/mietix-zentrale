@@ -229,6 +229,26 @@ body.nurTermine #uKopf{display:block;background:#fff;border-bottom:3px solid var
 #fTermin .tmZwei{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}#fTermin .tmZwei:empty{display:none}
 #fTermin .tmZwei button{border:0;border-radius:12px;padding:12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
 #fTermin .tmZwei button.rot{color:#C4161C}
+/* Aufgaben auf der Seite Termine (10.11.2026, Baran: „genau so aufgebaut wie Termine, ganz simpel“) */
+.tmSeg{display:flex;gap:4px;background:#E5E5EA;border-radius:12px;padding:3px;margin:2px 0 6px}
+.tmSeg button{flex:1;border:0;border-radius:10px;padding:10px 6px;background:transparent;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.tmSeg button span{color:#8A8A8E;margin-left:6px}.tmSeg button.an{background:#1C1C1E;color:#fff}.tmSeg button.an span{color:#C7C7CC}
+.taZ{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-top:.5px solid #D1D1D6}.taZ:first-child{border-top:0}
+.taBox{flex:0 0 26px;width:26px;height:26px;border-radius:50%;border:2px solid #C7C7CC;background:#fff;cursor:pointer;margin-top:1px;padding:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900}
+.taBox.erl{background:#34C759;border-color:#34C759}
+.taT{flex:1;min-width:0;cursor:pointer}.taT b{display:block;font-size:17px;font-weight:700;color:#1C1C1E;line-height:1.3;overflow-wrap:anywhere}
+.taT i{display:block;font-style:normal;font-size:14px;font-weight:600;color:#3A3A3C;margin-top:2px;overflow-wrap:anywhere}.taT i.rot{color:#C4161C}
+.tmErl .taT b{color:#6E6E73;text-decoration:line-through}
+#fAufgabe{background:#F2F2F7}#fAufgabe .tmGl{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:10px}
+#fAufgabe .tmFl{display:block;padding:9px 14px 10px;border-top:.5px solid #D1D1D6}#fAufgabe .tmFl:first-child{border-top:0}
+#fAufgabe .tmFl>span{display:block;font-size:12px;font-weight:800;color:#8A8A8E;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+#fAufgabe .tmFl input,#fAufgabe .tmFl textarea{display:block;width:100%!important;max-width:100%!important;box-sizing:border-box;margin:0!important;padding:2px 0!important;border:0!important;background:transparent!important;box-shadow:none!important;font-family:inherit;font-size:17px!important;font-weight:600;color:#1C1C1E;outline:0;min-height:30px;-webkit-appearance:none;appearance:none;border-radius:0}
+#fAufgabe .tmFl textarea{resize:none;min-height:46px;line-height:1.35}#fAufgabe .tmFl input[readonly]{color:#3A3A3C}
+#fAufgabe .taHin{font-size:13px;font-weight:600;color:#6E6E73;margin:-4px 4px 10px}
+#fAufgabe .tmFehler{color:#C4161C;font-size:15px;font-weight:700;margin:4px 4px 10px}#fAufgabe .tmFehler:empty{display:none}
+#fAufgabe .tmFertig{display:block;width:100%;margin-top:6px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-family:inherit;font-size:17px;font-weight:700;cursor:pointer}
+#fAufgabe .tmZwei{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}#fAufgabe .tmZwei:empty{display:none}
+#fAufgabe .tmZwei button{border:0;border-radius:12px;padding:12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
 .mxKnopf span,.mxKlapp>summary span{flex:1;min-width:0}
@@ -723,7 +743,20 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
 
 <h2 id="heuteTitel" style="color:var(--rot)">Achtung</h2>
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
-<div id="tmTeil"><div id="tmLK"></div><button type="button" class="tmNeu" id="tmNeu">+ Neuer Termin</button><div id="tmListe"></div></div>
+<div id="tmTeil"><div class="tmSeg" id="tmSeg" role="tablist"><button type="button" data-tab="t" class="an">Termine<span id="tmSegT"></span></button><button type="button" data-tab="a">Aufgaben<span id="tmSegA"></span></button></div>
+<div id="tmTerm"><div id="tmLK"></div><button type="button" class="tmNeu" id="tmNeu">+ Neuer Termin</button><div id="tmListe"></div></div>
+<div id="tmAufg" hidden><button type="button" class="tmNeu" id="taNeu">+ Neue Aufgabe</button><div id="taListe"></div></div></div>
+<div class="mxFenster" id="fAufgabe" role="dialog" aria-label="Aufgabe"><div class="mxKopf"><h3 id="taKopf">Neue Aufgabe</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+<div class="tmGl">
+ <label class="tmFl"><span>Was ist zu tun *</span><input id="taText" type="text" autocomplete="off" enterkeyhint="done" placeholder="Reifen bestellen, Versicherung anrufen"></label>
+ <label class="tmFl"><span>Bis wann</span><input id="taBis" type="date"></label>
+ <label class="tmFl"><span>Notiz</span><textarea id="taNotiz" rows="2" placeholder="Notiz"></textarea></label>
+</div>
+<div class="taHin" id="taHin">Kommt in 15 Minuten auch in die Excel.</div>
+<div class="tmFehler" id="taFehler" role="alert"></div>
+<button type="button" class="tmFertig" id="taFertig">Fertig</button>
+<div class="tmZwei" id="taZwei"></div>
+</div>
 <div class="mxFenster" id="fTermin" role="dialog" aria-label="Termin"><div class="mxKopf"><h3 id="tmKopf">Neuer Termin</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
 <div class="tmGl">
  <label class="tmFl"><span>Worum geht es *</span><input id="tmTitel" type="text" autocomplete="off" enterkeyhint="done" placeholder="Folierung, TÜV, Steuerberater"></label>

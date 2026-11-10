@@ -229,6 +229,26 @@ body.nurTermine #uKopf{display:block;background:#fff;border-bottom:3px solid var
 #fTermin .tmZwei{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}#fTermin .tmZwei:empty{display:none}
 #fTermin .tmZwei button{border:0;border-radius:12px;padding:12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
 #fTermin .tmZwei button.rot{color:#C4161C}
+/* Aufgaben auf der Seite Termine (10.11.2026, Baran: „genau so aufgebaut wie Termine, ganz simpel“) */
+.tmSeg{display:flex;gap:4px;background:#E5E5EA;border-radius:12px;padding:3px;margin:2px 0 6px}
+.tmSeg button{flex:1;border:0;border-radius:10px;padding:10px 6px;background:transparent;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.tmSeg button span{color:#8A8A8E;margin-left:6px}.tmSeg button.an{background:#1C1C1E;color:#fff}.tmSeg button.an span{color:#C7C7CC}
+.taZ{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-top:.5px solid #D1D1D6}.taZ:first-child{border-top:0}
+.taBox{flex:0 0 26px;width:26px;height:26px;border-radius:50%;border:2px solid #C7C7CC;background:#fff;cursor:pointer;margin-top:1px;padding:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900}
+.taBox.erl{background:#34C759;border-color:#34C759}
+.taT{flex:1;min-width:0;cursor:pointer}.taT b{display:block;font-size:17px;font-weight:700;color:#1C1C1E;line-height:1.3;overflow-wrap:anywhere}
+.taT i{display:block;font-style:normal;font-size:14px;font-weight:600;color:#3A3A3C;margin-top:2px;overflow-wrap:anywhere}.taT i.rot{color:#C4161C}
+.tmErl .taT b{color:#6E6E73;text-decoration:line-through}
+#fAufgabe{background:#F2F2F7}#fAufgabe .tmGl{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:10px}
+#fAufgabe .tmFl{display:block;padding:9px 14px 10px;border-top:.5px solid #D1D1D6}#fAufgabe .tmFl:first-child{border-top:0}
+#fAufgabe .tmFl>span{display:block;font-size:12px;font-weight:800;color:#8A8A8E;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+#fAufgabe .tmFl input,#fAufgabe .tmFl textarea{display:block;width:100%!important;max-width:100%!important;box-sizing:border-box;margin:0!important;padding:2px 0!important;border:0!important;background:transparent!important;box-shadow:none!important;font-family:inherit;font-size:17px!important;font-weight:600;color:#1C1C1E;outline:0;min-height:30px;-webkit-appearance:none;appearance:none;border-radius:0}
+#fAufgabe .tmFl textarea{resize:none;min-height:46px;line-height:1.35}#fAufgabe .tmFl input[readonly]{color:#3A3A3C}
+#fAufgabe .taHin{font-size:13px;font-weight:600;color:#6E6E73;margin:-4px 4px 10px}
+#fAufgabe .tmFehler{color:#C4161C;font-size:15px;font-weight:700;margin:4px 4px 10px}#fAufgabe .tmFehler:empty{display:none}
+#fAufgabe .tmFertig{display:block;width:100%;margin-top:6px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-family:inherit;font-size:17px;font-weight:700;cursor:pointer}
+#fAufgabe .tmZwei{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}#fAufgabe .tmZwei:empty{display:none}
+#fAufgabe .tmZwei button{border:0;border-radius:12px;padding:12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
 .mxKnopf span,.mxKlapp>summary span{flex:1;min-width:0}
@@ -723,7 +743,20 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
 
 <h2 id="heuteTitel" style="color:var(--rot)">Achtung</h2>
 <div class="k" id="heuteK"><div id="fort" class="versteckt"><div class="bal"><i></i></div><span></span></div><div id="heute"><div class="leer">Heute keine Übergabe und keine Rückgabe.</div></div></div>
-<div id="tmTeil"><div id="tmLK"></div><button type="button" class="tmNeu" id="tmNeu">+ Neuer Termin</button><div id="tmListe"></div></div>
+<div id="tmTeil"><div class="tmSeg" id="tmSeg" role="tablist"><button type="button" data-tab="t" class="an">Termine<span id="tmSegT"></span></button><button type="button" data-tab="a">Aufgaben<span id="tmSegA"></span></button></div>
+<div id="tmTerm"><div id="tmLK"></div><button type="button" class="tmNeu" id="tmNeu">+ Neuer Termin</button><div id="tmListe"></div></div>
+<div id="tmAufg" hidden><button type="button" class="tmNeu" id="taNeu">+ Neue Aufgabe</button><div id="taListe"></div></div></div>
+<div class="mxFenster" id="fAufgabe" role="dialog" aria-label="Aufgabe"><div class="mxKopf"><h3 id="taKopf">Neue Aufgabe</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+<div class="tmGl">
+ <label class="tmFl"><span>Was ist zu tun *</span><input id="taText" type="text" autocomplete="off" enterkeyhint="done" placeholder="Reifen bestellen, Versicherung anrufen"></label>
+ <label class="tmFl"><span>Bis wann</span><input id="taBis" type="date"></label>
+ <label class="tmFl"><span>Notiz</span><textarea id="taNotiz" rows="2" placeholder="Notiz"></textarea></label>
+</div>
+<div class="taHin" id="taHin">Kommt in 15 Minuten auch in die Excel.</div>
+<div class="tmFehler" id="taFehler" role="alert"></div>
+<button type="button" class="tmFertig" id="taFertig">Fertig</button>
+<div class="tmZwei" id="taZwei"></div>
+</div>
 <div class="mxFenster" id="fTermin" role="dialog" aria-label="Termin"><div class="mxKopf"><h3 id="tmKopf">Neuer Termin</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
 <div class="tmGl">
  <label class="tmFl"><span>Worum geht es *</span><input id="tmTitel" type="text" autocomplete="off" enterkeyhint="done" placeholder="Folierung, TÜV, Steuerberater"></label>
@@ -1960,7 +1993,7 @@ zeigen();abgleichen();auslagernBald();
       h+='<div class="tmGk'+(k?" "+k:"")+'">'+esc(titel)+'</div><div class="tmL">'+z.map(t=>zeile(t,hi,mitD)).join("")+'</div>'});
     if(!n)h='<div class="tmLeer">'+(LK&&LK.aktiv()?"Nichts gefunden. Anderen Filter wählen oder Filter zurücksetzen.":"Keine offenen Termine. Mit „+ Neuer Termin“ eintragen.")+'</div>';
     if(erl.length)h+='<details class="tmErl"'+(TM_ERL_AUF?" open":"")+'><summary><span>Erledigt ('+erl.length+')</span><em>⌄</em></summary><div class="tmL">'+erl.map(t=>zeile(t,hi,true)).join("")+'</div></details>';
-    $("tmListe").innerHTML=h;if(LK)LK.zeile(n+(n===1?" Termin":" Termine"));
+    $("tmListe").innerHTML=h;if(LK)LK.zeile(n+(n===1?" Termin":" Termine"));if(typeof tabZeigen==="function")try{tabZeigen()}catch(e){}
     const d=$("tmListe").querySelector(".tmErl");if(d)d.addEventListener("toggle",()=>{TM_ERL_AUF=d.open});
     $("tmListe").querySelectorAll("[data-tm]").forEach(z=>z.onclick=()=>oeffnen(z.dataset.tm))}
   let TM_ERL_AUF=false;
@@ -2011,7 +2044,46 @@ zeigen();abgleichen();auslagernBald();
   $("tmFertig").onclick=fertig;$("tmNeu").onclick=()=>oeffnen("");
   window.addEventListener("mietix-abgleich",()=>{zeichne()});
   zeichne();
+  // ---------- Aufgaben (10.11.2026): dieselben Aufgaben wie bei Autos und in der Excel (mietixAufgaben, die Brücke gleicht ab) ----------
+  let TAB="t";try{TAB=sessionStorage.getItem("mietixTermineTab")||"t"}catch(e){}
+  const aufg=()=>lies("mietixAufgaben",[]).filter(a=>a&&a.id&&!a._weg&&a.aufgabe);
+  function tabZeigen(){document.querySelectorAll("#tmSeg [data-tab]").forEach(b=>{b.classList.toggle("an",b.dataset.tab===TAB);b.setAttribute("aria-selected",b.dataset.tab===TAB)});$("tmTerm").hidden=TAB!=="t";$("tmAufg").hidden=TAB!=="a";
+    const nT=Object.values(alle()).filter(t=>t&&!t._weg&&!t.erledigt&&t.vonD).length,nA=aufg().filter(a=>!a.erledigt).length;$("tmSegT").textContent=nT||"";$("tmSegA").textContent=nA||"";
+    try{const h=document.querySelector("#uKopf h1");if(h)h.textContent=TAB==="a"?"Aufgaben":"Termine";document.title=TAB==="a"?"Aufgaben":"Termine"}catch(e){}}
+  document.querySelectorAll("#tmSeg [data-tab]").forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;try{sessionStorage.setItem("mietixTermineTab",TAB)}catch(e){}tabZeigen();if(TAB==="a")taZeichnen();scrollTo(0,0)});
+  function taWann(a,hi){if(!a.bis)return["",""];const d=a.bis,t=Math.round((new Date(d+"T12:00")-new Date(hi+"T12:00"))/864e5);
+    return[t<0?"überfällig seit "+kurz(d):t===0?"heute fällig":t===1?"morgen fällig, "+kurz(d):"bis "+kurz(d),t<0||t===0?"rot":""]}
+  function taZeile(a,hi){const w=taWann(a,hi),u=[w[0],a.tun].filter(Boolean).join(", ");
+    return'<div class="taZ" data-ta="'+esc(a.id)+'"><button type="button" class="taBox'+(a.erledigt?" erl":"")+'" aria-label="'+(a.erledigt?"Wieder offen":"Erledigt")+'">'+(a.erledigt?"✓":"")+'</button><div class="taT"><b>'+esc(a.aufgabe)+'</b>'+(u?'<i class="'+(a.erledigt?"":w[1])+'">'+esc(a.erledigt?"erledigt "+kurz(a.erledigt):u)+'</i>':(a.erledigt?'<i>erledigt '+kurz(a.erledigt)+'</i>':''))+'</div><span class="tmP">›</span></div>'}
+  let TA_ERL_AUF=false;
+  function taZeichnen(){const hi=iso(new Date()),mo=plus(hi,1),wd=(new Date(hi+"T12:00").getDay()+6)%7,soEnde=plus(hi,6-wd);
+    const L=aufg(),offen=L.filter(a=>!a.erledigt).sort((x,y)=>((x.bis||"9")+(x.seit||"")).localeCompare((y.bis||"9")+(y.seit||""))),erl=L.filter(a=>a.erledigt).sort((x,y)=>String(y.erledigt).localeCompare(String(x.erledigt))).slice(0,30);
+    const G=[["vorbei","Überfällig",a=>a.bis&&a.bis<hi],["heute","Heute, "+kurz(hi),a=>a.bis===hi],["","Morgen, "+kurz(mo),a=>a.bis===mo],["","Diese Woche",a=>a.bis>mo&&a.bis<=soEnde],["","Später",a=>a.bis>soEnde],["","Ohne Datum",a=>!a.bis]];
+    let h="";G.forEach(([k,t,f])=>{const z=offen.filter(f);if(z.length)h+='<div class="tmGk'+(k?" "+k:"")+'">'+esc(t)+'</div><div class="tmL">'+z.map(a=>taZeile(a,hi)).join("")+'</div>'});
+    if(!offen.length)h='<div class="tmLeer">Keine offenen Aufgaben. Mit „+ Neue Aufgabe“ eintragen.</div>';
+    if(erl.length)h+='<details class="tmErl"'+(TA_ERL_AUF?" open":"")+'><summary><span>Erledigt ('+erl.length+')</span><em>⌄</em></summary><div class="tmL">'+erl.map(a=>taZeile(a,hi)).join("")+'</div></details>';
+    $("taListe").innerHTML=h;const d=$("taListe").querySelector(".tmErl");if(d)d.addEventListener("toggle",()=>{TA_ERL_AUF=d.open});
+    $("taListe").querySelectorAll("[data-ta]").forEach(z=>{z.querySelector(".taBox").onclick=e=>{e.stopPropagation();abhaken(z.dataset.ta)};z.querySelector(".taT").onclick=()=>taOeffnen(z.dataset.ta)});tabZeigen()}
+  function taAendern(id,f){const l=lies("mietixAufgaben",[]),a=l.find(x=>x&&x.id===id);if(!a)return null;f(a);schreib("mietixAufgaben",l);return a}
+  // Abhaken mit einem Tipp, Rückgängig direkt danach (Erledigt geht mit der Brücke in die Excel)
+  function abhaken(id){const war=(aufg().find(x=>x.id===id)||{}).erledigt||"";const a=taAendern(id,x=>{if(x.erledigt)delete x.erledigt;else x.erledigt=iso(new Date())});if(!a)return;taZeichnen();
+    if(a.erledigt&&window.mxRueckBar)mxRueckBar("„"+a.aufgabe+"“ erledigt",()=>{taAendern(id,x=>{if(war)x.erledigt=war;else delete x.erledigt});taZeichnen()},8000);else if(window.nkMeldung)nkMeldung(a.erledigt?"Erledigt":"Wieder offen")}
+  let TA=null;
+  function taOeffnen(id){const a=id&&aufg().find(x=>x.id===id);TA=a?a.id:null;$("taKopf").textContent=a?"Aufgabe":"Neue Aufgabe";$("taText").value=a?a.aufgabe:"";$("taText").readOnly=!!a&&a.quelle!=="handy";
+    $("taBis").value=a?(a.bis||""):"";$("taNotiz").value=a?(a.tun||""):"";$("taFehler").textContent="";
+    $("taHin").textContent=a&&a.quelle!=="handy"?"Aus der Excel: Text dort ändern. Datum und Erledigt gehen von hier in die Excel.":"Kommt in 15 Minuten auch in die Excel.";
+    $("taZwei").innerHTML=a?'<button type="button" id="taErlK">'+(a.erledigt?"Wieder offen":"Erledigt")+'</button>':"";if(a)$("taErlK").onclick=()=>{window.mxZu();abhaken(a.id)};
+    window.mxAuf("fAufgabe");if(!a)setTimeout(()=>{try{$("taText").focus()}catch(e){}},250)}
+  function taFertig(){const t=$("taText").value.trim(),bis=$("taBis").value,no=$("taNotiz").value.trim();
+    if(!t){$("taFehler").textContent="Bitte eintragen, was zu tun ist.";return}
+    if(TA){taAendern(TA,a=>{if(a.quelle==="handy")a.aufgabe=t;if((a.bis||"")!==bis){a.bis=bis;if(bis)a.bisNeu={bis,am:new Date().toISOString()}}a.tun=no})}
+    else{const l=lies("mietixAufgaben",[]);l.push({id:"h"+String(Date.now())+Math.random().toString(36).slice(2,6),aufgabe:t,status:"Offen",bis:bis||"",tun:no,seit:iso(new Date()),quelle:"handy"});schreib("mietixAufgaben",l)}
+    const neu=!TA;TA=null;window.mxZu();taZeichnen();if(window.nkMeldung)nkMeldung(neu?"Aufgabe eingetragen":"Gespeichert")}
+  $("taFertig").onclick=taFertig;$("taNeu").onclick=()=>taOeffnen("");
+  $("taText").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();taFertig()}});
+  window.addEventListener("mietix-abgleich",()=>{if(TAB==="a")taZeichnen();else tabZeigen()});
+  tabZeigen();if(TAB==="a")taZeichnen();
   // ?t=<id> öffnet einen Termin (von der Startseite), ?neu=1 ein neues Fenster
-  try{const q=new URLSearchParams(location.search);if(q.get("t")&&alle()[q.get("t")])setTimeout(()=>oeffnen(q.get("t")),200);else if(q.get("neu"))setTimeout(()=>oeffnen(""),200)}catch(e){}
+  try{const q=new URLSearchParams(location.search);if(q.get("a")){TAB="a";tabZeigen();taZeichnen()}if(q.get("t")&&alle()[q.get("t")])setTimeout(()=>oeffnen(q.get("t")),200);else if(q.get("neu"))setTimeout(()=>oeffnen(""),200)}catch(e){}
 })();
 </script></body></html>
