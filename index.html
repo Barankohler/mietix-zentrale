@@ -359,6 +359,11 @@ function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kaution
       if(s-eB>0)l.push({art:"miete",t:N,b:s-eB,am:""})}}
   if(kr.teil&&ein>0){let r=ein;for(let i=l.length-1;i>=0&&r>0;i--)if(!l[i].am){const ab=Math.min(r,l[i].b);l[i].b-=ab;r-=ab}   // Kaution reichte nicht: Sie deckt zuerst die Nachzahlung, dann Verlängerung, dann Rest; nur das Übrige bleibt offen
     for(let i=l.length-1;i>=0;i--)if(!l[i].am&&l[i].b<=0)l.splice(i,1)}
+  // Teilzahlungen (10.11.2026): zählen am Tag der Zahlung. Um so viel ist weniger offen; wurde der Rest später mit „Bezahlt“ beglichen, kam dort um so viel weniger rein. Nichts doppelt.
+  {const tz=(v.teilzahlungen||[]).filter(t=>t&&+t.betrag>0);if(tz.length){let T=tz.reduce((q,t)=>q+Math.round(+t.betrag||0),0);const teile=l.filter(p=>p.t!=="Anzahlung");
+    teile.filter(p=>!p.am).concat(teile.filter(p=>p.am).sort((a,b)=>b.am.localeCompare(a.am))).forEach(p=>{if(T<=0)return;const d=Math.min(T,p.b);p.b-=d;T-=d});
+    for(let i=l.length-1;i>=0;i--)if(l[i].b<=0&&l[i].t!=="Anzahlung")l.splice(i,1);
+    tz.forEach(t=>l.push({art:"miete",t:"Teilzahlung",b:Math.round(+t.betrag||0),am:istTag(t.am)?t.am:""}))}}
   if((kr.verrechnet||kr.teil)&&ein>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:ein,am})}
   return l}
 /* Anzahlung einer Buchung ohne Mietvertrag (09.11.2026): zählt auch nach einem Storno, wenn sie behalten wurde. Zurückgezahltes steht als Minus mit Datum (leer: noch nicht).
@@ -553,6 +558,7 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
   const norm=t=>String(t==null?"":t).toLowerCase().replace(/\s+/g," ").trim();
   const freiTeile=w=>{const t=String(w||"").split("|");return t[0]==="frei"?{vd:t[1]||"",vu:t[2]||"10:00",bd:t[3]||"",bu:t[4]||"10:00"}:null};
   const freiText=w=>{const p=freiTeile(w),j=new Date().getFullYear(),k=x=>{const t=x.split("-");return Number(t[2])+"."+Number(t[1])+"."+(Number(t[0])===j?"":t[0].slice(2))};return p.vd&&p.bd?k(p.vd)+" bis "+k(p.bd):p.vd?"ab "+k(p.vd):"bis "+k(p.bd)};
+  const freiLang=w=>{const p=freiTeile(w),j=new Date().getFullYear(),k=(x,u)=>{const t=x.split("-");return Number(t[2])+"."+Number(t[1])+"."+(Number(t[0])===j?"":t[0].slice(2))+" "+u+" Uhr"};return p.vd&&p.bd?k(p.vd,p.vu)+" bis "+k(p.bd,p.bu):p.vd?"ab "+k(p.vd,p.vu):"bis "+k(p.bd,p.bu)};
   const vbZeile=(t,d,u)=>'<div class="lkVbZ"><div><label for="'+d+'">'+t+'</label><input type="date" id="'+d+'"></div><div><label for="'+u+'">Uhr</label><input type="time" id="'+u+'" value="10:00"></div></div>';
   const MK_L=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],MK_K=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
   const monText=v=>/^\d{4}-\d\d$/.test(v)?MK_L[+v.slice(5,7)-1]+" "+v.slice(0,4):v;
@@ -594,7 +600,9 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
     const host=()=>document.getElementById(hostId);
     const felderZeigen=()=>{(o.felder||[]).forEach(f=>{const el=host().querySelector('[data-lk="'+f.k+'"]');if(!el)return;const v=LK.w[f.k]||"",p=(f.werte()||[]).find(x=>x[0]===v);
       el.querySelector("b").textContent=v?(freiTeile(v)?freiText(v):f.monate?monText(v):p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
-    const zeileZeigen=()=>{const z=host().querySelector(".lkZeile");if(!z)return;z.innerHTML='<span>'+esc(zeileT)+'</span>'+(LK.aktiv()?'<a role="button" tabindex="0">Filter zurücksetzen</a>':"");
+    // Gewählter Zeitraum mit Uhrzeit in der Trefferzeile, auf allen Geräten gleich (10.11.2026, Baran)
+    const zeitZusatz=()=>(o.felder||[]).filter(f=>f.frei&&freiTeile(LK.w[f.k])).map(f=>freiLang(LK.w[f.k])).join(", ");
+    const zeileZeigen=()=>{const z=host().querySelector(".lkZeile");if(!z)return;const zz=zeitZusatz();z.innerHTML='<span>'+esc(zeileT+(zz?", "+zz:""))+'</span>'+(LK.aktiv()?'<a role="button" tabindex="0">Filter zurücksetzen</a>':"");
       const a=z.querySelector("a");if(a)a.onclick=()=>{LK.roh="";LK.q="";LK.w={};merke();const i=host().querySelector("input");if(i)i.value="";kreuz();felderZeigen();o.neu()}};
     const kreuz=()=>{const k=host().querySelector(".lkSuche button");if(k)k.style.display=LK.roh?"":"none"};
     LK.aktiv=()=>!!LK.q||Object.keys(LK.w).some(k=>LK.w[k]);
@@ -609,7 +617,7 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
     return LK};
   const tag=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   window.mxListenkopf.zeit=[["heute","Heute"],["woche","Diese Woche"],["naechsteW","Nächste Woche"],["monat","Dieser Monat"],["vormonat","Letzter Monat"],["naechsterM","Nächster Monat"],["jahr","Dieses Jahr"]];
-  window.mxListenkopf.freiText=freiText;window.mxListenkopf.monatWahl=monatBlatt;   // Monat und Jahr auch ohne Filterfeld: monatWahl(titel,false,"",[datenMonate],"JJJJ-MM",w=>…), leer = aktueller Monat
+  window.mxListenkopf.freiText=freiText;window.mxListenkopf.freiLang=freiLang;window.mxListenkopf.monatWahl=monatBlatt;   // Monat und Jahr auch ohne Filterfeld: monatWahl(titel,false,"",[datenMonate],"JJJJ-MM",w=>…), leer = aktueller Monat
   /* Liegt eine Miete im Zeitraum? Bei von/bis mit Uhrzeit minutengenau, bei den festen Knöpfen wie bisher nach Tagen */
   window.mxListenkopf.ueberlappt=function(w,vd,vu,bd,bu){const s=window.mxListenkopf.spanne(w);if(!s)return true;
     if(freiTeile(w)){const an=vd?vd+"T"+(vu||"00:00"):"",en=(bd||vd)?(bd||vd)+"T"+(bu||"23:59"):"";return an<=s[1]&&en>=s[0]}
@@ -715,7 +723,7 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
   // Letzter Tag einer Sperre ist frei, Regel wie im Kalender (D17, 05.11.2026): die Sperre gilt von 00:00 Uhr am ersten bis 00:00 Uhr am letzten Tag
   const sperreTrifft=(von,bis,s)=>von<s.bis&&bis>=s.von;
   const verlOffen=x=>(x.verlaengerungen||[]).reduce((s,y)=>s+(!y.bezahlt?(+y.aufpreis||0):Math.max(0,y.gezahlt!=null?(+y.aufpreis||0)-y.gezahlt:0)),0);
-  const offenB=x=>(!((x.zahlung||{}).rest||{}).am?zahl(((x.zahlung||{}).rest||{}).betrag):0)+verlOffen(x);
+  const offenB=x=>Math.max(0,(!((x.zahlung||{}).rest||{}).am?zahl(((x.zahlung||{}).rest||{}).betrag):0)+verlOffen(x)-(x.teilzahlungen||[]).filter(t=>t&&!t.verrechnet).reduce((q,t)=>q+(+t.betrag||0),0));   // minus Teilzahlung (10.11.2026)
   const endRest=x=>{const e=x.endabrechnung;if(!e)return (x.kostenVorab||[]).reduce((s,k)=>s+Math.round(+k.betrag||0),0);const bz=e.bezahlt;return !bz?(+e.summe||0):bz.betrag!=null?Math.max(0,(+e.summe||0)-(+bz.betrag||0)):0};
   if(window.navigator.standalone)document.getElementById("homeTipp").style.display="none";
   // Zeilen mit Aktion (31.10.2026, Baran: „nebendran eintragen“): Bezahlt und Kaution zurück direkt hier, der Name führt weiter in den Mietvertrag
@@ -921,9 +929,9 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
           text:"*Mehr Kilometer, weniger zahlen*\n\nSie haben mehr vor? Mit einem Kilometerpaket fahren Sie deutlich günstiger als mit Mehrkilometern nach der Rückgabe.\n\nIhr "+v.auto+", für Ihre ganze Miete:\n"+
             st.map((k,i)=>"- +"+k.toLocaleString("de-DE")+" km für "+eur2(c.km[i+1])+" € (statt "+eur2(k*c.kmPreis)+" €)").join("\n")+"\n\nSoll ich Ihnen eines davon dazubuchen? Geben Sie mir einfach kurz Bescheid."})}
       // Danke nach der Rückgabe heute
-      // Danke und Google-Bewertung am Tag nach der Rückgabe, verpasst bis 3 Tage danach (01.11.2026, Baran freigegeben)
+      // Danke und Google-Bewertung ab dem Rückgabetag, verpasst bis 3 Tage danach (10.11.2026, Baran: sofort nach Rückgabe)
       {const rd=String((v.rueck||{}).datum||v.bisD||"").slice(0,10);
-      if(v.status==="zurück"&&rd&&rd<hi&&rd>=plusT(hi,-3)&&!v.bedankt)L.push({g:"Danke und Bewertung",rd,t:v.name,i:v.auto+" zurück "+(rd===plusT(hi,-1)?"gestern":"am "+de(rd))+", mit Google-Bewertungslink",tel:v.telefon,mark:{nr:v.nr,feld:"bedankt"},
+      if(v.status==="zurück"&&rd&&rd<=hi&&rd>=plusT(hi,-3)&&!v.bedankt)L.push({g:"Danke und Bewertung",rd,t:v.name,i:v.auto+" zurück "+(rd===hi?"heute":rd===plusT(hi,-1)?"gestern":"am "+de(rd))+", mit Google-Bewertungslink",tel:v.telefon,mark:{nr:v.nr,feld:"bedankt"},
         text:"Vielen Dank, dass Sie mit uns gefahren sind! Wir hoffen, der "+v.auto+" hat Ihnen Spaß gemacht.\n\nWenn Sie zufrieden waren, freuen wir uns sehr über eine kurze Google-Bewertung:\nhttps://search.google.com/local/writereview?placeid=ChIJ1-FCSDWXvUcRqMvEYExcs1g"})}});
     // Bewertung: eine Zeile je Kunde, die letzte Rückgabe zählt, Senden gilt für alle seine Mieten (Prüfung 09.11.2026)
     {const d={};L.filter(x=>x.g==="Danke und Bewertung").forEach(x=>{const k=nT(x.t),a=d[k];if(!a){d[k]=x;return}const bleibt=x.rd>a.rd?x:a,weg=bleibt===x?a:x;bleibt.mark.auch=(bleibt.mark.auch||[]).concat([weg.mark.nr],weg.mark.auch||[]);d[k]=bleibt;L.splice(L.indexOf(weg),1)})}
@@ -1799,7 +1807,7 @@ zeigen();abgleichen();auslagernBald();
 (function(){if(window.mxAnschrift)return;
   const desc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
   const st=document.createElement("style");st.textContent=".mxAZ{display:grid;grid-template-columns:minmax(90px,32%) 1fr;gap:10px}.mxAZ>div{min-width:0}.mxAZ input{width:100%;box-sizing:border-box}";document.head.appendChild(st);
-  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/);
+  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{4,5})\s+(.+)$/);   // 4 Stellen: Österreich, Schweiz (10.11.2026)
     if(m){s=m[1].trim().replace(/,$/,"");p=m[2];o=m[3].trim()}else if(voll&&/\d/.test(v))s=v;else o=v.replace(/^,\s*/,"");return{s,p,o}}   // ohne Hausnummer ist es ein Ort (31.10.2026)
   function setzen(inp){if(inp.dataset.mxA)return;inp.dataset.mxA="1";const voll=inp.dataset.anschrift!=="plzort";
     const lab=inp.previousElementSibling&&inp.previousElementSibling.tagName==="LABEL"?inp.previousElementSibling:null;

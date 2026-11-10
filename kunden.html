@@ -249,6 +249,11 @@ function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kaution
       if(s-eB>0)l.push({art:"miete",t:N,b:s-eB,am:""})}}
   if(kr.teil&&ein>0){let r=ein;for(let i=l.length-1;i>=0&&r>0;i--)if(!l[i].am){const ab=Math.min(r,l[i].b);l[i].b-=ab;r-=ab}   // Kaution reichte nicht: Sie deckt zuerst die Nachzahlung, dann Verlängerung, dann Rest; nur das Übrige bleibt offen
     for(let i=l.length-1;i>=0;i--)if(!l[i].am&&l[i].b<=0)l.splice(i,1)}
+  // Teilzahlungen (10.11.2026): zählen am Tag der Zahlung. Um so viel ist weniger offen; wurde der Rest später mit „Bezahlt“ beglichen, kam dort um so viel weniger rein. Nichts doppelt.
+  {const tz=(v.teilzahlungen||[]).filter(t=>t&&+t.betrag>0);if(tz.length){let T=tz.reduce((q,t)=>q+Math.round(+t.betrag||0),0);const teile=l.filter(p=>p.t!=="Anzahlung");
+    teile.filter(p=>!p.am).concat(teile.filter(p=>p.am).sort((a,b)=>b.am.localeCompare(a.am))).forEach(p=>{if(T<=0)return;const d=Math.min(T,p.b);p.b-=d;T-=d});
+    for(let i=l.length-1;i>=0;i--)if(l[i].b<=0&&l[i].t!=="Anzahlung")l.splice(i,1);
+    tz.forEach(t=>l.push({art:"miete",t:"Teilzahlung",b:Math.round(+t.betrag||0),am:istTag(t.am)?t.am:""}))}}
   if((kr.verrechnet||kr.teil)&&ein>0){const am=[kr.am,(v.rueck||{}).datum,v.bisD].find(istTag)||"";l.push({art:"kaution",t:"Kaution einbehalten",b:ein,am})}
   return l}
 /* Anzahlung einer Buchung ohne Mietvertrag (09.11.2026): zählt auch nach einem Storno, wenn sie behalten wurde. Zurückgezahltes steht als Minus mit Datum (leer: noch nicht).
@@ -540,8 +545,10 @@ function alle(){
     const ea=v.endabrechnung||{},kr=v.kautionRueck||{},eS=v._weg?0:zahl(ea.summe),eBz=ea.bezahlt&&ea.bezahlt.am?ea.bezahlt:null;
     const kautNochDa=!!(z.kaut&&z.kaut.am&&!v.kautionRueck);   // Kaution liegt noch bei uns und ist nicht abgerechnet: wie im Mietvertrag noch keine Schuld (09.11.2026)
     const nachOffen=kautNochDa||(eBz&&eBz.art==="Kaution"&&kr.verrechnet)?0:Math.max(0,Math.round(eS-(eBz?(eBz.betrag!=null?zahl(eBz.betrag):eS):kr.verrechnet?zahl(kr.einbehalt):0)));
+    // Teilzahlung (10.11.2026): geht zuerst von Miete und Verlängerung ab, was übrig ist von der Nachzahlung
+    const mOff=(!rest.am?zahl(rest.betrag)||0:0)+(v.verlaengerungen||[]).reduce((q,y)=>q+(!y.bezahlt?+y.aufpreis||0:y.gezahlt!=null?Math.max(0,(+y.aufpreis||0)-y.gezahlt):0),0),tz=(v.teilzahlungen||[]).filter(t=>t&&!t.verrechnet).reduce((q,t)=>q+(+t.betrag||0),0);
     e.vertraege.push({nr:v.nr,auto:v.auto||"",von:v.vonD||"",bis:v.bisD||"",preis:zahl(v.gesamt||v.preis1),status:v.status||"",
-      mieteOffen:!!(v.vonD&&v.vonD<h&&((!rest.am&&zahl(rest.betrag))||(v.verlaengerungen||[]).some(y=>!y.bezahlt?+y.aufpreis>0:y.gezahlt!=null&&(+y.aufpreis||0)>y.gezahlt))),nachOffen})});   // wie offenBetrag im Mietvertrag (05.11.2026)
+      mieteOffen:!!(v.vonD&&v.vonD<h&&mOff-tz>0),nachOffen:Math.max(0,nachOffen-Math.max(0,tz-mOff))})});   // wie offenBetrag im Mietvertrag (05.11.2026)   // wie offenBetrag im Mietvertrag (05.11.2026)
   A.forEach(a=>{if(!a||!a.name)return;const e=hol(a.name,"anfrage");if(!e)return;
     if(!e.gesperrt){if(!e.telefon&&a.nummer)e.telefon=String(a.nummer);if(!e.ort&&a.ort)e.ort=String(a.ort);if(a.nummer)e._tels.push(ziffern(a.nummer))}
     e.anfragen.push({tag:a.tag||"",auto:a.auto||"",von:a.von||"",bis:a.bis||"",status:a.status||""})});
