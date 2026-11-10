@@ -303,7 +303,7 @@ function oeffne(schl){const f=blatt();
       '<div class="fz grund"><label>Grund</label>'+feld("eGrund",kEin?kr.grund:"","text","Schaden, Reinigung, Tank")+'</div>'+
       zeile("Zurückgegeben","Datum leer: noch nicht",feld("eZur",kr.betrag!=null?+kr.betrag||0:0),feld("eZurAm",kr.am,"tag"))+'</div>'+
       '<div class="fhin" id="eHin"></div>'+
-      '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Mappe öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
+      '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Buchung öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
     f.innerHTML=h}
   f.querySelectorAll("input").forEach(i=>i.addEventListener("input",pruefe));
   $("eSp").onclick=speichern;
@@ -690,7 +690,7 @@ function mieteZeile(v){const V="../mietix-vertrag/",preis='<b>'+(v.preis?EUR.for
 function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V="../mietix-vertrag/";   // auch andere Schreibweise, zusammengeführt über die Telefonnummer (06.11.2026)
   const seit=e.vertraege.length?e.vertraege[0].von:"",sMon=seit?MON[+seit.slice(5,7)-1]+" "+seit.slice(0,4):"";
   const unter=e.mieten>=2?"Stammkunde, "+e.mieten+" Mieten seit "+sMon:e.mieten===1?"1 Miete im "+sMon:hatBuchung(e)?"Bisher gebucht, noch keine Miete":e.anfragen.length?"Bisher nur Anfrage":"Noch keine Miete";
-  const tel=MK.ziffern(e.telefon),t=String(e.anschrift||"").match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/),t2=!t&&String(e.anschrift||"").match(/^(.*\S),\s*([^,]+)$/),str=t?t[1].replace(/,$/,""):t2?t2[1]:(e.anschrift||""),plzOrt=t?t[2]+" "+t[3]:t2?t2[2]:(e.ort||"");
+  const tel=MK.ziffern(e.telefon),t=String(e.anschrift||"").match(/^(.*?)[,\s]*(\d{4,5})\s+(.+)$/),t2=!t&&String(e.anschrift||"").match(/^(.*\S),\s*([^,]+)$/),str=t?t[1].replace(/,$/,""):t2?t2[1]:(e.anschrift||""),plzOrt=t?t[2]+" "+t[3]:t2?t2[2]:(e.ort||"");
   const wert=x=>x?'<b>'+esc(x)+'</b>':'<b class="leer2">nicht eingetragen</b>';
   let h='<div class="kTop"><a href="#" id="kZu">‹ Kunden</a><button type="button" id="kBearb">'+(BEARB?"Fertig":"Bearbeiten")+'</button></div><div class="blatt">';
   h+='<div class="kk"><div class="av" style="background:'+farbe(e.name)+'">'+esc(ini(e.name))+'</div><h2>'+esc(e.name)+'</h2><p>'+esc(unter)+(e.umsatz?", Umsatz "+EUR.format(e.umsatz):"")+'</p></div>';
@@ -1482,7 +1482,7 @@ zeigen();abgleichen();auslagernBald();
 (function(){if(window.mxAnschrift)return;
   const desc=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
   const st=document.createElement("style");st.textContent=".mxAZ{display:grid;grid-template-columns:minmax(90px,32%) 1fr;gap:10px}.mxAZ>div{min-width:0}.mxAZ input{width:100%;box-sizing:border-box}";document.head.appendChild(st);
-  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{5})\s+(.+)$/);
+  function teile(v,voll){v=String(v||"").trim();let s="",p="",o="";const m=v.match(/^(.*?)[,\s]*(\d{4,5})\s+(.+)$/);   // 4 Stellen: Österreich, Schweiz (10.11.2026)
     if(m){s=m[1].trim().replace(/,$/,"");p=m[2];o=m[3].trim()}else if(voll&&/\d/.test(v))s=v;else o=v.replace(/^,\s*/,"");return{s,p,o}}   // ohne Hausnummer ist es ein Ort (31.10.2026)
   function setzen(inp){if(inp.dataset.mxA)return;inp.dataset.mxA="1";const voll=inp.dataset.anschrift!=="plzort";
     const lab=inp.previousElementSibling&&inp.previousElementSibling.tagName==="LABEL"?inp.previousElementSibling:null;

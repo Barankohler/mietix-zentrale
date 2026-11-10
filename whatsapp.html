@@ -413,7 +413,7 @@ function oeffne(schl){const f=blatt();
       '<div class="fz grund"><label>Grund</label>'+feld("eGrund",kEin?kr.grund:"","text","Schaden, Reinigung, Tank")+'</div>'+
       zeile("Zurückgegeben","Datum leer: noch nicht",feld("eZur",kr.betrag!=null?+kr.betrag||0:0),feld("eZurAm",kr.am,"tag"))+'</div>'+
       '<div class="fhin" id="eHin"></div>'+
-      '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Mappe öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
+      '<div class="fknoepfe"><a href="'+esc(MAPPE(v.nr))+'">Buchung öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>';
     f.innerHTML=h}
   f.querySelectorAll("input").forEach(i=>i.addEventListener("input",pruefe));
   $("eSp").onclick=speichern;
@@ -888,8 +888,8 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
   function verlTag(c,v){const t=Math.max(1,Math.round((new Date(v.bisD+"T12:00")-new Date(v.vonD+"T12:00"))/86400000)),start=(new Date(v.vonD+"T12:00").getDay()+6)%7;
     return Math.round(listenMiete(c,start,t+1))-Math.round(listenMiete(c,start,t))}   // beide Mieten runden, dann abziehen, wie im Mietvertrag
   function waRunde(alle,anf,hi,mo,nach){const plusT=(d,n)=>{const x=new Date(d+"T12:00");x.setDate(x.getDate()+n);return iso(x)},L=[],ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,preis=a=>PREISE&&PREISE.cars.find(c=>c.n===a||c.anzeige===a);
-    const frei=(v)=>!alle.some(x=>x.nr!==v.nr&&x.auto===v.auto&&x.status!=="zurück"&&x.vonD&&x.bisD&&ue(mo,plusT(mo,1),x.vonD,x.bisD))
-      &&!anf.some(a=>a.status==="gebucht"&&a.auto===v.auto&&a.von&&a.bis&&ue(mo,plusT(mo,1),a.von,a.bis))&&!lies("mietixSperren",[]).some(s=>!s._weg&&s.auto===v.auto&&s.von&&s.bis&&sperreTrifft(mo,plusT(mo,1),s));   // Abholung morgen zählt als belegt (04.11.2026)
+    const freiAm=(v,t)=>!alle.some(x=>x.nr!==v.nr&&x.auto===v.auto&&x.status!=="zurück"&&x.vonD&&x.bisD&&ue(t,plusT(t,1),x.vonD,x.bisD))
+      &&!anf.some(a=>a.status==="gebucht"&&a.auto===v.auto&&a.von&&a.bis&&ue(t,plusT(t,1),a.von,a.bis))&&!lies("mietixSperren",[]).some(s=>!s._weg&&s.auto===v.auto&&s.von&&s.bis&&sperreTrifft(t,plusT(t,1),s)),frei=v=>freiAm(v,mo);   // Abholung morgen zählt als belegt (04.11.2026)
     // Nummer kann auch nur in der Kundenakte stehen (Prüfung 09.11.2026), die Korrektur weiter unten trägt sie dann ein
     const kbT=lies("mietixKunden",{}),nT=t=>String(t||"").toLowerCase().replace(/\s+/g,""),akteTel=t=>{const k=Object.keys(kbT).find(y=>nT(y)===nT(t));return k&&kbT[k]&&kbT[k].telefon};
     // Kaution im Abholungstext (Prüfung 09.11.2026): bezahlt oder Fahrzeug = keine Zeile, eingetragener Betrag gilt, leer = Kaution des Autos aus der Preisliste
@@ -899,6 +899,11 @@ window.mxZahlung={storno,anfragePosten,geh:u=>{location.href=u},oeffne,verlInRes
       if(v.vonD===mo&&!v.ueb&&!v.erinnert)L.push({g:"Abholung morgen",t:v.name,i:v.auto+", morgen ("+WT[new Date(mo+"T12:00").getDay()]+" "+de(mo)+")"+(v.vonU?" "+v.vonU+" Uhr":""),tel:v.telefon,mark:{nr:v.nr,feld:"erinnert"},
         text:"Kurze Erinnerung an Ihre Abholung morgen, "+tagLang(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
           (waKaution(v)>0?"\n- Kaution "+eur2(waKaution(v))+" €":"")+((z.rest||{}).am||!(zahl((z.rest||{}).betrag)>0)?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\n\nBis morgen!"});
+      // Verlängerung immer bereit (10.11.2026, Baran): auf der Seite WhatsApp bei jeder laufenden Miete, falls der Kunde früher fragt; nur wenn das Auto am Tag nach der Rückgabe frei ist
+      if(NUR_WA&&v.ueb&&v.status!=="zurück"&&v.bisD>hi){const nt=plusT(v.bisD,1);if(freiAm(v,nt)){const c2=preis(v.auto),tp=c2?verlTag(c2,v):0,vs=tp?Math.min(Math.round(tp)-10,Math.max(9,Math.round(tp*0.85/10)*10-1)):0;
+        L.push({g:"Verlängerung anbieten",immer:true,t:v.name,i:v.auto+", Rückgabe "+de(v.bisD)+", am "+de(nt)+" noch frei"+(v.verlFrueh?", gesendet am "+de(v.verlFrueh):""),tel:v.telefon,mark:{nr:v.nr,feld:"verlFrueh"},
+          text:"*Ihr "+v.auto+" ist am "+tagLang(nt)+" noch frei*\n\nDer Wagen ist am "+tagLang(nt)+" nicht verplant, diesen Vorteil geben wir direkt an Sie weiter:\n\n"+(vs?"*1 weiterer Tag für nur "+eur2(vs)+" €"+(vs<tp?" statt "+eur2(tp)+" €":"")+"*":"*1 weiterer Tag zum Vorteilspreis*")+
+            "\n\nEine kurze Antwort genügt, dann verlängern wir bis "+tagLang(nt)+(v.bisU?", "+v.bisU+" Uhr":"")+"."})}}
       // Verlängerung anbieten: Rückgabe heute, Auto morgen frei
       if(v.ueb&&v.status!=="zurück"&&v.bisD===hi&&!v.verlAngeboten&&frei(v)){const c=preis(v.auto),tp=c?verlTag(c,v):0,vs=tp?Math.min(Math.round(tp)-10,Math.max(9,Math.round(tp*0.85/10)*10-1)):0;   // 1.11.2026 Baran: Normalpreis = was der Folgetag nach den Preisregeln kostet
         L.push({g:"Verlängerung anbieten",t:v.name,i:v.auto+" zurück heute, morgen ("+de(mo)+") noch frei",tel:v.telefon,mark:{nr:v.nr,feld:"verlAngeboten"},
