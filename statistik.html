@@ -495,7 +495,9 @@ let burst=null,burstZeit=null;
 function sicherheitsnetz(k,alt,neu){
   // Papierkorb: Einträge, die aus einer Liste verschwunden sind (nicht bei Rückgängig selbst)
   if(!rueckLaeuft){try{const c=SPEICHER[k];const ma=alsMap(k,JSON.parse(alt||"null")||(c.liste?[]:{})),mn=alsMap(k,JSON.parse(neu||"null")||(c.liste?[]:{}));
-    const weg=Object.keys(ma).filter(p=>!(p in mn));
+    // Sperre eines gelöschten Termins: nicht in den Papierkorb, Termin und Sperre kommen zusammen über Termine › Gelöscht zurück (11.11.2026, strenge Prüfung Punkt 4)
+    const tmWeg=p=>{if(k!=="mietixSperren"||!/^termin-/.test(p))return false;let t=null;try{t=((JSON.parse(localStorage.getItem("mietixStand")||"{}")||{}).termine||{})[p.slice(7)]}catch(e){}return !t||!!t._weg||!t.sperren};
+    const weg=Object.keys(ma).filter(p=>!(p in mn)&&!tmWeg(p));
     if(weg.length){const pk=lies("mietixPapierkorb",[]),jetzt=new Date().toISOString();
       weg.forEach(p=>pk.push({id:k+":"+p+":"+Date.now(),ablage:k,schluessel:p,eintrag:ma[p],zeit:jetzt,text:(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(ma[p]||{})}));
       const grenze=new Date(Date.now()-90*864e5).toISOString();merk("mietixPapierkorb",pk.filter(x=>x.zeit>grenze));
@@ -550,11 +552,19 @@ function rueckgaengig(){if(!burst)return;
     else if(nicht.length)alert("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.")}
   else if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
   ungesichert=true;zeigen();window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
+// Angefangenen Entwurf wiederherstellen: ein gerade angefangener anderer geht nicht still verloren, er kommt vorher in den Papierkorb (11.11.2026, Prüfung A A7)
+function entwurfBeiseiteLegen(k,pk,neu){let alt=null;try{alt=JSON.parse(localStorage.getItem(k)||"null")}catch(x){}if(!alt||typeof alt!=="object")return pk;
+  const v=k==="mietixEntwurfVertrag",f=alt.f||{},wer=v?[String(f.name||"").trim(),alt.auto].filter(Boolean).join(", "):[String(alt.name||"").trim(),alt.auto].filter(Boolean).join(", ");
+  const inhalt=v?!!(String(f.name||"").trim()||alt.auto):!!(String(alt.name||"").trim()||String(alt.tel||"").trim()||alt.auto||alt.von||String(alt.notiz||"").trim());
+  const ohneZeit=x=>{const y=Object.assign({},x||{});delete y.zeit;return fp(y)};if(!inhalt||ohneZeit(alt)===ohneZeit(neu))return pk;
+  const text=(v?"Angefangener Mietvertrag: ":"Angefangene Buchung: ")+(wer||"ohne Namen");
+  setTimeout(()=>{if(typeof window.meldung==="function")window.meldung("Wiederhergestellt. "+(v?"Der gerade angefangene Mietvertrag":"Die gerade angefangene Buchung")+" ("+(wer||"ohne Namen")+") liegt jetzt im Papierkorb.")},0);
+  return pk.concat([{id:k+":"+Date.now(),ablage:k,schluessel:"entwurf",eintrag:alt,zeit:new Date().toISOString(),text}])}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
-  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
+  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",entwurfBeiseiteLegen("mietixEntwurfVertrag",pk.filter(x=>x.id!==id),e.eintrag));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
     roh.call(localStorage,"mietixEntwurfVertrag",JSON.stringify(Object.assign({},e.eintrag,{zeit:new Date().toISOString()})));
     window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
-  if(e.ablage==="mietixEntwurfBuchung"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangene Buchung (02.11.2026): liegt nur auf dem Gerät, frisch für 7 Tage
+  if(e.ablage==="mietixEntwurfBuchung"){merk("mietixPapierkorb",entwurfBeiseiteLegen("mietixEntwurfBuchung",pk.filter(x=>x.id!==id),e.eintrag));   // angefangene Buchung (02.11.2026): liegt nur auf dem Gerät, frisch für 7 Tage
     roh.call(localStorage,"mietixEntwurfBuchung",JSON.stringify(Object.assign({},e.eintrag,{zeit:Date.now()})));
     window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
   if(e.ablage==="schadensbelege"){const st=lies("mietixStand",{}),r=Object.assign({liste:[],max:{}},st.schadensbelege||{});   // Schadensbeleg (30.10.2026)

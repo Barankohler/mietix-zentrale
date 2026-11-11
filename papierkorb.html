@@ -400,7 +400,10 @@ function pkRueckSchuetzen(e){const j=Date.now();if(j-pkZeit>900)pkZurueck=[];pkZ
     catch(err){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Eintrag konnte nicht zurück in den Papierkorb. Seite offen lassen.")}}}
 const PK_LK=mxListenkopf("pkLK","papierkorb",{suche:"Name, Auto oder Text",felder:[{k:"ber",t:"Bereich",alle:"Alle Bereiche",werte:()=>PK_BER}],neu:()=>zeichne()});
 function zeichne(){
-  PK_LK.bauen();const pkAlle=(window.mietixPapierkorb?window.mietixPapierkorb():lies("mietixPapierkorb",[]).slice().sort((a,b)=>a.zeit<b.zeit?1:-1)),pk=pkAlle.filter(e=>{const x=e.eintrag||{};return PK_LK.passt([e.text,x.name,x.auto,x.fahrzeug].filter(Boolean).join(" "))});
+  // Sperre eines gelöschten Termins (11.11.2026, strenge Prüfung Punkt 4): nicht mehr hier, Termin und Sperre kommen zusammen über Termine › Gelöscht zurück.
+  // Alte Einträge bleiben gespeichert (laufen nach 90 Tagen ab), werden nur nicht mehr gezeigt: Wiederherstellen hier hätte nur die Sperre ohne Termin geholt.
+  const TMS=(lies("mietixStand",{})||{}).termine||{},tmWeg=e=>e.ablage==="mietixSperren"&&/^termin-/.test(String(e.schluessel||""))&&(()=>{const t=TMS[String(e.schluessel).slice(7)];return !t||!!t._weg||!t.sperren})();
+  PK_LK.bauen();const pkRoh=(window.mietixPapierkorb?window.mietixPapierkorb():lies("mietixPapierkorb",[]).slice().sort((a,b)=>a.zeit<b.zeit?1:-1)),pkAlle=pkRoh.filter(e=>!tmWeg(e)),tmZahl=pkRoh.length-pkAlle.length,pk=pkAlle.filter(e=>{const x=e.eintrag||{};return PK_LK.passt([e.text,x.name,x.auto,x.fahrzeug].filter(Boolean).join(" "))});
   // Ein Kasten je Bereich, immer in derselben Reihenfolge, auch wenn leer
   const BEREICHE=PK_BER.filter(b=>b[0]!=="_sonst");
   // Was keinen eigenen Kasten hat (Autos), steht unter Sonstiges, sonst wäre es unsichtbar (04.11.2026); Schadensbelege unter Schäden (06.11.2026)
@@ -416,6 +419,7 @@ function zeichne(){
   $("geloescht").innerHTML=pkZeig.map(([k,t])=>{const l=pk.filter(e=>e.ablage===k||(k==="_sonst"&&!KASTEN.includes(e.ablage))||(k==="mietixVorgaenge"&&(e.ablage==="mietixEntwurfVertrag"||e.ablage==="mietixEntwurfBuchung")));
     return '<div class="bereich"><div class="kopf"><b>'+t+'</b><span class="'+(l.length?"":"null")+'">'+l.length+'</span></div><div class="karte">'+
       (l.length?l.map(e=>'<div class="z"><div class="t"><b>'+zeileTitel(e)+'</b>'+zeileWo(e)+'<i>'+extra(e)+(/^Andere Fassung/.test(e.text||"")?'zur Seite gelegt ':'gelöscht ')+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">'+(PK_LK.aktiv()?"Nichts gefunden.":"Nichts gelöscht.")+'</div>')+'</div></div>'}).join("");
+  if(tmZahl&&(!PK_LK.w.ber||PK_LK.w.ber==="mietixSperren"))$("geloescht").insertAdjacentHTML("beforeend",'<div class="leer">Gelöschte Termine mit Sperre holst du unter <a class="lk" href="'+LINK+'mietix-zentrale/termine.html">Termine › Gelöscht</a> zurück, Termin und Sperre zusammen.</div>');
   {const zeigN=pk.filter(e=>!PK_LK.w.ber||e.ablage===PK_LK.w.ber||(PK_LK.w.ber==="_sonst"&&!KASTEN.includes(e.ablage))||(PK_LK.w.ber==="mietixVorgaenge"&&/^mietixEntwurf/.test(e.ablage))).length;PK_LK.zeile(PK_LK.aktiv()?zeigN+" von "+pkAlle.length+(pkAlle.length===1?" Eintrag":" Einträgen"):pkAlle.length+(pkAlle.length===1?" Eintrag":" Einträge"))}
   [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{const e=pk.find(y=>y.id===b.dataset.pk)||{},x=e.eintrag||{};
     // Belegt wieder ein Auto: lieber nachfragen (31.10.2026, Baran); Sperre auch, und vorher schauen, ob das Auto schon vergeben ist (06.11.2026)
@@ -715,7 +719,9 @@ let burst=null,burstZeit=null;
 function sicherheitsnetz(k,alt,neu){
   // Papierkorb: Einträge, die aus einer Liste verschwunden sind (nicht bei Rückgängig selbst)
   if(!rueckLaeuft){try{const c=SPEICHER[k];const ma=alsMap(k,JSON.parse(alt||"null")||(c.liste?[]:{})),mn=alsMap(k,JSON.parse(neu||"null")||(c.liste?[]:{}));
-    const weg=Object.keys(ma).filter(p=>!(p in mn));
+    // Sperre eines gelöschten Termins: nicht in den Papierkorb, Termin und Sperre kommen zusammen über Termine › Gelöscht zurück (11.11.2026, strenge Prüfung Punkt 4)
+    const tmWeg=p=>{if(k!=="mietixSperren"||!/^termin-/.test(p))return false;let t=null;try{t=((JSON.parse(localStorage.getItem("mietixStand")||"{}")||{}).termine||{})[p.slice(7)]}catch(e){}return !t||!!t._weg||!t.sperren};
+    const weg=Object.keys(ma).filter(p=>!(p in mn)&&!tmWeg(p));
     if(weg.length){const pk=lies("mietixPapierkorb",[]),jetzt=new Date().toISOString();
       weg.forEach(p=>pk.push({id:k+":"+p+":"+Date.now(),ablage:k,schluessel:p,eintrag:ma[p],zeit:jetzt,text:(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(ma[p]||{})}));
       const grenze=new Date(Date.now()-90*864e5).toISOString();merk("mietixPapierkorb",pk.filter(x=>x.zeit>grenze));
@@ -770,11 +776,19 @@ function rueckgaengig(){if(!burst)return;
     else if(nicht.length)alert("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.")}
   else if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
   ungesichert=true;zeigen();window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
+// Angefangenen Entwurf wiederherstellen: ein gerade angefangener anderer geht nicht still verloren, er kommt vorher in den Papierkorb (11.11.2026, Prüfung A A7)
+function entwurfBeiseiteLegen(k,pk,neu){let alt=null;try{alt=JSON.parse(localStorage.getItem(k)||"null")}catch(x){}if(!alt||typeof alt!=="object")return pk;
+  const v=k==="mietixEntwurfVertrag",f=alt.f||{},wer=v?[String(f.name||"").trim(),alt.auto].filter(Boolean).join(", "):[String(alt.name||"").trim(),alt.auto].filter(Boolean).join(", ");
+  const inhalt=v?!!(String(f.name||"").trim()||alt.auto):!!(String(alt.name||"").trim()||String(alt.tel||"").trim()||alt.auto||alt.von||String(alt.notiz||"").trim());
+  const ohneZeit=x=>{const y=Object.assign({},x||{});delete y.zeit;return fp(y)};if(!inhalt||ohneZeit(alt)===ohneZeit(neu))return pk;
+  const text=(v?"Angefangener Mietvertrag: ":"Angefangene Buchung: ")+(wer||"ohne Namen");
+  setTimeout(()=>{if(typeof window.meldung==="function")window.meldung("Wiederhergestellt. "+(v?"Der gerade angefangene Mietvertrag":"Die gerade angefangene Buchung")+" ("+(wer||"ohne Namen")+") liegt jetzt im Papierkorb.")},0);
+  return pk.concat([{id:k+":"+Date.now(),ablage:k,schluessel:"entwurf",eintrag:alt,zeit:new Date().toISOString(),text}])}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
-  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
+  if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",entwurfBeiseiteLegen("mietixEntwurfVertrag",pk.filter(x=>x.id!==id),e.eintrag));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
     roh.call(localStorage,"mietixEntwurfVertrag",JSON.stringify(Object.assign({},e.eintrag,{zeit:new Date().toISOString()})));
     window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
-  if(e.ablage==="mietixEntwurfBuchung"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangene Buchung (02.11.2026): liegt nur auf dem Gerät, frisch für 7 Tage
+  if(e.ablage==="mietixEntwurfBuchung"){merk("mietixPapierkorb",entwurfBeiseiteLegen("mietixEntwurfBuchung",pk.filter(x=>x.id!==id),e.eintrag));   // angefangene Buchung (02.11.2026): liegt nur auf dem Gerät, frisch für 7 Tage
     roh.call(localStorage,"mietixEntwurfBuchung",JSON.stringify(Object.assign({},e.eintrag,{zeit:Date.now()})));
     window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:["mietixPapierkorb"]}));clearTimeout(warte);warte=setTimeout(abgleichen,800);return true}
   if(e.ablage==="schadensbelege"){const st=lies("mietixStand",{}),r=Object.assign({liste:[],max:{}},st.schadensbelege||{});   // Schadensbeleg (30.10.2026)
