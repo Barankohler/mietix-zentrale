@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de"><head>
+<html lang="de"><head><script>/* Neu geladen oder neu aufgerufen? stil/fenster.py (11.11.2026) */(function(){if(window.mxWieder!==undefined)return;var t="";try{t=((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type||""}catch(e){}window.mxWieder=/^(reload|back_forward)$/.test(t);window.mxAltSchritte=0;try{var s=history.state;if(!window.mxWieder&&s&&typeof s==="object"&&!s.mxS&&!s.mxE){var n=+s.mxI||0;if(n>0||Object.keys(s).some(function(k){return k!=="mxI"})){history.replaceState({mxI:n},"");window.mxAltSchritte=n}}}catch(e){}addEventListener("popstate",function(e){if(window.mxLeise&&window.mxLeise())e.stopImmediatePropagation()},true)})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -252,8 +252,17 @@ body.nurTermine #uKopf{display:block;background:#fff;border-bottom:3px solid var
 #fAufgabe .tmFl select{display:block;width:100%!important;box-sizing:border-box;margin:0!important;padding:2px 20px 2px 0!important;border:0!important;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Cpath d='M1.5 1.5l5 5.5-5 5.5' stroke='%23C7C7CC' stroke-width='2.4' fill='none'/%3E%3C/svg%3E") no-repeat right 2px center!important;font-family:inherit;font-size:17px!important;font-weight:600;color:#1C1C1E;min-height:30px;-webkit-appearance:none;appearance:none;outline:0}
 .taKn{display:grid;grid-template-columns:1fr 1fr;gap:10px}.taKn .tmNeu{margin:12px 0 4px}
 .tmGk.plan{color:#1E8E4E}
-/* Reiter Plan (10.11.2026, Baran: „Ja, so bauen“): Tage als runde Knöpfe wie in „Tag planen“, darunter die Aufgaben des Tages */
-#pTage{margin:10px 0 2px}#pTage button span{margin-left:6px;color:#8A8A8E}#pTage button.an span{color:#C7C7CC}
+/* Reiter Plan (11.11.2026, Baran: „Ja, so bauen“): ein Auswahlfeld „Tag“ statt runder Knöpfe, Tipp öffnet das Fenster „Tag wählen“ mit der Woche */
+.pFeld{display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:#fff;border:0;border-radius:12px;padding:12px 14px;min-height:50px;margin:10px 0 2px;font-family:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pFeld .pE{flex:1;min-width:0;font-size:16px;font-weight:600;color:#8A8A8E}.pFeld b{font-size:16px;font-weight:700;color:#1C1C1E;white-space:nowrap}.pFeld i{font-style:normal;font-size:16px;font-weight:600;color:#8A8A8E;min-width:14px;text-align:right}.pFeld em{font-style:normal;color:#C7C7CC;font-size:20px;line-height:1}
+.pFeld:active{background:#F6F6F7}
+#fTag{background:#F2F2F7}.pWo{display:flex;align-items:center;gap:8px;margin:2px 0 10px}.pWo button{flex:0 0 44px;height:44px;border:0;border-radius:12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:22px;font-weight:700;cursor:pointer;padding:0}
+.pWo b{flex:1;min-width:0;text-align:center;font-size:15px;font-weight:700;color:#1C1C1E}
+.pTl{background:#fff;border-radius:12px;overflow:hidden}.pTz{display:flex;align-items:center;gap:10px;padding:13px 14px;border-top:.5px solid #D1D1D6;cursor:pointer;-webkit-tap-highlight-color:transparent}.pTz:first-child{border-top:0}
+.pTz span{flex:1;min-width:0;font-size:16px;font-weight:600;color:#1C1C1E}.pTz span i{font-style:normal;font-size:14px;font-weight:600;color:#8A8A8E;margin-left:6px}
+.pTz s{text-decoration:none;font-size:16px;font-weight:700;color:#1C1C1E;min-width:18px;text-align:right}.pTz u{flex:0 0 22px;text-decoration:none;color:#1E9E5A;font-size:18px;font-weight:900;text-align:center}
+.pTz.pNull span,.pTz.pNull s{color:#AEAEB2}.pTz.an{background:#EAF7EF}.pTz.an span{font-weight:800}
+.pLeer{font-size:15px;font-weight:600;color:#8A8A8E;margin:2px 16px 4px}
 .taT i .taPl{color:#1E8E4E;font-weight:800}
 #fPlan{background:#F2F2F7}.plTage{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px;align-items:center}.plTage button{border:0;border-radius:999px;padding:9px 16px;font-family:inherit;font-size:15px;font-weight:700;background:#E5E5EA;color:#1C1C1E;cursor:pointer}.plTage button.an{background:#1C1C1E;color:#fff}
 #fPlan .plTage input#plDatum,.plTage input{border:0!important;border-radius:999px!important;padding:0 12px!important;background:#E5E5EA!important;font-family:inherit;font-size:15px!important;font-weight:700;color:#1C1C1E;height:38px!important;min-height:38px!important;width:170px!important;max-width:170px!important;box-shadow:none!important;margin:0!important}
@@ -506,7 +515,7 @@ function baue(schl){
       (a.storno&&a.storno.art==="zurueck"?'<div class="fk">Rückzahlung</div><div class="fg">'+zeile("Zurückgezahlt","Datum leer: noch nicht",feld("eStB",+a.storno.betrag||0),feld("eStAm",a.storno.am,"tag"))+'</div>':"")+
       '<div class="fhin" id="eHin"></div><div class="fknoepfe"><a href="'+esc(ANFRAGE(a))+'">Buchung öffnen</a><button type="button" class="r" id="eSp">Speichern</button></div>'}
   }else{const v=lies("mietixVorgaenge",[]).find(x=>x&&x.nr===schl.slice(2));if(!v)return null;
-    const o={schl,kMiete:(v.kautionRueck||{}).verrechnet?+(v.kautionRueck||{}).miete||0:0,zurueck:v.status==="zurück"&&!!v.kautionRueck};   // zurueck: Kaution ist abgerechnet, 0 und 0 heißt dann „verschwunden“
+    const o={schl,kMiete:(v.kautionRueck||{}).verrechnet?+(v.kautionRueck||{}).miete||0:0,zurueck:v.status==="zurück",abgerechnet:!!v.kautionRueck,basis:Math.round(n0(v.gesamt)-(v.verlaengerungen||[]).reduce((q,y)=>q+(+y.aufpreis||0),0))};   // zurueck: Auto ist zurück, 0 und 0 heißt dann „nicht abgerechnet“ oder „verschwunden“ (11.11.2026, auch ohne Abrechnung)
     const z=v.zahlung||{},an=z.anz||{},re=z.rest||{},ka=z.kaut||{},kr=v.kautionRueck||{},e=v.endabrechnung||{},vl=v.verlaengerungen||[];
     const s=+e.summe||0,bz=e.bezahlt||null,mitKaution=!!(bz&&bz.art==="Kaution"&&kr.verrechnet),kEin=kr.verrechnet||kr.teil,nachOffen=mitKaution?posten(v).filter(p=>p.t==="Nachzahlung Rückgabe"&&!p.am).reduce((q,p)=>q+p.b,0):0;
     const teile=[e.mehrkm?"Mehr-km":"",e.tank?"Tank":"",e.versp?"Verspätung":"",(e.extra||[]).length?"Sonstiges":""].filter(Boolean).join(", ");
@@ -544,8 +553,10 @@ function pruefe(){let falsch=0;document.querySelectorAll("#fAendern input[inputm
   if($("eKaut")){const k=zahl($("eKaut").value)||0,ein=zahl($("eEin").value)||0,zur=zahl($("eZur").value)||0;
     const mi=(OFFEN&&OFFEN.kMiete)||0;
     // Zurückgegeben, Kaution abgerechnet, aber weder einbehalten noch zurück: sonst taucht sie in keiner Zahl auf (10.11.2026, Geld-Prüfung)
-    if(k&&OFFEN&&OFFEN.zurueck&&!Math.round(ein+zur+mi)){hin.className="fhin gelb";hin.textContent="Kaution "+eur(k)+": weder einbehalten noch zurückgegeben";return true}
+    if(k&&OFFEN&&OFFEN.zurueck&&!Math.round(ein+zur+mi)){hin.className="fhin gelb";hin.textContent="Kaution "+eur(k)+": "+(OFFEN.abgerechnet?"weder einbehalten noch zurückgegeben":"noch nicht abgerechnet, weder einbehalten noch zurückgegeben");return true}
     if(k&&ein+zur+mi&&Math.round(ein+zur+mi)!==Math.round(k)){hin.className="fhin gelb";hin.textContent="Kaution erhalten "+eur(k)+", einbehalten und zurück zusammen "+eur(ein+zur+mi)+". Bitte kurz prüfen.";return true}}
+  // Anzahlung und Rest passen nicht zum Mietpreis (11.11.2026, strenge Prüfung Punkt 5): nur Hinweis, gerechnet wird nichts von selbst
+  if($("eAnz")&&$("eRest")&&OFFEN&&OFFEN.basis>0){const a=zahl($("eAnz").value)||0,r=zahl($("eRest").value)||0;if(Math.round(a+r)!==OFFEN.basis){hin.className="fhin gelb";hin.textContent="Anzahlung und Rest ergeben "+eur(Math.round(a+r))+", der Mietpreis ohne Verlängerung ist "+eur(OFFEN.basis)+". "+(a+r>OFFEN.basis?"Das wäre zu viel bezahlt.":"Es fehlen "+eur(Math.round(OFFEN.basis-a-r))+".")+" Bitte kurz prüfen.";return true}}
   hin.className="fhin";hin.textContent="";return true}
 /* Nur Felder, die in diesem Fenster wirklich geändert wurden, werden geschrieben (10.11.2026, Geld-Prüfung, Baran: „Ja, alle beheben“).
    Verglichen wird mit dem Stand beim Öffnen. Hat ein anderes Fenster dasselbe Feld inzwischen anders gesetzt: roter Hinweis, nichts gespeichert.
@@ -829,7 +840,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
 <div id="tmTeil"><div class="tmSeg" id="tmSeg" role="tablist"><button type="button" data-tab="t" class="an">Termine<span id="tmSegT"></span></button><button type="button" data-tab="a">Aufgaben<span id="tmSegA"></span></button><button type="button" data-tab="p">Plan<span id="tmSegP"></span></button></div>
 <div id="tmTerm"><div id="tmLK"></div><button type="button" class="tmNeu" id="tmNeu">+ Neuer Termin</button><div id="tmListe"></div></div>
 <div id="tmAufg" hidden><div class="taKn"><button type="button" class="tmNeu" id="taNeu">+ Neue Aufgabe</button><button type="button" class="tmNeu" id="taPlan">Tag planen</button></div><div id="taListe"></div></div>
-<div id="tmPlan" hidden><div class="plTage" id="pTage"></div><div id="pListe"></div><button type="button" class="tmNeu" id="pPlanen">Tag planen</button></div></div>
+<div id="tmPlan" hidden><button type="button" class="pFeld" id="pFeld" aria-label="Tag wählen"><span class="pE">Tag</span><b id="pFeldW"></b><i id="pFeldN"></i><em>›</em></button><div id="pListe"></div><button type="button" class="tmNeu" id="pPlanen">Tag planen</button></div></div>
 <div class="mxFenster" id="fAufgabe" role="dialog" aria-label="Aufgabe"><div class="mxKopf"><h3 id="taKopf">Neue Aufgabe</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
 <div class="tmGl">
  <label class="tmFl"><span>Was ist zu tun *</span><input id="taText" type="text" autocomplete="off" enterkeyhint="done" placeholder="Reifen bestellen, Versicherung anrufen"></label>
@@ -842,6 +853,10 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
 <div class="tmFehler" id="taFehler" role="alert"></div>
 <button type="button" class="tmFertig" id="taFertig">Fertig</button>
 <div class="tmZwei" id="taZwei"></div>
+</div>
+<div class="mxFenster" id="fTag" role="dialog" aria-label="Tag wählen"><div class="mxKopf"><h3>Tag wählen</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+<div class="pWo"><button type="button" id="pWoZ" aria-label="Woche davor">‹</button><b id="pWoT"></b><button type="button" id="pWoV" aria-label="Woche danach">›</button></div>
+<div class="pTl" id="pTagL"></div>
 </div>
 <div class="mxFenster" id="fPlan" role="dialog" aria-label="Tag planen"><div class="mxKopf"><h3>Tag planen</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
 <div class="plTage" id="plTage"></div>
@@ -1344,6 +1359,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
   {const OK="mietixAnbAuf",fa=$a("fAnb"),fz=$a("fAnbZr");let auf=false;try{auf=sessionStorage.getItem(OK)==="1"}catch(e){}
     if(fa&&fz){const mo=new MutationObserver(()=>{const a=fa.classList.contains("auf")||!!anbZrVonFenster();try{if(a)sessionStorage.setItem(OK,"1");else sessionStorage.removeItem(OK)}catch(e){}});
       mo.observe(fa,{attributes:true,attributeFilter:["class"]});mo.observe(fz,{attributes:true,attributeFilter:["class"]});
+      if(auf&&!window.mxWieder){auf=false;try{sessionStorage.removeItem(OK)}catch(e){}}   // nur Neuladen und Zurück öffnen es wieder, ein neuer Aufruf nicht. Zeitraum und Auswahl vom selben Tag bleiben (11.11.2026)
       if(auf&&document.body.classList.contains("nurUmsatz")){let n=0;const t=setInterval(()=>{n++;if(n>60){clearInterval(t);return}
         if(!PREISE||!window.mxAuf||(history.state&&history.state.mxF)||document.querySelector(".mxFenster.auf"))return;clearInterval(t);if(!anbVorbei())anbOeffnen(ANB.vonD,ANB.bisD,null)},150)}}}
   window.addEventListener("mietix-abgleich",()=>{anbFrei();if($a("fAnb").classList.contains("auf"))anbZeichnen()});
@@ -1794,6 +1810,7 @@ zeigen();abgleichen();auslagernBald();
 </script>
 <script>
 /* Fenster (30.10.2026): Knopf mit data-fenster öffnet, ✕, Tipp daneben oder Esc schließt */
+(function(){if(window.mxWieder!==undefined)return;var t="";try{t=((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type||""}catch(e){}window.mxWieder=/^(reload|back_forward)$/.test(t);window.mxAltSchritte=0;try{var s=history.state;if(!window.mxWieder&&s&&typeof s==="object"&&!s.mxS&&!s.mxE){var n=+s.mxI||0;if(n>0||Object.keys(s).some(function(k){return k!=="mxI"})){history.replaceState({mxI:n},"");window.mxAltSchritte=n}}}catch(e){}addEventListener("popstate",function(e){if(window.mxLeise&&window.mxLeise())e.stopImmediatePropagation()},true)})();
 (function(){if(window.mxAuf)return;
   let bg=document.querySelector(".mxBg");if(!bg){bg=document.createElement("div");bg.className="mxBg";document.body.appendChild(bg)}
   // Zurück-Taste und Wischen schließen zuerst das Fenster, die Seite bleibt (04.11.2026, Baran: „wo richtig zurück ist“)
@@ -1802,19 +1819,24 @@ zeigen();abgleichen();auslagernBald();
     document.documentElement.style.overflow="";document.body.style.overflow=""};
   window.mxAuf=function(id){const f=document.getElementById(id);if(!f)return;schliessen();bg.classList.add("auf");f.classList.add("auf");
     document.documentElement.style.overflow="hidden";document.body.style.overflow="hidden";f.scrollTop=0;
-    if(!imVerlauf){try{history.pushState(Object.assign({},history.state||{},{mxF:id}),"");imVerlauf=true}catch(e){}}
+    if(!imVerlauf){if(still){pushNach=id;imVerlauf=true}else{try{history.pushState(Object.assign({},history.state||{},{mxF:id}),"");imVerlauf=true}catch(e){}}}   /* läuft gerade ein stiller Schritt zurück (Aufräumen nach dem Laden), kommt der eigene Schritt erst danach (11.11.2026) */
     snapF=f;snap=f.classList.contains("mxSchutz")?werte(f):null};
   // Fenster mit Geld (Klasse mxSchutz, 10.11.2026): Schließen durch ✕, Tipp daneben, Esc oder Zurück fragt bei Änderungen nach. Speichern schließt ohne Frage.
   let snap=null,snapF=null;
-  const werte=function(f){return[...f.querySelectorAll("input,textarea,select")].map(function(i){return i.type==="checkbox"||i.type==="radio"?i.checked:i.value}).join("~")+"|"+[...f.querySelectorAll(".an,.chip.an")].map(function(x){return x.textContent}).join("~")};
+  const werte=function(f){return[...f.querySelectorAll("input,textarea,select")].map(function(i){return i.type==="checkbox"||i.type==="radio"?i.checked:i.value}).join("~")+"|"+[...f.querySelectorAll(".an,.chip.an")].filter(function(x){return !x.closest("[data-mxkeinwert]")}).map(function(x){return x.textContent}).join("~")}   /* Auswahllisten mit data-mxkeinwert sind keine Eingabe (11.11.2026) */;
   const darfZu=function(){if(!snap||!snapF||!snapF.classList.contains("auf"))return true;if(werte(snapF)===snap)return true;if(confirm("Änderungen verwerfen?\n\nDas Getippte in diesem Fenster geht verloren.")){snap=null;return true}return false};
   window.mxGeaendertWeg=function(){snap=null};
   // ✕ nimmt den Eintrag wieder weg. Springt die Seite im selben Moment weiter, bleibt er als „überspringen“ im Verlauf stehen.
-  let still=false,skipT=null;
+  let still=false,skipT=null,putzen=null,pushNach=null;
   window.mxSkipNimm=function(){if(skipT){clearTimeout(skipT);skipT=null;return 1}return 0};   // die Seite springt selbst zurück und nimmt den Eintrag gleich mit
-  window.mxZu=function(){schliessen();if(!imVerlauf)return;imVerlauf=false;try{history.replaceState(Object.assign({},history.state||{},{mxSkip:1}),"")}catch(e){}
+  window.mxZu=function(){schliessen();if(!imVerlauf)return;imVerlauf=false;if(pushNach){pushNach=null;return}try{history.replaceState(Object.assign({},history.state||{},{mxSkip:1}),"")}catch(e){}
     skipT=setTimeout(function(){skipT=null;if(history.state&&history.state.mxSkip){still=true;history.back()}},0)};
-  addEventListener("popstate",function(e){if(still){still=false;e.stopImmediatePropagation();return}
+  /* stiller Schritt zurück: aufräumen, einen aufgeschobenen Fensterschritt nachholen, sonst nichts */
+  window.mxLeise=function(){if(!still)return false;still=false;
+      if(putzen){const p=putzen;putzen=null;try{history.replaceState(p,"")}catch(x){}}
+      if(pushNach){const f=document.getElementById(pushNach);pushNach=null;if(f&&f.classList.contains("auf")){try{history.pushState(Object.assign({},history.state||{},{mxF:f.id}),"")}catch(x){}}else imVerlauf=false}
+      return true};
+  addEventListener("popstate",function(e){if(window.mxLeise()){e.stopImmediatePropagation();return}
     if(imVerlauf){e.stopImmediatePropagation();if(!darfZu()){try{history.pushState(Object.assign({},history.state||{},{mxF:snapF&&snapF.id}),"")}catch(x){}return}imVerlauf=false;schliessen();return}
     if(e.state&&e.state.mxSkip){e.stopImmediatePropagation();history.back()}},true);
   document.addEventListener("click",function(e){const k=e.target.closest("[data-fenster]");if(k){e.preventDefault();mxAuf(k.dataset.fenster);return}
@@ -1822,7 +1844,11 @@ zeigen();abgleichen();auslagernBald();
   document.addEventListener("keydown",function(e){if(e.key==="Escape"&&darfZu())mxZu()});
   // Neu geladen, während ein Fenster offen war (zum Beispiel nach WhatsApp): das Fenster ist zu, sein Schritt steht noch im Verlauf.
   // Ohne Aufräumen täte das erste Zurück nichts (Prüfung 10.11.2026). Den Schritt still zurückgehen, die Seite merkt davon nichts.
-  try{if(history.state&&history.state.mxF&&!document.querySelector(".mxFenster.auf")&&/^(reload|back_forward)$/.test((((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type)||"")){still=true;history.back()}}catch(e){}})();
+  try{if(history.state&&history.state.mxF&&!document.querySelector(".mxFenster.auf")&&window.mxWieder){still=true;history.back()}}catch(e){}
+  /* Neu aufgerufen (11.11.2026): die alten Schritte dieser Seite still zurückgehen, bis zu ihrem ersten Eintrag. Dann führt das erste Zurück
+     dorthin, woher man kam, statt auf einen toten Schritt oder in einen alten Zustand (Reiter, Auto, Akte). Nur ersetzen statt zurückgehen
+     ließe die alten Einträge davor stehen (Prüfung: Zurück tat nichts oder sprang in den alten Zustand). */
+  try{const n=Math.min(window.mxAltSchritte||0,history.length-1);window.mxAltSchritte=0;if(!window.mxWieder&&n>0){putzen=Object.assign({},history.state||{},{mxI:0});still=true;history.go(-n)}}catch(e){}})();
 </script><script>
 /* Schutz (1.11.2026, Baran: geht etwas nicht, roter Hinweis mit Grund; alles sofort speichern) */
 (function(){if(window.mxFehler)return;

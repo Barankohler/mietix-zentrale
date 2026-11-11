@@ -1098,6 +1098,7 @@ zeigen();abgleichen();auslagernBald();
   new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input[data-anschrift]"))setzen(n);else if(n.querySelectorAll)alle(n)}}).observe(document.body,{childList:true,subtree:true})})();
 </script><script>
 /* Fenster (30.10.2026): Knopf mit data-fenster öffnet, ✕, Tipp daneben oder Esc schließt */
+(function(){if(window.mxWieder!==undefined)return;var t="";try{t=((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type||""}catch(e){}window.mxWieder=/^(reload|back_forward)$/.test(t);window.mxAltSchritte=0;try{var s=history.state;if(!window.mxWieder&&s&&typeof s==="object"&&!s.mxS&&!s.mxE){var n=+s.mxI||0;if(n>0||Object.keys(s).some(function(k){return k!=="mxI"})){history.replaceState({mxI:n},"");window.mxAltSchritte=n}}}catch(e){}addEventListener("popstate",function(e){if(window.mxLeise&&window.mxLeise())e.stopImmediatePropagation()},true)})();
 (function(){if(window.mxAuf)return;
   let bg=document.querySelector(".mxBg");if(!bg){bg=document.createElement("div");bg.className="mxBg";document.body.appendChild(bg)}
   // Zurück-Taste und Wischen schließen zuerst das Fenster, die Seite bleibt (04.11.2026, Baran: „wo richtig zurück ist“)
@@ -1106,19 +1107,24 @@ zeigen();abgleichen();auslagernBald();
     document.documentElement.style.overflow="";document.body.style.overflow=""};
   window.mxAuf=function(id){const f=document.getElementById(id);if(!f)return;schliessen();bg.classList.add("auf");f.classList.add("auf");
     document.documentElement.style.overflow="hidden";document.body.style.overflow="hidden";f.scrollTop=0;
-    if(!imVerlauf){try{history.pushState(Object.assign({},history.state||{},{mxF:id}),"");imVerlauf=true}catch(e){}}
+    if(!imVerlauf){if(still){pushNach=id;imVerlauf=true}else{try{history.pushState(Object.assign({},history.state||{},{mxF:id}),"");imVerlauf=true}catch(e){}}}   /* läuft gerade ein stiller Schritt zurück (Aufräumen nach dem Laden), kommt der eigene Schritt erst danach (11.11.2026) */
     snapF=f;snap=f.classList.contains("mxSchutz")?werte(f):null};
   // Fenster mit Geld (Klasse mxSchutz, 10.11.2026): Schließen durch ✕, Tipp daneben, Esc oder Zurück fragt bei Änderungen nach. Speichern schließt ohne Frage.
   let snap=null,snapF=null;
-  const werte=function(f){return[...f.querySelectorAll("input,textarea,select")].map(function(i){return i.type==="checkbox"||i.type==="radio"?i.checked:i.value}).join("~")+"|"+[...f.querySelectorAll(".an,.chip.an")].map(function(x){return x.textContent}).join("~")};
+  const werte=function(f){return[...f.querySelectorAll("input,textarea,select")].map(function(i){return i.type==="checkbox"||i.type==="radio"?i.checked:i.value}).join("~")+"|"+[...f.querySelectorAll(".an,.chip.an")].filter(function(x){return !x.closest("[data-mxkeinwert]")}).map(function(x){return x.textContent}).join("~")}   /* Auswahllisten mit data-mxkeinwert sind keine Eingabe (11.11.2026) */;
   const darfZu=function(){if(!snap||!snapF||!snapF.classList.contains("auf"))return true;if(werte(snapF)===snap)return true;if(confirm("Änderungen verwerfen?\n\nDas Getippte in diesem Fenster geht verloren.")){snap=null;return true}return false};
   window.mxGeaendertWeg=function(){snap=null};
   // ✕ nimmt den Eintrag wieder weg. Springt die Seite im selben Moment weiter, bleibt er als „überspringen“ im Verlauf stehen.
-  let still=false,skipT=null;
+  let still=false,skipT=null,putzen=null,pushNach=null;
   window.mxSkipNimm=function(){if(skipT){clearTimeout(skipT);skipT=null;return 1}return 0};   // die Seite springt selbst zurück und nimmt den Eintrag gleich mit
-  window.mxZu=function(){schliessen();if(!imVerlauf)return;imVerlauf=false;try{history.replaceState(Object.assign({},history.state||{},{mxSkip:1}),"")}catch(e){}
+  window.mxZu=function(){schliessen();if(!imVerlauf)return;imVerlauf=false;if(pushNach){pushNach=null;return}try{history.replaceState(Object.assign({},history.state||{},{mxSkip:1}),"")}catch(e){}
     skipT=setTimeout(function(){skipT=null;if(history.state&&history.state.mxSkip){still=true;history.back()}},0)};
-  addEventListener("popstate",function(e){if(still){still=false;e.stopImmediatePropagation();return}
+  /* stiller Schritt zurück: aufräumen, einen aufgeschobenen Fensterschritt nachholen, sonst nichts */
+  window.mxLeise=function(){if(!still)return false;still=false;
+      if(putzen){const p=putzen;putzen=null;try{history.replaceState(p,"")}catch(x){}}
+      if(pushNach){const f=document.getElementById(pushNach);pushNach=null;if(f&&f.classList.contains("auf")){try{history.pushState(Object.assign({},history.state||{},{mxF:f.id}),"")}catch(x){}}else imVerlauf=false}
+      return true};
+  addEventListener("popstate",function(e){if(window.mxLeise()){e.stopImmediatePropagation();return}
     if(imVerlauf){e.stopImmediatePropagation();if(!darfZu()){try{history.pushState(Object.assign({},history.state||{},{mxF:snapF&&snapF.id}),"")}catch(x){}return}imVerlauf=false;schliessen();return}
     if(e.state&&e.state.mxSkip){e.stopImmediatePropagation();history.back()}},true);
   document.addEventListener("click",function(e){const k=e.target.closest("[data-fenster]");if(k){e.preventDefault();mxAuf(k.dataset.fenster);return}
@@ -1126,5 +1132,9 @@ zeigen();abgleichen();auslagernBald();
   document.addEventListener("keydown",function(e){if(e.key==="Escape"&&darfZu())mxZu()});
   // Neu geladen, während ein Fenster offen war (zum Beispiel nach WhatsApp): das Fenster ist zu, sein Schritt steht noch im Verlauf.
   // Ohne Aufräumen täte das erste Zurück nichts (Prüfung 10.11.2026). Den Schritt still zurückgehen, die Seite merkt davon nichts.
-  try{if(history.state&&history.state.mxF&&!document.querySelector(".mxFenster.auf")&&/^(reload|back_forward)$/.test((((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type)||"")){still=true;history.back()}}catch(e){}})();
+  try{if(history.state&&history.state.mxF&&!document.querySelector(".mxFenster.auf")&&window.mxWieder){still=true;history.back()}}catch(e){}
+  /* Neu aufgerufen (11.11.2026): die alten Schritte dieser Seite still zurückgehen, bis zu ihrem ersten Eintrag. Dann führt das erste Zurück
+     dorthin, woher man kam, statt auf einen toten Schritt oder in einen alten Zustand (Reiter, Auto, Akte). Nur ersetzen statt zurückgehen
+     ließe die alten Einträge davor stehen (Prüfung: Zurück tat nichts oder sprang in den alten Zustand). */
+  try{const n=Math.min(window.mxAltSchritte||0,history.length-1);window.mxAltSchritte=0;if(!window.mxWieder&&n>0){putzen=Object.assign({},history.state||{},{mxI:0});still=true;history.go(-n)}}catch(e){}})();
 </script></body></html>
