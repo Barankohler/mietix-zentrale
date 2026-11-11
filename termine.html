@@ -203,6 +203,8 @@ body.nurTermine #uKopf{display:block;background:#fff;border-bottom:3px solid var
 .tmErl{margin-top:20px}.tmErl>summary{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:12px;padding:13px 16px;font-size:16px;font-weight:700;color:#6E6E73;cursor:pointer;list-style:none}
 .tmErl>summary::-webkit-details-marker{display:none}.tmErl>summary em{font-style:normal;color:#C7C7CC;transition:transform .15s}.tmErl[open]>summary em{transform:rotate(180deg)}
 .tmErl[open]>summary{margin-bottom:8px}.tmErl .tmZ b{color:#6E6E73}
+.tmGel{margin-top:10px}.tmGelZ{cursor:default;align-items:center}.tmGelZ:active{background:transparent}
+.tmWh{flex:0 0 auto;border:0;border-radius:10px;padding:9px 12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}.tmWh:active{background:#D8D8DD}
 /* Fenster Termin */
 #fTermin{background:#F2F2F7}
 #fTermin .tmGl{background:#fff;border-radius:12px;overflow:hidden;margin-bottom:10px}
@@ -272,6 +274,7 @@ body.nurTermine #uKopf{display:block;background:#fff;border-bottom:3px solid var
 .plZ u{flex:0 0 26px;width:26px;height:26px;border-radius:50%;border:2px solid #C7C7CC;box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900;text-decoration:none}.plZ.an u{background:#34C759;border-color:#34C759}
 .plZ span{flex:1;min-width:0}.plZ b{display:block;font-size:16px;font-weight:700;color:#1C1C1E}.plZ i{display:block;font-style:normal;font-size:13px;font-weight:600;color:#6E6E73;margin-top:1px}
 #fAufgabe .tmZwei button{border:0;border-radius:12px;padding:12px;background:#E5E5EA;color:#1C1C1E;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
+#fAufgabe .tmZwei button.rot{color:#C4161C}
 
 .mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
 .mxKnopf span,.mxKlapp>summary span{flex:1;min-width:0}
@@ -443,6 +446,8 @@ function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kaution
     if(bez>0)l.push({art:"verl",t:T,b:bez,am});
     if(y.bezahlt&&y.gezahlt!=null&&auf>bez)l.push({art:"verl",t:T,b:auf-bez,am:""})});
   const s=+e.summe||0;
+  // Weitere Kosten vor der Rückgabe (11.11.2026 nachts, Prüfung B A6): offen wie in der Mappe und in der Brücke, nach der Rückgabe stecken sie in der Endabrechnung
+  if(!v.endabrechnung){const kv=(v.kostenVorab||[]).reduce((q,x)=>q+Math.round(+(x&&x.betrag)||0),0);if(kv>0)l.push({art:"miete",t:"Weitere Kosten",b:kv,am:""})}
   if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0,N="Nachzahlung Rückgabe";
     if(bz&&bz.art==="Kaution"&&kr.verrechnet){   // steckt im Einbehalt der Kaution. Wurde der Einbehalt danach gesenkt, ist der nicht gedeckte Teil offen
       const gesenkt=kr.gesamt!=null?Math.max(0,(+kr.gesamt||0)-(+kr.miete||0)-ein):eB,nichtGedeckt=Math.min(gesenkt,Math.max(0,eB-Math.max(0,ein-imEin)));
@@ -577,6 +582,13 @@ function nurGeaenderte(schl){const hin=$("eHin"),jetzt=werteVon(schl);if(!jetzt)
 function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
   const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
   if(!nurGeaenderte(schl))return;
+  // Jede Geldänderung fragt „Sicher?“ mit alt und neu (11.11.2026 nachts, Prüfung B A5)
+  {const fw=feldWerte(),orig=OFFEN.orig||{},zeig=(id,x)=>/Am$/.test(id)?(istTag(x)?deJ(x):"leer"):id==="eGrund"?(String(x||"").trim()||"leer"):eur(Math.round(zahl(x)||0));
+    const z=Object.keys(fw).filter(id=>fNorm(id,fw[id])!==fNorm(id,orig[id])).map(id=>fName(id)+": "+zeig(id,orig[id])+" auf "+zeig(id,fw[id]));
+    if(z.length){const x=schl.startsWith("a:")?lies("mietixAnfragen",[]).find(y=>y&&y.id===schl.slice(2)):lies("mietixVorgaenge",[]).find(y=>y&&y.nr===schl.slice(2));
+      const tzOffen=!schl.startsWith("a:")&&x&&$("eRestAm")&&t("eRestAm")&&!istTag(((x.zahlung||{}).rest||{}).am)?(x.teilzahlungen||[]).filter(q=>q&&+q.betrag>0&&!q.verrechnet).reduce((q,y)=>q+Math.round(+y.betrag||0),0):0;
+      if(tzOffen)z.push("Teilzahlung "+eur(tzOffen)+" € ist im Rest enthalten, sie zählt nicht doppelt.");
+      if(!confirm("Zahlungen von "+((x&&x.name)||"diesem Kunden")+" ändern?\n\n"+z.join("\n")+"\n\nSicher?"))return}}
   if(schl.startsWith("a:")){const l=lies("mietixAnfragen",[]),a=l.find(x=>x&&x.id===schl.slice(2));if(!a)return weg();const vorher=JSON.stringify(a);
     const za=a.anzahlung||{},st=a.storno,gleich=Math.round(n0(za.betrag))===w("eAnz")&&(istTag(za.am)?za.am:"")===t("eAnzAm"),stNeu=!!(st&&$("eStB")&&(Math.round(+st.betrag||0)!==w("eStB")||(istTag(st.am)?st.am:"")!==t("eStAm")));
     if(gleich&&!stNeu){window.mxZu();return}   // nichts geändert
@@ -599,7 +611,9 @@ function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id)
     if(!y.imRest){const am=t("eVAm"+i),war=y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";if(am!==war){if(am){y.bezahlt=true;y.bezahltAm=am}else{y.bezahlt=false;delete y.bezahltAm}}}});
   if(preisPlus){v.preis1=wie(n0(v.preis1)+preisPlus);v.gesamt=wie(n0(v.preis1)+n0(v.preis2)+n0(v.paketPreis))}   // Mietpreis im Mietvertrag zieht mit, wie beim Verlängern
   {const r=Math.round(n0((z.rest||{}).betrag)),vr=verlInRest(v),feldRest=w("eRest"),soll=feldRest===Math.max(0,Math.round(r-vrAlt))?Math.max(0,Math.round(r+vr-vrAlt)):feldRest+vr;   // Rest ohne Verlängerung unverändert: Rest wächst nur um die geänderte Verlängerung
-    setz("rest",soll,t("eRestAm"))}
+    const warAm=istTag((z.rest||{}).am);setz("rest",soll,t("eRestAm"));
+    // Rest jetzt bezahlt: offene Teilzahlungen sind darin enthalten, wie bei „Bezahlt“ in der Mappe (teilVerrechnen), sonst zählen sie doppelt
+    if(!warAm&&istTag((z.rest||{}).am))(v.teilzahlungen||[]).forEach(q=>{if(q&&!q.verrechnet)q.verrechnet="rest"})}
   if($("eNach")){const e=v.endabrechnung,b=w("eNach"),am=t("eNachAm"),bz=e.bezahlt||null,warAm=bz&&istTag(bz.am)?bz.am:"",warB=bz?(bz.betrag!=null?Math.round(+bz.betrag||0):Math.round(+e.summe||0)):Math.round(+e.summe||0);
     if(am!==warAm||b!==warB){if(am){e.bezahlt=Object.assign({},bz||{},{am});if(e.bezahlt.art==="Kaution")e.bezahlt.art="";if(b===Math.round(+e.summe||0))delete e.bezahlt.betrag;else e.bezahlt.betrag=b}else delete e.bezahlt}}
   setz("kaut",w("eKaut"),t("eKautAm"));
@@ -953,7 +967,8 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
   function symbol(k,art){const f={Nachfassen:"#25D366",Kaution:"#1E8E4E",Offen:"#E8A200",Prüfen:"#C4161C",Aufgabe:"#E8A200",Zustand:"#E8A200"}[k]||(art==="rot"?"#C4161C":"#E8A200");
     const z={Nachfassen:"✉",Kaution:"€",Offen:"€",Prüfen:"!"}[k]||"!";return '<span class="sym" style="background:'+f+'">'+z+'</span>'}
   function zeichne(){
-    const h=new Date(),hi=iso(h),m=new Date();m.setDate(m.getDate()+1);const mo=iso(m);
+    const h=new Date(),hi=iso(h),m=new Date();m.setDate(m.getDate()+1);const mo=iso(m),jetztU=pad(h.getHours())+":"+pad(h.getMinutes());
+    const rSpaet=x=>!!x.bisD&&(x.bisD<hi||(x.bisD===hi&&!!x.bisU&&x.bisU<jetztU));   // dieselbe Regel wie „Überfällig“ in Buchungen (spaet)
     const kunden0=lies("mietixKunden",{}),alle=lies("mietixVorgaenge",[]),v=alle.filter(x=>x.status!=="zurück"),anf=lies("mietixAnfragen",[]),auf=lies("mietixAufgaben",[]),zust=lies("mietixZustand",[]);
     const out=[];
     const tag=d=>d<hi?"überfällig seit "+de(d):d===hi?"heute":"morgen ("+WT[m.getDay()]+" "+de(mo)+")",morgen=[];   // „morgen“ immer mit Datum (Baran, 31.10.2026)   // Morgen steht seit 31.10.2026 in einem eigenen Abschnitt (Baran)
@@ -972,7 +987,8 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
       if(k.am&&!x.kautionRueck)return 0;   // Kaution liegt noch da: wird beim Zurückgeben verrechnet
       return Math.max(0,Math.round((of-(kr.verrechnet?0:+kr.einbehalt||0))*100)/100)};
     // Überfällige Rückgabe bleibt sichtbar, ein Auto, das zurück sein müsste, kostet Geld (04.11.2026)
-    alle.filter(x=>!x._weg&&x.ueb&&x.status!=="zurück"&&x.bisD&&x.bisD<hi).forEach(x=>rest.push({t:x.name,i:(x.auto||"")+", Rückgabe war "+de(x.bisD),k:"Überfällig",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"}));
+    // Mit Uhrzeit wie Buchungen (11.11.2026, Nachtprüfung C5): Rückgabe heute 00:30 ist um 00:52 schon überfällig
+    alle.filter(x=>!x._weg&&x.ueb&&x.status!=="zurück"&&rSpaet(x)).forEach(x=>rest.push({t:x.name,i:(x.auto||"")+", Rückgabe war "+(x.bisD===hi?"heute"+(x.bisU?" "+x.bisU+" Uhr":""):de(x.bisD)),k:"Überfällig",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"}));
     // Abholung überfällig (09.11.2026): Beginn lag vor heute, keine Übergabe eingetragen. Nur Mietverträge, Anfragen zählen nicht. Die Übergabe-Liste selbst bleibt weg (01.11.2026, frisst Platz)
     alle.filter(x=>!x._weg&&!x.ueb&&x.status!=="zurück"&&x.status!=="storniert"&&x.vonD&&x.vonD<hi&&x.vonD>=(d=>{d.setDate(d.getDate()-7);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")})(new Date(hi+"T12:00"))).sort((a,b)=>a.vonD.localeCompare(b.vonD)).forEach(x=>rest.push({t:x.name,i:(x.auto||"")+", Abholung überfällig seit "+de(x.vonD),k:"Überfällig",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"}));
     // Miete offen nach der Rückgabe (09.11.2026): Rest oder Verlängerung noch nicht bezahlt, ab dem 4. Tag wie die Endabrechnung (Achtung nur über 3 Tage). Die Nachzahlung steht in der Zeile Endabrechnung, nie doppelt
@@ -1061,7 +1077,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
     document.getElementById("ausTitel").classList.toggle("versteckt",hi<"2027-03-01");document.getElementById("aus").classList.toggle("versteckt",hi<"2027-03-01");
     // Zähler auf den Kacheln
     const kunden=lies("mietixKunden",{});let sch=0;Object.keys(kunden).forEach(n=>{if(kunden[n]&&kunden[n].schadenOffen)sch++});
-    document.querySelectorAll(".kachel[data-zaehler]").forEach(k=>{const n={anfragen:offen,schaeden:sch,vertraege:rest.length,autos:autoPunkte.length,whatsapp:WA_ZAHL}[k.dataset.zaehler]||0;const z=k.querySelector(".zahl");z.textContent=n;z.classList.toggle("versteckt",!n)});
+    document.querySelectorAll(".kachel[data-zaehler]").forEach(k=>{const n={anfragen:offen,schaeden:sch,vertraege:rest.filter(x=>x.art==="rot").length,autos:autoPunkte.length,whatsapp:WA_ZAHL}[k.dataset.zaehler]||0;const z=k.querySelector(".zahl");z.textContent=n;z.classList.toggle("versteckt",!n)});
     // Punkt: grün angemeldet, grau nicht, rot wenn die Brücke hängt
     const sitzung=lies("mietixSitzung",null),st=(lies("mietixStand",{}).bruecke)||null;let text="";
     const p=document.getElementById("punkt");p.className="";
@@ -1083,7 +1099,9 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
       document.getElementById("zkSt").className=steht?"alarm":"gr";set("zkST",steht?"jetzt vermieten":"alle unterwegs")}
     const ue=alle.filter(x=>lebt(x)&&x.vonD===hi),ueA=anf.filter(a=>a.status==="gebucht"&&a.von===hi&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von));
     const ueE=ue.filter(x=>x.ueb).length,ueN=ue.length+ueA.length;set("zkUe",ueN);set("zkUeT",ueN&&ueE?ueE+" erledigt":"heute");
-    const ru=alle.filter(x=>lebt(x)&&x.bisD===hi&&x.ueb),ruE=ru.filter(x=>x.status==="zurück").length;set("zkR",ru.length);set("zkRT",ru.length&&ruE?ruE+" erledigt":"heute");
+    // Rückgabe heute: schon überfällige (Uhrzeit vorbei, noch nicht zurück) stehen unter Achtung, nicht hier (11.11.2026, wie Buchungen)
+    const jd=new Date(),jU=pad(jd.getHours())+":"+pad(jd.getMinutes());
+    const ru=alle.filter(x=>lebt(x)&&x.bisD===hi&&x.ueb&&(x.status==="zurück"||!x.bisU||x.bisU>=jU)),ruE=ru.filter(x=>x.status==="zurück").length;set("zkR",ru.length);set("zkRT",ru.length&&ruE?ruE+" erledigt":"heute");
     // Umsatz-Karte (09.11.2026, Baran: „den ganzen Umsatz, der diesen Monat reingekommen ist“): alles, was im Monat bezahlt wurde, dieselbe Rechnung wie „Zusammen“ auf der Seite Monat. Fixkosten kommen aus der Excel.
     const st=(lies("mietixStand",{})||{}).statistik||{},mon=hi.slice(0,7),M=(st.monate||[]).find(x=>x.m===mon),fix=+((st.fix||{}).gesamt)||0;
     const pListen=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&v.nr).map(v=>mxZahlung.posten(v)).concat(lies("mietixAnfragen",[]).map(a=>mxZahlung.anfragePosten(a))).filter(l=>l.length),imMon=(l,m,bis)=>l.filter(p=>p.am&&p.am.slice(0,7)===m&&(!bis||p.am<=bis)).reduce((s,p)=>s+p.b,0);
@@ -1121,8 +1139,11 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
   function verlTag(c,v){const t=Math.max(1,Math.round((new Date(v.bisD+"T12:00")-new Date(v.vonD+"T12:00"))/86400000)),start=(new Date(v.vonD+"T12:00").getDay()+6)%7;
     return Math.round(listenMiete(c,start,t+1))-Math.round(listenMiete(c,start,t))}   // beide Mieten runden, dann abziehen, wie im Mietvertrag
   function waRunde(alle,anf,hi,mo,nach){const plusT=(d,n)=>{const x=new Date(d+"T12:00");x.setDate(x.getDate()+n);return iso(x)},L=[],ue=(a1,b1,a2,b2)=>a1<b2&&b1>a2,preis=a=>PREISE&&PREISE.cars.find(c=>c.n===a||c.anzeige===a);
-    const freiAm=(v,t)=>!alle.some(x=>x.nr!==v.nr&&x.auto===v.auto&&x.status!=="zurück"&&x.vonD&&x.bisD&&ue(t,plusT(t,1),x.vonD,x.bisD))
-      &&!anf.some(a=>a.status==="gebucht"&&a.auto===v.auto&&a.von&&a.bis&&ue(t,plusT(t,1),a.von,a.bis))&&!lies("mietixSperren",[]).some(s=>!s._weg&&s.auto===v.auto&&s.von&&s.bis&&sperreTrifft(t,plusT(t,1),s)),frei=v=>freiAm(v,mo);   // Abholung morgen zählt als belegt (04.11.2026)
+    // Frei am Tag t heißt: von der jetzigen Rückgabe bis zum Ende von t belegt nichts anderes das Auto (11.11.2026, strenge Prüfung Punkt 15:
+    // nach einer verschobenen Rückgabe lief die andere Miete schon, geprüft wurde aber nur der Tag danach). Stornierte und gelöschte zählen nicht
+    const freiAm=(v,t)=>{const ab=v.bisD&&v.bisD<t?v.bisD:t,bis=plusT(t,1);
+      return !alle.some(x=>x.nr!==v.nr&&!x._weg&&x.auto===v.auto&&x.status!=="zurück"&&x.status!=="storniert"&&x.vonD&&x.bisD&&ue(ab,bis,x.vonD,x.bisD))
+      &&!anf.some(a=>!a._weg&&a.status==="gebucht"&&a.auto===v.auto&&a.von&&a.bis&&!(a.vertrag&&a.vertrag===v.nr)&&!(String(a.name||"").toLowerCase().replace(/\s+/g,"")===String(v.name||"").toLowerCase().replace(/\s+/g,"")&&a.von===v.vonD)&&ue(ab,bis,a.von,a.bis))&&!lies("mietixSperren",[]).some(s=>!s._weg&&s.auto===v.auto&&s.von&&s.bis&&sperreTrifft(ab,bis,s))},frei=v=>freiAm(v,mo);   // Abholung morgen zählt als belegt (04.11.2026)
     // Nummer kann auch nur in der Kundenakte stehen (Prüfung 09.11.2026), die Korrektur weiter unten trägt sie dann ein
     const kbT=lies("mietixKunden",{}),nT=t=>String(t||"").toLowerCase().replace(/\s+/g,""),akteTel=t=>{const k=Object.keys(kbT).find(y=>nT(y)===nT(t));return k&&kbT[k]&&kbT[k].telefon};
     // Kaution im Abholungstext (Prüfung 09.11.2026): bezahlt oder Fahrzeug = keine Zeile, eingetragener Betrag gilt, leer = Kaution des Autos aus der Preisliste
@@ -1687,22 +1708,50 @@ function sicherheitsnetz(k,alt,neu){
   const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]={alt,neu};else burst[k].neu=neu;
   rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
 let rueckLaeuft=false,rueckTimer=null;
+// Geld in der Rückfrage zu Rückgängig, jetzt und danach (11.11.2026 nachts, Prüfung B A14): „Rest bezahlt am: 11.11.2026 auf leer“
+function rueckGeldZeilen(b){const z=[];try{const k="mietixVorgaenge",roh2=s=>alsMap(k,JSON.parse(s||"null")||[]),a=roh2(b[k].alt),n=roh2(b[k].neu);
+  const N={"gesamt":"Mietpreis","zahlung.anz.betrag":"Anzahlung","zahlung.anz.am":"Anzahlung bezahlt am","zahlung.rest.betrag":"Rest","zahlung.rest.am":"Rest bezahlt am","zahlung.kaut.betrag":"Kaution","zahlung.kaut.am":"Kaution erhalten am",
+    "kautionRueck.betrag":"Kaution zurück","kautionRueck.am":"Kaution zurück am","kautionRueck.einbehalt":"Einbehalten","endabrechnung.summe":"Endabrechnung","endabrechnung.bezahlt.am":"Endabrechnung bezahlt am"};
+  const zl=s=>{s=String(s).replace(/€/g,"").trim();const x=parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""));return isNaN(x)?0:x};
+  const w=(p,x)=>x==null||x===""?"leer":/\.am$/.test(p)?String(x).slice(0,10).split("-").reverse().join("."):Math.round(zl(x)).toLocaleString("de-DE")+" €";
+  const ps=Object.keys(n).filter(p=>p in a&&istObj(a[p])&&istObj(n[p])&&fp(a[p])!==fp(n[p]));
+  ps.forEach(p=>{const vor=ps.length>1?"Mietvertrag "+p+", ":"";pfadUnterschiede(a[p],n[p],[],[]).forEach(u=>{const q=u.p.join(".");if(N[q])z.push(vor+N[q]+": "+w(q,u.neu)+" auf "+w(q,u.alt))});
+    ["verlaengerungen","teilzahlungen"].forEach(f=>{const la=(a[p][f]||[]).length,ln=(n[p][f]||[]).length;if(la!==ln)z.push(vor+(f==="verlaengerungen"?"Verlängerungen":"Teilzahlungen")+": "+ln+" auf "+la)})});
+  if(b.mietixVorgaenge&&Object.keys(n).some(p=>!(p in a)))z.push("Neuer Mietvertrag wird wieder entfernt")}catch(e){}return z.filter((x,i,l)=>l.indexOf(x)===i).slice(0,8)}
+// Unterschiede Pfad für Pfad (gleich wie unterschiede in stil/zahlung_aendern.py): Listen gleicher Länge Element für Element, sonst als Ganzes
+function pfadUnterschiede(a,b,p,out){const obj=x=>x&&typeof x==="object";
+  if(obj(a)&&obj(b)&&Array.isArray(a)===Array.isArray(b)&&(!Array.isArray(a)||a.length===b.length)){new Set(Object.keys(a).concat(Object.keys(b))).forEach(k=>pfadUnterschiede(a[k],b[k],p.concat(k),out))}
+  else if(fp(a)!==fp(b))out.push({p,alt:a,neu:b});return out}
+const anPfad=(o,p)=>p.reduce((x,k)=>x==null?undefined:x[k],o);
+function setzPfad(o,p,w){let x=o;for(let i=0;i<p.length-1;i++){if(x[p[i]]==null||typeof x[p[i]]!=="object")x[p[i]]={};x=x[p[i]]}const k=p[p.length-1];if(w===undefined)delete x[k];else x[k]=JSON.parse(JSON.stringify(w))}
 // Rückgängig steht neben dem Titel, nie über einem Knopf (Baustein in stil/schutz.py, 04.11.2026)
 function rueckZeigen(text){if(window.mxRueckZeig)window.mxRueckZeig("mietixRueck","Rückgängig: "+text,rueckgaengig)}
 function rueckgaengig(){if(!burst)return;
-  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
-  const b=burst;burst=null;rueckLaeuft=true;
-  // Nur die eigene Änderung zurücknehmen (05.11.2026): Was inzwischen von anderen Geräten kam, bleibt stehen
-  try{Object.keys(b).forEach(k=>{const l=liesAblage(k);if(l.kaputt){if(window.mxFehler)mxFehler("Rückgängig ging nicht: "+MEHRZAHL[k]+" auf diesem Gerät sind beschädigt.");return}
-    const leer=SPEICHER[k].liste?[]:{},roh2=s=>alsMap(k,JSON.parse(s||"null")||leer),a=roh2(b[k].alt),n=roh2(b[k].neu),m=alsMap(k,l.w);
+  if("mietixVorgaenge" in burst){const z=rueckGeldZeilen(burst);if(!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen."+(z.length?"\n\n"+z.join("\n"):"")+"\n\nSicher?"))return}
+  const b=burst;burst=null;rueckLaeuft=true;const nicht=[];let kaputt=false;
+  // Nur die eigene Änderung zurücknehmen (05.11.2026): Was inzwischen von anderen Geräten kam, bleibt stehen.
+  // Pfad für Pfad wie eigenesZurueck in stil/zahlung_aendern.py (11.11.2026 nachts, Prüfung B A2 und D A7): auch innerhalb von zahlung.rest, zahlung.kaut usw.
+  // Steht an einer dieser Stellen inzwischen etwas anderes, bleibt der Eintrag, wie er ist, und es kommt ein roter Hinweis statt „✓ Zurückgeholt“
+  try{Object.keys(b).forEach(k=>{const l=liesAblage(k);if(l.kaputt){kaputt=true;if(window.mxFehler)mxFehler("Rückgängig ging nicht: "+MEHRZAHL[k]+" auf diesem Gerät sind beschädigt.");return}
+    const leer=SPEICHER[k].liste?[]:{},roh2=s=>alsMap(k,JSON.parse(s||"null")||leer),a=roh2(b[k].alt),n=roh2(b[k].neu),m=alsMap(k,l.w),wer=p=>(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(n[p]||a[p]||{});
+    let neu=false;
     new Set([...Object.keys(a),...Object.keys(n)]).forEach(p=>{if(fp(a[p])===fp(n[p]))return;
-      if(!(p in a)){delete m[p];return}                                  // hier neu angelegt
-      if(!(p in n)||!(p in m)||!istObj(a[p])||!istObj(n[p])){m[p]=a[p];return}   // hier gelöscht
-      const o=Object.assign({},m[p]);new Set([...Object.keys(a[p]),...Object.keys(n[p])]).forEach(f=>{   // Feld für Feld: nur was hier geändert wurde und seitdem niemand sonst
-        if(fp(a[p][f])!==fp(n[p][f])&&fp(o[f])===fp(n[p][f])){if(f in a[p])o[f]=a[p][f];else delete o[f]}});
-      m[p]=o});
-    merk(k,ausMap(k,m))})}finally{rueckLaeuft=false}
-  const el=document.getElementById("mietixRueck");if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
+      if(!(p in a)){if(!(p in m)||fp(m[p])===fp(n[p])){delete m[p];neu=true}else nicht.push(wer(p));return}   // hier neu angelegt, inzwischen woanders geändert: bleibt
+      if(!(p in n)||!(p in m)||!istObj(a[p])||!istObj(n[p])){m[p]=a[p];neu=true;return}   // hier gelöscht
+      const o=JSON.parse(JSON.stringify(m[p])),d=pfadUnterschiede(a[p],n[p],[],[]).filter(u=>u.p[0]!=="verlauf"&&u.p[0]!=="geaendert");
+      if(d.some(u=>{const j=anPfad(o,u.p);return fp(j)!==fp(u.neu)&&fp(j)!==fp(u.alt)})){nicht.push(wer(p));return}
+      d.forEach(u=>setzPfad(o,u.p,u.alt));
+      if(fp(o.geaendert)===fp(n[p].geaendert)){if(a[p].geaendert===undefined)delete o.geaendert;else o.geaendert=a[p].geaendert}
+      {const av=Array.isArray(a[p].verlauf)?a[p].verlauf:[],nv=Array.isArray(n[p].verlauf)?n[p].verlauf:[];   // der eigene Eintrag im Verlauf geht mit
+        if(fp(o.verlauf)===fp(n[p].verlauf)){if(a[p].verlauf===undefined)delete o.verlauf;else o.verlauf=a[p].verlauf}
+        else if(Array.isArray(o.verlauf)&&nv.length>av.length)nv.slice(av.length).forEach(x=>{const i=o.verlauf.findIndex(y=>fp(y)===fp(x));if(i>=0)o.verlauf.splice(i,1)})}
+      m[p]=o;neu=true});
+    if(neu)merk(k,ausMap(k,m))})}finally{rueckLaeuft=false}
+  const el=document.getElementById("mietixRueck");
+  if(nicht.length||kaputt){if(el){el.classList.remove("an");el.onclick=null}
+    if(nicht.length&&window.mxFehler)mxFehler("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.",8000);
+    else if(nicht.length)alert("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.")}
+  else if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
   ungesichert=true;zeigen();window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
   if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
@@ -2117,8 +2166,28 @@ zeigen();abgleichen();auslagernBald();
   // Entwurf „Neuer Termin“ (10.11.2026, Prüfung: Titel, Ort und Notiz ohne Datum gingen verloren). Weg, sobald der Termin gespeichert ist.
   const TM_ENT="mietixFeld:terminNeu";
   const entwurfWeg=id=>{try{const e=JSON.parse(localStorage.getItem(TM_ENT)||"null");if(!e||!id||e.id===id)localStorage.removeItem(TM_ENT)}catch(x){}};
-  function speichern(t){entwurfWeg(t.id);const s=lies("mietixStand",{})||{};const tt=Object.assign({},s.termine&&typeof s.termine==="object"&&!Array.isArray(s.termine)?s.termine:{});
-    t.geaendert=new Date().toISOString();tt[t.id]=t;s.termine=tt;const ok=schreib("mietixStand",s);if(ok)sperreAbgleichen(t);return ok}
+  // Zwei Fenster (11.11.2026, strenge Prüfung Punkt 1): wie stammZusammen im Mietvertrag. basis = Stand beim Öffnen des Fensters.
+  // Geschrieben wird nur, was hier geändert wurde, alles andere bleibt auf dem neuesten Stand. Woanders gelöscht: nicht zurückholen.
+  // Dasselbe Feld hier und woanders verschieden geändert: nichts speichern, roter Hinweis mit Grund. Ohne basis (Rückgängig, Wiederherstellen) wird der Termin so geschrieben.
+  const TM_F=[["titel","Worum geht es"],["fuer","Für"],["auto","Fahrzeug"],["vonD","Datum von"],["vonU","Uhr von"],["bisD","Datum bis"],["bisU","Uhr bis"],["wo","Bei wem, wo"],["tel","Telefon"],["notiz","Notiz"],["sperren","Sperre"],["erledigt","Erledigt"],["_weg","Gelöscht"]];
+  const tmW=v=>v===true?"1":v===false||v==null?"":String(v).trim();
+  let TM_GRUND="";
+  function speichern(t,basis){TM_GRUND="";const s=lies("mietixStand",{})||{};const tt=Object.assign({},s.termine&&typeof s.termine==="object"&&!Array.isArray(s.termine)?s.termine:{});
+    const jetzt=tt[t.id];let neu=t;
+    if(basis&&jetzt){if(jetzt._weg&&!basis._weg&&!t._weg){TM_GRUND="weg";return false}
+      neu=Object.assign({},jetzt);const streit=[];
+      TM_F.forEach(([k,n])=>{const h=tmW(t[k]),b=tmW(basis[k]),j=tmW(jetzt[k]);if(h===b)return;if(j!==b&&j!==h){streit.push(n);return}if(t[k]===undefined)delete neu[k];else neu[k]=t[k]});
+      if(streit.length){TM_GRUND="Nicht gespeichert: "+streit.join(", ")+" inzwischen in einem anderen Fenster geändert. Bitte schließen und neu öffnen.";return false}}
+    entwurfWeg(t.id);neu=Object.assign({},neu,{geaendert:new Date().toISOString()});tt[t.id]=neu;s.termine=tt;const ok=schreib("mietixStand",s);if(ok){sperreAbgleichen(neu);TM_LETZT=neu}return ok}
+  let TM_LETZT=null;   // was zuletzt geschrieben wurde, mit dem Stand aus dem anderen Fenster
+  // Nach dem Speichern: Felder aus dem anderen Fenster ins offene Fenster holen, Getipptes bleibt (nur was hier nicht geändert wurde)
+  function nachziehen(){if(!TM_LETZT||!T||TM_LETZT.id!==T.id)return;const n=TM_LETZT;T0=Object.assign({},n);
+    const ids={titel:"tmTitel",vonD:"tmVonD",vonU:"tmVonU",bisD:"tmBisD",bisU:"tmBisU",wo:"tmWo",tel:"tmTel",notiz:"tmNotiz",auto:"tmAuto"};let anders=false;
+    TM_F.forEach(([k])=>{if(tmW(T[k])===tmW(n[k]))return;anders=true;T[k]=n[k];const el=ids[k]&&$(ids[k]);if(el&&el.value!==(n[k]||""))el.value=n[k]||""});
+    ["angelegt","geaendert"].forEach(k=>{if(n[k])T[k]=n[k]});if(anders)anzeigen()}
+  // Gespeichert oder nicht: der Grund steht rot da. Woanders gelöscht: Fenster zu, roter Hinweis
+  function nichtGespeichert(){if(TM_GRUND==="weg"){T0=null;window.mxZu();zeichne();const m="Nicht gespeichert: Der Termin wurde in einem anderen Fenster gelöscht. Er liegt unter „Gelöscht“ und lässt sich dort wiederherstellen.";if(window.mxFehler)mxFehler(m,7000);else alert(m);return}
+    if(TM_GRUND)$("tmFehler").textContent=TM_GRUND}
   const autoAnz=n=>{const a=AUTOS.find(x=>x[0]===n);return a?a[1]:n||""};
   // Sperre im Kalender: ganze Tage, der Tag nach dem Ende ist wieder frei (Regel wie im Kalender)
   function sperreAbgleichen(t){const sid="termin-"+t.id,l=lies("mietixSperren",[]),alt=l.find(x=>x.id===sid);
@@ -2153,12 +2222,27 @@ zeigen();abgleichen();auslagernBald();
       h+='<div class="tmGk'+(k?" "+k:"")+'">'+esc(titel)+'</div><div class="tmL">'+z.map(t=>zeile(t,hi,mitD)).join("")+'</div>'});
     if(!n)h='<div class="tmLeer">'+(LK&&LK.aktiv()?"Nichts gefunden. Anderen Filter wählen oder Filter zurücksetzen.":"Keine offenen Termine. Mit „+ Neuer Termin“ eintragen.")+'</div>';
     if(erl.length)h+='<details class="tmErl"'+(TM_ERL_AUF?" open":"")+'><summary><span>Erledigt ('+erl.length+')</span><em>⌄</em></summary><div class="tmL">'+erl.map(t=>zeile(t,hi,true)).join("")+'</div></details>';
+    // Gelöscht (11.11.2026, strenge Prüfung Punkt 4): eingeklappt wie „Erledigt“, Wiederherstellen holt Termin und Sperre zurück
+    const gel=Object.values(alle()).filter(t=>t&&t.id&&t._weg&&t.vonD&&passt(t)).sort((a,b)=>String(b.geaendert||"").localeCompare(String(a.geaendert||""))).slice(0,30);
+    if(gel.length){const sp=lies("mietixSperren",[]);
+      h+='<details class="tmErl tmGel"'+(TM_GEL_AUF?" open":"")+'><summary><span>Gelöscht ('+gel.length+')</span><em>⌄</em></summary><div class="tmL">'+gel.map(t=>{const waise=sp.some(x=>x&&x.id==="termin-"+t.id&&!x._weg);
+        const teile=[kurz(t.vonD)+(t.bisD&&t.bisD>t.vonD?" bis "+kurz(t.bisD):""),t.fuer==="fahrzeug"&&t.auto?autoAnz(t.auto):"Firma",t.geaendert?"gelöscht "+kurz(String(t.geaendert).slice(0,10)):""].filter(Boolean);
+        return '<div class="tmZ tmGelZ" data-gel="'+esc(t.id)+'"><div class="tmT"><b>'+esc(t.titel||"Termin")+'</b><i>'+esc(teile.join(", "))+'</i>'+(waise?'<div><span class="tmF sp">Sperre steht noch im Kalender</span></div>':(t.sperren&&t.fuer==="fahrzeug"&&t.auto?'<div><span class="tmF">mit Sperre</span></div>':""))+'</div><button type="button" class="tmWh" data-wh="'+esc(t.id)+'">Wiederherstellen</button></div>'}).join("")+'</div></details>'}
     $("tmListe").innerHTML=h;if(LK)LK.zeile(n+(n===1?" Termin":" Termine"));if(typeof tabZeigen==="function")try{tabZeigen()}catch(e){}
-    const d=$("tmListe").querySelector(".tmErl");if(d)d.addEventListener("toggle",()=>{TM_ERL_AUF=d.open});
+    const d=$("tmListe").querySelector(".tmErl:not(.tmGel)");if(d)d.addEventListener("toggle",()=>{TM_ERL_AUF=d.open});
+    const dg=$("tmListe").querySelector(".tmGel");if(dg)dg.addEventListener("toggle",()=>{TM_GEL_AUF=dg.open});
+    $("tmListe").querySelectorAll("[data-wh]").forEach(k=>k.onclick=e=>{e.stopPropagation();wiederherstellen(k.dataset.wh)});
     $("tmListe").querySelectorAll("[data-tm]").forEach(z=>z.onclick=()=>oeffnen(z.dataset.tm))}
-  let TM_ERL_AUF=false;
+  let TM_ERL_AUF=false,TM_GEL_AUF=false;
+  // Wiederherstellen: Termin ohne „gelöscht“, die Sperre kommt mit (sperreAbgleichen). Ist das Auto inzwischen vermietet, fragt es wie beim Fertig
+  function wiederherstellen(id){const t=alle()[id];if(!t||!t._weg)return;const x=Object.assign({},t);delete x._weg;
+    const b=x.fuer==="fahrzeug"&&x.sperren&&x.auto?belegt(x):[];
+    if(b.length&&!confirm(autoAnz(x.auto)+" wieder sperren?\n\nAchtung, in der Zeit vermietet oder gebucht: "+b.join(", ")+"\n\nAbbrechen = Termin ohne Sperre wiederherstellen."))x.sperren=false;
+    if(!speichern(x)){if(window.mxFehler)mxFehler("Nicht wiederhergestellt: Der Speicher auf diesem Gerät ist voll.");return}zeichne();
+    const txt="„"+(x.titel||"Termin")+"“ wiederhergestellt"+(x.sperren&&x.fuer==="fahrzeug"&&x.auto?", Sperre wieder im Kalender":"");
+    if(window.mxRueckBar)mxRueckBar(txt,()=>{const y=Object.assign({},alle()[id]||x,{_weg:true});speichern(y);zeichne()},8000);else if(window.nkMeldung)nkMeldung(txt)}
   // ---------- Fenster ----------
-  let T=null,NEU=false;
+  let T=null,NEU=false,T0=null;   // T0: Stand beim Öffnen (nur Geändertes wird geschrieben, 11.11.2026)
   function autosFuellen(){const s=$("tmAuto"),w=s.value;s.innerHTML='<option value="">Fahrzeug wählen</option>'+AUTOS.map(a=>'<option value="'+esc(a[0])+'">'+esc(a[1])+'</option>').join("");
     if(T&&T.auto&&!AUTOS.some(a=>a[0]===T.auto))s.insertAdjacentHTML("beforeend",'<option value="'+esc(T.auto)+'">'+esc(T.auto)+'</option>');s.value=T&&T.auto||w||""}
   function felderZeigen(){$("tmKopf").textContent=NEU?"Neuer Termin":"Termin";$("tmTitel").value=T.titel||"";$("tmVonD").value=T.vonD||"";$("tmVonU").value=T.vonU||"";$("tmBisD").value=T.bisD||"";$("tmBisU").value=T.bisU||"";
@@ -2182,20 +2266,21 @@ zeigen();abgleichen();auslagernBald();
   function tippen(){lesen();anzeigen();const z=zeitFehler();$("tmFehler").textContent=z;
     if(NEU)try{if(T.titel||T.vonD||T.wo||T.tel||T.notiz)localStorage.setItem(TM_ENT,JSON.stringify(T));else localStorage.removeItem(TM_ENT)}catch(x){}   // noch nicht gespeichert: als Entwurf sichern
     if(z||!T.titel||!T.vonD)return;
-    if(speichern(Object.assign({},T))){if(NEU){NEU=false;felderZeigen()}zeichne()}}
+    if(speichern(Object.assign({},T),T0)){nachziehen();if(NEU){NEU=false;felderZeigen()}zeichne()}else nichtGespeichert()}
   function oeffnen(id){const t=id&&alle()[id];NEU=!t;const hi=iso(new Date());
     T=t?Object.assign({},t):{id:"t"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),fuer:"fahrzeug",sperren:true,vonD:"",vonU:"",bisD:"",bisU:"",angelegt:new Date().toISOString()};
     if(!t&&LK&&LK.w.fuer)T.fuer=LK.w.fuer;if(T.fuer==="firma")T.sperren=false;
     if(!t){let e=null;try{e=JSON.parse(localStorage.getItem(TM_ENT)||"null")}catch(x){}if(e&&e.id&&!alle()[e.id])T=Object.assign(T,e)}   // angefangener neuer Termin kommt wieder
+    T0=t?Object.assign({},t):null;
     felderZeigen();window.mxAuf("fTermin");if(NEU)setTimeout(()=>{try{$("tmTitel").focus()}catch(e){}},250)}
   function fertig(){lesen();const z=zeitFehler(),f=fehlt();if(z){$("tmFehler").textContent=z;return}
     if(f.length){if(NEU&&!T.titel&&!T.vonD&&!T.wo&&!T.notiz&&!T.tel){entwurfWeg("");window.mxZu();return}$("tmFehler").textContent="Bitte noch eintragen: "+f.join(", ")+".";return}
     const b=T.fuer!=="firma"&&T.sperren?belegt(T):[];
     if(b.length&&!confirm(autoAnz(T.auto)+" sperren?\n\nAchtung, in der Zeit vermietet oder gebucht: "+b.join(", ")+"\n\nAbbrechen = Termin ohne Sperre speichern.")){T.sperren=false}
-    if(!speichern(Object.assign({},T)))return;window.mxZu();zeichne();if(window.nkMeldung)nkMeldung(NEU?"Termin eingetragen":"Gespeichert");NEU=false}
-  function erledigt(){lesen();const z=zeitFehler();if(z){$("tmFehler").textContent=z;return}T.erledigt=T.erledigt?"":iso(new Date());speichern(Object.assign({},T));window.mxZu();zeichne();if(window.nkMeldung)nkMeldung(T.erledigt?"Erledigt":"Wieder offen")}
+    if(!speichern(Object.assign({},T),T0)){nichtGespeichert();return}T0=null;window.mxZu();zeichne();if(window.nkMeldung)nkMeldung(NEU?"Termin eingetragen":"Gespeichert");NEU=false}
+  function erledigt(){lesen();const z=zeitFehler();if(z){$("tmFehler").textContent=z;return}T.erledigt=T.erledigt?"":iso(new Date());if(!speichern(Object.assign({},T),T0)){T.erledigt=T0?T0.erledigt:"";nichtGespeichert();return}T0=null;window.mxZu();zeichne();if(window.nkMeldung)nkMeldung(T.erledigt?"Erledigt":"Wieder offen")}
   function loeschen(){if(!confirm("Termin „"+(T.titel||"Termin")+"“ löschen?"+(T.sperren&&T.auto?"\n\nDie Sperre im Kalender wird auch aufgehoben.":"")))return;
-    const alt=Object.assign({},alle()[T.id]||T);speichern(Object.assign({},alt,{_weg:true}));window.mxZu();zeichne();
+    const alt=Object.assign({},alle()[T.id]||T);if(alt._weg){TM_GRUND="weg";nichtGespeichert();return}speichern(Object.assign({},alt,{_weg:true}));T0=null;window.mxZu();zeichne();
     if(window.mxRueckBar)mxRueckBar("Termin gelöscht",()=>{const x=Object.assign({},alt);delete x._weg;speichern(x);zeichne()},8000);else if(window.nkMeldung)nkMeldung("Termin gelöscht")}
   document.querySelectorAll("#fTermin [data-fuer]").forEach(b=>b.onclick=()=>{lesen();T.fuer=b.dataset.fuer;if(T.fuer==="firma")T.sperren=false;else if(!T.sperren&&NEU)T.sperren=true;anzeigen();tippen()});
   $("tmSp").onclick=()=>{lesen();T.sperren=!T.sperren;anzeigen();tippen()};
@@ -2276,9 +2361,19 @@ zeigen();abgleichen();auslagernBald();
   function taOeffnen(id){const a=id&&aufg().find(x=>x.id===id);TA=a?a.id:null;const f=a?info(a):{};TA_FUER=f.fuer||(f.auto?"fahrzeug":"firma");
     $("taAuto").innerHTML='<option value="">Fahrzeug wählen</option>'+AUTOS.map(x=>'<option value="'+esc(x[0])+'">'+esc(x[1])+'</option>').join("");if(f.auto&&!AUTOS.some(x=>x[0]===f.auto))$("taAuto").insertAdjacentHTML("beforeend",'<option value="'+esc(f.auto)+'">'+esc(f.auto)+'</option>');$("taAuto").value=f.auto||"";taFuer();$("taKopf").textContent=a?"Aufgabe":"Neue Aufgabe";$("taText").value=a?a.aufgabe:"";$("taText").readOnly=!!a&&a.quelle!=="handy";
     $("taBis").value=a?(a.bis||""):"";$("taNotiz").value=a?(f.notiz!=null?f.notiz:(a.tun||"")):"";$("taFehler").textContent="";
-    $("taHin").textContent=a&&a.quelle!=="handy"?"Aus der Excel: Text dort ändern. Datum und Erledigt gehen von hier in die Excel.":"Kommt in 15 Minuten auch in die Excel.";
-    $("taZwei").innerHTML=a?'<button type="button" id="taErlK">'+(a.erledigt?"Wieder offen":"Erledigt")+'</button>':"";if(a)$("taErlK").onclick=()=>{window.mxZu();abhaken(a.id)};
+    $("taHin").textContent=a&&a.quelle!=="handy"?"Aus der Excel: Text ändern und löschen geht nur dort, sonst kommt sie mit der Brücke wieder. Datum und Erledigt gehen von hier in die Excel.":"Kommt in 15 Minuten auch in die Excel.";
+    // Löschen nur für Aufgaben vom Handy (11.11.2026, strenge Prüfung Punkt 13). Aus der Excel nur Erledigt, die Brücke lädt sie sonst wieder hoch
+    const darfWeg=a&&a.quelle==="handy";
+    $("taZwei").style.gridTemplateColumns=darfWeg?"1fr 1fr":"";
+    $("taZwei").innerHTML=a?'<button type="button" id="taErlK">'+(a.erledigt?"Wieder offen":"Erledigt")+'</button>'+(darfWeg?'<button type="button" class="rot" id="taWeg">Löschen</button>':""):"";
+    if(a)$("taErlK").onclick=()=>{window.mxZu();abhaken(a.id)};if(darfWeg)$("taWeg").onclick=()=>taLoeschen(a.id);
     window.mxAuf("fAufgabe");if(!a)setTimeout(()=>{try{$("taText").focus()}catch(e){}},250)}
+  // Aufgabe löschen: Rückfrage, danach Papierkorb (Abgleich legt sie dort ab) und 8 Sekunden Rückgängig, wie bei Ausgaben
+  function taLoeschen(id){const l=lies("mietixAufgaben",[]),a=l.find(x=>x&&x.id===id);if(!a)return;
+    if(a.quelle!=="handy"){const m="Nicht gelöscht: Die Aufgabe steht in der Excel und käme mit der Brücke wieder. In der Excel löschen oder hier als Erledigt abhaken.";if(window.mxFehler)mxFehler(m,7000);else alert(m);return}
+    if(!confirm("Aufgabe „"+a.aufgabe+"“ löschen?\n\nSie liegt danach im Papierkorb."))return;
+    if(!schreib("mietixAufgaben",l.filter(x=>!(x&&x.id===id))))return;TA=null;window.mxZu();taZeichnen();
+    if(window.mxRueckBar)mxRueckBar("Aufgabe gelöscht",()=>{const n=lies("mietixAufgaben",[]);if(!n.some(x=>x&&x.id===id)){n.push(a);schreib("mietixAufgaben",n)}taZeichnen()},8000);else if(window.nkMeldung)nkMeldung("Aufgabe gelöscht")}
   function taFertig(){const t=$("taText").value.trim(),bis=$("taBis").value,no=$("taNotiz").value.trim(),au=TA_FUER==="fahrzeug"?$("taAuto").value:"";
     if(!t){$("taFehler").textContent="Bitte eintragen, was zu tun ist.";return}
     if(TA){const alt=aufg().find(x=>x.id===TA),fAlt=alt?info(alt):{};if(alt&&alt.quelle==="handy"&&alt.aufgabe!==t&&Object.keys(fAlt).length)infoSetzen(alt,{fuer:"",auto:"",notiz:"",plan:""});   // Text geändert: Info zieht mit

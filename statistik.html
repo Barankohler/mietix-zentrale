@@ -505,22 +505,50 @@ function sicherheitsnetz(k,alt,neu){
   const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]={alt,neu};else burst[k].neu=neu;
   rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
 let rueckLaeuft=false,rueckTimer=null;
+// Geld in der Rückfrage zu Rückgängig, jetzt und danach (11.11.2026 nachts, Prüfung B A14): „Rest bezahlt am: 11.11.2026 auf leer“
+function rueckGeldZeilen(b){const z=[];try{const k="mietixVorgaenge",roh2=s=>alsMap(k,JSON.parse(s||"null")||[]),a=roh2(b[k].alt),n=roh2(b[k].neu);
+  const N={"gesamt":"Mietpreis","zahlung.anz.betrag":"Anzahlung","zahlung.anz.am":"Anzahlung bezahlt am","zahlung.rest.betrag":"Rest","zahlung.rest.am":"Rest bezahlt am","zahlung.kaut.betrag":"Kaution","zahlung.kaut.am":"Kaution erhalten am",
+    "kautionRueck.betrag":"Kaution zurück","kautionRueck.am":"Kaution zurück am","kautionRueck.einbehalt":"Einbehalten","endabrechnung.summe":"Endabrechnung","endabrechnung.bezahlt.am":"Endabrechnung bezahlt am"};
+  const zl=s=>{s=String(s).replace(/€/g,"").trim();const x=parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""));return isNaN(x)?0:x};
+  const w=(p,x)=>x==null||x===""?"leer":/\.am$/.test(p)?String(x).slice(0,10).split("-").reverse().join("."):Math.round(zl(x)).toLocaleString("de-DE")+" €";
+  const ps=Object.keys(n).filter(p=>p in a&&istObj(a[p])&&istObj(n[p])&&fp(a[p])!==fp(n[p]));
+  ps.forEach(p=>{const vor=ps.length>1?"Mietvertrag "+p+", ":"";pfadUnterschiede(a[p],n[p],[],[]).forEach(u=>{const q=u.p.join(".");if(N[q])z.push(vor+N[q]+": "+w(q,u.neu)+" auf "+w(q,u.alt))});
+    ["verlaengerungen","teilzahlungen"].forEach(f=>{const la=(a[p][f]||[]).length,ln=(n[p][f]||[]).length;if(la!==ln)z.push(vor+(f==="verlaengerungen"?"Verlängerungen":"Teilzahlungen")+": "+ln+" auf "+la)})});
+  if(b.mietixVorgaenge&&Object.keys(n).some(p=>!(p in a)))z.push("Neuer Mietvertrag wird wieder entfernt")}catch(e){}return z.filter((x,i,l)=>l.indexOf(x)===i).slice(0,8)}
+// Unterschiede Pfad für Pfad (gleich wie unterschiede in stil/zahlung_aendern.py): Listen gleicher Länge Element für Element, sonst als Ganzes
+function pfadUnterschiede(a,b,p,out){const obj=x=>x&&typeof x==="object";
+  if(obj(a)&&obj(b)&&Array.isArray(a)===Array.isArray(b)&&(!Array.isArray(a)||a.length===b.length)){new Set(Object.keys(a).concat(Object.keys(b))).forEach(k=>pfadUnterschiede(a[k],b[k],p.concat(k),out))}
+  else if(fp(a)!==fp(b))out.push({p,alt:a,neu:b});return out}
+const anPfad=(o,p)=>p.reduce((x,k)=>x==null?undefined:x[k],o);
+function setzPfad(o,p,w){let x=o;for(let i=0;i<p.length-1;i++){if(x[p[i]]==null||typeof x[p[i]]!=="object")x[p[i]]={};x=x[p[i]]}const k=p[p.length-1];if(w===undefined)delete x[k];else x[k]=JSON.parse(JSON.stringify(w))}
 // Rückgängig steht neben dem Titel, nie über einem Knopf (Baustein in stil/schutz.py, 04.11.2026)
 function rueckZeigen(text){if(window.mxRueckZeig)window.mxRueckZeig("mietixRueck","Rückgängig: "+text,rueckgaengig)}
 function rueckgaengig(){if(!burst)return;
-  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
-  const b=burst;burst=null;rueckLaeuft=true;
-  // Nur die eigene Änderung zurücknehmen (05.11.2026): Was inzwischen von anderen Geräten kam, bleibt stehen
-  try{Object.keys(b).forEach(k=>{const l=liesAblage(k);if(l.kaputt){if(window.mxFehler)mxFehler("Rückgängig ging nicht: "+MEHRZAHL[k]+" auf diesem Gerät sind beschädigt.");return}
-    const leer=SPEICHER[k].liste?[]:{},roh2=s=>alsMap(k,JSON.parse(s||"null")||leer),a=roh2(b[k].alt),n=roh2(b[k].neu),m=alsMap(k,l.w);
+  if("mietixVorgaenge" in burst){const z=rueckGeldZeilen(burst);if(!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen."+(z.length?"\n\n"+z.join("\n"):"")+"\n\nSicher?"))return}
+  const b=burst;burst=null;rueckLaeuft=true;const nicht=[];let kaputt=false;
+  // Nur die eigene Änderung zurücknehmen (05.11.2026): Was inzwischen von anderen Geräten kam, bleibt stehen.
+  // Pfad für Pfad wie eigenesZurueck in stil/zahlung_aendern.py (11.11.2026 nachts, Prüfung B A2 und D A7): auch innerhalb von zahlung.rest, zahlung.kaut usw.
+  // Steht an einer dieser Stellen inzwischen etwas anderes, bleibt der Eintrag, wie er ist, und es kommt ein roter Hinweis statt „✓ Zurückgeholt“
+  try{Object.keys(b).forEach(k=>{const l=liesAblage(k);if(l.kaputt){kaputt=true;if(window.mxFehler)mxFehler("Rückgängig ging nicht: "+MEHRZAHL[k]+" auf diesem Gerät sind beschädigt.");return}
+    const leer=SPEICHER[k].liste?[]:{},roh2=s=>alsMap(k,JSON.parse(s||"null")||leer),a=roh2(b[k].alt),n=roh2(b[k].neu),m=alsMap(k,l.w),wer=p=>(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(n[p]||a[p]||{});
+    let neu=false;
     new Set([...Object.keys(a),...Object.keys(n)]).forEach(p=>{if(fp(a[p])===fp(n[p]))return;
-      if(!(p in a)){delete m[p];return}                                  // hier neu angelegt
-      if(!(p in n)||!(p in m)||!istObj(a[p])||!istObj(n[p])){m[p]=a[p];return}   // hier gelöscht
-      const o=Object.assign({},m[p]);new Set([...Object.keys(a[p]),...Object.keys(n[p])]).forEach(f=>{   // Feld für Feld: nur was hier geändert wurde und seitdem niemand sonst
-        if(fp(a[p][f])!==fp(n[p][f])&&fp(o[f])===fp(n[p][f])){if(f in a[p])o[f]=a[p][f];else delete o[f]}});
-      m[p]=o});
-    merk(k,ausMap(k,m))})}finally{rueckLaeuft=false}
-  const el=document.getElementById("mietixRueck");if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
+      if(!(p in a)){if(!(p in m)||fp(m[p])===fp(n[p])){delete m[p];neu=true}else nicht.push(wer(p));return}   // hier neu angelegt, inzwischen woanders geändert: bleibt
+      if(!(p in n)||!(p in m)||!istObj(a[p])||!istObj(n[p])){m[p]=a[p];neu=true;return}   // hier gelöscht
+      const o=JSON.parse(JSON.stringify(m[p])),d=pfadUnterschiede(a[p],n[p],[],[]).filter(u=>u.p[0]!=="verlauf"&&u.p[0]!=="geaendert");
+      if(d.some(u=>{const j=anPfad(o,u.p);return fp(j)!==fp(u.neu)&&fp(j)!==fp(u.alt)})){nicht.push(wer(p));return}
+      d.forEach(u=>setzPfad(o,u.p,u.alt));
+      if(fp(o.geaendert)===fp(n[p].geaendert)){if(a[p].geaendert===undefined)delete o.geaendert;else o.geaendert=a[p].geaendert}
+      {const av=Array.isArray(a[p].verlauf)?a[p].verlauf:[],nv=Array.isArray(n[p].verlauf)?n[p].verlauf:[];   // der eigene Eintrag im Verlauf geht mit
+        if(fp(o.verlauf)===fp(n[p].verlauf)){if(a[p].verlauf===undefined)delete o.verlauf;else o.verlauf=a[p].verlauf}
+        else if(Array.isArray(o.verlauf)&&nv.length>av.length)nv.slice(av.length).forEach(x=>{const i=o.verlauf.findIndex(y=>fp(y)===fp(x));if(i>=0)o.verlauf.splice(i,1)})}
+      m[p]=o;neu=true});
+    if(neu)merk(k,ausMap(k,m))})}finally{rueckLaeuft=false}
+  const el=document.getElementById("mietixRueck");
+  if(nicht.length||kaputt){if(el){el.classList.remove("an");el.onclick=null}
+    if(nicht.length&&window.mxFehler)mxFehler("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.",8000);
+    else if(nicht.length)alert("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.")}
+  else if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
   ungesichert=true;zeigen();window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
   if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden

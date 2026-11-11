@@ -241,6 +241,8 @@ function posten(v){const l=[],z=v.zahlung||{},e=v.endabrechnung||{},kr=v.kaution
     if(bez>0)l.push({art:"verl",t:T,b:bez,am});
     if(y.bezahlt&&y.gezahlt!=null&&auf>bez)l.push({art:"verl",t:T,b:auf-bez,am:""})});
   const s=+e.summe||0;
+  // Weitere Kosten vor der Rückgabe (11.11.2026 nachts, Prüfung B A6): offen wie in der Mappe und in der Brücke, nach der Rückgabe stecken sie in der Endabrechnung
+  if(!v.endabrechnung){const kv=(v.kostenVorab||[]).reduce((q,x)=>q+Math.round(+(x&&x.betrag)||0),0);if(kv>0)l.push({art:"miete",t:"Weitere Kosten",b:kv,am:""})}
   if(s>0){const bz=e.bezahlt&&istTag(e.bezahlt.am)?e.bezahlt:null,eB=bz?(bz.betrag!=null?+bz.betrag||0:s):0,N="Nachzahlung Rückgabe";
     if(bz&&bz.art==="Kaution"&&kr.verrechnet){   // steckt im Einbehalt der Kaution. Wurde der Einbehalt danach gesenkt, ist der nicht gedeckte Teil offen
       const gesenkt=kr.gesamt!=null?Math.max(0,(+kr.gesamt||0)-(+kr.miete||0)-ein):eB,nichtGedeckt=Math.min(gesenkt,Math.max(0,eB-Math.max(0,ein-imEin)));
@@ -375,6 +377,13 @@ function nurGeaenderte(schl){const hin=$("eHin"),jetzt=werteVon(schl);if(!jetzt)
 function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
   const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
   if(!nurGeaenderte(schl))return;
+  // Jede Geldänderung fragt „Sicher?“ mit alt und neu (11.11.2026 nachts, Prüfung B A5)
+  {const fw=feldWerte(),orig=OFFEN.orig||{},zeig=(id,x)=>/Am$/.test(id)?(istTag(x)?deJ(x):"leer"):id==="eGrund"?(String(x||"").trim()||"leer"):eur(Math.round(zahl(x)||0));
+    const z=Object.keys(fw).filter(id=>fNorm(id,fw[id])!==fNorm(id,orig[id])).map(id=>fName(id)+": "+zeig(id,orig[id])+" auf "+zeig(id,fw[id]));
+    if(z.length){const x=schl.startsWith("a:")?lies("mietixAnfragen",[]).find(y=>y&&y.id===schl.slice(2)):lies("mietixVorgaenge",[]).find(y=>y&&y.nr===schl.slice(2));
+      const tzOffen=!schl.startsWith("a:")&&x&&$("eRestAm")&&t("eRestAm")&&!istTag(((x.zahlung||{}).rest||{}).am)?(x.teilzahlungen||[]).filter(q=>q&&+q.betrag>0&&!q.verrechnet).reduce((q,y)=>q+Math.round(+y.betrag||0),0):0;
+      if(tzOffen)z.push("Teilzahlung "+eur(tzOffen)+" € ist im Rest enthalten, sie zählt nicht doppelt.");
+      if(!confirm("Zahlungen von "+((x&&x.name)||"diesem Kunden")+" ändern?\n\n"+z.join("\n")+"\n\nSicher?"))return}}
   if(schl.startsWith("a:")){const l=lies("mietixAnfragen",[]),a=l.find(x=>x&&x.id===schl.slice(2));if(!a)return weg();const vorher=JSON.stringify(a);
     const za=a.anzahlung||{},st=a.storno,gleich=Math.round(n0(za.betrag))===w("eAnz")&&(istTag(za.am)?za.am:"")===t("eAnzAm"),stNeu=!!(st&&$("eStB")&&(Math.round(+st.betrag||0)!==w("eStB")||(istTag(st.am)?st.am:"")!==t("eStAm")));
     if(gleich&&!stNeu){window.mxZu();return}   // nichts geändert
@@ -397,7 +406,9 @@ function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id)
     if(!y.imRest){const am=t("eVAm"+i),war=y.bezahlt?(istTag(y.bezahltAm)?y.bezahltAm:istTag(y.am)?y.am:""):"";if(am!==war){if(am){y.bezahlt=true;y.bezahltAm=am}else{y.bezahlt=false;delete y.bezahltAm}}}});
   if(preisPlus){v.preis1=wie(n0(v.preis1)+preisPlus);v.gesamt=wie(n0(v.preis1)+n0(v.preis2)+n0(v.paketPreis))}   // Mietpreis im Mietvertrag zieht mit, wie beim Verlängern
   {const r=Math.round(n0((z.rest||{}).betrag)),vr=verlInRest(v),feldRest=w("eRest"),soll=feldRest===Math.max(0,Math.round(r-vrAlt))?Math.max(0,Math.round(r+vr-vrAlt)):feldRest+vr;   // Rest ohne Verlängerung unverändert: Rest wächst nur um die geänderte Verlängerung
-    setz("rest",soll,t("eRestAm"))}
+    const warAm=istTag((z.rest||{}).am);setz("rest",soll,t("eRestAm"));
+    // Rest jetzt bezahlt: offene Teilzahlungen sind darin enthalten, wie bei „Bezahlt“ in der Mappe (teilVerrechnen), sonst zählen sie doppelt
+    if(!warAm&&istTag((z.rest||{}).am))(v.teilzahlungen||[]).forEach(q=>{if(q&&!q.verrechnet)q.verrechnet="rest"})}
   if($("eNach")){const e=v.endabrechnung,b=w("eNach"),am=t("eNachAm"),bz=e.bezahlt||null,warAm=bz&&istTag(bz.am)?bz.am:"",warB=bz?(bz.betrag!=null?Math.round(+bz.betrag||0):Math.round(+e.summe||0)):Math.round(+e.summe||0);
     if(am!==warAm||b!==warB){if(am){e.bezahlt=Object.assign({},bz||{},{am});if(e.bezahlt.art==="Kaution")e.bezahlt.art="";if(b===Math.round(+e.summe||0))delete e.bezahlt.betrag;else e.bezahlt.betrag=b}else delete e.bezahlt}}
   setz("kaut",w("eKaut"),t("eKautAm"));
@@ -705,6 +716,14 @@ window.dispatchEvent(new Event("mietix-kunden-bereit"));
 <script>
 const $=id=>document.getElementById(id);
 const MK=window.mietixKunden,de=MK.de;
+// Umbenannt (11.11.2026, Punkt 11): steht beim Namen im Kundenbuch „mit“, gilt der Name, auf den er verweist. So bleibt der neue Name vorn,
+// egal in welcher Reihenfolge die Einträge vom Abgleich kommen (alte Schreibweisen bleiben unter e.namen und in der Suche)
+{const roh=MK.alle,einsRoh=MK.eins;
+  MK.alle=function(){let K={};try{K=JSON.parse(localStorage.getItem("mietixKunden")||"{}")||{}}catch(x){}const ks=Object.keys(K);
+    return roh().map(e=>{for(let i=0;i<3;i++){const k=ks.find(n=>MK.norm(n)===MK.norm(e.name)),d=k&&K[k];if(!d||!d.mit||d._weg||MK.norm(d.mit)===MK.norm(e.name))break;
+      const z=ks.find(n=>MK.norm(n)===MK.norm(d.mit));if(!z||(K[z]&&K[z]._weg))break;if(!e.namen.includes(z))e.namen.push(z);e.name=z;
+      if(!e.gesperrt&&K[z])["telefon","anschrift","geb","gebort","email","ort","notiz"].forEach(f=>{if(K[z][f])e[f]=String(K[z][f])})}return e})};   // die Akte unter dem neuen Namen gilt
+  MK.eins=(n,l)=>einsRoh(n,l||MK.alle())}
 Object.defineProperty(window,"heute",{configurable:true,get:()=>MK.heute()});   // immer der aktuelle Tag, auch wenn die Seite über Nacht offen bleibt (09.11.2026)
 const EUR=new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR",maximumFractionDigits:0});
 const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -808,7 +827,7 @@ function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V
     if(e.mieten&&tageSeit(e.zuletzt)>90&&!e.keineAngebote)h+='<div class="tipp">Letzte Miete vor '+tageSeit(e.zuletzt)+' Tagen. Gute Gelegenheit für ein Angebot.</div>';
     if(e.angeschrieben)h+='<p class="mxText" style="margin-top:12px">Zuletzt Angebot geschickt: '+de(e.angeschrieben)+'</p>';
   }else{
-    h+='<div class="ab">Bearbeiten</div><div class="form"><label>Telefon</label><input id="dTel" inputmode="tel" value="'+esc(e.telefon)+'"><label>Anschrift</label><input id="dAnschrift" data-anschrift value="'+esc(e.anschrift)+'">'
+    h+='<div class="ab">Bearbeiten</div><div class="form"><label>Name</label><input id="dName" autocomplete="off" value="'+esc(e.name)+'"><label>Telefon</label><input id="dTel" inputmode="tel" value="'+esc(e.telefon)+'"><label>Anschrift</label><input id="dAnschrift" data-anschrift value="'+esc(e.anschrift)+'">'
       +'<div class="zwei"><div><label>Geburtsdatum</label><input id="dGeb" type="date" value="'+esc(e.geb)+'"></div><div><label>Geburtsort</label><input id="dGebort" value="'+esc(e.gebort)+'"></div></div>'
       +'<label>E-Mail</label><input id="dEmail" type="email" value="'+esc(e.email)+'"><label>Notiz (nur für uns)</label><textarea id="dNotiz">'+esc(e.notiz)+'</textarea>'
       +'<div class="schalter"><span>Keine Angebote mehr schicken</span><div class="sw'+(e.keineAngebote?" an":"")+'" id="dKeine"></div></div></div>'
@@ -821,14 +840,22 @@ function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V
   if($("kEntwurf"))$("kEntwurf").onclick=()=>$("kBearb").click();
   if(BEARB){$("dKeine").onclick=()=>$("dKeine").classList.toggle("an");
     // Angefangene Änderungen kommen wieder (1.11.2026, Regel: nichts verlieren)
-    const KE=window.mxEntwurf?mxEntwurf("#karte","kunde:"+e.name,["dTel","dAnschrift","dGeb","dGebort","dEmail","dNotiz"]):null;if(KE)KE.holen();
+    const KE=window.mxEntwurf?mxEntwurf("#karte","kunde:"+e.name,["dName","dTel","dAnschrift","dGeb","dGebort","dEmail","dNotiz"]):null;if(KE)KE.holen();
     const hand=v=>v===""?null:v;   // hier ist ein geleertes Feld gewollt und löscht (merken lässt "" sonst stehen, 06.11.2026)
-    $("dSpeichern").onclick=()=>{const dTel=$("dTel").value.trim(),dMail=$("dEmail").value.trim(),dGeb=$("dGeb").value;
+    $("dSpeichern").onclick=()=>{const dTel=$("dTel").value.trim(),dMail=$("dEmail").value.trim(),dGeb=$("dGeb").value,dName=$("dName").value.trim().replace(/\s+/g," "),dAn=$("dAnschrift").value.trim();
       const neuW=(w,alt)=>w&&w!==String(alt||"");   // nur frisch Getipptes prüfen, ein alter Eintrag hält das Speichern anderer Felder nicht auf (09.11.2026)
-      const falsch=neuW(dTel,e.telefon)&&MK.ziffern(dTel).length<6?"Telefonnummer unvollständig.":neuW(dMail,e.email)&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(dMail)?"E-Mail-Adresse stimmt nicht.":neuW(dGeb,e.geb)&&dGeb>heute?"Geburtsdatum liegt in der Zukunft.":"";if(falsch){if(window.mxFehler)mxFehler(falsch,6000);else meldung(falsch);return}
+      const nameNeu=!!dName&&dName!==e.name,anderer=nameNeu?MK.eins(dName,ALLE):null;
+      const falsch=!dName?"Name fehlt. Bitte Vor- und Nachname eintragen.":nameNeu&&dName.split(" ").length<2?"Bitte Vor- und Nachname.":anderer&&anderer.name!==e.name?"Den Namen „"+dName+"“ gibt es schon bei einem anderen Kunden. Bitte anders schreiben.":
+        neuW(dTel,e.telefon)&&MK.ziffern(dTel).length<6?"Telefonnummer unvollständig.":neuW(dMail,e.email)&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(dMail)?"E-Mail-Adresse stimmt nicht.":neuW(dGeb,e.geb)&&dGeb>heute?"Geburtsdatum liegt in der Zukunft.":"";if(falsch){if(window.mxFehler)mxFehler(falsch,6000);else meldung(falsch);return}
+      // Verbunden (11.11.2026, strenge Prüfung Punkt 10 und 11): neues Telefon, neue Anschrift und neuer Name gehen in die Mietverträge und Buchungen dieses Kunden,
+      // mit Eintrag im Verlauf. Unterschriebene Mietverträge behalten den Namen, wie er unterschrieben ist, Telefon und Anschrift ziehen mit.
+      const zug=kundeUebernehmen(e,{telefon:neuW(dTel,e.telefon)?dTel:"",anschrift:neuW(dAn,e.anschrift)?dAn:"",name:nameNeu?dName:""});
+      if(nameNeu&&!confirm("Name „"+e.name+"“ auf „"+dName+"“ ändern?"+(zug.zahlText?"\n\nGilt auch in "+zug.zahlText+".":"")+(zug.nUnt?"\n\n"+(zug.nUnt===1?"Ein unterschriebener Mietvertrag behält":zug.nUnt+" unterschriebene Mietverträge behalten")+" den Namen, wie er unterschrieben ist.":"")))return;
+      if(!zug.schreiben()){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll.",7000);else meldung("Nicht gespeichert, Speicher voll.");return}
+      if(nameNeu){e.name=dName;AUF=dName}
       const geleert=[["dTel","telefon","Telefon"],["dAnschrift","anschrift","Anschrift"],["dGeb","geb","Geburtsdatum"],["dGebort","gebort","Geburtsort"],["dEmail","email","E-Mail"]].filter(f=>!$(f[0]).value.trim());
       MK.merken(e.name,{telefon:hand($("dTel").value.trim()),anschrift:hand($("dAnschrift").value.trim()),geb:hand($("dGeb").value),gebort:hand($("dGebort").value.trim()),
-      email:hand($("dEmail").value.trim()),notiz:hand($("dNotiz").value.trim()),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;bearbRaus();meldung("Gespeichert");zeichne();karte();
+      email:hand($("dEmail").value.trim()),notiz:hand($("dNotiz").value.trim()),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;bearbRaus();meldung(zug.zahlText?"Gespeichert, auch in "+zug.zahlText:"Gespeichert");zeichne();karte();
       // Geleertes, das noch im Mietvertrag oder in einer Anfrage steht, wird von dort wieder angezeigt: sagen, statt still zurückzukommen (09.11.2026)
       const nochDa=(MK.eins(e.name,ALLE)||{}),zurueck=geleert.filter(f=>nochDa[f[1]]).map(f=>f[2]);if(zurueck.length&&window.mxFehler)mxFehler(zurueck.join(", ")+" steht weiter im Mietvertrag oder in einer Anfrage und wird von dort angezeigt.",7000)};
     // trifft alle Schreibweisen desselben Kunden (gleiche Telefonnummer), sonst bliebe ein Teil stehen (06.11.2026, Datenschutz)
@@ -851,11 +878,40 @@ function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V
           else if(p.ablage==="mietixKunden"&&istEr(p.schluessel||x.name,x.telefon)){KF.forEach(f=>{if(x[f])x[f]=""});x.gesperrt=true;x.keineAngebote=true;n++}});
         if(n)try{localStorage.setItem("mietixPapierkorb",JSON.stringify(P))}catch(x){meldung("Nicht gespeichert, Speicher voll.");return}}
       MK.merken(e.name,weg);andere.forEach(n=>MK.merken(n,Object.assign({mit:e.name},weg)));if(KE)KE.weg();BEARB=false;bearbRaus();meldung("Daten gelöscht.");zeichne();karte()}}}
+// Kundendaten in Mietverträge und Buchungen übernehmen (11.11.2026, strenge Prüfung Punkt 10 und 11). w: {telefon, anschrift, name}, leer = nicht geändert.
+// Gilt für alle Mietverträge (nicht gelöscht, auch stornierte) und Anfragen dieses Kunden: gleicher Name in jeder Schreibweise oder gleiche Telefonnummer.
+// Der Name ändert sich nur, wo noch nicht unterschrieben ist. Jede Änderung bekommt eine Zeile im Verlauf. Geschrieben wird erst mit schreiben().
+function kundeUebernehmen(e,w){const nn=(e.namen||[e.name]).map(MK.norm),tt=(e._tels||[]).concat(MK.ziffern(e.telefon)).filter(z=>z.length>=6),
+    istEr=(name,tel)=>nn.includes(MK.norm(name))||!!(tt.length&&tt.includes(MK.ziffern(tel)));
+  const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(x){return d}};
+  const V=lies("mietixVorgaenge",[]),A=lies("mietixAnfragen",[]),am=new Date().toISOString();let nV=0,nA=0,nUnt=0;
+  const zeile=(alt,neu,t)=>t+(alt?" "+alt+" auf ":" neu: ")+neu;
+  if(w.telefon||w.anschrift||w.name){
+    V.forEach(v=>{if(!v||v._weg||!istEr(v.name,v.telefon))return;const was=[];   // auch stornierte, sonst käme ihre alte Nummer in der Akte wieder hoch
+      if(w.telefon&&String(v.telefon||"").trim()!==w.telefon){was.push(zeile(v.telefon,w.telefon,"Telefon"));v.telefon=w.telefon}
+      if(w.anschrift&&String(v.anschrift||"").trim()!==w.anschrift){was.push(zeile(v.anschrift,w.anschrift,"Anschrift"));v.anschrift=w.anschrift}
+      if(w.name&&v.name!==w.name){if(v.unterschrift)nUnt++;else{was.push(zeile(v.name,w.name,"Name"));v.name=w.name}}
+      if(was.length){(v.verlauf=Array.isArray(v.verlauf)?v.verlauf:[]).push({am,was:"Aus Kunden übernommen: "+was.join(", ")});nV++}});
+    A.forEach(a=>{if(!a||a._weg||a.datenGeloescht||!istEr(a.name,a.nummer))return;const was=[];
+      if(w.telefon&&String(a.nummer||"").trim()!==w.telefon){was.push(zeile(a.nummer,w.telefon,"Telefon"));a.nummer=w.telefon}
+      if(w.anschrift&&String(a.anschrift||"").trim()!==w.anschrift){was.push(zeile(a.anschrift,w.anschrift,"Anschrift"));a.anschrift=w.anschrift}
+      if(w.name&&a.name!==w.name){was.push(zeile(a.name,w.name,"Name"));a.name=w.name}
+      if(was.length){(a.verlauf=Array.isArray(a.verlauf)?a.verlauf:[]).push({am,was:"Aus Kunden übernommen: "+was.join(", ")});nA++}})}
+  const tz=[];if(nV)tz.push(nV+(nV===1?" Mietvertrag":" Mietverträgen"));if(nA)tz.push(nA+(nA===1?" Buchung oder Anfrage":" Buchungen und Anfragen"));
+  return{nV,nA,nUnt,zahlText:tz.join(" und "),schreiben(){try{if(nV)localStorage.setItem("mietixVorgaenge",JSON.stringify(V));if(nA)localStorage.setItem("mietixAnfragen",JSON.stringify(A));
+      // neuer Name auch im Kundenbuch: die Daten ziehen unter den neuen Namen, alte Schreibweisen verweisen darauf (mit), so bleibt die Akte zusammen
+      if(w.name){const K=lies("mietixKunden",{}),nw=MK.norm(w.name),alt=Object.keys(K).find(n=>MK.norm(n)===MK.norm(e.name));
+        const d=Object.assign({},alt?K[alt]:{});delete d.mit;K[w.name]=Object.assign({},K[w.name]||{},d);
+        // nur andere Schreibweise (Groß/klein, Umlaut): alter Schlüssel geht, sonst bliebe er vorn. Sonst verweist er mit „mit“ auf den neuen Namen
+        Object.keys(K).forEach(n=>{if(n!==w.name&&MK.norm(n)===nw)delete K[n]});
+        new Set((e.namen||[]).concat(alt?[alt]:[]).concat(Object.keys(K).filter(n=>nn.includes(MK.norm(n))))).forEach(n=>{if(!n||MK.norm(n)===nw)return;
+          K[n]=n===alt?{mit:w.name,umbenannt:MK.heute()}:Object.assign({},K[n]||{},{mit:w.name})});
+        const K2={[w.name]:K[w.name]};Object.keys(K).forEach(n=>{if(n!==w.name)K2[n]=K[n]});localStorage.setItem("mietixKunden",JSON.stringify(K2))}return true}catch(x){return false}}}}
 // Nach Speichern oder Löschen: der Schritt „Bearbeiten“ geht aus dem Verlauf, das nächste Zurück verlässt die Akte (10.11.2026)
 function bearbRaus(){try{if(history.state&&history.state.bearb)history.back()}catch(x){}}
 // Liegt für diesen Kunden ein Entwurf, der vom Gespeicherten abweicht? (mxEntwurf in stil/schutz.py, Schlüssel mietixFeld:kunde:<Name>)
 function entwurfDa(e){let d=null;try{d=JSON.parse(localStorage.getItem("mietixFeld:kunde:"+e.name)||"null")}catch(x){}if(!d)return false;
-  const alt={dTel:e.telefon,dAnschrift:e.anschrift,dGeb:e.geb,dGebort:e.gebort,dEmail:e.email,dNotiz:e.notiz};
+  const alt={dName:e.name,dTel:e.telefon,dAnschrift:e.anschrift,dGeb:e.geb,dGebort:e.gebort,dEmail:e.email,dNotiz:e.notiz};
   return Object.keys(alt).some(k=>k in d&&d[k]!=null&&String(d[k]).trim()!==""&&String(d[k]).trim()!==String(alt[k]||"").trim())}
 /* Angebot verschicken (31.10.2026, Baran: Autos antippen, Übergabe und Rückgabe mit Datum und Uhrzeit, seriös und attraktiv) */
 let FLOTTE=null,AG_AUTOS=new Set(),AG_UEB=new Set();
@@ -1235,22 +1291,50 @@ function sicherheitsnetz(k,alt,neu){
   const jetzt=Date.now();if(!burst||jetzt-burstZeit>700)burst={};burstZeit=jetzt;if(!(k in burst))burst[k]={alt,neu};else burst[k].neu=neu;
   rueckZeigen(Object.keys(burst).map(x=>NAMEN[x]||x).filter((x,i,a)=>a.indexOf(x)===i).join(", "))}
 let rueckLaeuft=false,rueckTimer=null;
+// Geld in der Rückfrage zu Rückgängig, jetzt und danach (11.11.2026 nachts, Prüfung B A14): „Rest bezahlt am: 11.11.2026 auf leer“
+function rueckGeldZeilen(b){const z=[];try{const k="mietixVorgaenge",roh2=s=>alsMap(k,JSON.parse(s||"null")||[]),a=roh2(b[k].alt),n=roh2(b[k].neu);
+  const N={"gesamt":"Mietpreis","zahlung.anz.betrag":"Anzahlung","zahlung.anz.am":"Anzahlung bezahlt am","zahlung.rest.betrag":"Rest","zahlung.rest.am":"Rest bezahlt am","zahlung.kaut.betrag":"Kaution","zahlung.kaut.am":"Kaution erhalten am",
+    "kautionRueck.betrag":"Kaution zurück","kautionRueck.am":"Kaution zurück am","kautionRueck.einbehalt":"Einbehalten","endabrechnung.summe":"Endabrechnung","endabrechnung.bezahlt.am":"Endabrechnung bezahlt am"};
+  const zl=s=>{s=String(s).replace(/€/g,"").trim();const x=parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""));return isNaN(x)?0:x};
+  const w=(p,x)=>x==null||x===""?"leer":/\.am$/.test(p)?String(x).slice(0,10).split("-").reverse().join("."):Math.round(zl(x)).toLocaleString("de-DE")+" €";
+  const ps=Object.keys(n).filter(p=>p in a&&istObj(a[p])&&istObj(n[p])&&fp(a[p])!==fp(n[p]));
+  ps.forEach(p=>{const vor=ps.length>1?"Mietvertrag "+p+", ":"";pfadUnterschiede(a[p],n[p],[],[]).forEach(u=>{const q=u.p.join(".");if(N[q])z.push(vor+N[q]+": "+w(q,u.neu)+" auf "+w(q,u.alt))});
+    ["verlaengerungen","teilzahlungen"].forEach(f=>{const la=(a[p][f]||[]).length,ln=(n[p][f]||[]).length;if(la!==ln)z.push(vor+(f==="verlaengerungen"?"Verlängerungen":"Teilzahlungen")+": "+ln+" auf "+la)})});
+  if(b.mietixVorgaenge&&Object.keys(n).some(p=>!(p in a)))z.push("Neuer Mietvertrag wird wieder entfernt")}catch(e){}return z.filter((x,i,l)=>l.indexOf(x)===i).slice(0,8)}
+// Unterschiede Pfad für Pfad (gleich wie unterschiede in stil/zahlung_aendern.py): Listen gleicher Länge Element für Element, sonst als Ganzes
+function pfadUnterschiede(a,b,p,out){const obj=x=>x&&typeof x==="object";
+  if(obj(a)&&obj(b)&&Array.isArray(a)===Array.isArray(b)&&(!Array.isArray(a)||a.length===b.length)){new Set(Object.keys(a).concat(Object.keys(b))).forEach(k=>pfadUnterschiede(a[k],b[k],p.concat(k),out))}
+  else if(fp(a)!==fp(b))out.push({p,alt:a,neu:b});return out}
+const anPfad=(o,p)=>p.reduce((x,k)=>x==null?undefined:x[k],o);
+function setzPfad(o,p,w){let x=o;for(let i=0;i<p.length-1;i++){if(x[p[i]]==null||typeof x[p[i]]!=="object")x[p[i]]={};x=x[p[i]]}const k=p[p.length-1];if(w===undefined)delete x[k];else x[k]=JSON.parse(JSON.stringify(w))}
 // Rückgängig steht neben dem Titel, nie über einem Knopf (Baustein in stil/schutz.py, 04.11.2026)
 function rueckZeigen(text){if(window.mxRueckZeig)window.mxRueckZeig("mietixRueck","Rückgängig: "+text,rueckgaengig)}
 function rueckgaengig(){if(!burst)return;
-  if("mietixVorgaenge" in burst&&!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen. Weiter?"))return;
-  const b=burst;burst=null;rueckLaeuft=true;
-  // Nur die eigene Änderung zurücknehmen (05.11.2026): Was inzwischen von anderen Geräten kam, bleibt stehen
-  try{Object.keys(b).forEach(k=>{const l=liesAblage(k);if(l.kaputt){if(window.mxFehler)mxFehler("Rückgängig ging nicht: "+MEHRZAHL[k]+" auf diesem Gerät sind beschädigt.");return}
-    const leer=SPEICHER[k].liste?[]:{},roh2=s=>alsMap(k,JSON.parse(s||"null")||leer),a=roh2(b[k].alt),n=roh2(b[k].neu),m=alsMap(k,l.w);
+  if("mietixVorgaenge" in burst){const z=rueckGeldZeilen(burst);if(!confirm("Die letzte Änderung am Mietvertrag wird zurückgenommen. Was gerade in einem offenen Formular steht, bleibt dort stehen."+(z.length?"\n\n"+z.join("\n"):"")+"\n\nSicher?"))return}
+  const b=burst;burst=null;rueckLaeuft=true;const nicht=[];let kaputt=false;
+  // Nur die eigene Änderung zurücknehmen (05.11.2026): Was inzwischen von anderen Geräten kam, bleibt stehen.
+  // Pfad für Pfad wie eigenesZurueck in stil/zahlung_aendern.py (11.11.2026 nachts, Prüfung B A2 und D A7): auch innerhalb von zahlung.rest, zahlung.kaut usw.
+  // Steht an einer dieser Stellen inzwischen etwas anderes, bleibt der Eintrag, wie er ist, und es kommt ein roter Hinweis statt „✓ Zurückgeholt“
+  try{Object.keys(b).forEach(k=>{const l=liesAblage(k);if(l.kaputt){kaputt=true;if(window.mxFehler)mxFehler("Rückgängig ging nicht: "+MEHRZAHL[k]+" auf diesem Gerät sind beschädigt.");return}
+    const leer=SPEICHER[k].liste?[]:{},roh2=s=>alsMap(k,JSON.parse(s||"null")||leer),a=roh2(b[k].alt),n=roh2(b[k].neu),m=alsMap(k,l.w),wer=p=>(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(n[p]||a[p]||{});
+    let neu=false;
     new Set([...Object.keys(a),...Object.keys(n)]).forEach(p=>{if(fp(a[p])===fp(n[p]))return;
-      if(!(p in a)){delete m[p];return}                                  // hier neu angelegt
-      if(!(p in n)||!(p in m)||!istObj(a[p])||!istObj(n[p])){m[p]=a[p];return}   // hier gelöscht
-      const o=Object.assign({},m[p]);new Set([...Object.keys(a[p]),...Object.keys(n[p])]).forEach(f=>{   // Feld für Feld: nur was hier geändert wurde und seitdem niemand sonst
-        if(fp(a[p][f])!==fp(n[p][f])&&fp(o[f])===fp(n[p][f])){if(f in a[p])o[f]=a[p][f];else delete o[f]}});
-      m[p]=o});
-    merk(k,ausMap(k,m))})}finally{rueckLaeuft=false}
-  const el=document.getElementById("mietixRueck");if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
+      if(!(p in a)){if(!(p in m)||fp(m[p])===fp(n[p])){delete m[p];neu=true}else nicht.push(wer(p));return}   // hier neu angelegt, inzwischen woanders geändert: bleibt
+      if(!(p in n)||!(p in m)||!istObj(a[p])||!istObj(n[p])){m[p]=a[p];neu=true;return}   // hier gelöscht
+      const o=JSON.parse(JSON.stringify(m[p])),d=pfadUnterschiede(a[p],n[p],[],[]).filter(u=>u.p[0]!=="verlauf"&&u.p[0]!=="geaendert");
+      if(d.some(u=>{const j=anPfad(o,u.p);return fp(j)!==fp(u.neu)&&fp(j)!==fp(u.alt)})){nicht.push(wer(p));return}
+      d.forEach(u=>setzPfad(o,u.p,u.alt));
+      if(fp(o.geaendert)===fp(n[p].geaendert)){if(a[p].geaendert===undefined)delete o.geaendert;else o.geaendert=a[p].geaendert}
+      {const av=Array.isArray(a[p].verlauf)?a[p].verlauf:[],nv=Array.isArray(n[p].verlauf)?n[p].verlauf:[];   // der eigene Eintrag im Verlauf geht mit
+        if(fp(o.verlauf)===fp(n[p].verlauf)){if(a[p].verlauf===undefined)delete o.verlauf;else o.verlauf=a[p].verlauf}
+        else if(Array.isArray(o.verlauf)&&nv.length>av.length)nv.slice(av.length).forEach(x=>{const i=o.verlauf.findIndex(y=>fp(y)===fp(x));if(i>=0)o.verlauf.splice(i,1)})}
+      m[p]=o;neu=true});
+    if(neu)merk(k,ausMap(k,m))})}finally{rueckLaeuft=false}
+  const el=document.getElementById("mietixRueck");
+  if(nicht.length||kaputt){if(el){el.classList.remove("an");el.onclick=null}
+    if(nicht.length&&window.mxFehler)mxFehler("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.",8000);
+    else if(nicht.length)alert("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.")}
+  else if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
   ungesichert=true;zeigen();window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 window.mietixWiederherstellen=function(id){const pk=lies("mietixPapierkorb",[]),e=pk.find(x=>x.id===id);if(!e)return false;
   if(e.ablage==="mietixEntwurfVertrag"){merk("mietixPapierkorb",pk.filter(x=>x.id!==id));   // angefangener Mietvertrag: liegt nur auf dem Gerät, frisch für 48 Stunden
