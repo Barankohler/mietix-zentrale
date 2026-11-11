@@ -1123,9 +1123,9 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
     const pr=fix?Math.min(100,Math.round(miete/fix*100)):0,v=document.getElementById("umV");v.style.width=(fix?pr:0)+"%";v.classList.toggle("gut",fix>0&&miete>=fix);
     document.getElementById("umP").textContent=fix?(miete>=fix?"Fixkosten gedeckt":pr+" % der Fixkosten"):"";
     document.getElementById("umF").innerHTML=fix?"Fixkosten <b>"+e0(fix)+"</b>":"";
-    const mJ=+mon.slice(0,4),mM=+mon.slice(5,7),vk=mM===1?(mJ-1)+"-12":mJ+"-"+pad(mM-1),tagH=hi.slice(8,10),vm=pListen.reduce((s,l)=>s+imMon(l,vk,vk+"-"+tagH),0),erste=pListen.flat().filter(p=>p.am&&p.b>0).map(p=>p.am).sort()[0],vollerMonat=!!erste&&erste<vk+"-01",z=[];   // Prozent nur bei vollem Erfassungsmonat und mindestens 500 €, sonst nur Euro
+    const mJ=+mon.slice(0,4),mM=+mon.slice(5,7),vk=mM===1?(mJ-1)+"-12":mJ+"-"+pad(mM-1),vkL=new Date(+vk.slice(0,4),+vk.slice(5,7),0).getDate(),tagH=pad(Math.min(+hi.slice(8,10),vkL)),vm=pListen.reduce((s,l)=>s+imMon(l,vk,vk+"-"+tagH),0),mieteBis=pListen.reduce((s,l)=>s+imMon(l,mon,hi),0),erste=pListen.flat().filter(p=>p.am&&p.b>0).map(p=>p.am).sort()[0],vollerMonat=!!erste&&erste<vk+"-01",z=[];   // Prozent nur bei vollem Erfassungsmonat und mindestens 500 €, sonst nur Euro
     if(fix)z.push(miete>=fix?["Über den Fixkosten","+"+e0(miete-fix),"pos"]:["Bis zu den Fixkosten fehlen",e0(fix-miete),"neg"]);
-    if(vm>0){const d=Math.round((miete/vm-1)*100);z.push([MN[+vk.slice(5)-1]+" bis zum "+(+tagH)+".",e0(vm)+(vollerMonat&&vm>=500?'  <span class="'+(d>=0?"pos":"neg")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+" %</span>":""),""])}
+    if(vm>0){const d=Math.round((mieteBis/vm-1)*100);   /* Prozent wie auf Monat: nur bis heute (strenge App-Prüfung 11.11. F1) */z.push([MN[+vk.slice(5)-1]+" bis zum "+(+tagH)+".",e0(vm)+(vollerMonat&&vm>=500?'  <span class="'+(d>=0?"pos":"neg")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+" %</span>":""),""])}
     if(+((st.fix||{}).proTag))z.push(["Jeder Tag kostet",e0(st.fix.proTag),""]);
     document.getElementById("umZ").innerHTML=z.map(x=>'<span><span>'+esc(x[0])+'</span><b class="'+x[2]+'">'+x[1]+'</b></span>').join("")}
   // WhatsApp heute (31.10.2026, Baran: „morgens alle Nachrichten auf einmal“, Verlängerung und km-Paket als Umsatzbringer)
