@@ -95,6 +95,13 @@ header .logo{display:block;height:46px;width:auto}header{background:transparent!
 .fertig{padding:22px 0;text-align:center;color:var(--gruen);font-weight:800;font-size:18px}.fertig i{display:block;font-style:normal;font-size:14px;color:var(--grau);font-weight:600;margin-top:4px}
 body:not(.geladen) #heute .z{animation:rein .25s ease both}@keyframes rein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 /* Freie Autos anbieten (01.11.2026, Baran: echter Umsatzbringer, Zeitraum selbst wählen) */
+/* Zeitraum wie auf der Seite Angebot (12.11.2026, Baran: einheitlich) */
+.ubZ{display:flex;align-items:center;gap:12px;padding:8px 0 4px;min-height:50px;cursor:pointer;-webkit-tap-highlight-color:transparent}.ubZ:active{opacity:.7}
+.ubZ .t{flex:1;min-width:0}.ubZ .t b{display:block;font-size:17px;font-weight:600;color:#1C1C1E;line-height:1.3}.ubZ .t i{display:block;font-style:normal;font-size:14px;color:#8A8A8E;margin-top:1px}
+.ubOk{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#34C759;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:900}
+.ubPf{flex:0 0 26px;width:26px;height:26px;border-radius:50%;background:#E9E9EE;color:#1C1C1E;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;line-height:1}
+.ubHw{font-size:14px;font-weight:600;color:#6E6E73;margin:2px 0 6px}.ubZr{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.ubZr span{flex:0 0 auto;padding:9px 13px;border-radius:999px;background:#F2F2F4;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap}.ubZr span.an{background:#1C1C1E;color:#fff}
 .anbAb{font-size:13px;font-weight:800;color:var(--grau);margin:14px 2px 6px}
 /* Wie die Seite Angebot (01.11.2026, Baran: dieses Design gefällt mir sehr) */
 .anbKarte{padding:13px 16px}.anbLbl{font-size:11.5px;font-weight:800;color:var(--grau);text-transform:uppercase;letter-spacing:.6px;margin:0 0 8px}
@@ -918,8 +925,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
 <div id="umsatzTeil"><p id="uUnter">Freie Autos an frühere Kunden schicken</p>
 <h2>Freie Autos anbieten</h2>
 <div class="k anbKarte"><div class="anbS"><span class="anbNr">1</span><b>Wann?</b></div>
-  <div class="anbZr" id="anbKZr"><span data-d="1">1 Tag</span><span data-d="2">2 Tage</span><span data-d="3">3 Tage</span><span data-d="7">1 Woche</span><span data-we="5,1">Fr bis Sa</span><span data-we="5,2">Fr bis So</span><span data-we="6,2">Sa bis Mo</span><span data-we="5,3">Fr bis Mo</span></div>
-  <div class="anbZt" id="anbKZt"></div>
+  <div class="ubZ" id="anbKZt" role="button" tabindex="0"></div>
   <div class="anbLinie"></div>
   <div class="anbS"><span class="anbNr">2</span><b>Frei in dieser Zeit</b><span class="anbZahl" id="anbKT"></span></div>
   <div id="anbFrei" class="anbSchilder"></div>
@@ -929,6 +935,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
   <div class="anbHin" id="anbKZahl" style="margin-top:-4px"></div>
   <button class="anbGruen" type="button" id="anbStart">Freie Autos an Kunden schicken ›</button></div></div>
 <div class="mxFenster" id="fAnbZr" role="dialog" aria-label="Zeitraum"><div class="mxKopf"><h3>Zeitraum</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
+  <div id="anbKZr"><div class="ubHw">Ab heute:</div><div class="ubZr"><span data-d="1">1 Tag</span><span data-d="2">2 Tage</span><span data-d="3">3 Tage</span><span data-d="7">1 Woche</span></div><div class="ubHw">Wochenende (nächstes):</div><div class="ubZr"><span data-we="5,1">Fr bis Sa</span><span data-we="5,2">Fr bis So</span><span data-we="6,2">Sa bis Mo</span><span data-we="5,3">Fr bis Mo</span></div></div>
   <div class="anbZwei"><div><label for="anbVonD">Von</label><input id="anbVonD" type="date"></div><div><label for="anbVonU">Uhrzeit</label><input id="anbVonU" type="time" value="10:00"></div></div>
   <div class="anbZwei"><div><label for="anbBisD">Bis</label><input id="anbBisD" type="date"></div><div><label for="anbBisU">Uhrzeit</label><input id="anbBisU" type="time" value="10:00"></div></div>
   <button class="anbFertig" type="button" id="anbZrFertig">Fertig</button>
@@ -1326,6 +1333,8 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
   // Zeitraum steht oben auf der Karte (01.11.2026, Baran: „woran machst du den Zeitraum fest?“), wie im Angebot
   const anbZtText=()=>{if(!ANB.vonD||!ANB.bisD)return"";const d=anbTage(),kt=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);
     return kt(ANB.vonD)+" "+uhrT(ANB.vonU)+" bis "+kt(ANB.bisD)+" "+uhrT(ANB.bisU)+' <small>'+d+(d===1?" Tag":" Tage")+',</small> <u>ändern</u>'};
+  // Zeile wie im Angebot (12.11.2026): grüner Haken, „Do 12.11. 10:00 bis So 15.11. 10:00“, darunter die Tage, rechts ›
+  const anbZeile=()=>{if(!ANB.vonD||!ANB.bisD)return'<span class="ubOk" style="background:#FF3B30">✕</span><span class="t"><b style="color:#8A8A8E">Zeitraum wählen</b></span><span class="ubPf">›</span>';const d=anbTage(),kt=x=>WT[new Date(x+"T12:00").getDay()]+" "+de(x);return '<span class="ubOk">✓</span><span class="t"><b>'+kt(ANB.vonD)+" "+(ANB.vonU||"10:00")+" bis "+kt(ANB.bisD)+" "+(ANB.bisU||"10:00")+'</b><i>'+d+(d===1?" Tag":" Tage")+'</i></span><span class="ubPf">›</span>'};
   // Auswahl sichtbar (1.11.2026, Baran): Markierung aus dem Zeitraum selbst, stimmt auch beim Öffnen und nach Datum von Hand
   // Zwei Knöpfe mit gleichem Zeitraum (Freitag: „3 Tage“ und „Fr bis Mo“): nur der angetippte ist markiert (06.11.2026)
   function anbZeitraum(){const h=iso(new Date()),w=new Date().getDay(),K=[...document.querySelectorAll("#anbKZr span")],passt=K.filter(c=>{let v=h,b;
@@ -1333,17 +1342,17 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
       return !!ANB.vonD&&ANB.vonD===v&&ANB.bisD===b}),g=passt.includes(ANB.chip)?ANB.chip:passt[0];
     K.forEach(c=>c.classList.toggle("an",c===g));
     {const zr=$a("anbKZr"),g=zr.querySelector("span.an");if(g&&(g.offsetLeft<zr.scrollLeft||g.offsetLeft+g.offsetWidth>zr.scrollLeft+zr.clientWidth))zr.scrollLeft=g.offsetLeft-zr.clientWidth/2+g.offsetWidth/2}   // gewählter Knopf immer im Blick
-    $a("anbKZt").innerHTML=anbZtText();$a("anbFZt").innerHTML=anbZtText();
+    $a("anbKZt").innerHTML=anbZeile();$a("anbFZt").innerHTML=anbZtText();
     $a("anbVonD").value=ANB.vonD;$a("anbVonU").value=ANB.vonU;$a("anbBisD").value=ANB.bisD;$a("anbBisU").value=ANB.bisU}
-  const anbNeu=()=>{ANB.autos=null;anbZeitraum();anbFrei();if($a("fAnb").classList.contains("auf"))anbZeichnen()};
-  [...$a("anbKZr").children].forEach(c=>c.onclick=()=>{const h=iso(new Date());
+  const anbNeu=()=>{ANB.autos=null;anbZeitraum();anbFrei();anbSichern();   /* gewählter Zeitraum bleibt auch ohne Kunden-Fenster (12.11.2026) */if($a("fAnb").classList.contains("auf"))anbZeichnen()};
+  [...$a("anbKZr").querySelectorAll("span")].forEach(c=>c.onclick=()=>{const h=iso(new Date());
     if(c.dataset.d){ANB.vonD=h;ANB.bisD=plusT(h,+c.dataset.d)}else{const[wd,n]=c.dataset.we.split(",").map(Number),v=plusT(h,(wd-new Date().getDay()+7)%7);ANB.vonD=v;ANB.bisD=plusT(v,n)}
     c.dataset.von=ANB.vonD;c.dataset.bis=ANB.bisD;ANB.chip=c;anbNeu()});
   [["anbVonD","vonD"],["anbVonU","vonU"],["anbBisD","bisD"],["anbBisU","bisU"]].forEach(([id,f])=>$a(id).addEventListener("change",()=>{ANB[f]=$a(id).value;
     if((f==="vonD"||f==="bisD")&&ANB.vonD&&ANB.bisD<=ANB.vonD){const handBis=f==="bisD"&&!!ANB.bisD;ANB.bisD=plusT(ANB.vonD,1);if(handBis)mxFehler("Bis muss nach Von liegen. Bis steht jetzt auf "+de(ANB.bisD)+ANB.bisD.slice(0,4)+".",6000)}anbNeu()}));
   // „ändern“ im Kunden-Fenster: nach „Fertig“ geht es dorthin zurück
   let ANB_ZURUECK=false;
-  $a("anbKZt").onclick=()=>{ANB_ZURUECK=false;mxAuf("fAnbZr")};$a("anbFZt").onclick=()=>{ANB_ZURUECK=true;mxAuf("fAnbZr")};
+  $a("anbKZt").onclick=()=>{ANB_ZURUECK=false;mxAuf("fAnbZr")};$a("anbKZt").onkeydown=e=>{if(e.key==="Enter"){ANB_ZURUECK=false;mxAuf("fAnbZr")}};$a("anbFZt").onclick=()=>{ANB_ZURUECK=true;mxAuf("fAnbZr")};
   // Aus dem Kunden-Fenster geöffnet: Fertig, ✕, Tipp daneben, Esc und Zurück führen in das Kunden-Fenster zurück, nichts geht verloren (10.11.2026)
   function anbZrZurueck(){ANB_ZURUECK=false;mxAuf("fAnb");anbZeichnen()}
   const anbZrVonFenster=()=>ANB_ZURUECK&&$a("fAnbZr").classList.contains("auf")&&$a("fAnb");
