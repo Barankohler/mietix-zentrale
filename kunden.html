@@ -1117,11 +1117,23 @@ async function auth(pfad,body){const r=await holeMit(URL_+"/auth/v1/"+pfad,{meth
   const j=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(j.error_description||j.msg||j.message||"Anmeldung fehlgeschlagen");e.status=r.status;throw e}return j}
 function sichern(j){sitzung={token:j.access_token,neu:j.refresh_token,bis:Date.now()+(j.expires_in||3600)*1000-60000,
   email:(j.user&&j.user.email)||(sitzung&&sitzung.email)||""};merk("mietixSitzung",sitzung)}
-async function token(){if(!sitzung)return null;
-  if(Date.now()>sitzung.bis){try{sichern(await auth("token?grant_type=refresh_token",{refresh_token:sitzung.neu}))}
+/* Anmeldung über alle offenen Mietix-Fenster eines Geräts (12.11.2026, Mietvertrag 000562 ging nie hoch):
+   Jedes Fenster hielt seine eigene Kopie der Anmeldung. Erneuerte ein Fenster sie, schickte ein älteres Fenster später den
+   schon verbrauchten Schlüssel, bekam 4xx und meldete das ganze Gerät still ab. Ab jetzt gilt immer die Anmeldung im
+   localStorage, Erneuern geht nur in einem Fenster gleichzeitig, und vor dem Abmelden wird nachgesehen, ob ein anderes
+   Fenster schon erneuert hat. Wird das Gerät wirklich abgemeldet, kommt ein roter Hinweis. */
+function sitzungFrisch(){const s=lies("mietixSitzung",null);if(JSON.stringify(s)!==JSON.stringify(sitzung)){sitzung=s;if(!pwSetzen)zeigen()}}
+async function erneuern(){const alt=sitzung.neu;
+  try{sichern(await auth("token?grant_type=refresh_token",{refresh_token:alt}))}
     // Abmelden nur, wenn der Speicher die Anmeldung wirklich ablehnt, nicht bei schlechtem Netz (30.10.2026)
-    catch(e){if(e.status>=400&&e.status<500){sitzung=null;localStorage.removeItem("mietixSitzung");zeigen();return null}throw e}}
-  return sitzung.token}
+    catch(e){if(e.status>=400&&e.status<500){const s=lies("mietixSitzung",null);if(s&&s.neu&&s.neu!==alt){sitzung=s;return}   // ein anderes Fenster war schneller
+      sitzung=null;localStorage.removeItem("mietixSitzung");zeigen();
+      hinweis("Dieses Gerät wurde abgemeldet. Ab jetzt wird nichts gesichert. Bitte auf der Startseite neu anmelden.");return}
+    throw e}}
+async function token(){sitzungFrisch();if(!sitzung)return null;
+  if(Date.now()>sitzung.bis){const los=()=>{sitzungFrisch();return sitzung&&Date.now()>sitzung.bis?erneuern():null};
+    if(navigator.locks&&navigator.locks.request)await navigator.locks.request("mietix-anmeldung",los);else await los()}
+  return sitzung?sitzung.token:null}
 async function api(pfad,opt){const t=await token();if(!t)throw new Error("nicht angemeldet");
   const r=await holeMit(URL_+"/rest/v1/"+pfad,Object.assign({},opt,{headers:Object.assign({apikey:KEY,Authorization:"Bearer "+t,"Content-Type":"application/json"},(opt||{}).headers||{})}));
   if(!r.ok)throw new Error("Speicher antwortet "+r.status);const s=await r.text();return s?JSON.parse(s):null}
@@ -1297,7 +1309,7 @@ async function hochladen(k,c,h,hoch){const streit=[],gelungen=(z,ver)=>{const p=
     if(r[0])gelungen(z,r[0].geaendert);else streit.push(p)}
   return streit}
 async function abgleichen(){
-  if(!sitzung||!navigator.onLine)return;if(laeuft){nochmal=true;return}laeuft=true;const stand0=aenderungen;zeigen();
+  sitzungFrisch();if(!sitzung||!navigator.onLine)return;if(laeuft){nochmal=true;return}laeuft=true;const stand0=aenderungen;zeigen();
   const H=lies("mietixAbgleich",{}),geholt=[],kaputt=[];let warnung="";
   // Einmal je Gerät (31.10.2026, iPad mit vollem Speicher): Mietverträge, Papierkorb und Unterschriften frisch vom gemeinsamen Stand übernehmen.
   // Nur hier Liegendes, das noch nie hochging, bleibt und geht hoch. Kein Doppel in den Papierkorb.
@@ -1412,9 +1424,15 @@ function altSchutz(k,v){const keys=Object.keys(FREMD).filter(x=>x.indexOf(k+"|")
   return neu?JSON.stringify(arr):v}
 // Jede Änderung an den vier Speichern löst kurz danach einen Abgleich aus
 let warte=null;
+// Ohne Anmeldung gespeichert (12.11.2026): einmal je Seite ein roter Hinweis, damit es niemand übersieht. Nur auf der echten Seite, nicht im Test.
+let ohneGemeldet=false;
+function ohneAnmeldung(){if(ohneGemeldet||!/github\.io$/.test(location.hostname))return;ohneGemeldet=true;
+  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten und in der Excel. Bitte auf der Startseite anmelden.";
+    if(window.mxFehler)mxFehler(t);else alert(t)},300)}
 Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof v==="string"&&!rueckLaeuft&&!EIGEN)v=altSchutz(k,v);
   const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);if(this===localStorage&&WACHE[k])GESEHEN[k]=v;
   if(this===localStorage&&(SPEICHER[k]||k==="mietixEntwurfProtokolle")&&typeof v==="string"&&v.indexOf('"data:image/')>=0)auslagernBald();
+  if(this===localStorage&&SPEICHER[k]&&!sitzung&&!localStorage.getItem("mietixSitzung"))ohneAnmeldung();
   if(this===localStorage&&SPEICHER[k]){aenderungen++;if(!ungesichert){ungesichert=true;if(sitzung&&!pwSetzen)zeigen()}clearTimeout(warte);warte=setTimeout(abgleichen,800);if(k!=="mietixStand"&&k!=="mietixPapierkorb")sicherheitsnetz(k,alt,v)}};
 
 /* ---------- Sicherheitsnetz (28.10.2026, Baran: "Verklicken darf nichts verlieren") ----------
@@ -1610,6 +1628,7 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   "";
 document.head.appendChild(css);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
+window.addEventListener("storage",e=>{if(e.key==="mietixSitzung"||e.key===null){sitzungFrisch();if(sitzung)abgleichen()}});   // in einem anderen Fenster an- oder abgemeldet (12.11.2026)
 window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
 setInterval(abgleichen,60000);
 zeigen();abgleichen();auslagernBald();
