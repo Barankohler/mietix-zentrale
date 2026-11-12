@@ -1157,7 +1157,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
       // Erinnerung an die Abholung morgen
       if(v.vonD===mo&&!v.ueb&&!v.erinnert)L.push({g:"Abholung morgen",t:v.name,i:v.auto+", morgen ("+WT[new Date(mo+"T12:00").getDay()]+" "+de(mo)+")"+(v.vonU?" "+v.vonU+" Uhr":""),tel:v.telefon,mark:{nr:v.nr,feld:"erinnert"},
         text:"Kurze Erinnerung an Ihre Abholung morgen, "+tagLang(v.vonD)+(v.vonU?" um "+v.vonU+" Uhr":"")+", bei Mietix in der Peter-Sander-Straße 43 B, 55252 Mainz-Kastel.\n\nBitte mitbringen:\n- Personalausweis\n- Führerschein"+
-          (waKaution(v)>0?"\n- Kaution "+eur2(waKaution(v))+" €":"")+((z.rest||{}).am||!(zahl((z.rest||{}).betrag)>0)?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")+"\n\nBis morgen!"});
+          (waKaution(v)>0?"\n- Kaution "+eur2(waKaution(v))+" €":"")+((z.rest||{}).am||!(zahl((z.rest||{}).betrag)>0)?"":"\n- Restbetrag "+eur2(zahl((z.rest||{}).betrag))+" €")});
       // Verlängerung immer bereit (10.11.2026, Baran): auf der Seite WhatsApp bei jeder laufenden Miete, falls der Kunde früher fragt; nur wenn das Auto am Tag nach der Rückgabe frei ist
       if(NUR_WA&&v.ueb&&v.status!=="zurück"&&v.bisD>hi){const nt=plusT(v.bisD,1);if(freiAm(v,nt)){const c2=preis(v.auto),tp=c2?verlTag(c2,v):0,vs=tp?Math.min(Math.round(tp)-10,Math.max(9,Math.round(tp*0.85/10)*10-1)):0;
         L.push({g:"Verlängerung anbieten",immer:true,t:v.name,i:v.auto+", Rückgabe "+de(v.bisD)+", am "+de(nt)+" noch frei"+(v.verlFrueh?", gesendet am "+de(v.verlFrueh):""),tel:v.telefon,mark:{nr:v.nr,feld:"verlFrueh"},
