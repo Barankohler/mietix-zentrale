@@ -31,7 +31,7 @@ main{max-width:640px;margin:0 auto;padding:12px 16px 90px}
 .k{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:.5px solid var(--linie);cursor:pointer;min-height:60px}.k:first-child{border-top:0}.k:active{background:#F7F7F9}
 .av{flex:0 0 42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;letter-spacing:.3px}
 .t{flex:1;min-width:0}.t b{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:700;min-width:0}.t b span.n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.t i{display:block;font-style:normal;font-size:13px;color:#3A3A3C;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.t i.ort{color:var(--grau);margin-top:1px}
+.t i{display:block;font-style:normal;font-size:13px;color:#3A3A3C;margin-top:2px;overflow-wrap:anywhere}.t i.ort{color:var(--grau);margin-top:1px}
 .tag{flex:0 0 auto;font-size:10px;font-weight:800;padding:3px 6px;border-radius:6px;letter-spacing:.3px}.tag.stamm{background:#FFF4DB;color:#9A6700}.tag.ach{background:#FDECEC;color:#A31318}.tag.geb{background:#E6F4EA;color:var(--gruen)}.tag.grau{background:#F2F2F7;color:#3A3A3C}
 .ak{display:flex;gap:6px;flex:0 0 auto}.ak a{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .ak .wa{background:#E7F9EE}.ak .tel{background:#F2F2F7}.ak svg,.knoepfe svg{width:18px;height:18px;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
@@ -577,7 +577,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
 </header>
 <main>
 <div id="abgleich"></div>
-<div class="kz"><div><b id="kzAlle">0</b><i>Kunden</i></div><div><b id="kzStamm">0</b><i>Stammkunden</i></div><div><b id="kzNeu">0</b><i id="kzNeuT">neu im Monat</i></div></div>
+<div class="kz"><div><b id="kzAlle">0</b><i id="kzAlleT">Kunden</i></div><div><b id="kzStamm">0</b><i id="kzStammT">Stammkunden</i></div><div><b id="kzNeu">0</b><i id="kzNeuT">neu im Monat</i></div></div>
 <button class="mxKnopf" id="angebotAuf" type="button"><span><b>Angebot verschicken</b><i>Freie Autos an Stammkunden per WhatsApp</i></span><em>›</em></button>
 <div class="zeile1"><span id="zahl"></span><select id="sortierung" aria-label="Sortieren"><option value="name">A bis Z</option><option value="zuletzt">Zuletzt gemietet</option><option value="mieten">Meiste Mieten</option></select></div>
 <div id="liste"></div>
@@ -756,8 +756,8 @@ const SVG_WA='<svg viewBox="0 0 24 24" stroke="#128C4A"><path d="M4 20l1.3-3.9A8
 // Buchung (Stand gebucht) heißt Buchung, nicht Anfrage; gezählt wird weiter nur der Mietvertrag (06.11.2026)
 const hatBuchung=e=>(e.anfragen||[]).some(a=>a.status==="gebucht");
 function wieOft(e,ohneAuto){if(!e.mieten)return hatBuchung(e)?"Buchung, noch keine Miete":e.anfragen.length?"nur Anfrage, noch keine Miete":"noch keine Miete";
-  const z=e.zuletzt||"",zuk=z>heute;
-  return e.mieten+(e.mieten===1?" Miete":" Mieten")+(z?(zuk?", gebucht für ":", zuletzt ")+de(z):"")+(e.letztesAuto&&!ohneAuto?" ("+e.letztesAuto.replace(/^(Audi|Mercedes-Benz|Mercedes|VW|BMW) /,"")+")":"")}
+  const z=e.zuletzt||"",zuk=z>heute,dk=z.slice(0,4)===heute.slice(0,4)?de(z).slice(0,6):de(z);   // dieses Jahr ohne Jahr, nichts abgeschnitten (12.11.2026)
+  return e.mieten+(e.mieten===1?" Miete":" Mieten")+(z?(zuk?", gebucht für ":", zuletzt ")+dk:"")+(e.letztesAuto&&!ohneAuto?" ("+e.letztesAuto.replace(/^(Audi|Mercedes-Benz|Mercedes|VW|BMW) /,"")+")":"")}
 // Telefon in anderer Schreibweise (+49, 0049, Leerzeichen) findet denselben Kunden (09.11.2026)
 function perTelefon(q){const z=MK.ziffern(q);if(!/^[+\d][\d\s\/()-]{5,}$/.test(q)||z.length<6)return[];return ALLE.filter(e=>MK.ziffern(e.telefon).includes(z)||(e._tels||[]).some(t=>t.includes(z)))}
 function gefiltert(){const q0=$("suche").value.trim();let l=q0?MK.finde(q0,ALLE):ALLE.slice();if(q0&&!l.length)l=perTelefon(q0);
@@ -777,12 +777,12 @@ function zeileK(e){const gb=gebBald(e);
     +(e.telefon&&!e.gesperrt?'<div class="ak">'+(MK.ziffern(e.telefon)?'<a class="tel" href="tel:'+esc(MK.ziffern(e.telefon))+'" aria-label="Anrufen">'+SVG_TEL+'</a>':"")+(wa(e.telefon)?'<a class="wa" target="_blank" href="'+wa(e.telefon)+'" aria-label="WhatsApp">'+SVG_WA+'</a>':"")+'</div>':"")+'</div>'}
 function zeichne(){ALLE=MK.alle();const l=gefiltert();
   const stamm=ALLE.filter(e=>e.mieten>=2).length,mon=heute.slice(0,7),neu=ALLE.filter(e=>e.vertraege.length&&String(e.vertraege[0].von||"").slice(0,7)===mon).length;
-  $("kzAlle").textContent=ALLE.length;$("kzStamm").textContent=stamm;$("kzNeu").textContent=neu?"+"+neu:"0";$("kzNeuT").textContent="neu im "+MON[+mon.slice(5,7)-1];
+  $("kzAlle").textContent=ALLE.length;$("kzStamm").textContent=stamm;$("kzAlleT").textContent=ALLE.length===1?"Kunde":"Kunden";$("kzStammT").textContent=stamm===1?"Stammkunde":"Stammkunden";$("kzNeu").textContent=neu?"+"+neu:"0";$("kzNeuT").textContent="neu im "+MON[+mon.slice(5,7)-1];
   $("nAlle").textContent=ALLE.length;$("nStamm").textContent=stamm;$("nLange").textContent=ALLE.filter(e=>e.mieten&&tageSeit(e.zuletzt)>90).length;
   $("nAchtung").textContent=ALLE.filter(e=>e.warn.length).length;$("nGeb").textContent=ALLE.filter(e=>gebBald(e)!==false).length;
   $("zahl").textContent=l.length===ALLE.length?ALLE.length+(ALLE.length===1?" Kunde":" Kunden"):l.length+" von "+ALLE.length+" Kunden";
   let h="";
-  if(!l.length)h='<div class="leer">Niemand gefunden.</div>';
+  if(!l.length)h='<div class="leer">'+(!ALLE.length&&!$("suche").value.trim()?"Noch keine Kunden.":"Niemand gefunden.")+'</div>';   // ohne Suche kein „gefunden“ (12.11.2026)
   else if(SORT==="name"&&!$("suche").value.trim()){const gr={};l.forEach(e=>{let b=MK.norm(e.name).charAt(0).toUpperCase();if(!/[A-Z]/.test(b))b="#";(gr[b]=gr[b]||[]).push(e)});
     h=Object.keys(gr).map(b=>'<div class="buchst">'+b+'</div><div class="liste">'+gr[b].map(zeileK).join("")+'</div>').join("")}
   else h='<div class="liste" style="margin-top:6px">'+l.map(zeileK).join("")+'</div>';
@@ -874,7 +874,7 @@ function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V
       const nn=(e.namen||[e.name]).map(MK.norm),tt=(e._tels||[]).concat(MK.ziffern(e.telefon)).filter(z=>z.length>=6),istEr=(name,tel)=>nn.includes(MK.norm(name))||!!(tt.length&&tt.includes(MK.ziffern(tel)));
       // Schadensbelege bleiben (Aufbewahrung, Baran entscheidet), in der Rückfrage erwähnt (06.11.2026)
       let belege=0;try{const sb=((JSON.parse(localStorage.getItem("mietixStand")||"{}")||{}).schadensbelege||{}).liste;if(Array.isArray(sb))belege=sb.filter(b=>b&&istEr(b.name,b.telefon)).length}catch(x){}
-      if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+(andere.length?" (auch gespeichert als "+andere.join(", ")+")":"")+" löschen, auch in seinen Anfragen und im Papierkorb? Die Mietverträge bleiben (Aufbewahrungspflicht)"+(belege?(belege===1?", der Schadensbeleg bleibt auch (Aufbewahrung)":", die "+belege+" Schadensbelege bleiben auch (Aufbewahrung)"):"")+", der Kunde bekommt keine Angebote mehr."))return;
+      if(!confirm("Telefon, Anschrift, Geburtsdatum, E-Mail und Notiz von "+e.name+(andere.length?" (auch gespeichert als "+andere.join(", ")+")":"")+" löschen, auch in den Anfragen von "+e.name+" und im Papierkorb? Die Mietverträge bleiben (Aufbewahrungspflicht)"+(belege?(belege===1?", der Schadensbeleg bleibt auch (Aufbewahrung)":", die "+belege+" Schadensbelege bleiben auch (Aufbewahrung)"):"")+", "+e.name+" bekommt keine Angebote mehr."))return;
       const weg={telefon:null,anschrift:null,geb:null,gebort:null,email:null,notiz:null,ort:null,gesperrt:true,keineAngebote:true};
       // auch in den Anfragen dieses Kunden: Einträge bleiben, persönliche Angaben werden geleert (06.11.2026). Abgleich erkennt die Änderung wie bei jedem Speichern
       const AF=["nummer","alter","ort","anschrift","geb","gebort","email","notiz"],KF=["telefon","anschrift","geb","gebort","email","notiz","ort"];
