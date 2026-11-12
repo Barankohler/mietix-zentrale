@@ -331,9 +331,10 @@ function nurGeaenderte(schl){const hin=$("eHin"),jetzt=werteVon(schl);if(!jetzt)
   return true}
 function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
   const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
+  const fw0=feldWerte();   /* was in diesem Fenster getippt wurde, vor dem Nachziehen fremder Änderungen (12.11.2026, Prüfung) */
   if(!nurGeaenderte(schl))return;
   // Jede Geldänderung fragt „Sicher?“ mit alt und neu (11.11.2026 nachts, Prüfung B A5)
-  {const fw=feldWerte(),orig=OFFEN.orig||{},zeig=(id,x)=>/Am$/.test(id)?(istTag(x)?deJ(x):"leer"):id==="eGrund"?(String(x||"").trim()||"leer"):eur(Math.round(zahl(x)||0));
+  {const fw=fw0,orig=OFFEN.orig||{},zeig=(id,x)=>/Am$/.test(id)?(istTag(x)?deJ(x):"leer"):id==="eGrund"?(String(x||"").trim()||"leer"):eur(Math.round(zahl(x)||0));
     const z=Object.keys(fw).filter(id=>fNorm(id,fw[id])!==fNorm(id,orig[id])).map(id=>fName(id)+": "+zeig(id,orig[id])+" auf "+zeig(id,fw[id]));
     if(z.length){const x=schl.startsWith("a:")?lies("mietixAnfragen",[]).find(y=>y&&y.id===schl.slice(2)):lies("mietixVorgaenge",[]).find(y=>y&&y.nr===schl.slice(2));
       const tzOffen=!schl.startsWith("a:")&&x&&$("eRestAm")&&t("eRestAm")&&!istTag(((x.zahlung||{}).rest||{}).am)?(x.teilzahlungen||[]).filter(q=>q&&+q.betrag>0&&!q.verrechnet).reduce((q,y)=>q+Math.round(+y.betrag||0),0):0;

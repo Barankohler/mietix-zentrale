@@ -421,7 +421,8 @@ function zeichne(){
       (l.length?l.map(e=>'<div class="z"><div class="t"><b>'+zeileTitel(e)+'</b>'+zeileWo(e)+'<i>'+extra(e)+(/^Andere Fassung/.test(e.text||"")?'zur Seite gelegt ':'gelöscht ')+de(e.zeit)+'</i></div><button data-pk="'+esc(e.id)+'">Wiederherstellen</button></div>').join(""):'<div class="leer">'+(PK_LK.aktiv()?"Nichts gefunden.":"Nichts gelöscht.")+'</div>')+'</div></div>'}).join("");
   if(tmZahl&&(!PK_LK.w.ber||PK_LK.w.ber==="mietixSperren"))$("geloescht").insertAdjacentHTML("beforeend",'<div class="leer">Gelöschte Termine mit Sperre holst du unter <a class="lk" href="'+LINK+'mietix-zentrale/termine.html">Termine › Gelöscht</a> zurück, Termin und Sperre zusammen.</div>');
   {const zeigN=pk.filter(e=>!PK_LK.w.ber||e.ablage===PK_LK.w.ber||(PK_LK.w.ber==="_sonst"&&!KASTEN.includes(e.ablage))||(PK_LK.w.ber==="mietixVorgaenge"&&/^mietixEntwurf/.test(e.ablage))).length;PK_LK.zeile(PK_LK.aktiv()?zeigN+" von "+pkAlle.length+(pkAlle.length===1?" Eintrag":" Einträgen"):pkAlle.length+(pkAlle.length===1?" Eintrag":" Einträge"))}
-  [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{const e=pk.find(y=>y.id===b.dataset.pk)||{},x=e.eintrag||{};
+  [...$("geloescht").querySelectorAll("button[data-pk]")].forEach(b=>b.onclick=()=>{if(!lies("mietixPapierkorb",[]).some(y=>y.id===b.dataset.pk)){if(window.mxFehler)mxFehler("Schon wiederhergestellt, zum Beispiel in einem anderen Fenster.");else meldung("Schon wiederhergestellt.");zeichne();return}   /* altes Fenster (12.11.2026, Prüfung) */
+    const e=pk.find(y=>y.id===b.dataset.pk)||{},x=e.eintrag||{};
     // Belegt wieder ein Auto: lieber nachfragen (31.10.2026, Baran); Sperre auch, und vorher schauen, ob das Auto schon vergeben ist (06.11.2026)
     const belegt=e.ablage==="mietixVorgaenge"||e.ablage==="mietixSperren"||(e.ablage==="mietixAnfragen"&&x.status==="gebucht");
     if(belegt&&x.auto){const w=e.ablage==="mietixSperren"?{von:x.von,bis:x.bis}:zeit(x),wann=tk(w.von)+" bis "+tk(w.bis),konf=belegtDurch(e);
@@ -447,6 +448,7 @@ function zeichne(){
 zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)zeichne()});
+addEventListener("storage",e=>{if(!e.key||/^mietix/.test(e.key))zeichne()});   // anderes Fenster ändert: hier gleich nachziehen (12.11.2026)
 </script>
 <script>/* Mietix Abgleich: Mietverträge, Anfragen, Kunden und Fahrzeuge auf allen Geräten gleich (Supabase Frankfurt, seit 26.10.2026).
    Wird von tools/vertrag/build_html.py und tools/anfragen/build_html.py in die Seite eingebaut.

@@ -353,9 +353,10 @@ function nurGeaenderte(schl){const hin=$("eHin"),jetzt=werteVon(schl);if(!jetzt)
   return true}
 function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
   const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
+  const fw0=feldWerte();   /* was in diesem Fenster getippt wurde, vor dem Nachziehen fremder Änderungen (12.11.2026, Prüfung) */
   if(!nurGeaenderte(schl))return;
   // Jede Geldänderung fragt „Sicher?“ mit alt und neu (11.11.2026 nachts, Prüfung B A5)
-  {const fw=feldWerte(),orig=OFFEN.orig||{},zeig=(id,x)=>/Am$/.test(id)?(istTag(x)?deJ(x):"leer"):id==="eGrund"?(String(x||"").trim()||"leer"):eur(Math.round(zahl(x)||0));
+  {const fw=fw0,orig=OFFEN.orig||{},zeig=(id,x)=>/Am$/.test(id)?(istTag(x)?deJ(x):"leer"):id==="eGrund"?(String(x||"").trim()||"leer"):eur(Math.round(zahl(x)||0));
     const z=Object.keys(fw).filter(id=>fNorm(id,fw[id])!==fNorm(id,orig[id])).map(id=>fName(id)+": "+zeig(id,orig[id])+" auf "+zeig(id,fw[id]));
     if(z.length){const x=schl.startsWith("a:")?lies("mietixAnfragen",[]).find(y=>y&&y.id===schl.slice(2)):lies("mietixVorgaenge",[]).find(y=>y&&y.nr===schl.slice(2));
       const tzOffen=!schl.startsWith("a:")&&x&&$("eRestAm")&&t("eRestAm")&&!istTag(((x.zahlung||{}).rest||{}).am)?(x.teilzahlungen||[]).filter(q=>q&&+q.betrag>0&&!q.verrechnet).reduce((q,y)=>q+Math.round(+y.betrag||0),0):0;
@@ -631,7 +632,7 @@ function zeichne(){
   const kautErh=v=>{const k=(v.zahlung||{}).kaut||{};return istTag(k.am)?n0(k.betrag):0};
   const kListe=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&(!LK.w.auto||v.auto===LK.w.auto)&&LK.passt(v.name+" "+v.auto+" "+v.nr));   // alle Mieten, auch wenn die Miete selbst im Vormonat bezahlt wurde; Suche und Fahrzeug gelten
   const kErh=kListe.filter(v=>inMon(((v.zahlung||{}).kaut||{}).am)).reduce((s,v)=>s+kautErh(v),0);
-  const kBei=kListe.reduce((s,v)=>{const kr=v.kautionRueck||{};return s+(kautErh(v)&&!istTag(kr.am)?Math.max(0,kautErh(v)-(kr.verrechnet?+kr.einbehalt||0:0)):0)},0);
+  const kBei=kListe.reduce((s,v)=>{const kr=v.kautionRueck||{};return s+(kautErh(v)&&!istTag(kr.am)?Math.max(0,kautErh(v)-(kr.verrechnet?(+kr.einbehalt||0)+(+kr.miete||0):0)):0)},0);
   // Vergleich nur, wenn er etwas aussagt (09.11.2026, stand „▲ 765 %“): laufender Monat 1. bis heute gegen dieselben Tage im Vormonat, vergangener Monat voll gegen voll.
   // Der Vormonat muss ganz erfasst sein (früheste Zahlung davor) und mindestens 500 € haben, sonst nur sein Betrag.
   const vm=vorMon(M),summeIn=(m,bis)=>alle.reduce((s,x)=>s+x.p.filter(y=>String(y.am).slice(0,7)===m&&(!bis||y.am<=bis)).reduce((t,y)=>t+y.b,0),0),reinVor=summeIn(vm);

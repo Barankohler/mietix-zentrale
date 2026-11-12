@@ -387,9 +387,10 @@ function nurGeaenderte(schl){const hin=$("eHin"),jetzt=werteVon(schl);if(!jetzt)
   return true}
 function speichern(){if(!pruefe())return;const w=id=>$(id)?Math.round(zahl($(id).value)||0):null,t=id=>$(id)?$(id).value:"";
   const schl=OFFEN&&OFFEN.schl;if(!schl)return;const jetzt=new Date().toISOString();
+  const fw0=feldWerte();   /* was in diesem Fenster getippt wurde, vor dem Nachziehen fremder Änderungen (12.11.2026, Prüfung) */
   if(!nurGeaenderte(schl))return;
   // Jede Geldänderung fragt „Sicher?“ mit alt und neu (11.11.2026 nachts, Prüfung B A5)
-  {const fw=feldWerte(),orig=OFFEN.orig||{},zeig=(id,x)=>/Am$/.test(id)?(istTag(x)?deJ(x):"leer"):id==="eGrund"?(String(x||"").trim()||"leer"):eur(Math.round(zahl(x)||0));
+  {const fw=fw0,orig=OFFEN.orig||{},zeig=(id,x)=>/Am$/.test(id)?(istTag(x)?deJ(x):"leer"):id==="eGrund"?(String(x||"").trim()||"leer"):eur(Math.round(zahl(x)||0));
     const z=Object.keys(fw).filter(id=>fNorm(id,fw[id])!==fNorm(id,orig[id])).map(id=>fName(id)+": "+zeig(id,orig[id])+" auf "+zeig(id,fw[id]));
     if(z.length){const x=schl.startsWith("a:")?lies("mietixAnfragen",[]).find(y=>y&&y.id===schl.slice(2)):lies("mietixVorgaenge",[]).find(y=>y&&y.nr===schl.slice(2));
       const tzOffen=!schl.startsWith("a:")&&x&&$("eRestAm")&&t("eRestAm")&&!istTag(((x.zahlung||{}).rest||{}).am)?(x.teilzahlungen||[]).filter(q=>q&&+q.betrag>0&&!q.verrechnet).reduce((q,y)=>q+Math.round(+y.betrag||0),0):0;
@@ -865,8 +866,11 @@ function karte(){const e=MK.eins(AUF,ALLE);if(!e){zu();return}AUF=e.name;const V
       if(!zug.schreiben()){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll.",7000);else meldung("Nicht gespeichert, Speicher voll.");return}
       if(nameNeu){e.name=dName;AUF=dName}
       const geleert=[["dTel","telefon","Telefon"],["dAnschrift","anschrift","Anschrift"],["dGeb","geb","Geburtsdatum"],["dGebort","gebort","Geburtsort"],["dEmail","email","E-Mail"]].filter(f=>!$(f[0]).value.trim());
-      MK.merken(e.name,{telefon:hand($("dTel").value.trim()),anschrift:hand($("dAnschrift").value.trim()),geb:hand($("dGeb").value),gebort:hand($("dGebort").value.trim()),
-      email:hand($("dEmail").value.trim()),notiz:hand($("dNotiz").value.trim()),keineAngebote:$("dKeine").classList.contains("an")||null});if(KE)KE.weg();BEARB=false;bearbRaus();meldung(zug.zahlText?"Gespeichert, auch in "+zug.zahlText:"Gespeichert");zeichne();karte();
+      /* Nur Geändertes schreiben (12.11.2026, Prüfung: ein alter Tab mit nur neuer Notiz schrieb die alte Telefonnummer still zurück) */
+      {const neu={},F=[["dTel","telefon"],["dAnschrift","anschrift"],["dGeb","geb"],["dGebort","gebort"],["dEmail","email"],["dNotiz","notiz"]];
+        F.forEach(([id,k])=>{const v=$(id).value.trim();if(v!==String(e[k]||"").trim())neu[k]=hand(v)});
+        const ka=$("dKeine").classList.contains("an")||null;if(!!ka!==!!e.keineAngebote)neu.keineAngebote=ka;
+        if(Object.keys(neu).length)MK.merken(e.name,neu)}if(KE)KE.weg();BEARB=false;bearbRaus();meldung(zug.zahlText?"Gespeichert, auch in "+zug.zahlText:"Gespeichert");zeichne();karte();
       // Geleertes, das noch im Mietvertrag oder in einer Anfrage steht, wird von dort wieder angezeigt: sagen, statt still zurückzukommen (09.11.2026)
       const nochDa=(MK.eins(e.name,ALLE)||{}),zurueck=geleert.filter(f=>nochDa[f[1]]).map(f=>f[2]);if(zurueck.length&&window.mxFehler)mxFehler(zurueck.join(", ")+" steht weiter im Mietvertrag oder in einer Anfrage und wird von dort angezeigt.",7000)};
     // trifft alle Schreibweisen desselben Kunden (gleiche Telefonnummer), sonst bliebe ein Teil stehen (06.11.2026, Datenschutz)
