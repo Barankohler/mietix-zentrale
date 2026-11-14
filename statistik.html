@@ -583,7 +583,7 @@ function zeichne(){umsatzKarte();const S=(lies("mietixStand",{})||{}).statistik;
   const so=(S.ausgaben||[]).find(g=>g.art==="Sonstiges"),gs=(S.ausgaben||[]).reduce((s,g)=>s+g.b,0);
   if(so&&gs&&so.b/gs>.25)tipps.push([0,'<b>'+Math.round(so.b/gs*100)+' %</b> der Ausgaben stehen unter „Sonstiges“. In der Excel genauer zuordnen, dann sehen wir, wo das Geld wirklich hingeht.']);
   if(K.stammLange)tipps.push([0,'<b>'+K.stammLange+' Stammkunden</b> waren seit über 2 Monaten nicht da. Kurz anschreiben (Kunden, Lange nicht da).']);
-  if(S.schaeden&&S.schaeden.offen)tipps.push([0,'Aus Schäden sind noch <b>'+eur(S.schaeden.offen)+'</b> offen ('+S.schaeden.faelle+' Fälle). Nachhaken (Excel, Reiter Schäden).']);
+  if(S.schaeden&&S.schaeden.offen)tipps.push([0,'Aus Schäden sind noch <b>'+eur(S.schaeden.offen)+'</b> offen ('+S.schaeden.faelle+' Fälle). Nachhaken (Drive, Kundenforderungen).']);
   if(A.length&&A[0].schnitt)tipps.push([1,'Bestes Auto: <b>'+esc(autoKurz(A[0].name))+'</b> mit '+eur(A[0].schnitt)+' im Monat.']);
   if(K.top&&K.top[0])tipps.push([1,'Treuester Kunde: <b>'+esc(K.top[0].name)+'</b>, '+K.top[0].mieten+'× gemietet.']);
   if(d!=null&&d>0)tipps.push([1,'Mehr Umsatz als im '+vor.name+': <b>+'+d+' %</b>.']);
