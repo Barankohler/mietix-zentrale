@@ -852,7 +852,7 @@ let warte=null;
 // Ohne Anmeldung gespeichert (12.11.2026): einmal je Seite ein roter Hinweis, damit es niemand übersieht. Nur auf der echten Seite, nicht im Test.
 let ohneGemeldet=false;
 function ohneAnmeldung(){if(ohneGemeldet||!/github\.io$/.test(location.hostname))return;ohneGemeldet=true;
-  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten und in der Excel. Bitte auf der Startseite anmelden.";
+  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten. Bitte auf der Startseite anmelden.";
     if(window.mxFehler)mxFehler(t);else alert(t)},300)}
 Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof v==="string"&&!rueckLaeuft&&!EIGEN)v=altSchutz(k,v);
   const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);if(this===localStorage&&WACHE[k])GESEHEN[k]=v;
@@ -868,7 +868,7 @@ Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof
 const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
 const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
-  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
+  mietixAusgaben:x=>(x.rein?"Einnahme ":"Ausgabe ")+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
 let burst=null,burstZeit=null;

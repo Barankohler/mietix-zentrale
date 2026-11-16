@@ -74,6 +74,9 @@ main{max-width:680px;margin:0 auto;padding:14px 16px 90px}
 .umzl>span{display:flex;justify-content:space-between;gap:8px}.umzl b{color:#fff;white-space:nowrap}.umzl .neg{color:#FF6B6B}.umzl .pos{color:#4CD38A}
 .um{border-radius:18px}.um.versteckt{display:none}
 @media(max-width:360px){.umg{font-size:34px}}
+/* Filter Monat und Fahrzeug (16.11.2026): Listenkopf ohne Suchfeld, hier gibt es nichts zu suchen */
+#zlk .lkSuche{display:none}#zlk .lkKopf{margin-top:0}#zlk .lkFelder{margin-top:0}#zlk{margin-bottom:14px}
+.auswahl .kach b{font-size:16px;letter-spacing:-.3px;white-space:nowrap}   /* fünfstellige Beträge passen auch am iPhone in eine Zeile */
 </style><style>/* App-Design klar (01.11.2026) */
 body{background:#F2F2F7!important}
 /* Kopfzeile wie in iOS: „‹ Start“ als rote Schrift statt Pille */
@@ -486,11 +489,135 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
 /* iPhone: Betrag und Datum sind immer ganz zu lesen (08.11.2026, stand „2.00“ statt 2.000) */
 @media(max-width:560px){.mxZa .fz{grid-template-columns:104px minmax(0,1fr) 116px}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:104px minmax(0,1fr)}.mxZa .fz>label{font-size:13.5px}.mxZa .fz input[type=date]{padding:9px 4px}.mxZa .fz input[inputmode=decimal]{padding-left:8px}}
 @media(max-width:389px){.mxZa .fz{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);row-gap:6px}.mxZa .fz>label{grid-column:1/-1}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr)}}
-</style></head><body>
+</style><style>
+/* Listenkopf (04.11.2026) */
+.lkKopf{margin:12px 0 10px}.lkSuche{display:flex;align-items:center;gap:8px;background:#E4E4E9;border-radius:12px;padding:0 12px;height:44px;box-sizing:border-box}
+.lkSuche svg{width:18px;height:18px;flex:0 0 auto;stroke:#6E6E73;fill:none;stroke-width:2;stroke-linecap:round}
+.lkSuche input{flex:1;min-width:0;width:100%!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;height:40px;font:500 16px inherit;font-family:inherit;outline:0;-webkit-appearance:none;appearance:none}
+.lkSuche input::-webkit-search-cancel-button{-webkit-appearance:none}
+.lkSuche button{flex:0 0 auto;border:0;background:#AEAEB2;color:#fff;border-radius:50%;width:20px;height:20px;padding:0;font-size:12px;line-height:20px;cursor:pointer}
+.lkFelder{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column;gap:10px;margin-top:10px}
+.lkFeld{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:9px 12px;cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
+.lkFeld span{flex:1;min-width:0}.lkFeld small{display:block;font-size:11px;font-weight:700;color:#8A8A8E;text-transform:uppercase;letter-spacing:.4px}
+.lkFeld b{display:block;font-size:16px;font-weight:700;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lkFeld em{font-style:normal;color:#C7C7CC;font-size:20px}
+.lkFeld.gew b{color:#C4161C}
+.lkZeile{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:9px 4px 0;font-size:14px;font-weight:600;color:#6E6E73;min-height:18px}
+.lkZeile a{color:#C4161C;font-weight:700;text-decoration:none;white-space:nowrap;cursor:pointer}
+.lkRad{background:#F7F7F9;border-radius:14px;overflow:hidden}.lkRad div{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:.5px solid #E5E5EA;cursor:pointer}.lkRad div:first-child{border-top:0}
+.lkRad div span{flex:1;min-width:0;font-size:16px;font-weight:600}.lkRad div u{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:2px solid #C7C7CC;box-sizing:border-box}.lkRad div.an u{border:7px solid #C4161C}
+.lkVb{margin-top:14px;display:grid;gap:10px}.mxKopf+.lkVb{margin-top:0}.lkVbZ{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px}.lkVbZ>div{min-width:0}
+.lkVbZ label{display:block;margin:0 0 5px 3px!important;font-size:14px;font-weight:700;color:#6E6E73}
+.lkVbZ input{display:block;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box;height:48px;margin:0!important;padding:0 12px!important;border:0!important;border-radius:12px;background:#F2F2F7;font-family:inherit;font-size:16px;font-weight:600;color:#1C1C1E;text-align:left;-webkit-appearance:none;appearance:none}
+.lkVbZ input::-webkit-date-and-time-value{text-align:left}
+.lkVbF{color:#C4161C;font-size:14px;font-weight:700;margin:8px 3px 0}.lkVbF:empty{display:none}
+.lkMon{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:10px}.mxKopf+.lkMon,.lkRad+.lkMon{margin-top:0}.lkRad+.lkMon{margin-top:10px}
+.lkMon button{position:relative;display:block;width:100%;margin:0;border:0;border-radius:12px;background:#F2F2F7;color:#1C1C1E;min-height:50px;padding:0 2px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.lkMon button.an{background:#1C1C1E;color:#fff;font-weight:700}.lkMon button.da::after{content:"";position:absolute;left:50%;bottom:6px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#1B8A4B}.lkMon button.an.da::after{background:#7BE0A6}
+.lkMGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.lkJahre{display:flex;flex-direction:column;gap:8px;max-height:224px;overflow:auto}
+.lkMHin{font-size:13px;color:#8A8A8E;margin:10px 2px 0}
+.lkFertig{display:block;width:100%;margin-top:14px;border:0;border-radius:14px;padding:14px;background:#C4161C;color:#fff;font-size:17px;font-weight:700;font-family:inherit;cursor:pointer}
+
+.mxKnopf,.mxKlapp>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;background:#fff;border:1.5px solid #E4E4E7;border-radius:16px;padding:14px 16px;min-height:60px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04);color:#1C1C1E;margin:0 0 10px;-webkit-tap-highlight-color:transparent}
+.mxKnopf span,.mxKlapp>summary span{flex:1;min-width:0}
+.mxKnopf b,.mxKlapp>summary b{display:block;font-size:16px;font-weight:800;color:#1C1C1E}
+.mxKnopf i,.mxKlapp>summary i{display:block;font-style:normal;font-size:13px;color:#8A8A8E;margin-top:2px;font-weight:600}
+.mxKnopf em,.mxKlapp>summary em{flex:0 0 auto;font-style:normal;font-size:28px;color:#C4161C;font-weight:700;line-height:1;transition:transform .15s}
+.mxKnopf:active,.mxKlapp>summary:active{background:#F6F6F7}
+.mxKlapp>summary{list-style:none}.mxKlapp>summary::-webkit-details-marker{display:none}
+.mxKlapp[open]>summary{margin-bottom:10px}.mxKlapp[open]>summary em{transform:rotate(90deg)}
+.mxBg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;display:none}.mxBg.auf{display:block}
+.mxFenster{position:fixed;left:0;right:0;bottom:0;z-index:91;background:#fff;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:none;box-shadow:0 -10px 30px rgba(0,0,0,.18);margin:0 auto;max-width:560px;box-sizing:border-box;text-align:left}
+.mxFenster.auf{display:block;animation:mxHoch .22s ease-out}.mxBg.auf{animation:mxBlende .2s ease-out}
+@keyframes mxHoch{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}@keyframes mxBlende{from{opacity:0}to{opacity:1}}
+@media(min-width:700px){.mxFenster{top:50%;bottom:auto;transform:translateY(-50%);border-radius:22px;width:calc(100% - 48px);padding:20px}.mxFenster.auf{animation:mxMitte .2s ease-out}}
+@keyframes mxMitte{from{transform:translateY(-46%);opacity:0}to{transform:translateY(-50%);opacity:1}}
+.mxKopf{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.mxKopf h3{font-size:19px;font-weight:900;margin:0;color:#1C1C1E}
+.mxZu{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:0;background:#F2F2F4;font-size:17px;font-weight:800;cursor:pointer;color:#1C1C1E;font-family:inherit}
+.mxKlein{margin-top:8px}.mxKlein>summary{display:inline-flex;align-items:center;gap:6px;list-style:none;cursor:pointer;font-size:14px;font-weight:800;color:#1C1C1E;background:#F2F2F4;border-radius:999px;padding:9px 14px;min-height:40px;box-sizing:border-box}
+.mxKlein>summary::-webkit-details-marker{display:none}.mxKlein>summary em{font-style:normal;color:#C4161C;font-size:18px;line-height:1;transition:transform .15s}.mxKlein[open]>summary em{transform:rotate(90deg)}
+.mxText{font-size:14px;color:#8A8A8E;font-weight:600;margin:0 0 10px;line-height:1.4}
+</style></head><body><script>
+/* Listenkopf: Suche, Auswahlfelder, Trefferzahl, Filter zurücksetzen (04.11.2026) */
+(function(){if(window.mxListenkopf)return;
+  const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+  const norm=t=>String(t==null?"":t).toLowerCase().replace(/\s+/g," ").trim();
+  const freiTeile=w=>{const t=String(w||"").split("|");return t[0]==="frei"?{vd:t[1]||"",vu:t[2]||"10:00",bd:t[3]||"",bu:t[4]||"10:00"}:null};
+  const freiText=w=>{const p=freiTeile(w),j=new Date().getFullYear(),k=x=>{const t=x.split("-");return Number(t[2])+"."+Number(t[1])+"."+(Number(t[0])===j?"":t[0].slice(2))};return p.vd&&p.bd?k(p.vd)+" bis "+k(p.bd):p.vd?"ab "+k(p.vd):"bis "+k(p.bd)};
+  const freiLang=w=>{const p=freiTeile(w),j=new Date().getFullYear(),k=(x,u)=>{const t=x.split("-");return Number(t[2])+"."+Number(t[1])+"."+(Number(t[0])===j?"":t[0].slice(2))+" "+u+" Uhr"};return p.vd&&p.bd?k(p.vd,p.vu)+" bis "+k(p.bd,p.bu):p.vd?"ab "+k(p.vd,p.vu):"bis "+k(p.bd,p.bu)};
+  const vbZeile=(t,d,u)=>'<div class="lkVbZ"><div><label for="'+d+'">'+t+'</label><input type="date" id="'+d+'"></div><div><label for="'+u+'">Uhr</label><input type="time" id="'+u+'" value="10:00"></div></div>';
+  const MK_L=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],MK_K=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+  const monText=v=>/^\d{4}-\d\d$/.test(v)?MK_L[+v.slice(5,7)-1]+" "+v.slice(0,4):v;
+  const dieserMon=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")};
+  /* Monat und Jahr nebeneinander (09.11.2026, Baran): jeder Monat ist wählbar, nicht nur die mit Einträgen */
+  function monatBlatt(titel,mitAlle,alleText,mitDaten,wert,fertig){let f=document.getElementById("lkFenster");
+    if(!f){f=document.createElement("div");f.className="mxFenster";f.id="lkFenster";f.setAttribute("role","dialog");document.body.appendChild(f)}
+    const jetzt=dieserMon(),start=wert||(mitAlle?"":jetzt),da=new Set(mitDaten),j0=+jetzt.slice(0,4);
+    let J=+(start||jetzt).slice(0,4),M=start?+start.slice(5,7):0;
+    const jahre=[...new Set([j0-1,j0,j0+1,J].concat([...da].map(x=>+x.slice(0,4))))].sort((a,b)=>a-b);
+    f.setAttribute("aria-label",titel);
+    const hatDaten=(j,m)=>da.has(j+"-"+String(m).padStart(2,"0")),jahrDaten=j=>[...da].some(x=>+x.slice(0,4)===j);
+    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+
+      (mitAlle?'<div class="lkRad"><div data-alle="1"><span>'+esc(alleText)+'</span><u></u></div></div>':"")+
+      '<div class="lkMon"><div class="lkMGrid">'+MK_K.map((t,i)=>'<button type="button" data-m="'+(i+1)+'" aria-label="'+MK_L[i]+'">'+t+'</button>').join("")+'</div><div class="lkJahre">'+jahre.map(j=>'<button type="button" data-j="'+j+'">'+j+'</button>').join("")+'</div></div>'+
+      '<div class="lkMHin">Grüner Punkt: dort gibt es Einträge.</div><button type="button" class="lkFertig">Fertig</button>';
+    const zeig=()=>{f.querySelectorAll("[data-m]").forEach(b=>{b.classList.toggle("an",+b.dataset.m===M);b.classList.toggle("da",hatDaten(J,+b.dataset.m))});
+      f.querySelectorAll("[data-j]").forEach(b=>{b.classList.toggle("an",+b.dataset.j===J);b.classList.toggle("da",jahrDaten(+b.dataset.j))});
+      const a=f.querySelector("[data-alle]");if(a)a.classList.toggle("an",!M)};
+    f.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{M=+b.dataset.m;zeig()});
+    f.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{J=+b.dataset.j;if(!mitAlle&&!M)M=+jetzt.slice(5,7);zeig()});
+    const a=f.querySelector("[data-alle]");if(a)a.onclick=()=>{M=0;zeig()};
+    zeig();f.querySelector(".lkFertig").onclick=()=>{const v=M?J+"-"+String(M).padStart(2,"0"):"";window.mxZu();fertig(!mitAlle&&v===jetzt?"":v)};window.mxAuf("lkFenster")}
+  function blatt(titel,werte,wert,fertig,frei){let f=document.getElementById("lkFenster");
+    if(!f){f=document.createElement("div");f.className="mxFenster";f.id="lkFenster";f.setAttribute("role","dialog");document.body.appendChild(f)}
+    let w=wert;f.setAttribute("aria-label",titel);
+    f.innerHTML='<div class="mxKopf"><h3>'+esc(titel)+'</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>'+(frei==="nur"?"":'<div class="lkRad">'+
+      werte.map(([v,t],i)=>'<div data-i="'+i+'" class="'+(v===w?"an":"")+'"><span>'+esc(t)+'</span><u></u></div>').join("")+'</div>')+(frei?'<div class="lkVb">'+vbZeile("von","lkVonD","lkVonU")+vbZeile("bis","lkBisD","lkBisU")+'</div><div class="lkVbF" role="alert"></div>':"")+'<button type="button" class="lkFertig">Fertig</button>';
+    const fld=i=>document.getElementById(i),feh=f.querySelector(".lkVbF"),rad=z=>f.querySelectorAll("[data-i]").forEach(y=>y.classList.toggle("an",y===z));
+    f.querySelectorAll("[data-i]").forEach(z=>z.onclick=()=>{w=werte[+z.dataset.i][0];rad(z);if(frei){fld("lkVonD").value="";fld("lkBisD").value="";fld("lkVonU").value="10:00";fld("lkBisU").value="10:00";feh.textContent=""}});
+    if(frei){const p=freiTeile(w);if(p){fld("lkVonD").value=p.vd;fld("lkVonU").value=p.vu;fld("lkBisD").value=p.bd;fld("lkBisU").value=p.bu}
+      const neu=()=>{feh.textContent="";const vd=fld("lkVonD").value,bd=fld("lkBisD").value;if(vd||bd){w=["frei",vd,fld("lkVonU").value||"10:00",bd,fld("lkBisU").value||"10:00"].join("|");rad(null)}else if(freiTeile(w)){w="";rad(f.querySelector('[data-i="0"]'))}};
+      ["lkVonD","lkVonU","lkBisD","lkBisU"].forEach(i=>{fld(i).addEventListener("input",neu);fld(i).addEventListener("change",neu)})}
+    f.querySelector(".lkFertig").onclick=()=>{const p=frei&&freiTeile(w);if(p&&p.vd&&p.bd&&p.vd+"T"+p.vu>p.bd+"T"+p.bu){feh.textContent="„bis“ liegt vor „von“. Bitte Datum oder Uhrzeit ändern.";return}window.mxZu();fertig(w)};window.mxAuf("lkFenster")}
+  window.mxListenkopf=function(hostId,schluessel,o){const K="mietixLK:"+schluessel;let st={};try{st=JSON.parse(sessionStorage.getItem(K)||"{}")}catch(e){}
+    const LK={q:norm(st.q),w:Object.assign({},st.w||{}),roh:st.q||""};let bau=false,zeileT="";
+    (o.felder||[]).forEach(f=>{if(f.frei==="nur"&&LK.w[f.k]&&!freiTeile(LK.w[f.k]))delete LK.w[f.k]});
+    const merke=()=>{try{sessionStorage.setItem(K,JSON.stringify({q:LK.roh,w:LK.w}))}catch(e){}};
+    const host=()=>document.getElementById(hostId);
+    const felderZeigen=()=>{(o.felder||[]).forEach(f=>{const el=host().querySelector('[data-lk="'+f.k+'"]');if(!el)return;const v=LK.w[f.k]||"",p=(f.werte()||[]).find(x=>x[0]===v);
+      el.querySelector("b").textContent=v?(freiTeile(v)?freiText(v):f.monate?monText(v):p?p[1]:v):f.alle;el.classList.toggle("gew",!!v)})};
+    // Gewählter Zeitraum mit Uhrzeit in der Trefferzeile, auf allen Geräten gleich (10.11.2026, Baran)
+    const zeitZusatz=()=>(o.felder||[]).filter(f=>f.frei&&freiTeile(LK.w[f.k])).map(f=>freiLang(LK.w[f.k])).join(", ");
+    const zeileZeigen=()=>{const z=host().querySelector(".lkZeile");if(!z)return;const zz=zeitZusatz();z.innerHTML='<span>'+esc(zeileT+(zz?", "+zz:""))+'</span>'+(LK.aktiv()?'<a role="button" tabindex="0">Filter zurücksetzen</a>':"");
+      const a=z.querySelector("a");if(a)a.onclick=()=>{LK.roh="";LK.q="";LK.w={};merke();const i=host().querySelector("input");if(i)i.value="";kreuz();felderZeigen();o.neu()}};
+    const kreuz=()=>{const k=host().querySelector(".lkSuche button");if(k)k.style.display=LK.roh?"":"none"};
+    LK.aktiv=()=>!!LK.q||Object.keys(LK.w).some(k=>LK.w[k]);
+    LK.passt=t=>{if(!LK.q)return true;const h=norm(t);return LK.q.split(" ").every(x=>h.includes(x))};
+    LK.zeile=t=>{zeileT=t;zeileZeigen()};
+    LK.bauen=()=>{const h=host();if(!h)return LK;if(!bau||!h.firstChild){bau=true;h.innerHTML='<div class="lkKopf"><label class="lkSuche"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input type="search" autocomplete="off" placeholder="'+esc(o.suche||"Suchen")+'" aria-label="Suchen"><button type="button" aria-label="Suche leeren">✕</button></label>'+
+        ((o.felder||[]).length?'<div class="lkFelder">'+o.felder.map(f=>'<div class="lkFeld" role="button" tabindex="0" data-lk="'+f.k+'"><span><small>'+esc(f.t)+'</small><b></b></span><em>›</em></div>').join("")+'</div>':"")+'<div class="lkZeile"></div></div>';
+      const i=h.querySelector("input");i.value=LK.roh;i.addEventListener("input",()=>{LK.roh=i.value;LK.q=norm(i.value);merke();kreuz();o.neu()});
+      h.querySelector(".lkSuche button").onclick=e=>{e.preventDefault();i.value="";LK.roh="";LK.q="";merke();kreuz();o.neu();i.focus()};kreuz();
+      (o.felder||[]).forEach(f=>{h.querySelector('[data-lk="'+f.k+'"]').onclick=()=>{const nimm=w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()};if(f.monate){monatBlatt(f.t,f.monate==="alle",f.alle,(f.werte()||[]).map(x=>x[0]),LK.w[f.k]||"",nimm);return}blatt(f.t,[["",f.alle]].concat(f.werte()||[]),LK.w[f.k]||"",w=>{if(w)LK.w[f.k]=w;else delete LK.w[f.k];merke();felderZeigen();o.neu()},f.frei)}})}
+      felderZeigen();zeileZeigen();return LK};
+    return LK};
+  const tag=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  window.mxListenkopf.zeit=[["heute","Heute"],["woche","Diese Woche"],["naechsteW","Nächste Woche"],["monat","Dieser Monat"],["vormonat","Letzter Monat"],["naechsterM","Nächster Monat"],["jahr","Dieses Jahr"]];
+  window.mxListenkopf.freiText=freiText;window.mxListenkopf.freiLang=freiLang;window.mxListenkopf.monatWahl=monatBlatt;   // Monat und Jahr auch ohne Filterfeld: monatWahl(titel,false,"",[datenMonate],"JJJJ-MM",w=>…), leer = aktueller Monat
+  /* Liegt eine Miete im Zeitraum? Bei von/bis mit Uhrzeit minutengenau, bei den festen Knöpfen wie bisher nach Tagen */
+  window.mxListenkopf.ueberlappt=function(w,vd,vu,bd,bu){const s=window.mxListenkopf.spanne(w);if(!s)return true;
+    if(freiTeile(w)){const an=vd?vd+"T"+(vu||"00:00"):"",en=(bd||vd)?(bd||vd)+"T"+(bu||"23:59"):"";return an<=s[1]&&en>=s[0]}
+    return String(vd||"")<=s[1]&&String(bd||vd||"")>=s[0]};
+  window.mxListenkopf.spanne=function(w){const p=freiTeile(w);if(p)return[p.vd?p.vd+"T"+p.vu:"0000-01-01T00:00",p.bd?p.bd+"T"+p.bu:"9999-12-31T23:59"];const n=new Date(),j=n.getFullYear(),m=n.getMonth(),mo=new Date(j,m,n.getDate()-((n.getDay()+6)%7));
+    const pl=(d,x)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+x);
+    return{heute:[tag(n),tag(n)],woche:[tag(mo),tag(pl(mo,6))],naechsteW:[tag(pl(mo,7)),tag(pl(mo,13))],monat:[tag(new Date(j,m,1)),tag(new Date(j,m+1,0))],vormonat:[tag(new Date(j,m-1,1)),tag(new Date(j,m,0))],naechsterM:[tag(new Date(j,m+1,1)),tag(new Date(j,m+2,0))],jahr:[j+"-01-01",j+"-12-31"]}[w]||null};
+})();
+</script>
 <header><h1>MIETIX <span>ZAHLEN</span></h1></header>
 <main>
 <div id="abgleich"></div>
 <div class="um versteckt" id="um"><span class="umz"><span class="umt" id="umT">Umsatz</span><span class="umm" id="umM"></span></span><span class="umg" id="umG"></span><span class="umb"><span class="umv" id="umV"></span><span class="umf"></span></span><span class="umu"><span id="umP"></span><span id="umF"></span></span><span class="umzl" id="umZ"></span></div>
+<div id="zlk"></div>
 <div id="inhalt"><div class="leer">Zahlen werden geladen …</div></div>
 </main>
 <script>
@@ -502,10 +629,10 @@ const autoKurz=n=>String(n||"").replace("Mercedes-Benz ","").replace("Mercedes "
 const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const pz=(a,b)=>b?Math.round((a-b)/Math.abs(b)*100):null;
 
-// Umsatz-Karte (12.11.2026 von der Startseite hierher): dieselbe Rechnung wie dort, aus den App-Daten (Mietverträge, Buchungen), Fixkosten aus der Excel
+// Umsatz-Karte (12.11.2026 von der Startseite hierher): dieselbe Rechnung wie dort, aus den App-Daten (Mietverträge, Buchungen), Fixkosten von der Seite Geld
 function umsatzKarte(){const pad=n=>String(n).padStart(2,"0"),h0=new Date(),hi=h0.getFullYear()+"-"+pad(h0.getMonth()+1)+"-"+pad(h0.getDate()),set=(id,t)=>{$(id).textContent=t};
   if(!window.mxZahlung){$("um").classList.add("versteckt");return}
-    // Umsatz-Karte (09.11.2026, Baran: „den ganzen Umsatz, der diesen Monat reingekommen ist“): alles, was im Monat bezahlt wurde, dieselbe Rechnung wie „Zusammen“ auf der Seite Monat. Fixkosten kommen aus der Excel.
+    // Umsatz-Karte (09.11.2026, Baran: „den ganzen Umsatz, der diesen Monat reingekommen ist“): alles, was im Monat bezahlt wurde, dieselbe Rechnung wie „Zusammen“ auf der Seite Monat. Fixkosten kommen von der Seite Geld.
     const st=(lies("mietixStand",{})||{}).statistik||{},mon=hi.slice(0,7),M=(st.monate||[]).find(x=>x.m===mon),fix=+((st.fix||{}).gesamt)||0;
     const pListen=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&v.nr).map(v=>mxZahlung.posten(v)).concat(lies("mietixAnfragen",[]).map(a=>mxZahlung.anfragePosten(a))).filter(l=>l.length),imMon=(l,m,bis)=>l.filter(p=>p.am&&p.am.slice(0,7)===m&&(!bis||p.am<=bis)).reduce((s,p)=>s+p.b,0);
     const miete=pListen.reduce((s,l)=>s+imMon(l,mon),0),mieten=pListen.filter(l=>l.some(p=>p.am&&p.am.slice(0,7)===mon&&p.b>0)).length;
@@ -520,8 +647,36 @@ function umsatzKarte(){const pad=n=>String(n).padStart(2,"0"),h0=new Date(),hi=h
     if(vm>0){const d=Math.round((mieteBis/vm-1)*100);   /* Prozent wie auf Monat: nur bis heute (strenge App-Prüfung 11.11. F1) */z.push([MN[+vk.slice(5)-1]+" bis zum "+(+tagH)+".",e0(vm)+(vollerMonat&&vm>=500?'  <span class="'+(d>=0?"pos":"neg")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+" %</span>":""),""])}
     if(+((st.fix||{}).proTag))z.push(["Jeder Tag kostet",e0(st.fix.proTag),""]);
     document.getElementById("umZ").innerHTML=z.map(x=>'<span><span>'+esc(x[0])+'</span><b class="'+x[2]+'">'+x[1]+'</b></span>').join("")}
-function zeichne(){umsatzKarte();const S=(lies("mietixStand",{})||{}).statistik;
-  if(!S||!S.monate||!S.monate.length){$("inhalt").innerHTML='<div class="karte leer">Noch keine Zahlen da.<br><br>Sie kommen aus der Excel, sobald der Mac im Büro läuft und du hier angemeldet bist.</div>';return}
+// Filter Monat und Fahrzeug (16.11.2026): Auswahl aus statistik.detail, je Monat und Auto. Ohne Filter bleibt alles wie bisher.
+const MN_F=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const detail=()=>(((lies("mietixStand",{})||{}).statistik)||{}).detail||{};
+const ZLK=mxListenkopf("zlk","zahlen",{suche:"",felder:[
+  {k:"mon",t:"Monat",alle:"Alle Monate",monate:"alle",werte:()=>(detail().monate||[]).slice().reverse().map(m=>[m,MN_F[+m.slice(5,7)-1]+" "+m.slice(0,4)])},
+  {k:"auto",t:"Fahrzeug",alle:"Alle",werte:()=>(detail().autos||[]).map(a=>[a,autoKurz(a)])}],neu:()=>zeichne()});
+function auswahl(S){const D=S.detail||{},w=ZLK.w,ms=D.monate||[],z=(D.zeilen||[]).filter(x=>(!w.mon||x.m===w.mon)&&(!w.auto||x.a===w.auto));
+  const sum=k=>z.reduce((s,x)=>s+(+x[k]||0),0),rein=sum("rein"),miete=sum("miete"),raus=sum("raus"),fix=sum("fix"),ansch=sum("ansch"),mieten=sum("mieten"),ueb=rein-raus-fix;
+  const mText=m=>MN_F[+m.slice(5,7)-1]+" "+m.slice(0,4);
+  const titel=(w.mon?mText(w.mon):"Alle Monate"+(ms.length?" seit "+mText(ms[0]):""))+(w.auto?", "+autoKurz(w.auto):"");
+  if(!z.length)return'<div class="karte leer">Für '+esc(titel)+' steht nichts in den Zahlen.</div>';
+  let h='<div class="karte held auswahl"><div class="monat">'+esc(titel)+'</div><div class="gross">'+eur(rein)+'</div><div class="vgl">Umsatz, davon Miete '+eur(miete)+'</div>'+
+    '<div class="drei"><div class="kach"><b>'+eur(raus)+'</b><i>Ausgaben</i></div><div class="kach"><b>'+eur(fix)+'</b><i>Fixkosten</i></div>'+
+    '<div class="kach"><b class="'+(ueb>=0?"hoch":"runter")+'">'+eur(ueb)+'</b><i>Übrig (rein minus raus)</i></div></div>'+
+    '<div class="leise" style="margin-top:10px">'+mieten+(mieten===1?" Miete":" Mieten")+(ansch?". Autokauf-Anzahlungen ("+eur(ansch)+") zählen nicht als Ausgabe":"")+
+    '. Fixkosten zählen ab November 2026 aus der Liste auf der Seite Geld, davor stehen sie bei den Ausgaben.</div></div>';
+  if(!w.mon&&ms.length>1){const pro=ms.map(m=>{const y=z.filter(x=>x.m===m),r=y.reduce((s,x)=>s+x.rein,0),a=y.reduce((s,x)=>s+x.raus+x.fix,0);return{m,r,a}}),max=Math.max(1,...pro.map(p=>Math.max(p.r,p.a)));
+    h+='<div class="karte"><h2>Rein und raus je Monat</h2><div class="monate">'+pro.map(p=>'<div class="mo"><div class="bs"><div class="b" style="height:'+Math.round(p.r/max*100)+'%" title="'+eur(p.r)+'"></div><div class="b r" style="height:'+Math.round(p.a/max*100)+'%" title="'+eur(p.a)+'"></div></div>'+
+      '<div class="t">'+MN_F[+p.m.slice(5,7)-1].slice(0,3)+'</div><div class="p '+(p.r-p.a>=0?"hoch":"runter")+'">'+(p.r-p.a>=0?"+":"")+kurz(p.r-p.a)+'</div></div>').join("")+'</div>'+
+      '<div class="legende"><span>rein</span><span class="r">raus mit Fixkosten</span><span style="margin-left:auto">unten: was übrig blieb</span></div></div>'}
+  const arten={};z.forEach(x=>Object.entries(x.arten||{}).forEach(([a,b])=>{const k=String(a).trim();arten[k]=(arten[k]||0)+(+b||0)}));
+  const G=Object.entries(arten).filter(g=>g[1]>0).sort((a,b)=>b[1]-a[1]);
+  if(G.length){const gmax=Math.max(1,...G.map(g=>g[1])),summe=G.reduce((s,g)=>s+g[1],0);
+    h+='<div class="karte"><h2>Wohin geht das Geld?</h2><div class="leise">Ausgaben in dieser Auswahl zusammen: '+eur(summe)+' (ohne Fixkosten)</div>'+
+      G.map(g=>'<div class="zeile"><div class="kopf"><span>'+esc(g[0])+'</span><i>'+eur(g[1])+' ('+Math.round(g[1]/summe*100)+' %)</i></div><div class="balken"><i class="grau" style="width:'+Math.round(g[1]/gmax*100)+'%"></i></div></div>').join("")+'</div>'}
+  return h}
+function zeichne(){umsatzKarte();const S=(lies("mietixStand",{})||{}).statistik;ZLK.bauen();
+  if(!S||!S.monate||!S.monate.length){$("inhalt").innerHTML='<div class="karte leer">Noch keine Zahlen da.<br><br>Sie kommen vom Mac im Büro, sobald er läuft und du hier angemeldet bist.</div>';return}
+  if(ZLK.aktiv()){ZLK.zeile("");$("inhalt").innerHTML=auswahl(S);return}
+  ZLK.zeile("");
   const M=S.monate,jetzt=M[M.length-1],vor=M.length>1?M[M.length-2]:null,h=new Date();
   const tageMonat=new Date(h.getFullYear(),h.getMonth()+1,0).getDate(),tag=jetzt.m===new Date(h.getTime()-h.getTimezoneOffset()*6e4).toISOString().slice(0,7)?h.getDate():tageMonat;
   // Hochrechnung bis Monatsende erst ab dem 5. Tag, davor ist sie zu wackelig (12.11.2026, Baran)
@@ -581,7 +736,7 @@ function zeichne(){umsatzKarte();const S=(lies("mietixStand",{})||{}).statistik;
   if(S.fix&&S.fix.gesamt&&tag>=5&&tag<tageMonat&&hoch<S.fix.gesamt)tipps.push([0,'Bis Monatsende fehlen rund <b>'+eur(S.fix.gesamt-hoch)+'</b> bis die Fixkosten drin sind. Freie Autos am Wochenende an Stammkunden anbieten (Kunden, Angebot verschicken).']);
   A.filter(a=>a.fix&&a.schnitt<a.fix).sort((x,y)=>(x.schnitt-x.fix)-(y.schnitt-y.fix)).slice(0,2).forEach(a=>tipps.push([0,'<b>'+esc(autoKurz(a.name))+'</b> bringt im Schnitt '+eur(a.schnitt)+' im Monat, kostet aber '+eur(a.fix)+'. Öfter anbieten oder über Verkauf nachdenken.']));
   const so=(S.ausgaben||[]).find(g=>g.art==="Sonstiges"),gs=(S.ausgaben||[]).reduce((s,g)=>s+g.b,0);
-  if(so&&gs&&so.b/gs>.25)tipps.push([0,'<b>'+Math.round(so.b/gs*100)+' %</b> der Ausgaben stehen unter „Sonstiges“. In der Excel genauer zuordnen, dann sehen wir, wo das Geld wirklich hingeht.']);
+  if(so&&gs&&so.b/gs>.25)tipps.push([0,'<b>'+Math.round(so.b/gs*100)+' %</b> der Ausgaben stehen unter „Sonstiges“. Auf der Seite Geld genauer zuordnen, dann sehen wir, wo das Geld wirklich hingeht.']);
   if(K.stammLange)tipps.push([0,'<b>'+K.stammLange+' Stammkunden</b> waren seit über 2 Monaten nicht da. Kurz anschreiben (Kunden, Lange nicht da).']);
   if(S.schaeden&&S.schaeden.offen)tipps.push([0,'Aus Schäden sind noch <b>'+eur(S.schaeden.offen)+'</b> offen ('+S.schaeden.faelle+' Fälle). Nachhaken (Drive, Kundenforderungen).']);
   if(A.length&&A[0].schnitt)tipps.push([1,'Bestes Auto: <b>'+esc(autoKurz(A[0].name))+'</b> mit '+eur(A[0].schnitt)+' im Monat.']);
@@ -590,7 +745,7 @@ function zeichne(){umsatzKarte();const S=(lies("mietixStand",{})||{}).statistik;
   html+='<div class="karte"><h2>Daran arbeiten</h2>'+tipps.map(([gut,t])=>'<div class="tipp'+(gut?" gut":"")+'"><b>'+(gut?"✓":"!")+'</b><span>'+t+'</span></div>').join("")+'</div>';
 
   const standD=S.stand?new Date(S.stand):null,standOk=standD&&!isNaN(standD.getTime());   // ohne Zeitstempel nie „Invalid Date“ (Prüfung 06.11.2026)
-  html+='<div class="leise" style="text-align:center">Zahlen aus der Excel, '+(standOk?'Stand '+standD.toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+' Uhr':'Stand unbekannt')+'. Miete zählt, sobald sie bezahlt ist.</div>';
+  html+='<div class="leise" style="text-align:center">Zahlen aus der Zentrale, '+(standOk?'Stand '+standD.toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})+' Uhr':'Stand unbekannt')+'. Miete zählt, sobald sie bezahlt ist.</div>';
   $("inhalt").innerHTML=html}
 zeichne();
 window.addEventListener("mietix-abgleich",zeichne);
@@ -998,7 +1153,7 @@ let warte=null;
 // Ohne Anmeldung gespeichert (12.11.2026): einmal je Seite ein roter Hinweis, damit es niemand übersieht. Nur auf der echten Seite, nicht im Test.
 let ohneGemeldet=false;
 function ohneAnmeldung(){if(ohneGemeldet||!/github\.io$/.test(location.hostname))return;ohneGemeldet=true;
-  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten und in der Excel. Bitte auf der Startseite anmelden.";
+  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten. Bitte auf der Startseite anmelden.";
     if(window.mxFehler)mxFehler(t);else alert(t)},300)}
 Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof v==="string"&&!rueckLaeuft&&!EIGEN)v=altSchutz(k,v);
   const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);if(this===localStorage&&WACHE[k])GESEHEN[k]=v;
@@ -1014,7 +1169,7 @@ Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof
 const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
 const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
-  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
+  mietixAusgaben:x=>(x.rein?"Einnahme ":"Ausgabe ")+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
 let burst=null,burstZeit=null;
@@ -1455,4 +1610,59 @@ zeigen();abgleichen();auslagernBald();
   window.mxAnschrift=setzen;
   const alle=w=>(w||document).querySelectorAll("input[data-anschrift]").forEach(setzen);alle();
   new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input[data-anschrift]"))setzen(n);else if(n.querySelectorAll)alle(n)}}).observe(document.body,{childList:true,subtree:true})})();
+</script><script>
+/* Fenster (30.10.2026): Knopf mit data-fenster öffnet, ✕, Tipp daneben oder Esc schließt */
+(function(){if(window.mxWieder!==undefined)return;var t="";try{t=((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type||""}catch(e){}window.mxWieder=/^(reload|back_forward)$/.test(t);window.mxAltSchritte=0;try{var s=history.state;if(!window.mxWieder&&s&&typeof s==="object"&&!s.mxS&&!s.mxE){var n=+s.mxI||0;if(n>0||Object.keys(s).some(function(k){return k!=="mxI"})){history.replaceState({mxI:n},"");window.mxAltSchritte=n}}}catch(e){}addEventListener("popstate",function(e){if(window.mxLeise&&window.mxLeise())e.stopImmediatePropagation()},true)})();
+(function(){if(window.mxAuf)return;
+  let bg=document.querySelector(".mxBg");if(!bg){bg=document.createElement("div");bg.className="mxBg";document.body.appendChild(bg)}
+  // Zurück-Taste und Wischen schließen zuerst das Fenster, die Seite bleibt (04.11.2026, Baran: „wo richtig zurück ist“)
+  let imVerlauf=false;
+  /* Fenster zu: es gehört zu keiner Miete mehr (data-mxwache, Warnung bei Änderungen woanders, 11.11.2026) */
+  const schliessen=function(){document.querySelectorAll(".mxFenster.auf").forEach(f=>f.classList.remove("auf"));bg.classList.remove("auf");
+    document.querySelectorAll(".mxFenster[data-mxwache]").forEach(f=>{delete f.dataset.mxwache;f.mxNeuLaden=null});
+    document.documentElement.style.overflow="";document.body.style.overflow=""};
+  window.mxAuf=function(id){const f=document.getElementById(id);if(!f)return;const wache=f.dataset.mxwache,neuL=f.mxNeuLaden;schliessen();if(wache){f.dataset.mxwache=wache;f.mxNeuLaden=neuL}
+    f.dataset.mxseit=String(Date.now());f.querySelectorAll(".mxFremd").forEach(x=>x.remove());bg.classList.add("auf");f.classList.add("auf");
+    document.documentElement.style.overflow="hidden";document.body.style.overflow="hidden";f.scrollTop=0;
+    if(!imVerlauf){if(still){pushNach=id;imVerlauf=true}else{try{history.pushState(Object.assign({},history.state||{},{mxF:id}),"");imVerlauf=true}catch(e){}}}   /* läuft gerade ein stiller Schritt zurück (Aufräumen nach dem Laden), kommt der eigene Schritt erst danach (11.11.2026) */
+    snapF=f;snap=f.classList.contains("mxSchutz")?werte(f):null};
+  // Fenster mit Geld (Klasse mxSchutz, 10.11.2026): Schließen durch ✕, Tipp daneben, Esc oder Zurück fragt bei Änderungen nach. Speichern schließt ohne Frage.
+  let snap=null,snapF=null;
+  const werte=function(f){return[...f.querySelectorAll("input,textarea,select")].map(function(i){return i.type==="checkbox"||i.type==="radio"?i.checked:i.value}).join("~")+"|"+[...f.querySelectorAll(".an,.chip.an")].filter(function(x){return !x.closest("[data-mxkeinwert]")}).map(function(x){return x.textContent}).join("~")}   /* Auswahllisten mit data-mxkeinwert sind keine Eingabe (11.11.2026) */;
+  const darfZu=function(){if(!snap||!snapF||!snapF.classList.contains("auf"))return true;if(werte(snapF)===snap)return true;if(confirm("Änderungen verwerfen?\n\nDas Getippte in diesem Fenster geht verloren.")){snap=null;return true}return false};
+  window.mxGeaendertWeg=function(){snap=null};
+  /* Offenes Fenster warnt, wenn dieselbe Miete woanders geändert wurde (11.11.2026, Baran: „Ja, so bauen“). Die Seite setzt beim Öffnen
+     data-mxwache="Ablage|Schlüssel" und f.mxNeuLaden (Knopf „Neu laden, Getipptes bleibt“). Hinweis und Vergleich macht abgleich.js. */
+  (window.mietixWacheQuellen=window.mietixWacheQuellen||[]).push(function(){return[...document.querySelectorAll(".mxFenster.auf[data-mxwache]")].map(function(f){const t=f.dataset.mxwache.split("|");
+    return{k:t[0],p:t.slice(1).join("|"),el:f,seit:+f.dataset.mxseit||0,neuLaden:f.mxNeuLaden||null}})});
+  /* Getipptes in einem Fenster merken und nach dem neuen Öffnen wieder einsetzen (für „Neu laden, Getipptes bleibt“) */
+  window.mxFensterWerte=function(f){const o={};f.querySelectorAll("input[id],textarea[id],select[id]").forEach(function(i){o[i.id]=i.type==="checkbox"||i.type==="radio"?i.checked:i.value});
+    f.querySelectorAll("[data-tza],[data-za],[data-vz],[data-st]").forEach(function(x){const a=x.hasAttribute("data-tza")?"data-tza":x.hasAttribute("data-za")?"data-za":x.hasAttribute("data-vz")?"data-vz":"data-st";o["an|"+a+"|"+x.getAttribute(a)]=x.classList.contains("an")});return o};
+  window.mxFensterSetzen=function(f,alt,jetzt){Object.keys(jetzt).forEach(function(k){if(jetzt[k]===alt[k])return;
+    if(k.indexOf("an|")===0){if(!jetzt[k])return;const t=k.split("|"),x=[...f.querySelectorAll("["+t[1]+"]")].find(function(y){return y.getAttribute(t[1])===t[2]});if(x&&!x.classList.contains("an"))x.click();return}
+    const i=document.getElementById(k);if(!i||!f.contains(i))return;if(i.type==="checkbox"||i.type==="radio")i.checked=jetzt[k];else i.value=jetzt[k];
+    i.dispatchEvent(new Event("input",{bubbles:true}));i.dispatchEvent(new Event("change",{bubbles:true}))})};
+  // ✕ nimmt den Eintrag wieder weg. Springt die Seite im selben Moment weiter, bleibt er als „überspringen“ im Verlauf stehen.
+  let still=false,skipT=null,putzen=null,pushNach=null;
+  window.mxSkipNimm=function(){if(skipT){clearTimeout(skipT);skipT=null;return 1}return 0};   // die Seite springt selbst zurück und nimmt den Eintrag gleich mit
+  window.mxZu=function(){schliessen();if(!imVerlauf)return;imVerlauf=false;if(pushNach){pushNach=null;return}try{history.replaceState(Object.assign({},history.state||{},{mxSkip:1}),"")}catch(e){}
+    skipT=setTimeout(function(){skipT=null;if(history.state&&history.state.mxSkip){still=true;history.back()}},0)};
+  /* stiller Schritt zurück: aufräumen, einen aufgeschobenen Fensterschritt nachholen, sonst nichts */
+  window.mxLeise=function(){if(!still)return false;still=false;
+      if(putzen){const p=putzen;putzen=null;try{history.replaceState(p,"")}catch(x){}}
+      if(pushNach){const f=document.getElementById(pushNach);pushNach=null;if(f&&f.classList.contains("auf")){try{history.pushState(Object.assign({},history.state||{},{mxF:f.id}),"")}catch(x){}}else imVerlauf=false}
+      return true};
+  addEventListener("popstate",function(e){if(window.mxLeise()){e.stopImmediatePropagation();return}
+    if(imVerlauf){e.stopImmediatePropagation();if(!darfZu()){try{history.pushState(Object.assign({},history.state||{},{mxF:snapF&&snapF.id}),"")}catch(x){}return}imVerlauf=false;schliessen();return}
+    if(e.state&&e.state.mxSkip){e.stopImmediatePropagation();history.back()}},true);
+  document.addEventListener("click",function(e){const k=e.target.closest("[data-fenster]");if(k){e.preventDefault();mxAuf(k.dataset.fenster);return}
+    if((e.target.closest(".mxZu")||e.target===bg)&&darfZu())mxZu()});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&darfZu())mxZu()});
+  // Neu geladen, während ein Fenster offen war (zum Beispiel nach WhatsApp): das Fenster ist zu, sein Schritt steht noch im Verlauf.
+  // Ohne Aufräumen täte das erste Zurück nichts (Prüfung 10.11.2026). Den Schritt still zurückgehen, die Seite merkt davon nichts.
+  try{if(history.state&&history.state.mxF&&!document.querySelector(".mxFenster.auf")&&window.mxWieder){still=true;history.back()}}catch(e){}
+  /* Neu aufgerufen (11.11.2026): die alten Schritte dieser Seite still zurückgehen, bis zu ihrem ersten Eintrag. Dann führt das erste Zurück
+     dorthin, woher man kam, statt auf einen toten Schritt oder in einen alten Zustand (Reiter, Auto, Akte). Nur ersetzen statt zurückgehen
+     ließe die alten Einträge davor stehen (Prüfung: Zurück tat nichts oder sprang in den alten Zustand). */
+  try{const n=Math.min(window.mxAltSchritte||0,history.length-1);window.mxAltSchritte=0;if(!window.mxWieder&&n>0){putzen=Object.assign({},history.state||{},{mxI:0});still=true;history.go(-n)}}catch(e){}})();
 </script></body></html>

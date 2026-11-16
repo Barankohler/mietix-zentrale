@@ -116,7 +116,7 @@ html body .buGk,html body .alK,html body .uGk,html body h2.hT,html body #s_unter
 <div class="k"><a class="z" href="https://barankohler.github.io/mietix-vertrag/?zeige=vertraege&unterschrift=1"><span class="t"><b>Meine Unterschrift hinterlegen</b><i>Öffnet das Fenster bei den Mietverträgen</i></span><span class="pfeil">›</span></a></div>
 
 <h2>Stände</h2>
-<div class="hinweis">Sicherungspunkte der ganzen Zentrale liegen auf dem Mac (Personal-OS, projects, mietix, staende) und in iCloud (Excel Archiv, Mietix, Stände). Zu Claude sagen: „Hol Stand 4 zurück.“</div>
+<div class="hinweis">Sicherungspunkte der ganzen Zentrale liegen auf dem Mac (Schreibtisch, Mietix Autovermietung, Werkstatt, staende) und in Google Drive (Mietix Dokumentation, Excel Archiv, Mietix, Stände). Zu Claude sagen: „Hol Stand 4 zurück.“</div>
 </div>
 <script>
 const WA="*Mietix*\n\nZentrale: https://barankohler.github.io/mietix-zentrale/\nAnfragen: https://barankohler.github.io/mietix-anfragen/\nKalender: https://barankohler.github.io/mietix-belegung/\nAngebot: https://barankohler.github.io/mietix-belegung/?zeige=angebot\nBuchungen: https://barankohler.github.io/mietix-vertrag/\nKunden: https://barankohler.github.io/mietix-zentrale/kunden.html\nAutos: https://barankohler.github.io/mietix-autos/\nGeld: https://barankohler.github.io/mietix-geld/\nMonat: https://barankohler.github.io/mietix-zentrale/monat.html\nZahlen: https://barankohler.github.io/mietix-zentrale/statistik.html\nSchäden: https://barankohler.github.io/mietix-schadensabrechnung/\nNachrichten: https://barankohler.github.io/mietix-zentrale/nachrichten.html\nWhatsApp: https://barankohler.github.io/mietix-zentrale/whatsapp.html\nUmsatzbringer: https://barankohler.github.io/mietix-zentrale/umsatzbringer.html\nTermine: https://barankohler.github.io/mietix-zentrale/termine.html\nStory: https://barankohler.github.io/mietix-story/\nUmsatz-Radar: https://barankohler.github.io/mietix-umsatz-radar/\nPapierkorb: https://barankohler.github.io/mietix-zentrale/papierkorb.html\nEinstellungen: https://barankohler.github.io/mietix-zentrale/einstellungen.html";
@@ -126,7 +126,7 @@ document.getElementById("kopieren").onclick=async function(){const k=this,alt=k.
 (function(){const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
   const uhrDe=(z,mitTag)=>{const d=new Date(z),p=n=>String(n).padStart(2,"0");return (mitTag?p(d.getDate())+"."+p(d.getMonth()+1)+". ":"")+p(d.getHours())+":"+p(d.getMinutes())};
   function stand(){const st=(lies("mietixStand",{}).bruecke)||null,el=document.getElementById("bruecke");if(!st||!st.zeit){el.textContent="";return}
-    const alter=(Date.now()-new Date(st.zeit))/3600000,wartet=st.ok!==false&&alter<=2&&/offen|wartet/i.test(st.text||"")&&!/aktuell/i.test(st.text||"");el.textContent=wartet?st.text+(st.seit?", seit "+uhrDe(st.seit,true)+" Uhr":", Stand "+uhrDe(st.zeit)+" Uhr"):"Excel: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true)+" Uhr":"aktuell bis "+uhrDe(st.zeit)+" Uhr"));
+    const alter=(Date.now()-new Date(st.zeit))/3600000,wartet=st.ok!==false&&alter<=2&&/offen|wartet/i.test(st.text||"")&&!/aktuell/i.test(st.text||"");el.textContent=wartet?st.text+(st.seit?", seit "+uhrDe(st.seit,true)+" Uhr":", Stand "+uhrDe(st.zeit)+" Uhr"):"Mac: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true)+" Uhr":"aktuell bis "+uhrDe(st.zeit)+" Uhr"));
     // Von Hand in der Excel geändert (Excel gewinnt, Baran): sichtbar machen, sobald die Brücke die Liste schickt (05.11.2026)
     const h=lies("mietixStand",{}).excelHand,l=h&&Array.isArray(h.liste)?h.liste:[];let box=document.getElementById("excelHand");if(!l.length){if(box)box.remove();return}
     if(!box){box=document.createElement("div");box.id="excelHand";box.style.cssText="font-size:13px;font-weight:600;color:#6E6E73;margin-top:8px;line-height:1.4";el.after(box)}
@@ -535,7 +535,7 @@ let warte=null;
 // Ohne Anmeldung gespeichert (12.11.2026): einmal je Seite ein roter Hinweis, damit es niemand übersieht. Nur auf der echten Seite, nicht im Test.
 let ohneGemeldet=false;
 function ohneAnmeldung(){if(ohneGemeldet||!/github\.io$/.test(location.hostname))return;ohneGemeldet=true;
-  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten und in der Excel. Bitte auf der Startseite anmelden.";
+  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten. Bitte auf der Startseite anmelden.";
     if(window.mxFehler)mxFehler(t);else alert(t)},300)}
 Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof v==="string"&&!rueckLaeuft&&!EIGEN)v=altSchutz(k,v);
   const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);if(this===localStorage&&WACHE[k])GESEHEN[k]=v;
@@ -551,7 +551,7 @@ Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof
 const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
 const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
-  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
+  mietixAusgaben:x=>(x.rein?"Einnahme ":"Ausgabe ")+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
 let burst=null,burstZeit=null;

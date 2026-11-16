@@ -805,7 +805,7 @@ window.addEventListener("popstate",()=>{const st=history.state||{};   // ein Fen
   if(AUF&&BEARB&&!st.bearb){BEARB=false;karte();return}
   if(AUF&&!BEARB&&st.bearb){BEARB=true;karte()}});
 function mieteZeile(v){const V="../mietix-vertrag/",preis='<b>'+(v.preis?EUR.format(v.preis):"")+'</b>';
-  if(v.alt)return'<div class="mz"><div class="mzT"><b>'+esc(v.auto||"Miete")+'</b><i>'+de(v.von)+', aus der Excel</i></div><div class="mzR">'+preis+'</div></div>';
+  if(v.alt)return'<div class="mz"><div class="mzT"><b>'+esc(v.auto||"Miete")+'</b><i>'+de(v.von)+', ältere Miete</i></div><div class="mzR">'+preis+'</div></div>';
   // Stand wie in der Mappe: zurück, unterwegs (Übergabe gemacht), sonst gebucht (Übergabe offen)
   const vg=(()=>{try{return(JSON.parse(localStorage.getItem("mietixVorgaenge")||"[]")||[]).find(x=>x&&x.nr===v.nr)||{}}catch(_){return{}}})();
   const schild=(v.status==="zurück"?'<span class="schild gruen">zurück</span>':vg.ueb?'<span class="schild rot">unterwegs</span>':'<span class="schild grau">gebucht</span>')+(v.mieteOffen||v.nachOffen?'<span class="schild gelb">offen</span>':"");
@@ -1427,7 +1427,7 @@ let warte=null;
 // Ohne Anmeldung gespeichert (12.11.2026): einmal je Seite ein roter Hinweis, damit es niemand übersieht. Nur auf der echten Seite, nicht im Test.
 let ohneGemeldet=false;
 function ohneAnmeldung(){if(ohneGemeldet||!/github\.io$/.test(location.hostname))return;ohneGemeldet=true;
-  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten und in der Excel. Bitte auf der Startseite anmelden.";
+  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten. Bitte auf der Startseite anmelden.";
     if(window.mxFehler)mxFehler(t);else alert(t)},300)}
 Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof v==="string"&&!rueckLaeuft&&!EIGEN)v=altSchutz(k,v);
   const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);if(this===localStorage&&WACHE[k])GESEHEN[k]=v;
@@ -1443,7 +1443,7 @@ Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof
 const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
 const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
-  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
+  mietixAusgaben:x=>(x.rein?"Einnahme ":"Ausgabe ")+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
 let burst=null,burstZeit=null;

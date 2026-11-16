@@ -883,7 +883,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
  <label class="tmFl"><span>Bis wann</span><input id="taBis" type="date"></label>
 </div>
 <div class="tmGl"><label class="tmFl"><span>Notizen</span><textarea id="taNotiz" rows="5" placeholder="Alles Wichtige dazu: Nummern, Ansprechpartner, Stand"></textarea></label></div>
-<div class="taHin" id="taHin">Kommt in 15 Minuten auch in die Excel.</div>
+<div class="taHin" id="taHin">Wird auf allen Geräten gespeichert.</div>
 <div class="tmFehler" id="taFehler" role="alert"></div>
 <button type="button" class="tmFertig" id="taFertig">Fertig</button>
 <div class="tmZwei" id="taZwei"></div>
@@ -1103,7 +1103,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
     const p=document.getElementById("punkt");p.className="";
     if(!sitzung){text=""}
     else if(st&&st.zeit){const alter=(Date.now()-new Date(st.zeit))/3600000;const wartet=/offen|wartet/i.test(st.text||"")&&!/aktuell/i.test(st.text||""),lange=wartet&&st.seit&&(Date.now()-new Date(st.seit))/3600000>2,rot=alter>2||st.ok===false||lange;p.className=rot?"rot":wartet?"gelb":"gruen";   // Excel offen: gelb, ab 2 Stunden rot, es wird nichts eingetragen (05.11.2026)
-      text=lange&&alter<=2&&st.ok!==false?String(st.text)+", seit "+uhrDe(st.seit,true)+" Uhr":!rot&&wartet?String(st.text)+", Stand "+uhrDe(st.zeit)+" Uhr":"Excel: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true)+" Uhr. Mac aus oder ohne Internet?":"aktuell bis "+uhrDe(st.zeit)+" Uhr"))}
+      text=lange&&alter<=2&&st.ok!==false?String(st.text)+", seit "+uhrDe(st.seit,true)+" Uhr":!rot&&wartet?String(st.text)+", Stand "+uhrDe(st.zeit)+" Uhr":"Mac: "+(st.ok===false?st.text:(alter>2?"zuletzt "+uhrDe(st.zeit,true)+" Uhr. Mac aus oder ohne Internet?":"aktuell bis "+uhrDe(st.zeit)+" Uhr"))}
     else{p.className="gruen";text="Angemeldet, alles gesichert."}
     document.getElementById("bruecke").textContent=text;
   }
@@ -1838,7 +1838,7 @@ let warte=null;
 // Ohne Anmeldung gespeichert (12.11.2026): einmal je Seite ein roter Hinweis, damit es niemand übersieht. Nur auf der echten Seite, nicht im Test.
 let ohneGemeldet=false;
 function ohneAnmeldung(){if(ohneGemeldet||!/github\.io$/.test(location.hostname))return;ohneGemeldet=true;
-  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten und in der Excel. Bitte auf der Startseite anmelden.";
+  setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten. Bitte auf der Startseite anmelden.";
     if(window.mxFehler)mxFehler(t);else alert(t)},300)}
 Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof v==="string"&&!rueckLaeuft&&!EIGEN)v=altSchutz(k,v);
   const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);if(this===localStorage&&WACHE[k])GESEHEN[k]=v;
@@ -1854,7 +1854,7 @@ Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof
 const NAMEN={mietixVorgaenge:"Mietvertrag",mietixAnfragen:"Anfrage",mietixKunden:"Kunde",mietixFahrzeuge:"Fahrzeug",mietixAusgaben:"Ausgabe",
   mietixSperren:"Sperre",mietixAufgaben:"Aufgabe",mietixZustand:"Zustand",mietixAutos:"Auto"};
 const BESCHRIFTUNG={mietixVorgaenge:x=>"Mietvertrag "+(x.nr||"")+" "+(x.name||""),mietixAnfragen:x=>"Anfrage "+(x.name||"")+(x.auto?", "+x.auto:""),
-  mietixAusgaben:x=>"Ausgabe "+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
+  mietixAusgaben:x=>(x.rein?"Einnahme ":"Ausgabe ")+(x.betrag!=null?(isNaN(+x.betrag)?String(x.betrag).replace(/\s*€\s*$/,""):(+x.betrag).toLocaleString("de-DE",{maximumFractionDigits:2}))+" €":"")+(x.art?", "+String(x.art).trim():"")+(x.auto?", "+x.auto:""),
   mietixSperren:x=>"Sperre "+(x.auto||"")+(x.von?" ab "+x.von.split("-").reverse().join("."):""),mietixAufgaben:x=>"Aufgabe "+(x.aufgabe||""),
   mietixZustand:x=>"Zustand "+(x.auto||"")+": "+(x.text||"")};
 let burst=null,burstZeit=null;
@@ -2563,7 +2563,7 @@ zeigen();abgleichen();auslagernBald();
   function taOeffnen(id){const a=id&&aufg().find(x=>x.id===id);TA=a?a.id:null;const f=a?info(a):{};TA_FUER=f.fuer||(f.auto?"fahrzeug":"firma");
     $("taAuto").innerHTML='<option value="">Fahrzeug wählen</option>'+AUTOS.map(x=>'<option value="'+esc(x[0])+'">'+esc(x[1])+'</option>').join("");if(f.auto&&!AUTOS.some(x=>x[0]===f.auto))$("taAuto").insertAdjacentHTML("beforeend",'<option value="'+esc(f.auto)+'">'+esc(f.auto)+'</option>');$("taAuto").value=f.auto||"";taFuer();$("taKopf").textContent=a?"Aufgabe":"Neue Aufgabe";$("taText").value=a?a.aufgabe:"";$("taText").readOnly=!!a&&a.quelle!=="handy";
     $("taBis").value=a?(a.bis||""):"";$("taNotiz").value=a?(f.notiz!=null?f.notiz:(a.tun||"")):"";$("taFehler").textContent="";
-    $("taHin").textContent=a&&a.quelle!=="handy"?"Aus der Excel: Text ändern und löschen geht nur dort, sonst kommt sie mit der Brücke wieder. Datum und Erledigt gehen von hier in die Excel.":"Kommt in 15 Minuten auch in die Excel.";
+    $("taHin").textContent=a&&a.quelle!=="handy"?"Diese Aufgabe lässt sich hier nur verschieben und abhaken.":"Wird auf allen Geräten gespeichert.";
     // Löschen nur für Aufgaben vom Handy (11.11.2026, strenge Prüfung Punkt 13). Aus der Excel nur Erledigt, die Brücke lädt sie sonst wieder hoch
     const darfWeg=a&&a.quelle==="handy";
     $("taZwei").style.gridTemplateColumns=darfWeg?"1fr 1fr":"";
@@ -2572,7 +2572,7 @@ zeigen();abgleichen();auslagernBald();
     window.mxAuf("fAufgabe");if(!a)setTimeout(()=>{try{$("taText").focus()}catch(e){}},250)}
   // Aufgabe löschen: Rückfrage, danach Papierkorb (Abgleich legt sie dort ab) und 8 Sekunden Rückgängig, wie bei Ausgaben
   function taLoeschen(id){const l=lies("mietixAufgaben",[]),a=l.find(x=>x&&x.id===id);if(!a)return;
-    if(a.quelle!=="handy"){const m="Nicht gelöscht: Die Aufgabe steht in der Excel und käme mit der Brücke wieder. In der Excel löschen oder hier als Erledigt abhaken.";if(window.mxFehler)mxFehler(m,7000);else alert(m);return}
+    if(a.quelle!=="handy"){const m="Nicht gelöscht: Diese Aufgabe lässt sich hier nur abhaken.";if(window.mxFehler)mxFehler(m,7000);else alert(m);return}
     if(!confirm("Aufgabe „"+a.aufgabe+"“ löschen?\n\nSie liegt danach im Papierkorb."))return;
     if(!schreib("mietixAufgaben",l.filter(x=>!(x&&x.id===id))))return;TA=null;window.mxZu();taZeichnen();
     if(window.mxRueckBar)mxRueckBar("Aufgabe gelöscht",()=>{const n=lies("mietixAufgaben",[]);if(!n.some(x=>x&&x.id===id)){n.push(a);schreib("mietixAufgaben",n)}taZeichnen()},8000);else if(window.nkMeldung)nkMeldung("Aufgabe gelöscht")}
