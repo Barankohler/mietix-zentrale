@@ -1025,6 +1025,11 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
         const key=x.a+x.w+y.w;if(schon[key])return;schon[key]=1;const d=ab.slice(0,10);
         dop.push({ab,t:x.a+" doppelt verplant",i:x.w+" und "+y.w+", "+(d<hi?"seit "+kurzT(d):d===hi?"heute ("+kurzT(d)+")":d===mo?"morgen ("+kurzT(d)+")":"ab "+kurzT(d)),k:"Prüfen",art:"rot",href:B+"mietix-belegung/"})}));
       dop.sort((p,q)=>p.ab.localeCompare(q.ab));rest.unshift(...dop)}
+    // Mietvertrag nur im Papierkorb (16.11.2026: 000560 Kesen Berkan lag nach einer doppelt vergebenen Nummer 4 Tage unbemerkt dort):
+    // eine beim Abgleich zur Seite gelegte Fassung mit Übergabe, zu der bei den Mietverträgen nichts mit demselben Namen und Mietbeginn steht
+    {const nP=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
+      lies("mietixPapierkorb",[]).filter(e=>e&&!e._weg&&e.ablage==="mietixVorgaenge"&&e.andere&&e.eintrag&&e.eintrag.ueb&&!alle.some(x=>!x._weg&&nP(x.name)===nP(e.eintrag.name)&&x.vonD===e.eintrag.vonD))
+        .forEach(e=>rest.unshift({t:e.eintrag.name||"Mietvertrag "+e.schluessel,i:"Mietvertrag "+e.schluessel+(e.eintrag.auto?", "+e.eintrag.auto:"")+", liegt nur im Papierkorb",k:"Prüfen",art:"rot",href:"papierkorb.html"}))}
     const WA_NACH=[];   // Nachfassen steht seit 01.11.2026 unter „Zu erledigen“
     const waNr=t=>nkNummer(t);
     const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");

@@ -627,7 +627,11 @@ function zeichne(){
   LK.zeile(passt.length+(passt.length===1?" Miete":" Mieten")+" im "+monName(M));
   const sum=a=>passt.reduce((s,x)=>s+x.drin.filter(y=>y.art===a).reduce((t,y)=>t+y.b,0),0);
   const anz=a=>passt.filter(x=>x.drin.some(y=>y.art===a)).length;
-  const miete=sum("miete"),verl=sum("verl"),kEin=sum("kaution"),rein=miete+verl+kEin,offen=passt.reduce((s,x)=>s+x.off,0);
+  // Einnahmen von Hand (Seite Geld, 16.11.2026): zählen mit wie auf den Seiten Geld und Zahlen, sonst stünde hier weniger als dort
+  const handAlle=lies("mietixAusgaben",[]).filter(x=>x&&!x._weg&&x.rein&&istTag(String(x.datum||"").slice(0,10))),
+    handIn=(m,bis)=>handAlle.filter(x=>String(x.datum).slice(0,7)===m&&(!bis||String(x.datum).slice(0,10)<=bis)).reduce((s,x)=>s+n0(x.betrag),0),
+    hand=handAlle.filter(x=>inMon(x.datum)&&(!LK.w.auto||x.auto===LK.w.auto)&&LK.passt([x.art,x.auto,x.notiz].join(" "))).reduce((s,x)=>s+n0(x.betrag),0);
+  const miete=sum("miete"),verl=sum("verl"),kEin=sum("kaution"),rein=miete+verl+kEin+hand,offen=passt.reduce((s,x)=>s+x.off,0);
   // Kaution: bei Übergabe im Monat erhalten, und was gerade bei uns liegt (erhalten, noch nicht zurückgegeben)
   const kautErh=v=>{const k=(v.zahlung||{}).kaut||{};return istTag(k.am)?n0(k.betrag):0};
   const kListe=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg&&(!LK.w.auto||v.auto===LK.w.auto)&&LK.passt(v.name+" "+v.auto+" "+v.nr));   // alle Mieten, auch wenn die Miete selbst im Vormonat bezahlt wurde; Suche und Fahrzeug gelten
@@ -635,9 +639,9 @@ function zeichne(){
   const kBei=kListe.reduce((s,v)=>{const kr=v.kautionRueck||{};return s+(kautErh(v)&&!istTag(kr.am)?Math.max(0,kautErh(v)-(kr.verrechnet?(+kr.einbehalt||0)+(+kr.miete||0):0)):0)},0);
   // Vergleich nur, wenn er etwas aussagt (09.11.2026, stand „▲ 765 %“): laufender Monat 1. bis heute gegen dieselben Tage im Vormonat, vergangener Monat voll gegen voll.
   // Der Vormonat muss ganz erfasst sein (früheste Zahlung davor) und mindestens 500 € haben, sonst nur sein Betrag.
-  const vm=vorMon(M),summeIn=(m,bis)=>alle.reduce((s,x)=>s+x.p.filter(y=>String(y.am).slice(0,7)===m&&(!bis||y.am<=bis)).reduce((t,y)=>t+y.b,0),0),reinVor=summeIn(vm);
+  const vm=vorMon(M),summeIn=(m,bis)=>alle.reduce((s,x)=>s+x.p.filter(y=>String(y.am).slice(0,7)===m&&(!bis||y.am<=bis)).reduce((t,y)=>t+y.b,0),0)+handIn(m,bis),reinVor=summeIn(vm);
   const laeuft=M===JETZT,tagVor=Math.min(+heute().slice(8,10),new Date(+vm.slice(0,4),+vm.slice(5,7),0).getDate());
-  const basis=laeuft?summeIn(vm,vm+"-"+pad(tagVor)):reinVor,frueh=alle.reduce((m,x)=>x.p.reduce((n,y)=>y.am&&(!n||y.am<n)?y.am:n,m),"");
+  const basis=laeuft?summeIn(vm,vm+"-"+pad(tagVor)):reinVor,frueh=handAlle.reduce((n,x)=>!n||x.datum<n?String(x.datum).slice(0,10):n,alle.reduce((m,x)=>x.p.reduce((n,y)=>y.am&&(!n||y.am<n)?y.am:n,m),""));
   const d=M<=JETZT&&frueh&&frueh<vm+"-01"&&reinVor>=500&&basis>=500?Math.round((summeIn(M,laeuft?heute():"")-basis)/basis*100):null,st=n=>n+(n===1?" Miete":" Mieten"),MN=M.slice(0,4)===JETZT.slice(0,4)?MON[+M.slice(5,7)-1]:monName(M);   // anderes Jahr: immer mit Jahreszahl (09.11.2026)
   const MV=vm.slice(0,4)===JETZT.slice(0,4)?MON[+vm.slice(5,7)-1]:monName(vm),VT=laeuft?(tagVor===1?"1. ":"1. bis "+tagVor+". ")+MV:MV;
   // Offen aus früheren Monaten: Mietverträge, die schon vorbei sind und im Monat oben nicht stehen. Übergeben oder zurück, Buchungen und nie angetretene Mieten zählen nicht
@@ -648,6 +652,7 @@ function zeichne(){
     '<div class="gr"><i>Verlängerungen</i><b>'+eur(verl)+'</b><small>'+st(anz("verl"))+'</small></div>'+
     '<div class="gr"><i>Kaution einbehalten</i><b>'+eur(kEin)+'</b><small>'+st(anz("kaution"))+'</small></div></div>';
   h+='<div class="karte gesamt">'+
+    (hand?'<div class="gz"><span>Einnahmen von Hand</span><b>'+eur(hand)+'</b></div>':"")+
     '<div class="gz summe1"><span>Zusammen im '+MN+'</span><b>'+eur(rein)+'</b></div>'+
     (LK.q||LK.w.auto||M>JETZT?"":d!=null?'<div class="vgl '+(d>=0?"hoch":"runter")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+' % gegenüber '+VT+' ('+eur(basis)+')</div>':reinVor?'<div class="vgl leise">'+MV+': '+eur(reinVor)+'</div>':"")+
     (offen?'<div class="gz offen"><span>Noch offen</span><b>'+eur(offen)+'</b></div>':"")+

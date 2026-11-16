@@ -49,7 +49,7 @@ main{max-width:680px;margin:0 auto;padding:14px 16px 90px}
 .balken i.rot{background:var(--rot)}.balken i.grau{background:#9A9AA0}
 .balken u{position:absolute;top:-4px;bottom:-4px;width:3px;background:var(--text);border-radius:2px}
 .marke{display:inline-block;font-size:11px;font-weight:600;border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
-.marke.g{background:#E8F6EE;color:var(--gruen)}.marke.r{background:var(--hell);color:var(--rot)}
+.marke.g{background:#E8F6EE;color:var(--gruen)}.marke.r{background:var(--hell);color:var(--rot)}.marke.n{background:#F2F2F7;color:#6F6F72}
 /* Stamm */
 .stamm{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .top{margin-top:12px}
@@ -712,11 +712,11 @@ function zeichne(){umsatzKarte();const S=(lies("mietixStand",{})||{}).statistik;
 
   // 4. Welches Auto verdient?
   const A=(S.autos||[]).filter(a=>a.mieten||a.fix);
-  if(A.length){const amax=Math.max(1,...A.map(a=>Math.max(a.schnitt,a.fix)));
-    html+='<div class="karte"><h2>Welches Auto verdient?</h2><div class="leise">Miete im Schnitt pro Monat (letzte 3 Monate). Der schwarze Strich sind die Fixkosten des Autos.</div>'+
-      A.map(a=>{const ok=a.schnitt>=a.fix;return'<div class="zeile"><div class="kopf"><span>'+esc(autoKurz(a.name))+(a.fix?'<span class="marke '+(ok?"g":"r")+'">'+(ok?"trägt sich":"trägt sich nicht")+'</span>':"")+'</span><i>'+eur(a.schnitt)+'</i></div>'+
-        '<div class="balken"><i class="'+(ok?"":"rot")+'" style="width:'+Math.round(a.schnitt/amax*100)+'%"></i>'+(a.fix?'<u style="left:'+Math.min(99,Math.round(a.fix/amax*100))+'%"></u>':"")+'</div>'+
-        '<div class="leise" style="margin-top:4px">'+a.mieten+' Mieten insgesamt, diesen Monat '+eur(a.monat)+(a.fix?', Fixkosten '+eur(a.fix)+' im Monat':"")+'</div></div>'}).join("")+'</div>'}
+  if(A.length){const wert=a=>a.neu?a.monat:a.schnitt,amax=Math.max(1,...A.map(a=>Math.max(wert(a),a.fix)));
+    html+='<div class="karte"><h2>Welches Auto verdient?</h2><div class="leise">Miete im Schnitt pro Monat (letzte 3 Monate). Der schwarze Strich sind die Fixkosten des Autos.'+(A.some(a=>a.neu)?' Neue Autos (noch keine 3 Monate dabei): Miete diesen Monat.':'')+'</div>'+
+      A.map(a=>{const ok=a.neu||wert(a)>=a.fix;return'<div class="zeile"><div class="kopf"><span>'+esc(autoKurz(a.name))+(a.neu?'<span class="marke n">neu</span>':a.fix?'<span class="marke '+(ok?"g":"r")+'">'+(ok?"trägt sich":"trägt sich nicht")+'</span>':"")+'</span><i>'+eur(wert(a))+'</i></div>'+
+        '<div class="balken"><i class="'+(ok?"":"rot")+'" style="width:'+Math.round(wert(a)/amax*100)+'%"></i>'+(a.fix?'<u style="left:'+Math.min(99,Math.round(a.fix/amax*100))+'%"></u>':"")+'</div>'+
+        '<div class="leise" style="margin-top:4px">'+a.mieten+(a.mieten===1?' Miete':' Mieten')+' insgesamt, diesen Monat '+eur(a.monat)+(a.fix?', Fixkosten '+eur(a.fix)+' im Monat':"")+'</div></div>'}).join("")+'</div>'}
 
   // 5. Unser Stamm
   const K=S.kunden||{};
@@ -734,12 +734,12 @@ function zeichne(){umsatzKarte();const S=(lies("mietixStand",{})||{}).statistik;
   // 7. Daran arbeiten (und was gut läuft)
   const tipps=[];
   if(S.fix&&S.fix.gesamt&&tag>=5&&tag<tageMonat&&hoch<S.fix.gesamt)tipps.push([0,'Bis Monatsende fehlen rund <b>'+eur(S.fix.gesamt-hoch)+'</b> bis die Fixkosten drin sind. Freie Autos am Wochenende an Stammkunden anbieten (Kunden, Angebot verschicken).']);
-  A.filter(a=>a.fix&&a.schnitt<a.fix).sort((x,y)=>(x.schnitt-x.fix)-(y.schnitt-y.fix)).slice(0,2).forEach(a=>tipps.push([0,'<b>'+esc(autoKurz(a.name))+'</b> bringt im Schnitt '+eur(a.schnitt)+' im Monat, kostet aber '+eur(a.fix)+'. Öfter anbieten oder über Verkauf nachdenken.']));
+  A.filter(a=>a.fix&&!a.neu&&a.schnitt<a.fix).sort((x,y)=>(x.schnitt-x.fix)-(y.schnitt-y.fix)).slice(0,2).forEach(a=>tipps.push([0,'<b>'+esc(autoKurz(a.name))+'</b> bringt im Schnitt '+eur(a.schnitt)+' im Monat, kostet aber '+eur(a.fix)+'. Öfter anbieten oder über Verkauf nachdenken.']));
   const so=(S.ausgaben||[]).find(g=>g.art==="Sonstiges"),gs=(S.ausgaben||[]).reduce((s,g)=>s+g.b,0);
   if(so&&gs&&so.b/gs>.25)tipps.push([0,'<b>'+Math.round(so.b/gs*100)+' %</b> der Ausgaben stehen unter „Sonstiges“. Auf der Seite Geld genauer zuordnen, dann sehen wir, wo das Geld wirklich hingeht.']);
   if(K.stammLange)tipps.push([0,'<b>'+K.stammLange+' Stammkunden</b> waren seit über 2 Monaten nicht da. Kurz anschreiben (Kunden, Lange nicht da).']);
   if(S.schaeden&&S.schaeden.offen)tipps.push([0,'Aus Schäden sind noch <b>'+eur(S.schaeden.offen)+'</b> offen ('+S.schaeden.faelle+' Fälle). Nachhaken (Drive, Kundenforderungen).']);
-  if(A.length&&A[0].schnitt)tipps.push([1,'Bestes Auto: <b>'+esc(autoKurz(A[0].name))+'</b> mit '+eur(A[0].schnitt)+' im Monat.']);
+  {const best=A.filter(a=>!a.neu).sort((x,y)=>y.schnitt-x.schnitt)[0];if(best&&best.schnitt)tipps.push([1,'Bestes Auto: <b>'+esc(autoKurz(best.name))+'</b> mit '+eur(best.schnitt)+' im Monat.'])}
   if(K.top&&K.top[0])tipps.push([1,'Treuester Kunde: <b>'+esc(K.top[0].name)+'</b>, '+K.top[0].mieten+'× gemietet.']);
   if(d!=null&&d>0)tipps.push([1,'Mehr Umsatz als im '+vor.name+': <b>+'+d+' %</b>.']);
   html+='<div class="karte"><h2>Daran arbeiten</h2>'+tipps.map(([gut,t])=>'<div class="tipp'+(gut?" gut":"")+'"><b>'+(gut?"✓":"!")+'</b><span>'+t+'</span></div>').join("")+'</div>';
