@@ -43,6 +43,10 @@ main{max-width:640px;margin:0 auto;padding:12px 16px 120px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
 .chip{border:0;background:#EDEDF0;color:#1C1C1E;border-radius:999px;padding:8px 12px;font:700 14px -apple-system,system-ui,sans-serif;cursor:pointer}
 .chip.an{background:var(--rot);color:#fff}
+.chip,.pill{min-height:44px}
+#mxRueckBar,#mietixRueck{z-index:96!important}
+#lk{scroll-margin-top:120px}
+.kz .kzNur{background:#fff;border-radius:12px;padding:11px 12px}
 .beleg{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:.5px solid var(--linie);font-size:15px}.beleg:first-of-type{border-top:0}
 .pill{border:0;border-radius:999px;padding:6px 12px;font:800 13px -apple-system,system-ui,sans-serif;cursor:pointer;min-width:96px}
 .pill.da{background:var(--gruenH);color:var(--gruen)}.pill.fehlt{background:var(--rotH);color:var(--rot)}.pill.korrektur{background:var(--gelbH);color:var(--gelb)}.pill.nicht{background:#EDEDF0;color:#6C6C70}
@@ -259,7 +263,7 @@ html body .buGk,html body .alK,html body .uGk,html body h2.hT,html body #s_unter
 <div class="kz">
   <button type="button" data-kz="holen"><b class="rot" id="kzHolen">0 €</b><i>Noch zu holen</i><small id="kzHolenN">0 Fälle</small></button>
   <button type="button" data-kz="klaeren"><b id="kzKlaeren">0 €</b><i>Erst klären</i><small id="kzKlaerenN">0 Fälle</small></button>
-  <button type="button" data-kz=""><b id="kzKaution">0 €</b><i>Kaution behalten</i><small id="kzKautionN">in 0 Fällen</small></button>
+  <div class="kzNur"><b id="kzKaution">0 €</b><i>Kaution behalten</i><small id="kzKautionN">in 0 Fällen</small></div>
   <button type="button" data-kz="belege"><b class="gelb" id="kzBelege">0</b><i>Belege fehlen</i><small id="kzBelegeN">in 0 Fällen</small></button>
 </div>
 <div id="vorschlaege"></div>
@@ -273,7 +277,7 @@ html body .buGk,html body .alK,html body .uGk,html body h2.hT,html body #s_unter
 
 <div class="mxFenster" id="fZahlung" role="dialog" aria-label="Zahlung eintragen"><div class="mxKopf"><h3>Zahlung eintragen</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
   <p class="klein" id="zWer"></p>
-  <label class="f" for="zBetrag">Betrag in €</label><input class="f" id="zBetrag" inputmode="decimal" autocomplete="off" placeholder="z. B. 500">
+  <label class="f" for="zBetrag">Betrag</label><input class="f" id="zBetrag" inputmode="decimal" autocomplete="off" placeholder="z. B. 500">
   <label class="f" for="zDatum">Wann bezahlt?</label><input class="f" id="zDatum" type="date">
   <label class="f">Wie?</label><div class="chips" id="zArt"><button class="chip an" type="button" data-v="Überweisung">Überweisung</button><button class="chip" type="button" data-v="Bar">Bar</button><button class="chip" type="button" data-v="Karte">Karte</button></div>
   <p class="klein">Steht danach auch auf der Seite Geld bei den Einnahmen.</p>
@@ -281,8 +285,8 @@ html body .buGk,html body .alK,html body .uGk,html body h2.hT,html body #s_unter
 </div>
 
 <div class="mxFenster" id="fAendern" role="dialog" aria-label="Fall ändern"><div class="mxKopf"><h3>Fall ändern</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div>
-  <label class="f" for="aForderung">Schaden in € (was er insgesamt zahlen muss)</label><input class="f" id="aForderung" inputmode="decimal" autocomplete="off">
-  <label class="f" for="aKaution">Kaution behalten in € (leer = nicht belegt)</label><input class="f" id="aKaution" inputmode="decimal" autocomplete="off">
+  <label class="f" for="aForderung">Schaden (was er insgesamt zahlen muss)</label><input class="f" id="aForderung" inputmode="decimal" autocomplete="off">
+  <label class="f" for="aKaution">Kaution behalten (leer = nicht belegt)</label><input class="f" id="aKaution" inputmode="decimal" autocomplete="off">
   <label class="f" for="aWorum">Worum geht es?</label><textarea class="f" id="aWorum"></textarea>
   <label class="f" for="aFrist">Frist</label><input class="f" id="aFrist" autocomplete="off" placeholder="z. B. Zahlung bis 30.11.2026">
   <label class="f" for="aSchritt">Nächster Schritt</label><textarea class="f" id="aSchritt"></textarea>
@@ -296,8 +300,9 @@ html body .buGk,html body .alK,html body .uGk,html body h2.hT,html body #s_unter
   <label class="f" for="nAuto">Auto</label><select class="f" id="nAuto"></select>
   <label class="f" for="nRueck">Rückgabe am</label><input class="f" id="nRueck" type="date">
   <label class="f" for="nWorum">Was ist passiert?</label><textarea class="f" id="nWorum" placeholder="z. B. Kratzer Stoßstange hinten"></textarea>
-  <label class="f" for="nForderung">Schaden in € (leer = Betrag kommt noch)</label><input class="f" id="nForderung" inputmode="decimal" autocomplete="off">
-  <label class="f" for="nKaution">Kaution behalten in €</label><input class="f" id="nKaution" inputmode="decimal" autocomplete="off">
+  <label class="f" for="nForderung">Schaden (leer = Betrag kommt noch)</label><input class="f" id="nForderung" inputmode="decimal" autocomplete="off">
+  <label class="f" for="nKaution">Kaution behalten (leer = keine oder nicht belegt)</label><input class="f" id="nKaution" inputmode="decimal" autocomplete="off">
+  <p class="klein" id="nHinweis" style="margin-top:6px"></p>
   <label class="f" for="nTel">Telefon (freiwillig)</label><input class="f" id="nTel" inputmode="tel" autocomplete="off">
   <div class="knoepfe"><button class="knopf haupt breit" type="button" id="nSpeichern">Schaden aufnehmen</button></div>
 </div>
@@ -317,6 +322,9 @@ const EUR=n=>{const r=Math.round((+n||0)*100)/100;return r.toLocaleString("de-DE
 const EUR0=n=>Math.round(+n||0).toLocaleString("de-DE")+" €";
 const lies=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k)||"null");return v==null?d:v}catch(e){return d}};
 function schreib(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll.");else alert("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll.");return false}}
+const ROH=Storage.prototype.setItem;   // vor abgleich.js geholt: schreibt die Einnahme einer Zahlung ohne dessen zweiten Rückgängig-Knopf
+function schreibStill(k,v){try{ROH.call(localStorage,k,JSON.stringify(v));setTimeout(()=>{if(window.mietixAbgleichen)window.mietixAbgleichen()},60);return true}
+  catch(e){if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll.");else alert("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll.");return false}}
 function meldung(t){const m=$("meld");m.textContent=t;m.classList.add("an");clearTimeout(m._t);m._t=setTimeout(()=>m.classList.remove("an"),2200)}
 const ICH=()=>{try{return((JSON.parse(localStorage.getItem("mietixSitzung")||"null")||{}).email||"").toLowerCase()}catch(e){return""}};
 // Namen vergleichbar machen wie die Brücke (forderungen.dreh): Reihenfolge, Umlaute und Klammerzusatz egal
@@ -331,46 +339,62 @@ const STATI=["Offen","Gemahnt","Inkasso","Bestritten","Anwalt Gegenseite","Geric
 const ST=()=>lies("mietixStand",{})||{};
 function FAELLE(){const k=ST().kundenschaeden,f=k&&k.faelle&&typeof k.faelle==="object"?k.faelle:{};
   return Object.keys(f).map(id=>Object.assign({},f[id],{id})).filter(x=>x&&!x._weg&&x.name)}
-const zahlungen=f=>(f.zahlungen||[]).reduce((s,z)=>s+(+z.betrag||0),0);
+// Zahlungen (17.11.2026, Befund der Prüfer): stehen nur als Einnahme auf der Seite Geld (Feld schaden = Kennung des Falls), nicht im Fall.
+// So geht keine Zahlung verloren, wenn zwei Handys gleichzeitig am selben Fall etwas ändern. Ältere Zahlungen im Fall (zahlungen) zählen mit.
+let EIN=[];
+const holeEin=()=>(EIN=(lies("mietixAusgaben",[])||[]).filter(x=>x&&!x._weg&&x.rein&&x.schaden));
+const zahlListe=f=>(f.zahlungen||[]).map(z=>({am:z.am,betrag:+z.betrag||0,art:z.art||""})).concat(EIN.filter(x=>x.schaden===f.id).map(x=>({am:x.datum,betrag:+x.betrag||0,art:x.zahlart||"",id:x.id})));
+const zahlungen=f=>zahlListe(f).reduce((s,z)=>s+z.betrag,0);
 const ohneBetrag=f=>!f.erledigt&&(f.forderung==null||f.forderung==="");
-const offen=f=>f.erledigt||ohneBetrag(f)?0:Math.max(0,Math.round(((+f.forderung||0)-(+f.bezahlt||0)-zahlungen(f))*100)/100);
+const rest=f=>Math.round(((+f.forderung||0)-(+f.bezahlt||0)-zahlungen(f))*100)/100;
+const offen=f=>f.erledigt||ohneBetrag(f)?0:Math.max(0,rest(f));
 const sonstBezahlt=f=>Math.max(0,Math.round(((+f.bezahlt||0)-(f.einbehalten!=null&&f.einbehalten!==""?+f.einbehalten:0))*100)/100);
 const fehlen=f=>BELEGE.filter(([k])=>{const v=(f.belege||{})[k]||"fehlt";return v==="fehlt"||v==="korrektur"});
-const zaehlt=f=>!f.erledigt&&f.gruppe!=="antworten";
-function fristD(f){const t=String(f.frist||"").replace(/\([^)]*\)/g," "),h=HEUTE(),d=[...t.matchAll(/(\d{1,2})\.(\d{1,2})\.(\d{4})/g)].map(m=>m[3]+"-"+pad(+m[2])+"-"+pad(+m[1])).sort();
-  return d.find(x=>x>=h)||d[d.length-1]||""}   // wie die Drive-Liste: Noch zu holen und Erst klären
+const zaehlt=f=>!f.erledigt&&f.gruppe!=="antworten";   // wie die Drive-Liste: Noch zu holen und Erst klären
+// Frist: erstes Datum im Text wie in der Drive-Liste, Klammern zählen nicht (Anerkenntnis …); „keine“ ist keine Frist
+const fristText=f=>/^\s*(keine?|-)?\s*$/i.test(String(f.frist||""))?"":String(f.frist);
+function fristD(f){const m=fristText(f).replace(/\([^)]*\)/g," ").match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);return m?m[3]+"-"+pad(+m[2])+"-"+pad(+m[1]):""}
 function sortiert(l){const bald=plusTage(7),r=f=>{const d=fristD(f);return d&&d<=bald?"0"+d:"1"+String(1e10-Math.round(offen(f)*100)).padStart(12,"0")};
   return l.slice().sort((a,b)=>r(a)<r(b)?-1:r(a)>r(b)?1:String(a.name).localeCompare(String(b.name),"de"))}
+// Auto so, wie die Seite Geld es kennt (Anzeige-Name aus der Preisdatei)
+const autoAnz=n=>{const s=String(n||"");const a=AUTOS.find(x=>x.n===s||x.anzeige===s)||AUTOS.find(x=>s&&(s.startsWith(x.anzeige||x.n)||s.startsWith(x.n)));return a?(a.anzeige||a.n):""};
+// Fall beim eigenen Anwalt, vor Gericht oder bestritten: keine Abrechnung anbieten (Regel „Keine Angriffsfläche“)
+const beimAnwalt=f=>/\bRA\b|Anwalt|Mandat|Gericht|bestreit|Widerspruch|Chargeback|Nexi|Inkasso|Creditreform/i.test([f.inkasso,f.schritt,f.hinweis,f.frist].join(" "));
 
-/* Mietverträge mit Schadensanerkennung, die noch nicht als Fall da sind */
+/* Mietverträge mit Schadensanerkennung, die noch nicht als Fall da sind. Fälle mit Vertragsnummer zählen nur über die Nummer, Fälle ohne
+   Nummer über den Namen, wenn das Datum passt (Befund der Prüfer: sonst fehlte der neue Schaden eines Stammkunden mit einem alten Fall). */
+const nrAus=t=>(String(t||"").match(/\d{5,6}/)||[""])[0];
+function gedeckt(x,alle){const sd=String(x.schaden.datum).slice(0,10);
+  return alle.some(f=>{const nrs=[f.vertrag,nrAus(f.mvNr)].filter(Boolean);if(nrs.length)return nrs.includes(x.nr);
+    const fd=String(f.datum||f.rueckgabe||"").slice(0,10);return dreh(f.name)===dreh(x.name)&&!!fd&&Math.abs(new Date(fd)-new Date(sd))<=31*864e5})}
 function neueAusVertraegen(alle){const v=lies("mietixVorgaenge",[])||[];
-  return v.filter(x=>x&&!x._weg&&x.schaden&&x.schaden.datum&&(x.schaden.sb||x.schaden.betrag||x.schaden.besch||x.schaden.art)
-    &&!alle.some(f=>(f.vertrag&&f.vertrag===x.nr)||(dreh(f.name)===dreh(x.name)&&(!f.erledigt||String(f.datum||"")>=String(x.schaden.datum).slice(0,10)))))
+  return v.filter(x=>x&&!x._weg&&x.schaden&&x.schaden.datum&&(x.schaden.sb||x.schaden.betrag||x.schaden.besch||x.schaden.art)&&!gedeckt(x,alle))
     .sort((a,b)=>String(b.schaden.datum).localeCompare(String(a.schaden.datum)))}
 
 /* ---------- Liste ---------- */
 const LK=mxListenkopf("lk","schaeden",{suche:"Name oder Auto",felder:[{k:"stand",t:"Stand",alle:"Alle offenen",werte:()=>[["holen","Noch zu holen"],["klaeren","Erst klären"],["antworten","Nur antworten"],["belege","Belege fehlen"],["erledigt","Erledigt"]]}],neu:()=>zeichne()});
-function zeile(f){const o=offen(f),fe=fehlen(f),h=HEUTE(),fd=fristD(f),vorbei=fd&&fd<h,bald=fd&&!vorbei&&fd<=plusTage(7);
-  const betrag=ohneBetrag(f)?'<b class="gelb">Betrag fehlt</b>':'<b class="'+(f.erledigt?"gruen":o<=0?"grau":f.gruppe==="holen"?"rot":"dunkel")+'">'+EUR(o)+'</b>';
+function zeile(f){const o=offen(f),fe=fehlen(f),h=HEUTE(),fd=fristD(f),vorbei=fd&&fd<h,bald=fd&&!vorbei&&fd<=plusTage(7),r=rest(f);
+  const betrag=f.erledigt?(r>0?'<b class="grau">'+EUR(r)+' offen gelassen</b>':'<b class="gruen">Bezahlt</b>'):ohneBetrag(f)?'<b class="gelb">Betrag fehlt</b>':'<b class="'+(o<=0?"grau":f.gruppe==="holen"?"rot":"dunkel")+'">'+EUR(o)+'</b>';
   const kau=f.einbehalten==null||f.einbehalten===""?"Kaution nicht belegt":+f.einbehalten>0?"Kaution "+EUR(f.einbehalten)+" behalten":"keine Kaution";
   const bl=fe.length?(fe.length>3?"Fehlt: "+fe.length+" Belege":"Fehlt: "+fe.map(x=>x[1]).join(", ")):"Belege: alle da";
+  const ft=fristText(f);
   return '<div class="k" data-id="'+esc(f.id)+'"><div class="t"><b>'+esc(f.name)+(f.pruefen?'<span class="tag gelb">PRÜFEN</span>':'')+'</b>'+
     '<i>'+esc([f.auto,f.rueckgabe?"Rückgabe "+de(f.rueckgabe):""].filter(Boolean).join(", "))+'</i>'+
-    '<i class="st">'+esc(f.erledigt?"Erledigt"+(f.erledigtAm?" am "+de(f.erledigtAm):""):f.status||"Offen")+(f.frist&&!f.erledigt?', <span class="'+(vorbei?"rot":bald?"orange":"")+'">'+esc(kurz(f.frist,46))+'</span>':'')+'</i>'+
-    '<i class="bl '+(fe.length?"fehlt":"ok")+'">'+esc(bl)+'</i></div>'+
-    '<div class="betrag">'+betrag+'<small>'+esc(kau)+'</small></div></div>'}
-function zeichne(){LK.bauen();const alle=FAELLE(),offeneF=alle.filter(zaehlt);
+    '<i class="st">'+esc(f.erledigt?"Erledigt"+(f.erledigtAm?" am "+de(f.erledigtAm):""):f.status||"Offen")+(ft&&!f.erledigt?', <span class="'+(vorbei?"rot":bald?"orange":"")+'">'+esc(kurz(ft,46))+'</span>':'')+'</i>'+
+    (f.erledigt?'':'<i class="bl '+(fe.length?"fehlt":"ok")+'">'+esc(bl)+'</i>')+'</div>'+
+    '<div class="betrag">'+betrag+(f.erledigt?'':'<small>'+esc(kau)+'</small>')+'</div></div>'}
+function zeichne(){LK.bauen();holeEin();const alle=FAELLE(),offeneF=alle.filter(zaehlt);
   const holen=offeneF.filter(f=>f.gruppe==="holen"),klaeren=offeneF.filter(f=>f.gruppe!=="holen");
   $("kzHolen").textContent=EUR0(holen.reduce((s,f)=>s+offen(f),0));$("kzHolenN").textContent=holen.length+(holen.length===1?" Fall":" Fälle");
   $("kzKlaeren").textContent=EUR0(klaeren.reduce((s,f)=>s+offen(f),0));$("kzKlaerenN").textContent=klaeren.length+(klaeren.length===1?" Fall":" Fälle");
-  const mitK=alle.filter(f=>!f.erledigt&&f.einbehalten!=null&&f.einbehalten!=="");
+  const mitK=alle.filter(f=>!f.erledigt&&+f.einbehalten>0);
   $("kzKaution").textContent=EUR0(mitK.reduce((s,f)=>s+(+f.einbehalten||0),0));$("kzKautionN").textContent="in "+mitK.length+(mitK.length===1?" Fall":" Fällen");
   const mitB=alle.filter(f=>!f.erledigt&&fehlen(f).length),nB=mitB.reduce((s,f)=>s+fehlen(f).length,0);
   $("kzBelege").textContent=nB;$("kzBelegeN").textContent="in "+mitB.length+(mitB.length===1?" Fall":" Fällen");
   document.querySelectorAll("[data-kz]").forEach(b=>b.classList.toggle("an",!!b.dataset.kz&&LK.w.stand===b.dataset.kz));
-  // Vorschläge aus den Mietverträgen
+  // Vorschläge aus den Mietverträgen (alle, die Kachel auf der Startseite zählt sie auch alle)
   const neu=neueAusVertraegen(alle);
-  $("vorschlaege").innerHTML=neu.map(v=>'<div class="vorschlag"><b>Schaden bei '+esc(v.name||"ohne Namen")+'</b><i>'+esc([v.auto,"Rückgabe "+de((v.rueck&&v.rueck.datum)||v.bisD),(zahl(v.schaden.sb)||zahl(v.schaden.betrag))?"Selbstbeteiligung "+EUR(zahl(v.schaden.sb)||zahl(v.schaden.betrag)):""].filter(Boolean).join(", "))+'</i><i>Steht im Mietvertrag, aber noch nicht in dieser Liste.</i><button class="chip an" type="button" data-neu="'+esc(v.nr)+'">Aufnehmen</button></div>').join("");
+  $("vorschlaege").innerHTML=neu.map(v=>'<div class="vorschlag"><b>Schaden bei '+esc(v.name||"ohne Namen")+'</b><i>'+esc([v.auto,"Rückgabe "+de((v.rueck&&v.rueck.datum)||v.bisD),zahl(v.schaden.sb)>0?"Selbstbeteiligung bis "+EUR(zahl(v.schaden.sb)):""].filter(Boolean).join(", "))+'</i><i>Steht im Mietvertrag, aber noch nicht in dieser Liste.</i><button class="chip an" type="button" data-neu="'+esc(v.nr)+'">Aufnehmen</button></div>').join("");
   $("vorschlaege").querySelectorAll("[data-neu]").forEach(b=>b.onclick=()=>neuOeffnen(b.dataset.neu));
   // Liste
   const st=LK.w.stand||"",passt=f=>LK.passt([f.name,f.auto,f.kz,f.worum].join(" "));
@@ -379,8 +403,8 @@ function zeichne(){LK.bauen();const alle=FAELLE(),offeneF=alle.filter(zaehlt);
   LK.zeile(l.length+(l.length===1?" Fall":" Fälle"));
   if(!l.length){$("liste").innerHTML='<div class="leer">'+(LK.aktiv()?"Nichts gefunden. Andere Suche oder Filter zurücksetzen.":"Keine offenen Schäden.")+'</div>';return}
   const gr=st==="erledigt"?[["","Erledigt"]]:GRUPPEN;
-  $("liste").innerHTML=gr.map(([g,t])=>{const teil=sortiert(st==="erledigt"?l:l.filter(f=>(f.gruppe||"klaeren")===g));
-    if(!teil.length)return"";const s=teil.reduce((q,f)=>q+offen(f),0);
+  $("liste").innerHTML=gr.map(([g,t])=>{const teil=st==="erledigt"?l.slice().sort((a,b)=>String(b.erledigtAm||b.datum||"").localeCompare(String(a.erledigtAm||a.datum||""))):sortiert(l.filter(f=>(f.gruppe||"klaeren")===g));
+    if(!teil.length)return"";const s=st==="erledigt"?0:teil.reduce((q,f)=>q+offen(f),0);
     return'<div class="ab">'+esc(t)+(s?", "+EUR0(s):"")+'</div><div class="liste">'+teil.map(zeile).join("")+'</div>'}).join("");
   $("liste").querySelectorAll("[data-id]").forEach(z=>z.onclick=()=>{zeigeFall(z.dataset.id);mxAuf("fFall")})}
 document.querySelectorAll("[data-kz]").forEach(b=>b.onclick=()=>{const v=b.dataset.kz;if(!v)return;
@@ -388,38 +412,47 @@ document.querySelectorAll("[data-kz]").forEach(b=>b.onclick=()=>{const v=b.datas
   try{sessionStorage.setItem("mietixLK:schaeden",JSON.stringify({q:LK.q||"",w:LK.w}))}catch(e){}
   zeichne();const z=$("lk");if(z)z.scrollIntoView({block:"start",behavior:"smooth"})});
 
-/* ---------- Speichern (mit Rückgängig) ---------- */
+/* ---------- Speichern (mit Rückgängig nur für den eigenen Fall) ---------- */
 let OFFEN_ID="";
-function aendern(id,fn,text,zurueck){const st=ST(),ks=JSON.parse(JSON.stringify(st.kundenschaeden||{faelle:{}}));if(!ks.faelle||typeof ks.faelle!=="object")ks.faelle={};
-  const vorher=JSON.parse(JSON.stringify(ks)),f=ks.faelle[id]||(ks.faelle[id]={id});fn(f);
+const ordne=x=>Array.isArray(x)?x.map(ordne):x&&typeof x==="object"?Object.keys(x).sort().reduce((o,k)=>{o[k]=ordne(x[k]);return o},{}):x;
+const gleich=(a,b)=>JSON.stringify(ordne(a===undefined?null:a))===JSON.stringify(ordne(b===undefined?null:b));
+function fallSchreiben(id,fn,text){const st=ST(),ks=JSON.parse(JSON.stringify(st.kundenschaeden||{faelle:{}}));if(!ks.faelle||typeof ks.faelle!=="object")ks.faelle={};
+  const vorher=ks.faelle[id]?JSON.parse(JSON.stringify(ks.faelle[id])):undefined,f=ks.faelle[id]||(ks.faelle[id]={id});fn(f);
   (f.verlauf=Array.isArray(f.verlauf)?f.verlauf:[]).push({am:new Date().toISOString(),was:text,wer:ICH()});
-  ks.stand=new Date().toISOString();st.kundenschaeden=ks;if(!schreib("mietixStand",st))return false;
-  zeichne();if(OFFEN_ID===id&&$("fFall").classList.contains("auf"))zeigeFall(id);
-  if(window.mxRueckBar)mxRueckBar(text,()=>{const s2=ST();s2.kundenschaeden=vorher;schreib("mietixStand",s2);if(zurueck)zurueck();zeichne();if($("fFall").classList.contains("auf")&&OFFEN_ID)zeigeFall(OFFEN_ID)},8000);else meldung(text);
-  return true}
+  ks.stand=new Date().toISOString();st.kundenschaeden=ks;if(!schreib("mietixStand",st))return null;
+  const nachher=JSON.parse(JSON.stringify(f));
+  return{zurueck(){const s2=ST(),k2=JSON.parse(JSON.stringify(s2.kundenschaeden||{faelle:{}})),jetzt=(k2.faelle||{})[id];
+    if(!gleich(jetzt,nachher)){if(window.mxFehler)mxFehler("Nicht zurückgenommen: Der Fall wurde inzwischen auf einem anderen Gerät geändert.");else meldung("Nicht zurückgenommen, inzwischen woanders geändert");return false}
+    if(vorher===undefined)delete k2.faelle[id];else k2.faelle[id]=vorher;k2.stand=new Date().toISOString();s2.kundenschaeden=k2;return schreib("mietixStand",s2)}}}
+const neuZeigen=id=>{zeichne();if(OFFEN_ID===id&&$("fFall").classList.contains("auf"))zeigeFall(id)};
+const nachRueck=()=>{zeichne();if($("fFall").classList.contains("auf")&&OFFEN_ID)zeigeFall(OFFEN_ID)};
+function aendern(id,fn,text){const r=fallSchreiben(id,fn,text);if(!r)return false;neuZeigen(id);
+  if(window.mxRueckBar)mxRueckBar(text,()=>{r.zurueck();nachRueck()},8000);else meldung(text);return true}
 
 /* ---------- Fenster: ein Fall ---------- */
 const gzeile=(t,w)=>'<div class="gz"><span>'+t+'</span><b>'+w+'</b></div>';
 const ziffernWa=t=>{let d=String(t||"").replace(/[^\d+]/g,"");if(d.startsWith("+"))d=d.slice(1);else if(d.startsWith("00"))d=d.slice(2);else if(d.startsWith("0"))d="49"+d.slice(1);return d.length>=8?d:""};
-function zeigeFall(id){const f=FAELLE().find(x=>x.id===id);if(!f)return;OFFEN_ID=id;$("fTitel").textContent=f.name;
-  const o=offen(f),sb=sonstBezahlt(f),zl=f.zahlungen||[];
+function zeigeFall(id){holeEin();const f=FAELLE().find(x=>x.id===id);if(!f)return;OFFEN_ID=id;$("fTitel").textContent=f.name;
+  const o=offen(f),sb=sonstBezahlt(f),zl=zahlListe(f),r=rest(f);
+  const summe=f.erledigt?(r>0?'<div class="gz summe"><span>Nicht bezahlt (abgeschlossen)</span><b class="grau">'+EUR(r)+'</b></div>':'<div class="gz summe"><span>Stand</span><b class="gruen">Bezahlt</b></div>')
+    :'<div class="gz summe"><span>Noch offen</span><b class="'+(ohneBetrag(f)?"gelb":o>0?"rot":"gruen")+'">'+(ohneBetrag(f)?"Betrag fehlt":EUR(o))+'</b></div>';
   let h='<div class="geld">'+gzeile("Schaden",f.forderung==null||f.forderung===""?'<span class="gelb">Betrag fehlt</span>':EUR(f.forderung))+
     gzeile("Kaution behalten",f.einbehalten!=null&&f.einbehalten!==""?(+f.einbehalten>0?EUR(f.einbehalten):"keine")+(f.kautionArt?'<small>'+esc(kurz(f.kautionArt,70))+'</small>':''):'<span class="grau">nicht belegt'+(f.kautionAuto?", üblich bei dem Auto "+EUR(f.kautionAuto):"")+'</span>')+
-    (sb?gzeile("Sonst schon bezahlt",EUR(sb)):"")+zl.map(z=>gzeile("Bezahlt am "+de(z.am)+(z.art?", "+esc(z.art):""),EUR(z.betrag))).join("")+
-    '<div class="gz summe"><span>Noch offen</span><b class="'+(ohneBetrag(f)?"gelb":o>0?"rot":"gruen")+'">'+(ohneBetrag(f)?"Betrag fehlt":EUR(o))+'</b></div></div>';
+    (sb?gzeile("Sonst schon bezahlt",EUR(sb)):"")+zl.map(z=>gzeile("Bezahlt am "+de(z.am)+(z.art?", "+esc(z.art):""),EUR(z.betrag))).join("")+summe+'</div>';
   if(f.pruefen)h+='<div class="pruefen"><b>Bitte prüfen</b>'+esc(f.pruefen)+'<div class="chips" style="margin-top:8px"><button class="chip" type="button" id="geprueft">Ist geklärt</button></div></div>';
   if(f.worum)h+='<div class="block"><b>Worum es geht</b><p>'+esc(f.worum)+'</p></div>';
-  h+='<div class="block"><b>Stand</b>'+(f.erledigt?'<p class="gruen"><b>Erledigt'+(f.erledigtAm?" am "+de(f.erledigtAm):"")+'</b></p>':'<div class="chips">'+STATI.map(s=>'<button class="chip'+(s===(f.status||"Offen")?" an":"")+'" type="button" data-status="'+esc(s)+'">'+esc(s)+'</button>').join("")+'</div>')+
-    (f.frist?'<p><i>Frist:</i> '+esc(f.frist)+'</p>':'')+(f.schritt?'<p><i>Nächster Schritt:</i> '+esc(f.schritt)+'</p>':'')+'</div>';
+  const ft=fristText(f);
+  h+='<div class="block"><b>Stand</b>'+(f.erledigt?'<p class="gruen"><b>Erledigt'+(f.erledigtAm?" am "+de(f.erledigtAm):"")+'</b></p>':'<div class="chips">'+STATI.map(s=>'<button class="chip'+(s===(f.status||"Offen")?" an":"")+'" type="button" data-status="'+esc(s)+'">'+esc(s)+'</button>').join("")+'</div>'+
+    (ft?'<p><i>Frist:</i> '+esc(ft)+'</p>':'')+(f.schritt?'<p><i>Nächster Schritt:</i> '+esc(f.schritt)+'</p>':''))+'</div>';
   h+='<div class="block"><b>Belege, antippen ändert</b>'+BELEGE.map(([k,t])=>{const v=(f.belege||{})[k]||"fehlt";return'<div class="beleg"><span>'+esc(t)+'</span><button class="pill '+(BKL[v]||"fehlt")+'" type="button" data-beleg="'+k+'">'+(BWORT[v]||"Fehlt")+'</button></div>'}).join("")+'</div>';
-  const vt=f.vertrag?'<p><a class="knopf" style="display:inline-flex;min-height:40px;padding:9px 14px" href="https://barankohler.github.io/mietix-vertrag/?nr='+encodeURIComponent(f.vertrag)+'&zeige=mappe">Mietvertrag öffnen ›</a></p>':(f.mvNr?'<p><i>Mietvertrag Nr.:</i> '+esc(f.mvNr)+' (Papier)</p>':'');
+  const vt=f.vertrag?'<p><a class="knopf" style="display:inline-flex;padding:9px 14px" href="https://barankohler.github.io/mietix-vertrag/?nr='+encodeURIComponent(f.vertrag)+'&zeige=mappe">Mietvertrag öffnen ›</a></p>':(f.mvNr?'<p><i>Mietvertrag Nr.:</i> '+esc(f.mvNr)+' (Papier)</p>':'');
   h+='<div class="block"><b>Miete</b><p>'+esc(f.auto||"")+'</p>'+(f.uebergabe?'<p><i>Übergabe:</i> '+esc(de(f.uebergabe))+'</p>':'')+(f.rueckgabe?'<p><i>Rückgabe:</i> '+esc(de(f.rueckgabe))+'</p>':'')+vt+'</div>';
   const tel=String(f.telefon||"").replace(/[^\d+]/g,""),wa=ziffernWa(f.telefon);
   if(tel||f.email||f.anschrift)h+='<div class="block"><b>Kontakt</b>'+(tel?'<div class="knoepfe"><a class="knopf" href="tel:'+esc(tel)+'">Anrufen</a>'+(wa?'<a class="knopf wa" target="_blank" rel="noopener" href="https://wa.me/'+wa+'">WhatsApp</a>':'')+'</div>':'')+
     (f.email?'<p><i>E-Mail:</i> '+esc(f.email)+'</p>':'')+(f.anschrift?'<p><i>Anschrift:</i> '+esc(f.anschrift)+'</p>':'')+'</div>';
   const u=[["Kostenvoranschlag",f.kv],["Rechnung",f.rechnung],["Mahnungen",f.mahnungen],["Inkasso, Anwalt, Gericht",f.inkasso],["So setzt sich der Betrag zusammen",f.zusammensetzung],["Hinweis",f.hinweis],["Belege im Drive",f.ordner?"Mietix Dokumentation/"+f.ordner:""]].filter(x=>x[1]&&!/^(keine?|noch keins?)$/i.test(String(x[1]).trim()));
   if(u.length)h+='<div class="block klein"><b>Unterlagen</b>'+u.map(([t,w])=>'<p><i>'+esc(t)+':</i> '+esc(w)+'</p>').join("")+'</div>';
-  const schreibOk=!f.erledigt&&(f.status==="Offen"||f.status==="Gemahnt"||!f.status);
+  const schreibOk=!f.erledigt&&(f.status==="Offen"||f.status==="Gemahnt"||!f.status)&&!beimAnwalt(f);
   h+='<div class="knoepfe">'+(f.erledigt?'':'<button class="knopf haupt" type="button" id="zahlungAuf">Zahlung eintragen</button>')+'<button class="knopf" type="button" id="aendernAuf">Ändern</button>'+
     '<button class="knopf'+(f.erledigt?" breit":"")+'" type="button" id="erledigtKnopf">'+(f.erledigt?"Wieder offen":"Erledigt")+'</button>'+
     (schreibOk?'<a class="knopf" href="https://barankohler.github.io/mietix-schadensabrechnung/'+(f.vertrag?"?vertrag="+encodeURIComponent(f.vertrag):"")+'">Abrechnung schreiben ›</a>':'')+'</div>';
@@ -430,63 +463,72 @@ function zeigeFall(id){const f=FAELLE().find(x=>x.id===id);if(!f)return;OFFEN_ID
   const g=$("geprueft");if(g)g.onclick=()=>aendern(id,x=>{x.geprueft={am:HEUTE(),text:x.pruefen};x.pruefen=""},f.name+": geprüft");
   const zA=$("zahlungAuf");if(zA)zA.onclick=()=>zahlungOeffnen(id);
   $("aendernAuf").onclick=()=>aendernOeffnen(id);
-  $("erledigtKnopf").onclick=()=>{if(f.erledigt)aendern(id,x=>{x.erledigt=false;delete x.erledigtAm},f.name+": wieder offen");
+  $("erledigtKnopf").onclick=()=>{if(f.erledigt)aendern(id,x=>{x.erledigt=false;delete x.erledigtAm;if(x.status==="Bezahlt")x.status="Offen"},f.name+": wieder offen");
     else{if(o>0&&!confirm(f.name+" schuldet noch "+EUR(o)+". Trotzdem als erledigt ablegen?"))return;aendern(id,x=>{x.erledigt=true;x.erledigtAm=HEUTE()},f.name+": erledigt")}}}
 
-/* ---------- Zahlung eintragen: im Fall und als Einnahme auf der Seite Geld ---------- */
+/* ---------- Zahlung eintragen: als Einnahme auf der Seite Geld, ein Rückgängig für alles ---------- */
 let Z_ID="",Z_ART="Überweisung";
-function zahlungOeffnen(id){const f=FAELLE().find(x=>x.id===id);if(!f)return;Z_ID=id;$("zWer").textContent=f.name+", noch offen "+(ohneBetrag(f)?"(Betrag fehlt)":EUR(offen(f)));
+function zahlungOeffnen(id){holeEin();const f=FAELLE().find(x=>x.id===id);if(!f)return;Z_ID=id;$("zWer").textContent=f.name+", noch offen "+(ohneBetrag(f)?"(Betrag fehlt)":EUR(offen(f)));
   $("zBetrag").value="";$("zDatum").value=HEUTE();Z_ART="Überweisung";$("zArt").querySelectorAll(".chip").forEach(c=>c.classList.toggle("an",c.dataset.v===Z_ART));mxAuf("fZahlung");setTimeout(()=>$("zBetrag").focus(),250)}
 $("zArt").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{Z_ART=c.dataset.v;$("zArt").querySelectorAll(".chip").forEach(x=>x.classList.toggle("an",x===c))});
-$("zSpeichern").onclick=()=>{const f=FAELLE().find(x=>x.id===Z_ID);if(!f)return;const b=Math.round(zahl($("zBetrag").value)*100)/100,am=$("zDatum").value||HEUTE();
+$("zSpeichern").onclick=()=>{holeEin();const f=FAELLE().find(x=>x.id===Z_ID);if(!f)return;const b=Math.round(zahl($("zBetrag").value)*100)/100,am=$("zDatum").value||HEUTE();
   if(!(b>0)){meldung("Bitte einen Betrag eintragen");$("zBetrag").focus();return}
-  const a=lies("mietixAusgaben",[])||[],eid=String(Date.now())+Math.random().toString(36).slice(2,6);
-  a.push({id:eid,datum:am,art:"Selbstbeteiligung Kunde",auto:f.autoName||"",betrag:b,notiz:"Schaden "+f.name+(Z_ART?" ("+Z_ART+")":""),rein:true,wer:ICH(),erstellt:new Date().toISOString(),schaden:f.id});
-  if(!schreib("mietixAusgaben",a))return;
-  const rest=Math.round((offen(f)-b)*100)/100,fertig=!ohneBetrag(f)&&rest<=0;
-  const ok=aendern(Z_ID,x=>{x.zahlungen=(Array.isArray(x.zahlungen)?x.zahlungen:[]).concat([{am,betrag:b,art:Z_ART,einnahme:eid}]);if(fertig){x.status="Bezahlt";x.erledigt=true;x.erledigtAm=am}},
-    f.name+": "+EUR(b)+" bezahlt"+(fertig?", Fall erledigt":", noch offen "+EUR(Math.max(0,rest))),()=>{const a2=(lies("mietixAusgaben",[])||[]).filter(x=>x.id!==eid);schreib("mietixAusgaben",a2)});
-  if(ok){zeigeFall(Z_ID);mxAuf("fFall")}};
+  const fehlt=ohneBetrag(f),r0=Math.round((offen(f)-b)*100)/100,fertig=!fehlt&&r0<=0,eid=String(Date.now())+Math.random().toString(36).slice(2,6);
+  const ein={id:eid,datum:am,art:"Selbstbeteiligung Kunde",auto:autoAnz(f.autoName)||autoAnz(f.auto),betrag:b,notiz:"Schaden "+f.name,zahlart:Z_ART,rein:true,wer:ICH(),erstellt:new Date().toISOString(),schaden:f.id};
+  if(!schreibStill("mietixAusgaben",(lies("mietixAusgaben",[])||[]).concat([ein])))return;
+  const r=fertig?fallSchreiben(Z_ID,x=>{x.status="Bezahlt";x.erledigt=true;x.erledigtAm=am},f.name+": bezahlt, erledigt"):null;
+  const text=f.name+": "+EUR(b)+" bezahlt"+(fehlt?", Betrag fehlt noch":fertig?", Fall erledigt":", noch offen "+EUR(Math.max(0,r0)));
+  zeigeFall(Z_ID);mxAuf("fFall");zeichne();
+  const weg=()=>{schreibStill("mietixAusgaben",(lies("mietixAusgaben",[])||[]).filter(x=>x.id!==eid));if(r)r.zurueck();nachRueck()};
+  if(window.mxRueckBar)mxRueckBar(text,weg,8000);else meldung(text)};
 
-/* ---------- Ändern ---------- */
-let A_ID="",A_GR="holen";
+/* ---------- Ändern: nur was im Fenster wirklich geändert wurde ---------- */
+let A_ID="",A_GR="holen",A_START=null;
+const azahl=v=>v==null||v===""?"":String(Math.round(+v*100)/100).replace(".",",");
 function aendernOeffnen(id){const f=FAELLE().find(x=>x.id===id);if(!f)return;A_ID=id;
-  const z=v=>v==null||v===""?"":String(Math.round(+v*100)/100).replace(".",",");
-  $("aForderung").value=z(f.forderung);$("aKaution").value=z(f.einbehalten);$("aWorum").value=f.worum||"";$("aFrist").value=f.frist||"";$("aSchritt").value=f.schritt||"";
-  A_GR=f.gruppe||"klaeren";$("aGruppe").querySelectorAll(".chip").forEach(c=>c.classList.toggle("an",c.dataset.v===A_GR));mxAuf("fAendern")}
+  $("aForderung").value=azahl(f.forderung);$("aKaution").value=azahl(f.einbehalten);$("aWorum").value=f.worum||"";$("aFrist").value=f.frist||"";$("aSchritt").value=f.schritt||"";
+  A_GR=f.gruppe||"klaeren";$("aGruppe").querySelectorAll(".chip").forEach(c=>c.classList.toggle("an",c.dataset.v===A_GR));
+  A_START={fo:$("aForderung").value,ka:$("aKaution").value,worum:$("aWorum").value,frist:$("aFrist").value,schritt:$("aSchritt").value,gr:A_GR};mxAuf("fAendern")}
 $("aGruppe").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{A_GR=c.dataset.v;$("aGruppe").querySelectorAll(".chip").forEach(x=>x.classList.toggle("an",x===c))});
-$("aSpeichern").onclick=()=>{const f=FAELLE().find(x=>x.id===A_ID);if(!f)return;
-  const tf=$("aForderung").value.trim(),tk=$("aKaution").value.trim(),fo=tf===""?null:Math.round(zahl(tf)*100)/100,ka=tk===""?null:Math.round(zahl(tk)*100)/100;
-  if(tf!==""&&!(fo>=0)){meldung("Schaden: bitte eine Zahl");return}if(tk!==""&&!(ka>=0)){meldung("Kaution: bitte eine Zahl");return}
-  const fristT=$("aFrist").value.trim();
+$("aSpeichern").onclick=()=>{const f=FAELLE().find(x=>x.id===A_ID);if(!f||!A_START)return;
+  const n={fo:$("aForderung").value.trim(),ka:$("aKaution").value.trim(),worum:$("aWorum").value.trim(),frist:$("aFrist").value.trim(),schritt:$("aSchritt").value.trim(),gr:A_GR};
+  const neu=Object.keys(n).filter(k=>String(n[k]).trim()!==String(A_START[k]).trim());
+  if(!neu.length){zeigeFall(A_ID);mxAuf("fFall");return}
+  const fo=n.fo===""?null:Math.round(zahl(n.fo)*100)/100,ka=n.ka===""?null:Math.round(zahl(n.ka)*100)/100;
+  if(neu.includes("fo")&&n.fo!==""&&!(fo>=0)){meldung("Schaden: bitte eine Zahl");return}if(neu.includes("ka")&&n.ka!==""&&!(ka>=0)){meldung("Kaution: bitte eine Zahl");return}
   // Kaution zählt wie in der Drive-Liste als schon bezahlt: Änderung der Kaution ändert „bezahlt“ um denselben Betrag
-  const altK=f.einbehalten!=null&&f.einbehalten!==""?+f.einbehalten:0,neuK=ka==null?0:ka;
-  const ok=aendern(A_ID,x=>{x.forderung=fo;x.einbehalten=ka;x.bezahlt=Math.max(0,Math.round(((+x.bezahlt||0)-altK+neuK)*100)/100);
-    x.worum=$("aWorum").value.trim();x.frist=fristT;x.fristDatum=fristD({frist:fristT});x.schritt=$("aSchritt").value.trim();x.gruppe=A_GR},f.name+": geändert");
+  const ok=aendern(A_ID,x=>{if(neu.includes("fo"))x.forderung=fo;
+    if(neu.includes("ka")){const altK=x.einbehalten!=null&&x.einbehalten!==""?+x.einbehalten:0;x.einbehalten=ka;x.bezahlt=Math.max(0,Math.round(((+x.bezahlt||0)-altK+(ka||0))*100)/100)}
+    if(neu.includes("worum"))x.worum=n.worum;if(neu.includes("frist")){x.frist=n.frist;x.fristDatum=fristD({frist:n.frist})}if(neu.includes("schritt"))x.schritt=n.schritt;if(neu.includes("gr"))x.gruppe=A_GR},f.name+": geändert");
   if(ok){zeigeFall(A_ID);mxAuf("fFall")}};
 
 /* ---------- Neuer Schaden ---------- */
-const autoWahl=()=>'<option value="">Auto wählen</option>'+AUTOS.map(a=>'<option value="'+esc(a.n)+'">'+esc(a.anzeige||a.n)+'</option>').join("")+'<option value="anders">Anderes Auto</option>';
+const autoWahl=()=>'<option value="">Auto wählen</option>'+AUTOS.map(a=>'<option value="'+esc(a.n)+'">'+esc(a.anzeige||a.n)+'</option>').join("");
 let N_VERTRAG="";
+function nHinweis(){const v=N_VERTRAG?(lies("mietixVorgaenge",[])||[]).find(x=>x&&x.nr===N_VERTRAG):null,a=AUTOS.find(x=>x.n===$("nAuto").value),sb=v&&v.schaden?zahl(v.schaden.sb):NaN;
+  $("nHinweis").textContent=[sb>0?"Laut Mietvertrag Selbstbeteiligung höchstens "+EUR(sb)+".":"",a&&a.kaution&&!$("nKaution").value?"Übliche Kaution bei dem Auto: "+EUR(a.kaution)+". Nur eintragen, wenn sie wirklich behalten wurde.":""].filter(Boolean).join(" ")}
 function neuOeffnen(nr){N_VERTRAG="";["nName","nRueck","nWorum","nForderung","nKaution","nTel"].forEach(i=>$(i).value="");$("nAuto").innerHTML=autoWahl();
   const alle=FAELLE(),neu=neueAusVertraegen(alle);
-  $("nVertraege").innerHTML=neu.length?'<label class="f">Aus einem Mietvertrag übernehmen</label><div class="chips">'+neu.slice(0,6).map(v=>'<button class="chip'+(v.nr===nr?" an":"")+'" type="button" data-v="'+esc(v.nr)+'">'+esc((v.name||"ohne Namen")+", "+(v.auto||""))+'</button>').join("")+'</div>':"";
+  $("nVertraege").innerHTML=neu.length?'<label class="f">Aus einem Mietvertrag übernehmen</label><div class="chips">'+neu.slice(0,8).map(v=>'<button class="chip'+(v.nr===nr?" an":"")+'" type="button" data-v="'+esc(v.nr)+'">'+esc((v.name||"ohne Namen")+", "+(v.auto||""))+'</button>').join("")+'</div>':"";
   $("nVertraege").querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{$("nVertraege").querySelectorAll(".chip").forEach(c=>c.classList.toggle("an",c===b));ausVertrag(b.dataset.v)});
-  if(nr)ausVertrag(nr);mxAuf("fNeu")}
+  if(nr)ausVertrag(nr);nHinweis();mxAuf("fNeu")}
 function ausVertrag(nr){const v=(lies("mietixVorgaenge",[])||[]).find(x=>x&&x.nr===nr);if(!v)return;N_VERTRAG=nr;const s=v.schaden||{};
   $("nName").value=v.name||"";const a=AUTOS.find(x=>x.n===v.auto||x.anzeige===v.auto);$("nAuto").value=a?a.n:"";
   $("nRueck").value=String((v.rueck&&v.rueck.datum)||v.bisD||"").slice(0,10);$("nWorum").value=[s.art,s.besch,s.ortFz].filter(Boolean).join(", ");
-  const h=zahl(s.sb)||zahl(s.betrag);$("nForderung").value=h>0?String(h).replace(".",","):"";
-  const kr=v.kautionRueck||{},kb=zahl(((v.zahlung||{}).kaut||{}).betrag),ke=kr.einbehalt!=null&&kr.einbehalt!==""?zahl(kr.einbehalt):(kb>0?kb:(a?a.kaution:NaN));
-  $("nKaution").value=ke>0?String(ke).replace(".",","):"";$("nTel").value=v.telefon||""}
-$("nAuto").onchange=()=>{const a=AUTOS.find(x=>x.n===$("nAuto").value);if(a&&!$("nKaution").value)$("nKaution").value=String(a.kaution).replace(".",",")};
+  // Schaden bleibt leer: im Mietvertrag steht nur die Selbstbeteiligung (Obergrenze), nie die Schadenshöhe (Befund der Prüfer)
+  $("nForderung").value="";
+  // Kaution nur, wenn sie als Geld belegt ist: bei der Rückgabe behalten, sonst erhalten (mit Datum) und keine Fahrzeug-Kaution
+  const kr=v.kautionRueck||{},k=(v.zahlung||{}).kaut||{},geld=!/fahrzeug/i.test(String(v.kautionArt||k.art||""));
+  const ke=zahl(kr.einbehalt)>0?zahl(kr.einbehalt):(geld&&k.am&&zahl(k.betrag)>0?zahl(k.betrag):NaN);
+  $("nKaution").value=ke>0?String(ke).replace(".",","):"";$("nTel").value=v.telefon||"";nHinweis()}
+$("nAuto").onchange=nHinweis;$("nKaution").oninput=nHinweis;
 $("neuKnopf").onclick=()=>neuOeffnen("");
 $("nSpeichern").onclick=()=>{const name=$("nName").value.trim();if(!name){meldung("Bitte den Namen eintragen");$("nName").focus();return}
   const tf=$("nForderung").value.trim(),tk=$("nKaution").value.trim(),fo=tf===""?null:Math.round(zahl(tf)*100)/100,ka=tk===""?null:Math.round(zahl(tk)*100)/100;
   if(tf!==""&&!(fo>=0)){meldung("Schaden: bitte eine Zahl");return}if(tk!==""&&!(ka>=0)){meldung("Kaution: bitte eine Zahl");return}
   const v=N_VERTRAG?(lies("mietixVorgaenge",[])||[]).find(x=>x&&x.nr===N_VERTRAG):null,an=$("nAuto").value,a=AUTOS.find(x=>x.n===an);
   const id="ks-"+Date.now().toString(36),be={mietvertrag:v?"da":"fehlt",uebergabe:v&&v.ueb?"da":"fehlt",rueckgabe:v&&v.rueck?"da":"fehlt",anerkannt:v&&v.schaden&&v.schaden.anerkannt?"da":"fehlt",kv:"fehlt",rechnung:"fehlt",fotosVorher:"fehlt",fotosNachher:"fehlt"};
-  const ok=aendern(id,x=>Object.assign(x,{id,name,kunde:v?v.name:"",vertrag:v?v.nr:"",mvNr:"",auto:a?(a.anzeige||a.n)+(v&&v.kz?" ("+v.kz+")":""):(an==="anders"?"":""),autoName:a?a.n:"",kz:v&&v.kz||"",
+  const ok=aendern(id,x=>Object.assign(x,{id,name,kunde:v?v.name:"",vertrag:v?v.nr:"",mvNr:"",auto:a?(a.anzeige||a.n)+(v&&v.kz?" ("+v.kz+")":""):"",autoName:a?(a.anzeige||a.n):"",kz:v&&v.kz||"",
       uebergabe:v?String(v.vonD||"")+(v.vonU?"T"+v.vonU:""):"",rueckgabe:$("nRueck").value||"",datum:$("nRueck").value||HEUTE(),worum:$("nWorum").value.trim(),
       forderung:fo,bezahlt:ka||0,einbehalten:ka,kautionArt:v&&v.zahlung&&v.zahlung.kaut?String(v.zahlung.kaut.art||""):"",kautionAuto:a?a.kaution:null,zahlungen:[],
       status:"Offen",gruppe:"holen",erledigt:false,frist:"",fristDatum:"",schritt:fo==null?"Kostenvoranschlag besorgen":"Schadensabrechnung schreiben und schicken",

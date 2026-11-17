@@ -998,7 +998,7 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
     // Ein Heute (Liste Punkt 11): auch Kaution zurückgeben, Miete noch offen und gebucht ohne Mietvertrag
     const rest=[],tageSeit=d=>Math.round((new Date(hi)-new Date(String(d).slice(0,10)))/864e5);
     // Warnung, bevor es Geld kostet (31.10.2026): Kaution über 7 Tage, Miete über 3 Tage offen
-    alle.filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&zahl(x.zahlung.kaut.betrag)&&!(x.kautionRueck&&x.kautionRueck.am)).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD),lang=s>7;
+    alle.filter(x=>x.status==="zurück"&&((x.zahlung||{}).kaut||{}).am&&zahl(x.zahlung.kaut.betrag)&&!(x.kautionRueck&&x.kautionRueck.am)&&!(x.kautionRueck&&!(zahl(x.kautionRueck.betrag)>0))).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD),lang=s>7;
       rest.push({t:x.name,i:"Kaution "+EUR(x.kautionRueck?x.kautionRueck.betrag:zahl(x.zahlung.kaut.betrag))+" zurückgeben"+(lang?", schon "+s+" Tage!":""),k:"Kaution",art:lang?"rot":"gruen",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe",akt:"kaution",nr:x.nr})});
     // Miete offen schon am Tag der Übergabe (31.10.2026, Prüfbericht: vorher erst ab dem nächsten Tag sichtbar)
     if(false)alle.filter(x=>x.vonD&&x.vonD<=hi&&x.ueb&&offenB(x)>0).forEach(x=>{const s=tageSeit(x.vonD);rest.push({t:x.name,i:EUR(offenB(x))+" Miete noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe",akt:"bezahlt",nr:x.nr})});
@@ -1105,7 +1105,8 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
     // Ohne Fälle in der Zentrale wie früher die Kunden mit offenem Schaden.
     const kunden=lies("mietixKunden",{});let sch=0;{const ks=(lies("mietixStand",{})||{}).kundenschaeden,ff=ks&&ks.faelle&&typeof ks.faelle==="object"?Object.values(ks.faelle).filter(f=>f&&!f._weg&&f.name):null;
       if(ff){const dr=s=>((String(s||"").toLowerCase().replace(/\(.*?\)/g," ").replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").normalize("NFD").replace(/[̀-ͯ]/g,"").match(/[a-z0-9]+/g))||[]).sort().join(" ");
-        sch=ff.filter(f=>!f.erledigt&&f.gruppe!=="antworten").length+alle.filter(x=>!x._weg&&x.schaden&&x.schaden.datum&&(x.schaden.sb||x.schaden.betrag||x.schaden.besch||x.schaden.art)&&!ff.some(f=>(f.vertrag&&f.vertrag===x.nr)||(dr(f.name)===dr(x.name)&&(!f.erledigt||String(f.datum||"")>=String(x.schaden.datum).slice(0,10))))).length}
+        sch=ff.filter(f=>!f.erledigt&&f.gruppe!=="antworten").length+alle.filter(x=>!x._weg&&x.schaden&&x.schaden.datum&&(x.schaden.sb||x.schaden.betrag||x.schaden.besch||x.schaden.art)&&!ff.some(f=>{const nrs=[f.vertrag,(String(f.mvNr||"").match(/\d{5,6}/)||[""])[0]].filter(Boolean);if(nrs.length)return nrs.includes(x.nr);   // wie die Seite Schäden: mit Nummer nur über die Nummer
+          const fd=String(f.datum||f.rueckgabe||"").slice(0,10);return dr(f.name)===dr(x.name)&&!!fd&&Math.abs(new Date(fd)-new Date(String(x.schaden.datum).slice(0,10)))<=31*864e5})).length}
       else Object.keys(kunden).forEach(n=>{if(kunden[n]&&kunden[n].schadenOffen)sch++})}
     document.querySelectorAll(".kachel[data-zaehler]").forEach(k=>{const n={anfragen:offen,schaeden:sch,vertraege:rest.filter(x=>x.art==="rot").length,autos:autoPunkte.length,whatsapp:WA_ZAHL}[k.dataset.zaehler]||0;const z=k.querySelector(".zahl");z.textContent=n;z.classList.toggle("versteckt",!n)});
     // Punkt: grün angemeldet, grau nicht, rot wenn die Brücke hängt
