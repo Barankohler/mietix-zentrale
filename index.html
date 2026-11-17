@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de"><head><script>/* Neu geladen oder neu aufgerufen? stil/fenster.py (11.11.2026) */(function(){if(window.mxWieder!==undefined)return;var t="";try{t=((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type||""}catch(e){}window.mxWieder=/^(reload|back_forward)$/.test(t);window.mxAltSchritte=0;try{var s=history.state;if(!window.mxWieder&&s&&typeof s==="object"&&!s.mxS&&!s.mxE){var n=+s.mxI||0;if(n>0||Object.keys(s).some(function(k){return k!=="mxI"})){history.replaceState({mxI:n},"");window.mxAltSchritte=n}}}catch(e){}addEventListener("popstate",function(e){if(window.mxLeise&&window.mxLeise())e.stopImmediatePropagation()},true)})();</script>
+<html lang="de"><head><script>/* Alte oder neue Startseite? tools/zentrale/start_neu.py (17.11.2026) */(function(){var k="mietixStartAnsicht";function pruefen(){try{var v=localStorage.getItem(k);if(v==="alt"){localStorage.setItem(k,"alt?");location.replace("alt.html"+location.search+location.hash);return true}if(v==="alt?")window.mxStartAltFehlt=true}catch(e){}return false}pruefen();addEventListener("pageshow",function(e){if(e.persisted)pruefen()})})();</script><script>/* Neu geladen oder neu aufgerufen? stil/fenster.py (11.11.2026) */(function(){if(window.mxWieder!==undefined)return;var t="";try{t=((performance.getEntriesByType&&performance.getEntriesByType("navigation")[0])||{}).type||""}catch(e){}window.mxWieder=/^(reload|back_forward)$/.test(t);window.mxAltSchritte=0;try{var s=history.state;if(!window.mxWieder&&s&&typeof s==="object"&&!s.mxS&&!s.mxE){var n=+s.mxI||0;if(n>0||Object.keys(s).some(function(k){return k!=="mxI"})){history.replaceState({mxI:n},"");window.mxAltSchritte=n}}}catch(e){}addEventListener("popstate",function(e){if(window.mxLeise&&window.mxLeise())e.stopImmediatePropagation()},true)})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -755,7 +755,144 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
 /* iPhone: Betrag und Datum sind immer ganz zu lesen (08.11.2026, stand „2.00“ statt 2.000) */
 @media(max-width:560px){.mxZa .fz{grid-template-columns:104px minmax(0,1fr) 116px}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:104px minmax(0,1fr)}.mxZa .fz>label{font-size:13.5px}.mxZa .fz input[type=date]{padding:9px 4px}.mxZa .fz input[inputmode=decimal]{padding-left:8px}}
 @media(max-width:389px){.mxZa .fz{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);row-gap:6px}.mxZa .fz>label{grid-column:1/-1}.mxZa .fz.grund,.mxZa .fz.zwei{grid-template-columns:minmax(0,1fr)}}
-</style></head><body><script>
+</style><style id="snStil">/* Neue Startseite „Heute“ (17.11.2026): hell, weiße Karten mit Rand, Rot nur für die eine Hauptaktion, Überfälliges und das Plus */
+body.snNeu{--sn-rot:#C4161C;--sn-rot-d:#A31217;--sn-rot-h:#FCEBEC;--sn-text:#1C1C1E;--sn-t2:#5F5F66;--sn-t3:#9898A0;--sn-fl:#F1F1F4;--sn-li:#E4E4E9;--sn-rand:#CDCDD4;--sn-kopf:#F7F7F9;
+  --sn-gruen:#157F47;--sn-gruen-h:#E3F4EA;--sn-gelb:#9A5B00;--sn-gelb-h:#FFF0CC;--sn-blau:#1B5BC7;--sn-blau-h:#E5EDFC;--sn-grau-h:#ECECF0;--sn-wa:#0F8A47;--sn-wa-h:#DDF5E6}
+html body.snNeu{background:var(--sn-fl)!important;color:var(--sn-text)}
+/* Die alte Seite bleibt im Dokument und rechnet weiter, sie ist nur ausgeblendet. Fenster, Anmeldung (#stand) und „Neue Version da“ (#mxNeu) bleiben sichtbar. */
+body.snNeu .app>*:not(#snKopf):not(#snInhalt):not(.mxFenster):not(script):not(style):not(#stand):not(#mxNeu){display:none!important}
+html body.snNeu .app{padding:0 14px calc(104px + env(safe-area-inset-bottom))}
+body.snNeu #stand{margin:10px 0 0}
+/* Rückfall: läuft das Skript der neuen Schicht nicht, nimmt ein eigener kleiner Block die Klasse snNeu weg. Dann steht die heutige Seite da, ohne Reste der neuen. */
+body:not(.snNeu) #snKopf,body:not(.snNeu) #snInhalt,body:not(.snNeu) #snLeiste{display:none!important}
+#snHinweis[hidden],#snLBd[hidden],#snHomeTipp[hidden]{display:none!important}
+.snIc{display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+/* Kopf */
+#snKopf{padding:calc(14px + env(safe-area-inset-top)) 2px 2px}
+.snKz{display:flex;align-items:center;justify-content:space-between;min-height:44px;gap:8px}
+#snKopf h1,.snH1{font-size:32px;font-weight:800;letter-spacing:-.7px;line-height:1.12;margin:0;color:var(--sn-text)}
+.snRe{display:flex;align-items:center;gap:8px;margin-left:auto}
+.snIb{width:44px;height:44px;border-radius:12px;background:#fff;border:1.5px solid var(--sn-rand);display:grid;place-items:center;color:var(--sn-text);padding:0;cursor:pointer;-webkit-appearance:none;appearance:none}
+.snIb:active{background:#F6F6F8}
+.snSync{position:relative;display:inline-flex;gap:5px;align-items:center;font-size:13px;font-weight:700;height:30px;padding:0 4px 0 8px;border-radius:999px;border:0;cursor:pointer;white-space:nowrap;color:var(--sn-gruen);background:transparent;-webkit-appearance:none;appearance:none}
+.snSync::after{content:"";position:absolute;left:0;right:0;top:-7px;bottom:-7px}
+.snSync.snOffen{color:var(--sn-t2)}
+.snSync.snWarte{color:var(--sn-gelb);background:var(--sn-gelb-h);padding:0 10px}.snSync.snNicht{color:var(--sn-rot-d);background:var(--sn-rot-h);padding:0 10px}
+.snUnter{color:var(--sn-t2);font-size:15px;font-weight:500;margin-top:3px}
+/* Hinweis beim ersten Öffnen */
+#snHinweis{display:flex;gap:10px;align-items:flex-start;background:var(--sn-blau-h);border:1.5px solid #A9C2F2;border-radius:14px;padding:11px 12px;margin:12px 0 0;font-size:14px;font-weight:500;line-height:1.4;color:var(--sn-text)}
+#snHinweis .snIc{color:var(--sn-blau);margin-top:1px}
+#snHinweis b{display:block;font-size:15px;font-weight:700}
+.snHk{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+.snHk button{height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--sn-rand);background:#fff;color:var(--sn-text);font-size:14.5px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
+/* Vier Zahlen */
+.snKza{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border:1.5px solid var(--sn-rand);border-radius:16px;margin:12px 0 0;overflow:hidden}
+.snKza>a{display:block;padding:11px 4px 10px;text-align:center;border-left:1.5px solid var(--sn-li);text-decoration:none;color:var(--sn-text);min-width:0}
+.snKza>a:first-child{border-left:0}.snKza>a:active{background:#F6F6F8}
+.snKza b{display:block;font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.1;min-height:29px;font-variant-numeric:tabular-nums}
+.snKza span{display:block;font-size:12.5px;font-weight:700;margin-top:3px}
+.snKza small{display:block;font-size:11px;letter-spacing:-.1px;white-space:nowrap;font-weight:600;color:var(--sn-t3);margin-top:1px}
+.snTBlau{color:var(--sn-blau)}.snTGruen{color:var(--sn-gruen)}.snTGrau{color:var(--sn-t2)}
+/* Bereich: eigene Karte, Kopf mit kräftiger Linie, Pfeil klappt auf und zu */
+.snB{background:#fff;border:1.5px solid var(--sn-rand);border-radius:16px;margin:14px 0 0;overflow:hidden}
+.snBk{display:flex;align-items:center;gap:8px;width:100%;height:46px;margin:0;padding:0 12px 0 14px;background:var(--sn-kopf);border:0;border-bottom:2px solid var(--sn-text);border-radius:0;color:var(--sn-text);text-align:left;cursor:pointer;-webkit-appearance:none;appearance:none}
+.snFest>.snBk{cursor:default}
+.snBt{font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.snBk .snPf{margin-left:auto;color:var(--sn-t2)}
+.snB.snZu>.snBk{border-bottom:0}.snB.snZu>.snBi{display:none}
+.snAnz{min-width:24px;height:24px;border-radius:12px;padding:0 7px;font-size:13px;font-weight:800;display:inline-grid;place-items:center;background:#E2E2E7;color:var(--sn-text)}
+.snAnz.snRot{background:var(--sn-rot);color:#fff}
+.snBh{padding:9px 14px 0;font-size:13px;font-weight:500;color:var(--sn-t3)}
+/* Zeile: links Zeichen oder Uhrzeit, Mitte Titel und Grund, rechts genau eine Sache */
+.snZ{display:flex;align-items:center;gap:11px;padding:11px 13px;border-top:1px solid var(--sn-li);min-height:64px;text-decoration:none;color:var(--sn-text)}
+.snZ:first-child{border-top:0}.snZ:active{background:#F6F6F8}
+.snL{flex:0 0 38px;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--sn-grau-h);color:var(--sn-t2)}
+.snL.snRotH{background:var(--sn-rot-h);color:var(--sn-rot)}.snL.snGruenH{background:var(--sn-gruen-h);color:var(--sn-gruen)}.snL.snGelbH{background:var(--sn-gelb-h);color:var(--sn-gelb)}
+.snL.snBlauH{background:var(--sn-blau-h);color:var(--sn-blau)}.snL.snWaH{background:var(--sn-wa-h);color:var(--sn-wa)}
+.snZeit{flex:0 0 52px;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.15;color:var(--sn-text)}
+.snZeit small{display:block;font-size:11.5px;font-weight:700;color:var(--sn-t3);margin-bottom:2px;white-space:nowrap}
+.snZeit.snTag{flex-basis:62px}
+.snM{flex:1;min-width:0}
+.snM b{display:block;font-size:16px;letter-spacing:-.1px;font-weight:700;line-height:1.25;overflow-wrap:anywhere}
+.snM i{display:block;font-style:normal;font-size:14px;font-weight:500;color:var(--sn-t2);margin-top:2px;line-height:1.32;overflow-wrap:anywhere}
+.snM i.snWarn{color:var(--sn-rot);font-weight:650}.snM i.snGelb{color:var(--sn-gelb);font-weight:650}
+.snR{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-left:auto}
+.snR .snPf{color:#B9B9C0}
+.snKk{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:44px;padding:0 14px;border-radius:999px;font-size:14.5px;font-weight:750;white-space:nowrap;text-decoration:none;box-sizing:border-box}
+.snKk.snHaupt{background:var(--sn-rot);color:#fff}.snKk.snRand{background:#fff;border:1.5px solid var(--sn-rand);color:var(--sn-text)}
+.snZ.snAus{background:#FAFAFC}.snZ.snAus .snM b,.snZ.snAus .snM i,.snZ.snAus .snZeit{color:var(--sn-t3)}
+.snErl{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:750;color:var(--sn-t2)}.snErl .snIc{color:var(--sn-gruen)}
+/* Jetzt wichtig: der Titel läuft über die ganze Breite, darunter Text und Knopf. So bricht kein Titel um, alle Knöpfe beginnen an derselben Kante. */
+.snW .snZ{display:grid;grid-template-columns:38px minmax(0,1fr) auto;column-gap:11px;row-gap:3px;align-items:center;padding:12px 13px 13px}
+.snW .snZ .snM{display:contents}
+.snW .snZ .snL{grid-column:1;grid-row:1/3;align-self:start}
+.snW .snZ .snM b{grid-column:2/4;grid-row:1}
+.snW .snZ .snM i{grid-column:2;grid-row:2;margin-top:0}
+.snW .snZ .snR{grid-column:3;grid-row:2;margin-left:0}
+.snW .snZ .snKk{min-width:104px}
+/* Heute: Zeilen mit Knopf (Übergabe, Rückgabe, Mietvertrag) genauso. Der Autoname läuft über die ganze Breite, nur der Grund teilt sich den Platz mit dem Knopf. */
+.snZ.snMk{display:grid;grid-template-columns:52px minmax(0,1fr) auto;column-gap:11px;row-gap:3px;align-items:center}
+.snZ.snMk .snM{display:contents}
+.snZ.snMk .snZeit{grid-column:1;grid-row:1/3;align-self:start;padding-top:1px}
+.snZ.snMk .snM b{grid-column:2/4;grid-row:1}
+.snZ.snMk .snM i{grid-column:2;grid-row:2;margin-top:0}
+.snZ.snMk .snR{grid-column:3;grid-row:2;margin-left:0}
+/* Sehr schmal (320 Punkte): neben dem Knopf bliebe dem Grund kaum Platz, darum sitzt der Knopf dort unter dem Grund */
+@media(max-width:349px){.snZ.snMk .snZeit{grid-row:1/4}.snZ.snMk .snM i{grid-column:2/4}.snZ.snMk .snR{grid-column:2/4;grid-row:3;justify-self:start;margin-top:5px}
+  .snW .snZ .snL{grid-row:1/4}.snW .snZ .snM i{grid-column:2/4}.snW .snZ .snR{grid-column:2/4;grid-row:3;justify-self:start;margin-top:5px}
+  .snKza>a{padding-left:2px;padding-right:2px}.snKza span{font-size:11.5px;letter-spacing:-.2px}}
+/* Leerer Tag */
+.snLeer{text-align:center;padding:26px 6px 4px}
+.snLeer .snL{margin:0 auto 12px;width:46px;height:46px;border-radius:50%;background:#fff;border:1.5px solid var(--sn-rand)}
+.snLeer>b{display:block;font-size:19px;font-weight:800}
+.snLeer>span{display:block;color:var(--sn-t2);font-size:15px;font-weight:500;margin:6px auto 16px;max-width:310px;line-height:1.4}
+.snAkt2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.snAkt2 .snKk{padding:0 6px}
+/* Feste Leiste unten: Heute, Kalender, Plus, Buchungen, Menü. Ebene unter den Fenstern (90) und unter „Rückgängig“ (85). */
+#snLeiste{position:fixed;left:0;right:0;bottom:0;z-index:80;background:#fff;border-top:1.5px solid var(--sn-rand);padding:9px 4px max(6px,calc(env(safe-area-inset-bottom) - 8px))}
+.snLi{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));max-width:480px;margin:0 auto}
+#snLeiste a,#snLeiste button{display:flex;flex-direction:column;align-items:center;gap:3px;height:50px;margin:0;padding:0;background:none;border:0;border-radius:0;position:relative;font-size:11.5px;font-weight:700;color:var(--sn-t3);text-decoration:none;cursor:pointer;-webkit-appearance:none;appearance:none}
+#snLeiste .snAn{color:var(--sn-rot)}
+.snPlusK{width:56px;height:56px;border-radius:50%;background:var(--sn-rot);color:#fff;display:grid;place-items:center;margin:-22px auto 0;border:4px solid #fff;box-sizing:border-box;filter:drop-shadow(0 5px 7px rgba(196,22,28,.3))}
+.snBd{position:absolute;top:-5px;left:50%;margin-left:6px;min-width:19px;height:19px;border-radius:10px;background:var(--sn-rot);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;padding:0 5px;border:2px solid #fff;box-sizing:border-box}
+body.snMenueAuf #snLeiste{z-index:92}
+/* Meldungen der Seite sitzen sonst hinter der Leiste */
+body.snNeu #zMeld,body.snNeu #mxFehler{bottom:calc(86px + env(safe-area-inset-bottom))!important}
+/* Kacheln im Plus-Blatt und im Menü: zwei Spalten, mit Linien abgetrennt */
+.snKacheln{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1px;background:var(--sn-li);border:1.5px solid var(--sn-rand);border-radius:16px;overflow:hidden}
+.snB>.snKacheln{border:0;border-radius:0}
+.snKacheln.snEine{grid-template-columns:minmax(0,1fr)}
+.snK{display:flex;align-items:center;gap:8px;min-height:68px;padding:7px 8px 7px 10px;background:#fff;text-decoration:none;color:var(--sn-text);min-width:0;box-sizing:border-box}
+.snK:active{background:#F6F6F8}.snK.snBreit{grid-column:1/-1}
+.snSym{width:34px;height:34px;border-radius:11px;background:var(--sn-grau-h);color:var(--sn-t2);display:grid;place-items:center;flex:0 0 auto}
+.snKt{min-width:0}
+.snKt>b{display:block;font-size:15.5px;font-weight:700;letter-spacing:-.1px;line-height:1.2;overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto}
+.snKt>small{display:block;font-size:12.5px;font-weight:500;color:var(--sn-t2);margin-top:1px;line-height:1.28;overflow-wrap:anywhere}
+/* Menü: kein nowrap, die kleine Zeile darf auf zwei Zeilen wachsen, nichts wird abgeschnitten. Der Name bleibt in einer Zeile:
+   unter 380 Punkten etwas engere Kachel, unter 360 Punkten (iPhone mit „Größerer Text“, 320 Punkte) steht das Menü in einer Spalte. */
+.snMg .snK{padding-right:10px}
+@media(max-width:379px){.snMg .snK{gap:7px;padding:7px 8px}.snMg .snSym{width:30px;height:30px;border-radius:10px}.snMg .snKt>b{font-size:15px}}
+@media(max-width:359px){.snMg .snKacheln{grid-template-columns:minmax(0,1fr)}}
+.snKt>small b{color:var(--sn-rot);font-weight:700}
+.snFuss{margin:14px 8px 0;font-size:13px;color:var(--sn-t3);font-weight:500;line-height:1.4;text-align:center}
+/* Plus-Blatt (Fenster von unten aus stil/fenster.py) */
+#snPlus .snGriff{width:40px;height:5px;border-radius:3px;background:#D3D3D9;margin:-6px auto 8px}
+#snPlus .mxKopf h3{font-size:22px;font-weight:800;letter-spacing:-.3px}
+#snPlus .mxZu{width:44px;height:44px}
+/* Menü: dasselbe Fenster, über die ganze Seite. Die Leiste bleibt darüber sichtbar. */
+html body #snMenue.mxFenster{top:0;bottom:0;left:0;right:0;width:auto;max-width:none;max-height:none;border-radius:0;transform:none;background:var(--sn-fl);padding:0 0 calc(92px + env(safe-area-inset-bottom));animation:none}
+.snMi{max-width:430px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 14px 0}
+@media(min-width:760px){.snMi{max-width:680px}}
+.snMi .snKz{padding:0 2px}.snMi .snUnter{padding:0 2px}
+.snSu{display:flex;align-items:center;gap:10px;height:48px;margin:12px 0 0;padding:0 13px;border-radius:13px;background:#fff;border:1.5px solid var(--sn-rand);color:var(--sn-t3)}
+.snSu:focus-within{border-color:var(--sn-rot)}
+html body #snMenue #suche{flex:1;min-width:0;width:auto;height:44px;margin:0;padding:0;border:0!important;border-radius:0!important;background:transparent!important;outline:0!important;font-size:16px;font-weight:500;color:var(--sn-text);-webkit-appearance:none;appearance:none}
+#snMenue #treffer{margin:10px 0 0;border:1.5px solid var(--sn-rand);border-radius:16px;padding:2px 14px}
+#snMenue.snSucht .snMg{display:none}
+.snMg .snK{min-height:70px}
+.snAltZ{display:flex;justify-content:center;margin:16px 0 0}
+.snAlt.snLaedt{color:var(--sn-t3)}
+.snAlt{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 18px;border-radius:999px;background:#fff;border:1.5px solid var(--sn-rand);color:var(--sn-text);font-size:14.5px;font-weight:700;text-decoration:none}
+</style></head><body class="snNeu"><script>
 /* Listenkopf: Suche, Auswahlfelder, Trefferzahl, Filter zurücksetzen (04.11.2026) */
 (function(){if(window.mxListenkopf)return;
   const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -860,9 +997,10 @@ window.mxZahlung={storno,anfragePosten,geh,oeffne,verlInRest,posten,gespeichert,
     if(k)k.onclick=async e=>{e.preventDefault();e.stopPropagation();const ok=await nkKopieren(tx());if(ok&&nachher)nachher("ko")}};
 })();
 </script><div id="uKopf"><a href="./">‹ Start</a><h1>Umsatzbringer</h1></div><div class="app">
-<header><span id="punkt" title="Anmeldung und Stand"></span></header>
+<div id="snKopf"><div class="snKz"><h1>Heute</h1><span class="snRe"><button type="button" class="snIb" id="snSuchKnopf" aria-label="Suchen"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></button><button type="button" class="snSync snOffen" id="snSync" aria-label="Sicherung: Anmeldung und Stand zeigen"><svg class="snIc" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Sicherung</span></button></span></div><div class="snUnter" id="snDatum">&nbsp;</div></div><header><span id="punkt" title="Anmeldung und Stand"></span></header>
 <div id="stand"><div id="abgleich"></div><div id="bruecke" class="tipp" style="text-align:left;margin:0 4px 6px"></div></div>
 
+<div id="snInhalt"><div id="snHinweis" hidden><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.3"/></svg><div><b id="snHinT"></b><span id="snHinS"></span><div class="snHk" id="snHinK"></div></div></div><div class="snKza" id="snZahlen"><a id="snZU" href="#"><b>&nbsp;</b><span>Unterwegs</span><small>bei Kunden</small></a><a id="snZS" href="#"><b>&nbsp;</b><span>Stehen</span><small>sind frei</small></a><a id="snZUe" href="#"><b>&nbsp;</b><span>Übergabe</span><small>heute</small></a><a id="snZR" href="#"><b>&nbsp;</b><span>Rückgabe</span><small>heute</small></a></div><div id="snBereiche"></div></div>
 <div id="gruss" class="versteckt"></div>   <!-- Begrüßung weg (01.11.2026, Baran: „das kann weg“) -->
 <div class="zk" id="zk"><a class="gr" href="https://barankohler.github.io/mietix-belegung/"><b id="zkU">&nbsp;</b><i>Unterwegs</i><em>bei Kunden</em></a><a id="zkSt" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot"><b id="zkS">&nbsp;</b><i>Stehen</i><em id="zkST">jetzt vermieten</em></a><a class="gr" href="https://barankohler.github.io/mietix-vertrag/?zeige=heute"><b id="zkUe">&nbsp;</b><i>Übergabe</i><em id="zkUeT">heute</em></a><a class="rt" href="https://barankohler.github.io/mietix-vertrag/?zeige=unterwegs"><b id="zkR">&nbsp;</b><i>Rückgabe</i><em id="zkRT">heute</em></a></div>
 <div class="such versteckt"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="suche" type="search" placeholder="Kunde, Auto, Nummer, Telefon" autocomplete="off" enterkeyhint="search"></div>
@@ -2361,4 +2499,231 @@ zeigen();abgleichen();auslagernBald();
   window.mxAnschrift=setzen;
   const alle=w=>(w||document).querySelectorAll("input[data-anschrift]").forEach(setzen);alle();
   new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input[data-anschrift]"))setzen(n);else if(n.querySelectorAll)alle(n)}}).observe(document.body,{childList:true,subtree:true})})();
-</script></body></html>
+</script><nav id="snLeiste" aria-label="Hauptseiten"><div class="snLi"><button type="button" id="snLHeute" class="snAn"><svg class="snIc" width="25" height="25" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/></svg>Heute</button><a href="https://barankohler.github.io/mietix-belegung/"><svg class="snIc" width="25" height="25" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Kalender</a><button type="button" id="snLPlus" data-fenster="snPlus" aria-label="Neu anlegen"><span class="snPlusK"><svg class="snIc" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></button><a href="https://barankohler.github.io/mietix-vertrag/" id="snLBuch"><svg class="snIc" width="25" height="25" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg>Buchungen<span class="snBd" id="snLBd" hidden></span></a><button type="button" id="snLMenue"><svg class="snIc" width="25" height="25" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg>Menü</button></div></nav><div class="mxFenster" id="snPlus" role="dialog" aria-label="Neu anlegen"><div class="snGriff"></div><div class="mxKopf"><h3>Neu anlegen</h3><button class="mxZu" type="button" aria-label="Schließen">✕</button></div><div class="snKacheln"><a class="snK snBreit" href="https://barankohler.github.io/mietix-vertrag/?neu=1" data-sn-name="Buchung"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg></span><span class="snKt"><b>Buchung</b><small>Auto für später reservieren</small></span></a><a class="snK snBreit" href="https://barankohler.github.io/mietix-vertrag/?zeige=vertrag" data-sn-name="Mietvertrag"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12 20 3M16.5 6.5l3 3M14 9l2 2"/></svg></span><span class="snKt"><b>Mietvertrag</b><small>Kunde holt das Auto jetzt ab</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-anfragen/" data-sn-name="Anfrage"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9.5L4 20z"/><path d="M8 9h8M8 12.5h5"/></svg></span><span class="snKt"><b>Anfrage</b><small>Kunde fragt an</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot" data-sn-name="Angebot"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.6" cy="8.6" r="1.3"/></svg></span><span class="snKt"><b>Angebot</b><small>Preis verschicken</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/kunden.html" data-sn-name="Kunde"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.2 3.6-6.8 8-6.8s8 2.6 8 6.8"/></svg></span><span class="snKt"><b>Kunde</b><small>Neu anlegen</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-belegung/" data-sn-name="Auto sperren"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><span class="snKt"><b>Auto sperren</b><small>Werkstatt, privat</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/termine.html?neu=1" data-sn-name="Termin"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="snKt"><b>Termin</b><small>TÜV, Folierer</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/termine.html?a=1" data-sn-name="Aufgabe"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="m3.5 6 1.2 1.2L7 4.9M3.5 12l1.2 1.2L7 10.9M3.5 18l1.2 1.2L7 16.9"/></svg></span><span class="snKt"><b>Aufgabe</b><small>Nicht vergessen</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-geld/" data-sn-name="Ausgabe"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 7.4a5.3 5.3 0 1 0 0 9.2M2.8 10.8h6.4M2.8 13.2h5.4"/><path d="M16 12h6"/></svg></span><span class="snKt"><b>Ausgabe</b><small>Tanken, Wäsche</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-geld/" data-sn-name="Einnahme"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 7.4a5.3 5.3 0 1 0 0 9.2M2.8 10.8h6.4M2.8 13.2h5.4"/><path d="M19 9v6M16 12h6"/></svg></span><span class="snKt"><b>Einnahme</b><small>Nicht aus Miete</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/schaeden.html" data-sn-name="Schaden"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.4M12 16.9v.3"/></svg></span><span class="snKt"><b>Schaden</b><small>Fall abrechnen</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-story/" data-sn-name="Story"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="m8.5 16 2.5-3 2 2 2.5-3.5"/></svg></span><span class="snKt"><b>Story</b><small>Bild für Instagram</small></span></a></div><div class="snFuss">Alles Neue beginnt hier.</div></div><div class="mxFenster" id="snMenue" role="dialog" aria-label="Menü"><div class="snMi"><div class="snKz"><div class="snH1" role="heading" aria-level="1">Menü</div><span class="snRe"><button type="button" class="snSync snOffen" id="snSyncM" aria-label="Sicherung: Anmeldung und Stand zeigen"><svg class="snIc" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Sicherung</span></button></span></div><div class="snUnter">Alle Seiten an einem Ort</div><div class="snSu" id="snSu"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></div><div id="snSeiten"></div><div id="snTreffer"></div><div class="snB snFest snMg"><div class="snBk"><span class="snBt">Jeden Tag</span></div><div class="snKacheln"><a class="snK snBreit" href="https://barankohler.github.io/mietix-belegung/" data-sn-name="Kalender"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span class="snKt"><b>Kalender</b><small>Wer hat welches Auto, was ist frei</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-vertrag/" data-sn-name="Buchungen" data-sn-z="vertraege" data-sn-zahl="0"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg></span><span class="snKt"><b>Buchungen</b><small data-sn-leer="Übergabe und Rückgabe">Übergabe und Rückgabe</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-anfragen/" data-sn-name="Anfragen" data-sn-z="anfragen" data-sn-zahl="0"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9.5L4 20z"/><path d="M8 9h8M8 12.5h5"/></svg></span><span class="snKt"><b>Anfragen</b><small data-sn-leer="Wer hat gefragt">Wer hat gefragt</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-belegung/?zeige=angebot" data-sn-name="Angebot"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.6" cy="8.6" r="1.3"/></svg></span><span class="snKt"><b>Angebot</b><small>Preis für<br>einen Kunden</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/umsatzbringer.html" data-sn-name="Umsatzbringer"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span><span class="snKt"><b>Umsatzbringer</b><small>Freie Autos<br>an viele Kunden</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/whatsapp.html" data-sn-name="WhatsApp" data-sn-z="whatsapp" data-sn-zahl="0"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M9.2 8.3c-.3 1.4.4 3 1.7 4.3 1.3 1.3 2.9 2 4.3 1.7"/></svg></span><span class="snKt"><b>WhatsApp</b><small data-sn-leer="Nichts fällig">Nichts fällig</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/termine.html" data-sn-name="Termine"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="snKt"><b>Termine</b><small>Aufgaben und Plan</small></span></a></div></div><div class="snB snFest snMg"><div class="snBk"><span class="snBt">Verwaltung</span></div><div class="snKacheln"><a class="snK snBreit" href="https://barankohler.github.io/mietix-zentrale/monat.html" data-sn-name="Monat"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span><span class="snKt"><b>Monat</b><small>Was kam je Miete rein</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/kunden.html" data-sn-name="Kunden"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.2 3.6-6.8 8-6.8s8 2.6 8 6.8"/></svg></span><span class="snKt"><b>Kunden</b><small>Akten und Mieten</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-autos/" data-sn-name="Autos" data-sn-z="autos" data-sn-zahl="0"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11.5 6.7 7a2 2 0 0 1 1.9-1.3h6.8A2 2 0 0 1 17.3 7L19 11.5"/><rect x="3" y="11.5" width="18" height="6" rx="2"/><path d="M6.5 17.5v2M17.5 17.5v2M6.5 14.5h1.5M16 14.5h1.5"/></svg></span><span class="snKt"><b>Autos</b><small data-sn-leer="Zustand und Fristen">Zustand und Fristen</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-geld/" data-sn-name="Geld"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 6.5a6.5 6.5 0 1 0 0 11M5 10.5h8M5 13.5h7"/></svg></span><span class="snKt"><b>Geld</b><small>Rein und raus</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/schaeden.html" data-sn-name="Schäden" data-sn-z="schaeden" data-sn-zahl="0"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.4M12 16.9v.3"/></svg></span><span class="snKt"><b>Schäden</b><small data-sn-leer="Kundenschäden">Kundenschäden</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/statistik.html" data-sn-name="Zahlen"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V11M12 20V4M19 20v-6"/></svg></span><span class="snKt"><b>Zahlen</b><small>Wo stehen wir</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-zentrale/nachrichten.html" data-sn-name="Nachrichten"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span><span class="snKt"><b>Nachrichten</b><small>Texte zum Kopieren</small></span></a></div></div><div class="snB snFest snMg"><div class="snBk"><span class="snBt">Weitere Seiten</span></div><div class="snKacheln"><a class="snK" href="https://barankohler.github.io/mietix-story/" data-sn-name="Story"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="m8.5 16 2.5-3 2 2 2.5-3.5"/></svg></span><span class="snKt"><b>Story</b><small>Bild für Instagram</small></span></a><a class="snK" href="https://barankohler.github.io/mietix-umsatz-radar/" data-sn-name="Umsatz-Radar"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="m12 12 6-6"/></svg></span><span class="snKt"><b>Umsatz-Radar</b><small>Wem heute<br>etwas anbieten</small></span></a><a class="snK" href="papierkorb.html" data-sn-name="Papierkorb"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></span><span class="snKt"><b>Papierkorb</b><small>Gelöschtes zurück</small></span></a><a class="snK" href="einstellungen.html" data-sn-name="Einstellungen"><span class="snSym"><svg class="snIc" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M18 7h2M4 17h2M11 17h9"/><circle cx="15.5" cy="7" r="2.4"/><circle cx="8.5" cy="17" r="2.4"/></svg></span><span class="snKt"><b>Einstellungen</b><small>Anmeldung, Links</small></span></a></div></div><div class="snAltZ snMg"><a class="snAlt" href="alt.html" id="snZurAlt">Alte Startseite</a></div><div class="snFuss snMg" id="snHomeTipp">Zum Startbildschirm: unten Teilen,<br>dann „Zum Home-Bildschirm“.</div></div></div><script>
+/* Neue Startseite „Heute“ (17.11.2026, tools/zentrale/start_neu.py). Liest, was die heutige Seite gerechnet hat, und ordnet es neu an.
+   Schreibt nichts in die Daten. Einziger eigener Schlüssel: der Merker für alte oder neue Ansicht. */
+(function(){
+  "use strict";/*snStart*/
+  if(!document.body.classList.contains("snNeu"))return;
+  const B="https://barankohler.github.io/",MERKER="mietixStartAnsicht",IC={"r": "<path d=\"m9 6 6 6-6 6\"/>", "u": "<path d=\"m6 9 6 6 6-6\"/>", "o": "<path d=\"m6 15 6-6 6 6\"/>", "haken": "<path d=\"m5 12.5 4.5 4.5L19 7.5\"/>", "warn": "<path d=\"M12 4 2.8 19.5h18.4z\"/><path d=\"M12 10v4.4M12 16.9v.3\"/>", "uhr": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "euro": "<path d=\"M17.5 6.5a6.5 6.5 0 1 0 0 11M5 10.5h8M5 13.5h7\"/>", "korb": "<path d=\"M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13\"/>", "wa": "<path d=\"M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z\"/><path d=\"M9.2 8.3c-.3 1.4.4 3 1.7 4.3 1.3 1.3 2.9 2 4.3 1.7\"/>", "trend": "<path d=\"M3 17l6-6 4 4 8-8\"/><path d=\"M15 7h6v6\"/>", "nachricht": "<path d=\"M4 5h16v11H9.5L4 20z\"/><path d=\"M8 9h8M8 12.5h5\"/>", "liste": "<path d=\"M10 6h10M10 12h10M10 18h10\"/><path d=\"m3.5 6 1.2 1.2L7 4.9M3.5 12l1.2 1.2L7 10.9M3.5 18l1.2 1.2L7 16.9\"/>", "kalender": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"3\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/>"};
+  const $=id=>document.getElementById(id);
+  const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+  const esc=t=>String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const pad=n=>String(n).padStart(2,"0"),iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  const NB=" ",WT=["So","Mo","Di","Mi","Do","Fr","Sa"],TAGE=["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+  const MONATE=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+  const de=s=>s?String(s).slice(0,10).split("-").reverse().slice(0,2).join(".")+".":"";
+  const kurzTag=d=>WT[new Date(d+"T12:00").getDay()]+NB+de(d);
+  const EUR=n=>Math.round(+n||0).toLocaleString("de-DE")+NB+"€";
+  const mz=(n,ein,mehr)=>n+NB+(n===1?ein:mehr);
+  const nG=t=>String(t||"").toLowerCase().replace(/\s+/g,"");
+  // Wochentag und Datum, „ab“, „seit“, „war“ und das Datum bleiben in einer Zeile. Beträge bleiben, wie die heutige Seite sie schreibt.
+  const kleb=t=>String(t==null?"":t).replace(/(^|[\s(])(Mo|Di|Mi|Do|Fr|Sa|So) (\d{2}\.\d{2}\.)/g,"$1$2"+NB+"$3").replace(/(^|\s)(seit|ab|bis|war) (?=\d|(?:Mo|Di|Mi|Do|Fr|Sa|So)\u00a0)/g,"$1$2"+NB).replace(/(\d) (Tagen?|Uhr)(?![a-zäöü])/g,"$1"+NB+"$2");
+  const ic=(n,g,kl)=>'<svg class="snIc'+(kl?" "+kl:"")+'" width="'+g+'" height="'+g+'" viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>';
+  // Offenes Geld einer Miete: dieselbe Rechnung wie offenB auf der heutigen Startseite (build_html.py)
+  const zahl=v=>{if(v==null)return 0;const s=String(v).trim();if(!s)return 0;return parseFloat(s.indexOf(",")>=0?s.replace(/\./g,"").replace(",","."):s.replace(/\.(?=\d{3}(\D|$))/g,""))||0};
+  const verlOffen=x=>(x.verlaengerungen||[]).reduce((s,y)=>s+(!y.bezahlt?(+y.aufpreis||0):Math.max(0,y.gezahlt!=null?(+y.aufpreis||0)-y.gezahlt:0)),0);
+  const offenB=x=>Math.max(0,(!((x.zahlung||{}).rest||{}).am?zahl(((x.zahlung||{}).rest||{}).betrag):0)+verlOffen(x)-(x.teilzahlungen||[]).filter(t=>t&&!t.verrechnet).reduce((q,t)=>q+(+t.betrag||0),0));
+
+  const an=()=>document.body.classList.contains("snNeu");   // false nach dem Rückfall auf die heutige Seite
+  // ---------- Bausteine ----------
+  const li=(icon,farbe)=>'<span class="snL'+(farbe?" sn"+farbe+"H":"")+'">'+ic(icon,21)+'</span>';
+  const zeit=(t,ohne)=>'<span class="snZeit">'+(t?esc(t):'<small>'+(ohne||"heute")+'</small>')+'</span>';   // ohne Uhrzeit steht klein „heute“, keine Lücke
+  const zeitTag=(d,u)=>'<span class="snZeit snTag"><small>'+esc(kurzTag(d))+'</small>'+esc(u||"")+'</span>';
+  const kk=(t,haupt)=>'<span class="snKk '+(haupt?"snHaupt":"snRand")+'">'+esc(t)+'</span>';
+  const PF='<span class="snPf">'+ic("r",18)+'</span>',ERL='<span class="snErl">'+ic("haken",16)+'Erledigt</span>';
+  // o: href, l (links), t (Titel), i (Grund), iArt, r (rechts), kl, alt (Titel der Zeile auf der alten Seite, für die Gegenprobe)
+  const zeile=o=>'<a class="snZ'+(o.kl?" "+o.kl:"")+'" href="'+esc(o.href)+'"'+(o.alt!=null?' data-sn-alt="'+esc(o.alt)+'"':"")+(o.art?' data-sn-art="'+o.art+'"':"")+'>'+o.l
+    +'<span class="snM"><b>'+esc(kleb(o.t))+'</b>'+(o.i?'<i'+(o.iArt?' class="'+o.iArt+'"':"")+'>'+esc(kleb(o.i))+'</i>':"")+'</span>'+(o.r?'<span class="snR">'+o.r+'</span>':"")+'</a>';
+  const ZU={wichtig:false,tag:false,zutun:false,kommt:true,aus:true};   // welche Mappe zugeklappt ist (nur für diesen Besuch der Seite)
+  const bereich=(kenn,titel,n,inhalt,rot)=>'<div class="snB'+(ZU[kenn]?" snZu":"")+(kenn==="wichtig"?" snW":"")+'" data-sn-b="'+kenn+'">'
+    +'<button type="button" class="snBk" aria-expanded="'+(!ZU[kenn])+'"><span class="snBt">'+esc(titel)+'</span><span class="snAnz'+(rot?" snRot":"")+'">'+n+'</span>'
+    +'<span class="snPf">'+ic(ZU[kenn]?"u":"o",20)+'</span></button><div class="snBi">'+inhalt+'</div></div>';
+
+  // ---------- Jetzt wichtig: die roten Zeilen unter „Achtung“ der heutigen Seite, jede genau einmal, mit demselben Ziel ----------
+  // Geld-Schritte (Kaution, Endabrechnung) führen in Stufe 1 in die Mappe, wo man sie heute erledigt. Die Zeile selbst schreibt nichts.
+  function wichtigAus(el){
+    const akt=el.dataset.akt||"",a=akt?el.querySelector("a.t"):el;
+    const txt=s=>{const x=el.querySelector(s);return x?x.textContent.trim():""},t=txt("b"),i=txt("i"),k=txt(".chip");
+    const o={href:a?a.getAttribute("href"):"#",alt:t,art:"wichtig",l:li("warn","Rot"),t:t,i:i.replace(/!$/,""),knopf:"Öffnen",ueber:k==="Überfällig"};
+    let m;
+    if(/doppelt verplant$/.test(t)){o.knopf="Prüfen"}
+    else if(/liegt nur im Papierkorb$/.test(i)){o.l=li("korb","Rot");o.knopf="Prüfen";o.t="Mietvertrag nur im Papierkorb";o.i=i.indexOf(t)===0?i:t+", "+i}
+    else if(akt==="kaution"&&(m=i.match(/^Kaution (.+?) zurückgeben(?:, schon (\d+) Tage!)?$/))){o.l=li("euro","Gelb");o.t="Kaution zurückzahlen";o.i=t+", "+m[1]+(m[2]?", seit "+m[2]+NB+"Tagen":"")}
+    else if((m=i.match(/^(.*), Rückgabe war (.*)$/))){o.l=li("uhr","Rot");o.t=m[1]?m[1]+" ist überfällig":"Rückgabe überfällig";o.i=t+", Rückgabe war "+m[2];o.iArt="snWarn"}
+    else if((m=i.match(/^(.*), Abholung überfällig seit (.*)$/))){o.l=li("uhr","Rot");o.t=(m[1]?m[1]+": ":"")+"Übergabe überfällig";o.i=t+", seit "+m[2];o.iArt="snWarn"}
+    else if((m=i.match(/^Miete (.+?) offen seit (\d+) Tagen$/))){o.l=li("euro","Gelb");o.t="Miete noch offen";o.i=t+", "+m[1]+", seit "+m[2]+NB+"Tagen"}
+    else if(akt==="endbezahlt"||/^Endabrechnung /.test(i)){o.l=li("euro","Gelb");o.t="Endabrechnung noch offen";o.i=t+", "+o.i}
+    return o}
+
+  // ---------- Zeichnen ----------
+  function zeichnen(){
+    const h=new Date(),hi=iso(h),jU=pad(h.getHours())+":"+pad(h.getMinutes());
+    const plus=n=>{const d=new Date(hi+"T12:00");d.setDate(d.getDate()+n);return iso(d)},w7=plus(7);
+    $("snDatum").textContent=TAGE[h.getDay()]+", "+h.getDate()+". "+MONATE[h.getMonth()]+" "+h.getFullYear();
+    const alt=id=>{const e=$(id);return e?e.textContent.replace(/ /g," ").trim():""};
+    const zaehler=k=>{const z=document.querySelector('.kachel[data-zaehler="'+k+'"] .zahl');return z&&!z.classList.contains("versteckt")?(parseInt(z.textContent,10)||0):0};
+
+    // Vier Zahlen: genau die Werte und Ziele der heutigen Kacheln. Leer bleibt leer (Stehen, solange die Preisliste fehlt).
+    const zU=alt("zkU"),zS=alt("zkS"),zUe=alt("zkUe"),zR=alt("zkR");
+    const vier=(kenn,wert,farbe,klein,quelle)=>{const a=$(kenn),b=a.querySelector("b");b.textContent=wert===""?NB:wert;b.className=wert===""?"":(+wert?farbe:"snTGrau");
+      if(klein)a.querySelector("small").textContent=klein;const q=$(quelle);if(q){const z=q.closest("a");if(z)a.setAttribute("href",z.getAttribute("href"))}};
+    vier("snZU",zU,"snTBlau","bei Kunden","zkU");
+    vier("snZS",zS,"snTGruen",zS!==""&&!+zS?"alle unterwegs":"sind frei","zkS");
+    vier("snZUe",zUe,"",alt("zkUeT")||"heute","zkUe");
+    vier("snZR",zR,"",alt("zkRT")||"heute","zkR");
+
+    // Jetzt wichtig
+    const wichtig=[...document.querySelectorAll("#heute>.z")].filter(el=>!/termine\.html\?t=/.test((el.getAttribute("href")||"")+((el.querySelector("a.t")||{getAttribute(){return ""}}).getAttribute("href")||""))).map(wichtigAus);
+    const ueberN=wichtig.filter(o=>o.ueber).length;
+
+    // Heute: Übergaben und Rückgaben nach den Regeln der vier Zahlen (zahlenZeichnen), damit Zahl und Zeilen übereinstimmen
+    const alle=lies("mietixVorgaenge",[]),anf=lies("mietixAnfragen",[]),lebt=x=>x&&x.status!=="storniert"&&!x._weg;
+    const mv=(x,was)=>B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige="+was;
+    const ohneMV=a=>a&&a.status==="gebucht"&&a.von&&!a.vertrag&&!alle.some(x=>nG(x.name)===nG(a.name)&&x.vonD===a.von);
+    const name=x=>x.name||"ohne Namen";
+    const tag=[],kommt=[];
+    alle.filter(x=>lebt(x)&&x.vonD===hi).forEach(x=>{const fertig=!!x.ueb,of=fertig?0:offenB(x);
+      tag.push({s:x.vonU||"99",art:"uebergabe",kl:"snMk"+(fertig?" snAus":""),l:zeit(x.vonU),t:"Übergabe "+(x.auto||""),i:name(x)+(of>0?", Rest "+EUR(of)+" bei der Übergabe":""),
+        r:fertig?ERL:kk("Übergabe"),href:mv(x,fertig?"mappe":"uebergabe")})});
+    anf.filter(a=>ohneMV(a)&&a.von===hi).forEach(a=>tag.push({s:a.vonU||"99",art:"uebergabe",kl:"snMk",l:zeit(a.vonU),t:"Übergabe "+(a.auto||""),i:(a.name||a.nummer||"ohne Namen")+", noch kein Mietvertrag",iArt:"snWarn",
+      r:kk("Mietvertrag"),href:B+"mietix-vertrag/?buchung="+encodeURIComponent(a.id)}));
+    alle.filter(x=>lebt(x)&&x.bisD===hi&&x.ueb&&(x.status==="zurück"||!x.bisU||x.bisU>=jU)).forEach(x=>{const fertig=x.status==="zurück",of=fertig?0:offenB(x);
+      tag.push({s:x.bisU||"99",art:"rueckgabe",kl:"snMk"+(fertig?" snAus":""),l:zeit(x.bisU),t:(x.auto||"Auto")+" zurück",i:name(x)+(of>0?", "+EUR(of)+" noch offen":""),iArt:of>0?"snGelb":"",
+        r:fertig?ERL:kk("Rückgabe"),href:mv(x,fertig?"mappe":"rueckgabe")})});
+    // Termine: dieselbe Auswahl wie unter „Achtung“ (nicht erledigt, nicht gelöscht). Heute und laufende hier, die nächsten 7 Tage unter „Kommt als Nächstes“.
+    const st=lies("mietixStand",{})||{},tm=st.termine&&typeof st.termine==="object"&&!Array.isArray(st.termine)?st.termine:{};
+    const termine=Object.values(tm).filter(t=>t&&t.id&&!t._weg&&!t.erledigt&&t.vonD);
+    const tmZiel=t=>B+"mietix-zentrale/termine.html?t="+encodeURIComponent(t.id),tmText=(t,vor)=>[vor,t.fuer!=="firma"&&t.auto?t.auto:"",t.wo||""].filter(Boolean).join(", ");
+    termine.filter(t=>t.vonD<=hi&&(t.bisD||t.vonD)>=hi).forEach(t=>{const lauf=t.vonD<hi;
+      tag.push({s:lauf?"00":(t.vonU||"99"),art:"termin",alt:t.titel||"Termin",l:zeit(lauf?"":t.vonU,lauf?"läuft":""),t:t.titel||"Termin",i:tmText(t,lauf?"Termin, läuft bis "+kurzTag(t.bisD||t.vonD):"Termin"),r:PF,href:tmZiel(t)})});
+    tag.sort((a,b)=>String(a.s).localeCompare(String(b.s)));
+
+    // Kommt als Nächstes: morgen und die Tage danach (7 Tage), dieselben Listen mit größerem Fenster
+    alle.filter(x=>lebt(x)&&x.status!=="zurück"&&!x.ueb&&x.vonD>hi&&x.vonD<=w7).forEach(x=>kommt.push({s:x.vonD+(x.vonU||"99"),art:"uebergabe",l:zeitTag(x.vonD,x.vonU),t:"Übergabe "+(x.auto||""),i:name(x),r:PF,href:mv(x,"uebergabe")}));
+    anf.filter(a=>!a._weg&&ohneMV(a)&&a.von>hi&&a.von<=w7).forEach(a=>kommt.push({s:a.von+(a.vonU||"99"),art:"uebergabe",l:zeitTag(a.von,a.vonU),t:"Übergabe "+(a.auto||""),i:(a.name||a.nummer||"ohne Namen")+", noch kein Mietvertrag",r:PF,href:B+"mietix-vertrag/?buchung="+encodeURIComponent(a.id)}));
+    alle.filter(x=>lebt(x)&&x.status!=="zurück"&&x.ueb&&x.bisD>hi&&x.bisD<=w7).forEach(x=>kommt.push({s:x.bisD+(x.bisU||"99"),art:"rueckgabe",l:zeitTag(x.bisD,x.bisU),t:(x.auto||"Auto")+" zurück",i:name(x),r:PF,href:mv(x,"rueckgabe")}));
+    termine.filter(t=>t.vonD>hi&&t.vonD<=w7).forEach(t=>kommt.push({s:t.vonD+(t.vonU||"99"),art:"termin",alt:t.titel||"Termin",l:zeitTag(t.vonD,t.vonU),t:t.titel||"Termin",i:tmText(t,"Termin"),r:PF,href:tmZiel(t)}));
+    kommt.sort((a,b)=>String(a.s).localeCompare(String(b.s)));
+
+    // Zu tun: die Zähler der heutigen Kacheln, je eine Zeile mit Pfeil zur Seite
+    const Z={};["anfragen","vertraege","autos","whatsapp","schaeden"].forEach(k=>Z[k]=zaehler(k));
+    const zutun=[];
+    if(Z.whatsapp){const gr=[...new Set([...document.querySelectorAll("#wa .waGk")].map(e=>e.textContent.trim()).filter(Boolean))].slice(0,3);
+      zutun.push({art:"zaehler",l:li("wa","Wa"),t:mz(Z.whatsapp,"WhatsApp-Nachricht","WhatsApp-Nachrichten")+" fällig",i:gr.length?gr.join(", "):"Fertige Texte, ein Tipp zum Senden",r:PF,href:B+"mietix-zentrale/whatsapp.html"})}
+    const stehen=+zS||0;
+    if(stehen)zutun.push({art:"stehen",l:li("trend","Gruen"),t:stehen===1?"1"+NB+"Auto steht":stehen+NB+"Autos stehen",i:"An frühere Kunden schicken",r:PF,href:B+"mietix-zentrale/umsatzbringer.html"});
+    if(Z.anfragen)zutun.push({art:"zaehler",l:li("nachricht","Blau"),t:mz(Z.anfragen,"Anfrage","Anfragen")+" offen",i:"Antworten und Angebot schicken",r:PF,href:B+"mietix-anfragen/"});
+    if(Z.autos){   // die Zahl der Kachel Autos mischt drei Dinge. Aufgeteilt wird nur, wenn die drei Teile genau diese Zahl ergeben.
+      const auf=lies("mietixAufgaben",[]),zust=lies("mietixZustand",[]),sta=lies("mietixAutos",{});
+      const aL=auf.filter(a=>a&&!a.erledigt&&!a._weg&&a.aufgabe&&a.bis&&a.bis<=w7),nZ=zust.filter(z=>z&&!z.erledigt&&z.auto).length;let nF=0,rot=aL.some(a=>a.bis<hi);
+      Object.keys(sta).forEach(n=>["tuev","service","reifen","garantie"].forEach(k=>{const d=sta[n]&&sta[n][k];if(!d)return;const t=Math.round((new Date(String(d).slice(0,10))-new Date(hi))/864e5);if(t<=14){nF++;if(t<=7)rot=true}}));
+      const teile=[aL.length?mz(aL.length,"Aufgabe","Aufgaben"):"",nZ?mz(nZ,"offener Punkt","offene Punkte"):"",nF?mz(nF,"Frist","Fristen"):""].filter(Boolean);
+      zutun.push({art:"zaehler",l:li("liste",rot?"Rot":"Gelb"),t:mz(Z.autos,"Punkt","Punkte")+" an den Autos",i:aL.length+nZ+nF===Z.autos&&teile.length?teile.join(", "):"Aufgaben, offene Punkte, TÜV und Service",r:PF,href:B+"mietix-autos/"})}
+    if(Z.schaeden)zutun.push({art:"zaehler",l:li("warn","Gelb"),t:Z.schaeden===1?"1"+NB+"Schaden offen":Z.schaeden+NB+"Schäden offen",i:"Noch zu holen oder erst klären",r:PF,href:B+"mietix-zentrale/schaeden.html"});
+
+    // Ausstieg: wie heute erst ab 01.03.2027, die Zeilen kommen unverändert aus der Liste der heutigen Seite
+    const ausEl=$("aus"),ausDa=ausEl&&!ausEl.classList.contains("versteckt");
+    const aus=ausDa?[...ausEl.querySelectorAll(".z")].map(el=>{const k=(el.querySelector(".chip")||{}).textContent||"",t=(el.querySelector("b")||{}).textContent||"";
+      return {art:"aus",alt:t,l:li(k==="Schaden"?"warn":"kalender",k==="Schaden"?"Gelb":"Rot"),t:t,i:(el.querySelector("i")||{}).textContent||"",r:PF,href:el.getAttribute("href")||"#"}}):[];
+
+    // Zusammensetzen. Bereiche mit 0 fallen weg. Ist nichts zu tun, steht ein Satz mit zwei Auswegen.
+    let html="";
+    if(wichtig.length)html+=bereich("wichtig","Jetzt wichtig",wichtig.length,wichtig.map((o,n)=>zeile(Object.assign(o,{r:kk(o.knopf,n===0)}))).join(""),true);
+    if(tag.length)html+=bereich("tag","Heute, "+kurzTag(hi),tag.length,tag.map(zeile).join(""));
+    const ruhig=!wichtig.length&&!tag.length&&!zutun.some(o=>o.art!=="stehen");
+    if(ruhig)html+='<div class="snLeer" id="snLeer"><span class="snL">'+ic("haken",21)+'</span><b>Heute steht nichts an</b><span>Keine Übergabe, keine Rückgabe, kein Termin, nichts Dringendes.</span>'
+      +'<div class="snAkt2"><a class="snKk snRand" href="'+B+'mietix-zentrale/umsatzbringer.html">Freie Autos anbieten</a><a class="snKk snRand" href="'+B+'mietix-zentrale/termine.html">Tag planen</a></div></div>';
+    else if(zutun.length)html+=bereich("zutun","Zu tun",zutun.length,zutun.map(zeile).join(""));
+    if(kommt.length)html+=bereich("kommt","Kommt als Nächstes",kommt.length,'<div class="snBh">Die nächsten 7 Tage</div>'+kommt.map(zeile).join(""));
+    if(ausDa)html+=bereich("aus",alt("ausTitel")||"Ausstieg 30.06.2027",aus.length,aus.length?aus.map(zeile).join(""):'<div class="snBh" style="padding-bottom:12px">Nichts offen über den Ausstieg hinaus.</div>');
+    const ziel=$("snBereiche");if(ziel.__snH!==html){ziel.__snH=html;ziel.innerHTML=html}
+
+    // Leiste und Menü: dieselben Zähler wie auf den heutigen Kacheln
+    const bd=$("snLBd");bd.textContent=Z.vertraege;bd.hidden=!Z.vertraege;$("snLBuch").dataset.snZahl=String(Z.vertraege);
+    const klein={anfragen:Z.anfragen?mz(Z.anfragen,"Anfrage","Anfragen")+" offen":"",
+      vertraege:(zU!==""?esc(zU)+NB+"unterwegs":"")+(Z.vertraege?(zU!==""?",<br>":"")+"<b>"+Z.vertraege+NB+(ueberN===Z.vertraege?"überfällig":"wichtig")+"</b>":""),
+      autos:Z.autos?mz(Z.autos,"Punkt","Punkte")+" offen":"",whatsapp:Z.whatsapp?mz(Z.whatsapp,"Nachricht","Nachrichten")+" fällig":"",schaeden:Z.schaeden?Z.schaeden+NB+"offen":""};
+    document.querySelectorAll("#snMenue [data-sn-z]").forEach(a=>{const k=a.dataset.snZ,s=a.querySelector("small");a.dataset.snZahl=String(Z[k]||0);if(s)s.innerHTML=klein[k]||s.dataset.snLeer||""});
+  }
+
+  // ---------- Sicherungs-Stand: aus dem Punkt und der Anzeige des Abgleichs. Antippen zeigt wie heute Anmeldung und Brücke. ----------
+  function sync(){if(!an())return;const p=$("punkt"),ab=$("abgleich"),q=s=>!!(ab&&ab.querySelector(s));let art="",text="Gesichert",zeichen="haken";
+    if(!lies("mietixSitzung",null)||q(".abgl.rot")||q(".abgl-frage")){art="snNicht";text="Nicht gesichert";zeichen="warn"}
+    else if(q(".abgl.status.wird")||q(".abgl.status.gelb")){art="snWarte";text="Änderungen warten";zeichen="uhr"}
+    else if(p&&p.classList.contains("rot")){art="snWarte";const aus=/Mac aus/.test(($("bruecke")||{}).textContent||"");text=aus?"Mac aus?":"Mac prüfen";zeichen=aus?"uhr":"warn"}   // alles gesichert, nur die Brücke am Mac hängt: gelb, nie rot. Der Grund steht nach dem Antippen
+    else if(p&&p.classList.contains("gelb")){art="snWarte";text="Mac wartet";zeichen="uhr"}
+    document.querySelectorAll(".snSync").forEach(k=>{const neu="snSync"+(art?" "+art:"");if(k.className===neu&&k.dataset.snT===text)return;k.className=neu;k.dataset.snT=text;k.innerHTML=ic(zeichen,15)+"<span>"+text+"</span>"})}
+  const standAuf=an=>{const s=$("stand");if(an===undefined)$("punkt").click();else s.classList.toggle("auf",an);if(s.classList.contains("auf"))window.scrollTo(0,0)};
+
+  // ---------- Bedienung ----------
+  const fensterAuf=()=>document.querySelector(".mxFenster.auf");
+  const geh=u=>{if(window.mxZahlung&&window.mxZahlung.geh)window.mxZahlung.geh(u);else location.href=u};   // aus einem offenen Fenster ohne toten Schritt im Verlauf
+  const melden=t=>{if(window.mxFehler)window.mxFehler(t,7000);else alert(t)};
+  // Mappen auf und zu
+  $("snBereiche").addEventListener("click",e=>{const k=e.target.closest(".snBk");if(!k)return;const b=k.parentNode,kenn=b.dataset.snB;ZU[kenn]=!ZU[kenn];
+    b.classList.toggle("snZu",ZU[kenn]);k.setAttribute("aria-expanded",String(!ZU[kenn]));k.querySelector(".snPf").innerHTML=ic(ZU[kenn]?"u":"o",20);$("snBereiche").__snH=""});
+  // Leiste
+  $("snLHeute").addEventListener("click",()=>{if(fensterAuf()&&window.mxZu)window.mxZu();window.scrollTo(0,0)});
+  $("snLMenue").addEventListener("click",()=>{if($("snMenue").classList.contains("auf"))window.mxZu();else window.mxAuf("snMenue")});
+  $("snSuchKnopf").addEventListener("click",()=>{window.mxAuf("snMenue");const s=$("suche");if(s)try{s.focus()}catch(e){}});
+  $("snSync").addEventListener("click",()=>standAuf());
+  $("snSyncM").addEventListener("click",()=>{window.mxZu();setTimeout(()=>standAuf(true),80)});
+  // Links in Leiste, Plus-Blatt und Menü: ist ein Fenster offen, erst sauber schließen, dann springen
+  [$("snLeiste"),$("snPlus"),$("snMenue")].forEach(el=>el.addEventListener("click",e=>{const a=e.target.closest("a[href]");if(!a||a.id==="snZurAlt"||a.target==="_blank"||!fensterAuf())return;e.preventDefault();geh(a.href)}));
+  // Menü offen: Leiste bleibt darüber sichtbar, „Menü“ ist markiert. Menü zu: Suche leeren.
+  const suchfeld=$("suche"),treffer=$("treffer");
+  new MutationObserver(()=>{const auf=$("snMenue").classList.contains("auf");document.body.classList.toggle("snMenueAuf",auf);$("snLMenue").classList.toggle("snAn",auf);$("snLHeute").classList.toggle("snAn",!auf);
+    if(!auf&&suchfeld&&suchfeld.value){suchfeld.value="";suchfeld.dispatchEvent(new Event("input",{bubbles:true}))}}).observe($("snMenue"),{attributes:true,attributeFilter:["class"]});
+  // Suche: das Feld der Seite zieht ins Menü um (der Zuhörer der Seite bleibt am Feld). Dazu die Seiten selbst nach Namen.
+  if(suchfeld&&treffer){$("snSu").appendChild(suchfeld);$("snTreffer").appendChild(treffer);const platz=()=>suchfeld.setAttribute("placeholder",innerWidth<350?"Kunde, Auto, Vertrag":"Kunde, Auto, Kennzeichen, Vertrag");platz();addEventListener("resize",platz);suchfeld.setAttribute("aria-label","Suchen");
+    const nrm=t=>String(t||"").toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss").replace(/\s+/g," ").trim();
+    suchfeld.addEventListener("input",()=>{const q=nrm(suchfeld.value),sucht=q.length>=2,el=$("snSeiten");$("snMenue").classList.toggle("snSucht",sucht);if(!sucht){el.innerHTML="";return}
+      const t=[...document.querySelectorAll("#snMenue .snMg .snK")].filter(k=>nrm(k.dataset.snName).includes(q));
+      el.innerHTML=t.length?'<div class="snB snFest"><div class="snBk"><span class="snBt">Seiten</span></div><div class="snKacheln snEine">'+t.map(k=>k.outerHTML.replace(" snBreit","")).join("")+'</div></div>':""})}
+  // Hinweis zum Startbildschirm nur im Browser, nicht als App
+  if(navigator.standalone||(window.matchMedia&&matchMedia("(display-mode: standalone)").matches))$("snHomeTipp").hidden=true;
+
+  // ---------- Rückweg zur alten Startseite ----------
+  // Erst prüfen, ob alt.html da ist (Netz oder Kopie auf dem Gerät), dann den Merker setzen. So führt der Tipp nie ins Leere.
+  // Sofort Rückmeldung am Knopf, weitere Tipps sind gesperrt. Das Netz bekommt 3 Sekunden (wie der Service Worker), dann zählt die Kopie auf dem Gerät.
+  let altLaeuft=false;
+  const altKnopf=laeuft=>{altLaeuft=laeuft;const k=$("snZurAlt");k.textContent=laeuft?"Wird geöffnet …":"Alte Startseite";k.classList.toggle("snLaedt",laeuft);if(laeuft)k.setAttribute("aria-busy","true");else k.removeAttribute("aria-busy");
+    document.querySelectorAll("#snHinK button").forEach(b=>{b.disabled=laeuft})};
+  async function zurAlt(){if(altLaeuft)return;altKnopf(true);let da=false;
+    try{const ab=new AbortController(),uhr=setTimeout(()=>ab.abort(),3000);try{const r=await fetch("alt.html",{method:"HEAD",cache:"no-store",signal:ab.signal});da=r.ok}finally{clearTimeout(uhr)}}catch(e){}
+    if(!da){try{da=!!(window.caches&&await caches.match(new URL("alt.html",location.href).href))}catch(e){}}
+    if(!da){altKnopf(false);melden("Die alte Startseite ist gerade nicht erreichbar. Bitte später noch einmal versuchen.");return}
+    try{localStorage.setItem(MERKER,"alt")}catch(e){}
+    const los=()=>location.replace("alt.html");
+    if(fensterAuf()&&window.mxZu){window.mxZu();setTimeout(los,150)}else los()}
+  $("snZurAlt").addEventListener("click",e=>{e.preventDefault();zurAlt()});
+  addEventListener("pageshow",e=>{if(e.persisted&&altLaeuft)altKnopf(false)});   // Seite kam aus dem Zwischenspeicher des Browsers zurück
+  // Hinweis: beim ersten Öffnen einmal, wo es zurück zur alten Seite geht. Oder: die alte Seite kam beim letzten Mal nicht an.
+  (function(){let m=null;try{m=localStorage.getItem(MERKER)}catch(e){return}
+    const hin=$("snHinweis"),knopf=(t,fn)=>{const b=document.createElement("button");b.type="button";b.textContent=t;b.addEventListener("click",fn);$("snHinK").appendChild(b)};
+    const bleiben=()=>{try{localStorage.setItem(MERKER,"neu")}catch(e){}hin.hidden=true};
+    if(window.mxStartAltFehlt){$("snHinT").textContent="Die alte Startseite war nicht erreichbar";$("snHinS").textContent="Darum sehen Sie jetzt die neue. Es ist nichts verloren.";
+      knopf("Noch einmal versuchen",zurAlt);knopf("Bei der neuen bleiben",bleiben);hin.hidden=false}
+    else if(m===null){$("snHinT").textContent="Das ist die neue Startseite";$("snHinS").textContent="Zurück zur alten geht es im Menü ganz unten: „Alte Startseite“.";
+      knopf("Verstanden",()=>{hin.hidden=true});hin.hidden=false;try{localStorage.setItem(MERKER,"neu")}catch(e){}}})();
+  // Kopie von alt.html für ohne Netz (der Service Worker legt jede gute Antwort ab). Nur live, in der Vorschau gibt es keinen Service Worker.
+  if("serviceWorker" in navigator&&location.protocol==="https:")setTimeout(()=>{if(navigator.onLine)fetch("alt.html").catch(()=>{})},5000);
+
+  // ---------- Auslöser: die heutige Seite zeichnet bei jedem Abgleich neu. Danach zeichnet die neue Schicht nach. ----------
+  // Bricht das Zeichnen ab, wird es einmal still wiederholt. Bricht es zweimal hintereinander ab, steht von selbst die heutige Seite da (Rückfall), mit einem Satz dazu.
+  let geplant=false,fehl=0;
+  const rueckfall=()=>{mo.disconnect();ms.disconnect();try{if(fensterAuf()&&window.mxZu)window.mxZu()}catch(e){}document.body.classList.remove("snNeu","snMenueAuf");window.scrollTo(0,0);
+    if(window.mxFehler)window.mxFehler("Die neue Startseite hatte einen Fehler. Sie sehen jetzt die alte Startseite, es ist nichts verloren.",15000)};
+  const plan=()=>{if(geplant||!an())return;geplant=true;Promise.resolve().then(()=>{geplant=false;if(!an())return;
+    try{zeichnen();fehl=0}catch(e){fehl++;window.snFehler=(window.snFehler||0)+1;try{console.error(e)}catch(x){}if(fehl>=2)rueckfall();else setTimeout(plan,300)}})};
+  const mo=new MutationObserver(plan);
+  ["heute","zk","aus","ausTitel","wa"].forEach(id=>{const e=$(id);if(e)mo.observe(e,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["class"]})});
+  document.querySelectorAll(".kacheln").forEach(e=>mo.observe(e,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["class"]}));
+  const ms=new MutationObserver(sync);
+  ["punkt","abgleich","bruecke"].forEach(id=>{const e=$(id);if(e)ms.observe(e,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["class"]})});
+  addEventListener("online",sync);addEventListener("offline",sync);
+  sync();zeichnen();
+  window.snLaeuft=1;   // letzte Zeile: nur wenn alles bis hier lief, bleibt die neue Schicht stehen (siehe RUECKFALL)
+})();
+</script><script>/* Rückfall auf die heutige Startseite. tools/zentrale/start_neu.py (17.11.2026) */if(!window.snLaeuft&&document.body.classList.contains("snNeu")){document.body.classList.remove("snNeu","snMenueAuf");try{if(window.mxFehler)window.mxFehler("Die neue Startseite konnte nicht starten. Sie sehen die alte Startseite, es ist nichts verloren.",15000)}catch(e){}}</script></body></html>
