@@ -1368,10 +1368,15 @@ zeigen();abgleichen();auslagernBald();
   function rkSetzen(el){const sicht=e=>e&&e.offsetParent!==null&&e.getBoundingClientRect().height>0;
     const platz=[document.querySelector("#karte.auf .kk"),...document.querySelectorAll("h1"),...document.querySelectorAll(".buTop")].find(sicht);
     el.classList.add("an");const w=el.offsetWidth||103,h=el.offsetHeight||31;
+    const nichtUnten=()=>{if(el.mxUnten){el.mxUnten=0;el.classList.remove("nxHoch");el.style.bottom=""}};
     if(platz){const r=platz.getBoundingClientRect(),y=r.top+r.height/2-h/2,x=r.right-w;const t=document.createRange();t.selectNodeContents(platz);let tr=r.left;[...platz.childNodes].forEach(n=>{if(n===el)return;try{const q=document.createRange();q.selectNodeContents(n);q.getClientRects().length&&(tr=Math.max(tr,q.getBoundingClientRect().right))}catch(e){}});
-      if(r.bottom>h&&r.top<innerHeight-h&&tr+8<x&&!trifft(el,x,y,w,h)){if(getComputedStyle(platz).position==="static")platz.style.position="relative";if(el.parentNode!==platz)platz.appendChild(el);el.style.position="absolute";el.style.right="0";el.style.top="50%";el.style.transform="translateY(-50%)";return}}
+      if(r.bottom>h&&r.top<innerHeight-h&&tr+8<x&&!trifft(el,x,y,w,h)){if(getComputedStyle(platz).position==="static")platz.style.position="relative";if(el.parentNode!==platz)platz.appendChild(el);nichtUnten();el.style.position="absolute";el.style.right="0";el.style.top="50%";el.style.transform="translateY(-50%)";return}}
     if(el.parentNode!==document.body)document.body.appendChild(el);el.style.position="fixed";el.style.right="16px";el.style.transform="";const xf=innerWidth-16-w;
-    for(let y=10;y<innerHeight*0.7;y+=22){if(!trifft(el,xf,y,w,h)){el.style.top=y+"px";return}}el.classList.remove("an")}
+    for(let y=10;y<innerHeight*0.7;y+=22){if(!trifft(el,xf,y,w,h)){nichtUnten();el.style.top=y+"px";return}}
+    // Neue Ansicht (23.11.2026): ist oben jeder Platz belegt, unten rechts über der Leiste (Lage-Klasse nxHoch aus tools/stil/leiste.py), nie über einem Knopf, nie unsichtbar
+    if(document.documentElement.classList.contains("nxNeu")&&document.getElementById("nxLeiste")){el.mxUnten=1;el.classList.add("nxHoch");el.style.top="auto";
+      for(let d=10;d<innerHeight*0.45;d+=22){el.style.bottom=d+"px";const q=el.getBoundingClientRect();if(!trifft(el,q.left,q.top,w,h))return}el.style.bottom="10px";return}
+    el.classList.remove("an")}
   window.mxRueckZeig=function(id,label,fn,ms){if(!document.body)return null;if(!document.getElementById("mxRkStil")){const c=document.createElement("style");c.id="mxRkStil";c.textContent=RK_STIL;document.head.appendChild(c)}
     let el=document.getElementById(id);if(!el){el=document.createElement("button");el.type="button";el.id=id;document.body.appendChild(el)}
     el.textContent="Rückgängig";el.setAttribute("aria-label",label);el.onclick=()=>{el.mxWill=false;fn()};el.mxWill=true;rkSetzen(el);
