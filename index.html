@@ -1810,12 +1810,14 @@ const SPEICHER={mietixVorgaenge:{tab:"vorgaenge",pk:"nr",liste:true},mietixAnfra
   mietixKunden:{tab:"kunden",pk:"name",liste:false},mietixFahrzeuge:{tab:"fahrzeuge",pk:"name",liste:false},
   mietixAusgaben:{tab:"ausgaben",pk:"id",liste:true},mietixSperren:{tab:"sperren",pk:"id",liste:true},
   mietixAufgaben:{tab:"aufgaben",pk:"id",liste:true},mietixZustand:{tab:"zustand",pk:"id",liste:true},mietixAutos:{tab:"autos",pk:"name",liste:false},mietixStand:{tab:"stand",pk:"id",liste:false},mietixPapierkorb:{tab:"papierkorb",pk:"id",liste:true}};
-const roh=Storage.prototype.setItem;
-const lies=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||"")||d}catch(e){return d}};
+const roh=Storage.prototype.setItem,rohLesen=Storage.prototype.getItem;
+// Eigene Lesezugriffe des Abgleichs zählen nicht als „die Seite hat den Stand gelesen“ (23.11.2026, Schutz vor alten Fenstern)
+const lsGet=k=>rohLesen.call(localStorage,k);
+const lies=(k,d)=>{try{return JSON.parse(lsGet(k)||"")||d}catch(e){return d}};
 // Eine Ablage lesen und dabei unterscheiden (05.11.2026): fehlt = gar nichts da, kaputt = da, aber nicht lesbar. Beides darf nie als „alles gelöscht“ hochgehen.
-function liesAblage(k){const c=SPEICHER[k],leer=c.liste?[]:{},r=localStorage.getItem(k);if(r===null||r==="")return{w:leer,fehlt:true};
-  try{const w=JSON.parse(r);if(w===null)return{w:leer,fehlt:true};if(c.liste?Array.isArray(w):(w&&typeof w==="object"&&!Array.isArray(w)))return{w}}catch(e){}
-  return{w:leer,kaputt:true}}
+function liesAblage(k){const c=SPEICHER[k],leer=c.liste?[]:{},r=lsGet(k);if(r===null||r==="")return{w:leer,fehlt:true,roh:r};
+  try{const w=JSON.parse(r);if(w===null)return{w:leer,fehlt:true,roh:r};if(c.liste?Array.isArray(w):(w&&typeof w==="object"&&!Array.isArray(w)))return{w,roh:r}}catch(e){}
+  return{w:leer,kaputt:true,roh:r}}
 const merk=(k,v)=>{try{roh.call(localStorage,k,JSON.stringify(v));return true}catch(e){if(window.mxVoll)mxVoll();else if(window.mxFehler)mxFehler("Nicht gespeichert: Der Speicher auf diesem Gerät ist voll. Seite offen lassen, sonst geht etwas verloren.");return false}};   // Hinweis auch hier (1.11.2026)
 // Jede Anfrage an den Speicher höchstens 20 Sekunden (31.10.2026): sonst hing der Abgleich bei schlechtem Netz für immer
 const KEINE_VERBINDUNG="Keine Verbindung, wird nachgeholt";   // statt „Failed to fetch“ und „signal is aborted“ (05.11.2026)
@@ -1869,10 +1871,10 @@ async function sicherRaus(k,w,H){const c=SPEICHER[k];if(!c)return bilderRaus(w);
 let ausT=null,ausLauf=false;
 const auslagernBald=()=>{clearTimeout(ausT);ausT=setTimeout(auslagern,300)};
 async function auslagern(){if(ausLauf){auslagernBald();return}ausLauf=true;
-  try{for(const k of Object.keys(SPEICHER).concat(["mietixEntwurfProtokolle"])){const r=localStorage.getItem(k);if(!r||r.indexOf('"data:image/')<0)continue;
+  try{for(const k of Object.keys(SPEICHER).concat(["mietixEntwurfProtokolle"])){const r=lsGet(k);if(!r||r.indexOf('"data:image/')<0)continue;
       let w;try{w=JSON.parse(r)}catch(e){continue}
       const H=lies("mietixAbgleich",{}),hv=JSON.stringify(H),s=await sicherRaus(k,w,H);if(s===w)continue;
-      if(localStorage.getItem(k)!==r||(laeuft&&k in SPEICHER)){auslagernBald();continue}   // inzwischen geändert oder Abgleich läuft: gleich noch einmal
+      if(lsGet(k)!==r||(laeuft&&k in SPEICHER)){auslagernBald();continue}   // inzwischen geändert oder Abgleich läuft: gleich noch einmal
       if(JSON.stringify(lies("mietixAbgleich",{}))!==hv){auslagernBald();continue}
       if(k in SPEICHER)merk("mietixAbgleich",H);roh.call(localStorage,k,JSON.stringify(s))}}
   catch(e){}finally{ausLauf=false}}
@@ -1966,7 +1968,7 @@ function wertText(p,x){const n=String((p||[]).slice(-1)[0]||"");
 function streitText(k,eintrag,streit){const wer=(BESCHRIFTUNG[k]||(x=>NAMEN[k]||k))(eintrag||{}).trim(),teile=streit.slice(0,3).map(x=>feldName(x.p)+" wurde auf zwei Geräten verschieden geändert: "+wertText(x.p,x.hier)+" und "+wertText(x.p,x.dort)+".");
   if(streit.length>3)teile.push("Dazu "+(streit.length-3)+" weitere Angaben.");
   return (wer?wer+": ":"")+teile.join(" ")+" Bitte prüfen, der andere Stand liegt im Papierkorb."}
-let GERAET=null;try{GERAET=localStorage.getItem("mietixGeraet");if(!GERAET){GERAET="g"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);roh.call(localStorage,"mietixGeraet",GERAET)}}catch(e){}
+let GERAET=null;try{GERAET=lsGet("mietixGeraet");if(!GERAET){GERAET="g"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);roh.call(localStorage,"mietixGeraet",GERAET)}}catch(e){}
 // streit: [{p:Pfad, hier:Wert, dort:Wert}] = Felder, die auf zwei Geräten verschieden geändert wurden. Dann nur sie beim Wiederherstellen (A8) und ein roter Hinweis mit Grund.
 function andereFassung(k,p,eintrag,streit,hier,still){if(k==="mietixPapierkorb"||k==="mietixStand")return;
   const pk=lies("mietixPapierkorb",[]),jetzt=new Date().toISOString(),c=SPEICHER[k];
@@ -2023,10 +2025,10 @@ function zusammen(k,p,lokal,server,basisHash,basisFelder){
 /* Gleiche Nummer, anderer Name (05.11.2026, zwei Geräte ohne Netz): zwei verschiedene Mietverträge. Beide bleiben, der spätere bekommt eine neue Nummer. */
 const nameGleich=(a,b)=>String(a||"").toLowerCase().replace(/\s+/g,"")===String(b||"").toLowerCase().replace(/\s+/g,"");
 const andererKunde=(a,b)=>!!(a&&b&&!b._weg&&String(a.name||"").trim()&&String(b.name||"").trim()&&!nameGleich(a.name,b.name));
-function freieNummer(m){let max=+(localStorage.getItem("mietixHoechsteNr")||0)||0;const nimm=s=>{if(/^\d{6}$/.test(String(s))&&+s>max)max=+s};
+function freieNummer(m){let max=+(lsGet("mietixHoechsteNr")||0)||0;const nimm=s=>{if(/^\d{6}$/.test(String(s))&&+s>max)max=+s};
   Object.keys(m).forEach(nimm);lies("mietixPapierkorb",[]).forEach(x=>{if(x&&x.ablage==="mietixVorgaenge")nimm(x.schluessel)});return String(max+1).padStart(6,"0")}
 function nummerGewechselt(m,alt,eintrag,neu){m[neu]=Object.assign({},eintrag,{nr:neu});
-  try{if(+neu>(+(localStorage.getItem("mietixHoechsteNr")||0)||0))roh.call(localStorage,"mietixHoechsteNr",String(+neu))}catch(e){}
+  try{if(+neu>(+(lsGet("mietixHoechsteNr")||0)||0))roh.call(localStorage,"mietixHoechsteNr",String(+neu))}catch(e){}
   hinweis("Die Nummer "+alt+" gab es zweimal. "+(eintrag.name||"Dieser Mietvertrag")+" hat jetzt Mietvertrag "+neu+". Schon ausgedruckt oder verschickt? Bitte neu ausgeben.");
   window.dispatchEvent(new CustomEvent("mietix-nummer-neu",{detail:{alt,neu,name:eintrag.name||""}}))}
 // Holen, zusammenführen, hochladen. Geht ein Eintrag oben nicht mehr auf den geholten Stand, wird nur er neu geholt und die Runde wiederholt.
@@ -2046,6 +2048,8 @@ async function ablageAbgleichen(k,c,h,zeilen,geholt){
       else{h.hash[p]=fp(z.daten);if(FELDWEISE[k])h.felder[p]=felderVon(z.daten)}});
     for(const [alt,eintrag] of doppelt){let neu=await window.mietixNeueNummer();if(!neu||neu in m2)neu=freieNummer(m2);nummerGewechselt(m2,alt,eintrag,neu)}
     if(anders){let w=ausMap(k,m2);try{w=await sicherRaus(k,w,{[k]:h})}catch(e){}
+      // Während des Wartens hat eine Seite gespeichert (23.11.2026): nie den vorher gelesenen Stand darüberschreiben, die ganze Runde neu
+      if(lsGet(k)!==l0.roh){nochmal=true;throw new Error("Ein Fenster hat gerade gespeichert, wird nachgeholt")}
       if(WACHE[k])herkunftMerken();
       if(!merk(k,w))throw new Error("Speicher auf diesem Gerät voll");if(!geholt.includes(k))geholt.push(k);
       if(WACHE[k])fremdPruefen(k,"geraet")}
@@ -2110,7 +2114,7 @@ async function abgleichen(){
   if(geholt.length)window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:geholt}));
   laeuft=false;zeigen();auslagernBald();if(nochmal){nochmal=false;setTimeout(abgleichen,500)}}
 // Knöpfe der roten Zeile: viele Löschungen freigeben oder zurückholen, beschädigte Liste neu holen
-window.mietixAbgleichWahl=function(art,k,ja){if(art==="kaputt"){const r=localStorage.getItem(k);if(r)dbRein([["kaputt:"+k+":"+Date.now(),r]]).catch(()=>{});localStorage.removeItem(k)}
+window.mietixAbgleichWahl=function(art,k,ja){if(art==="kaputt"){const r=lsGet(k);if(r)dbRein([["kaputt:"+k+":"+Date.now(),r]]).catch(()=>{});localStorage.removeItem(k)}
   else LOESCH[k]=!!ja;FRAGEN=FRAGEN.filter(f=>f.k!==k);zeigen();return abgleichen()};
 /* ---------- Offenes Fenster warnt, wenn dieselbe Miete woanders geändert wurde (11.11.2026, Baran: „Ja, so bauen“) ----------
    Diese Seite merkt sich je Ablage den Stand, den sie zuletzt kannte (eigenes Speichern zählt mit). Kommt ein anderer Stand an
@@ -2120,12 +2124,12 @@ window.mietixAbgleichWahl=function(art,k,ja){if(art==="kaputt"){const r=localSto
    Altes Fenster schreibt alten Stand zurück: Was inzwischen woanders geändert wurde und hier nur aus dem alten Fenster stammt, bleibt neu.
    Der alte Stand liegt im Papierkorb, roter Hinweis mit Grund. Gilt nur, solange das Fenster aus der Zeit vor der Änderung offen ist. */
 const WACHE={mietixVorgaenge:1,mietixAnfragen:1},GESEHEN={},FREMD={};let EIGEN=false;
-Object.keys(WACHE).forEach(k=>{try{GESEHEN[k]=localStorage.getItem(k)}catch(e){}});
+Object.keys(WACHE).forEach(k=>{try{GESEHEN[k]=lsGet(k)}catch(e){}});
 window.mietixWacheQuellen=window.mietixWacheQuellen||[];
 const ohneLaerm=x=>{if(!istObj(x))return x;const y=Object.assign({},x);delete y.verlauf;delete y.geaendert;return y};
 const anPfadW=(o,p)=>p.reduce((x,k)=>x==null?undefined:x[k],o);
 function herkunftMerken(){try{roh.call(localStorage,"mietixFremdHerkunft",JSON.stringify({zeit:Date.now(),geraet:GERAET}))}catch(e){}}
-function herkunftQuelle(){try{const h=JSON.parse(localStorage.getItem("mietixFremdHerkunft")||"null");return h&&Date.now()-h.zeit<5000?"geraet":"fenster"}catch(e){return"fenster"}}
+function herkunftQuelle(){try{const h=JSON.parse(lsGet("mietixFremdHerkunft")||"null");return h&&Date.now()-h.zeit<5000?"geraet":"fenster"}catch(e){return"fenster"}}
 function wacheOffen(){let r=[];(window.mietixWacheQuellen||[]).forEach(f=>{try{r=r.concat(f()||[])}catch(e){}});return r}
 const roh2map=(k,s)=>{try{return alsMap(k,JSON.parse(s||"null")||(SPEICHER[k].liste?[]:{}))}catch(e){return null}};
 // Kurz, was sich geändert hat: „Rest bezahlt am 11.11. bar“, „Verlängert bis 14.11.“
@@ -2170,9 +2174,9 @@ function fremdHinweis(it,quelle,zeilen){const el=it.el;if(!el||!el.querySelector
   try{const r=h.getBoundingClientRect();if((r.bottom<0||r.top>innerHeight)&&window.mxFehler)mxFehler(kopfT+" "+h.mxZeilen.slice(0,3).join(", ")+". Hinweis oben im "+(el.classList.contains("mxFenster")?"Fenster.":"Formular."),6000)}catch(e){}}
 window.mietixFremdWeg=el=>{if(el&&el.querySelectorAll)el.querySelectorAll(".mxFremd").forEach(x=>x.remove())};
 // Fremde Änderung angekommen: vergleichen, merken (für den Schutz vor dem alten Fenster), offene Fenster derselben Miete warnen
-function fremdPruefen(k,quelle){let jetzt;try{jetzt=localStorage.getItem(k)}catch(e){return}const vorher=GESEHEN[k];GESEHEN[k]=jetzt;if(vorher===jetzt||vorher===undefined)return;
+function fremdPruefen(k,quelle){let jetzt;try{jetzt=lsGet(k)}catch(e){return}const vorher=GESEHEN[k];GESEHEN[k]=jetzt;if(vorher===jetzt||vorher===undefined)return;
   const a=roh2map(k,vorher),n=roh2map(k,jetzt);if(!a||!n)return;const liste=[];
-  new Set([...Object.keys(a),...Object.keys(n)]).forEach(p=>{if(fp(ohneLaerm(a[p]))===fp(ohneLaerm(n[p])))return;liste.push({k,p,alt:a[p],neu:n[p]});
+  new Set([...Object.keys(a),...Object.keys(n)]).forEach(p=>{if(jetzt)altStandMerken(k,p,a[p],n[p]);if(fp(ohneLaerm(a[p]))===fp(ohneLaerm(n[p])))return;liste.push({k,p,alt:a[p],neu:n[p]});
     if(istObj(a[p])&&istObj(n[p])&&!n[p]._weg){const r=FREMD[k+"|"+p]||(FREMD[k+"|"+p]={zeit:Date.now(),pfade:{}});
       pfadUnterschiede(ohneLaerm(a[p]),ohneLaerm(n[p]),[],[]).forEach(u=>{const s=JSON.stringify(u.p),alt=r.pfade[s];r.pfade[s]={p:u.p,vor:alt?alt.vor:fp(u.alt),nach:fp(u.neu)}});r.zeit=Date.now()}});
   if(!liste.length)return;
@@ -2181,7 +2185,7 @@ function fremdPruefen(k,quelle){let jetzt;try{jetzt=localStorage.getItem(k)}catc
 addEventListener("storage",e=>{if(e.storageArea===localStorage&&WACHE[e.key])fremdPruefen(e.key,herkunftQuelle())});
 // Schreibt ein Fenster, das schon vor der fremden Änderung offen war, an diesen Stellen genau den alten Wert zurück: der neue bleibt
 function altSchutz(k,v){const keys=Object.keys(FREMD).filter(x=>x.indexOf(k+"|")===0);if(!keys.length)return v;
-  let arr;try{arr=JSON.parse(v)}catch(e){return v}if(!Array.isArray(arr))return v;const c=roh2map(k,localStorage.getItem(k));if(!c)return v;
+  let arr;try{arr=JSON.parse(v)}catch(e){return v}if(!Array.isArray(arr))return v;const c=roh2map(k,lsGet(k));if(!c)return v;
   const pk=SPEICHER[k].pk,quellen=window.mietixWacheQuellen||[],offen=quellen.length?wacheOffen():null;let neu=false;
   keys.forEach(key=>{const r=FREMD[key],p=key.slice(k.length+1);
     if(offen?!offen.some(it=>it.k===k&&String(it.p)===p&&(it.seit||0)<r.zeit):Date.now()-r.zeit>10*60000){delete FREMD[key];return}   // Fenster schon neu geladen oder zu: gilt nicht mehr
@@ -2191,6 +2195,33 @@ function altSchutz(k,v){const keys=Object.keys(FREMD).filter(x=>x.indexOf(k+"|")
     andereFassung(k,p,orig,alt.map(x=>({p:x.p,hier:anPfadW(c[p],x.p),dort:anPfadW(orig,x.p)})),c[p],true);
     hinweis(wer+": "+was+(alt.length>1?" wurden":" wurde")+" inzwischen woanders geändert. Ein vorher geöffnetes Fenster wollte den alten Stand speichern. Der neue Stand bleibt, der alte liegt im Papierkorb.")});
   return neu?JSON.stringify(arr):v}
+/* ---------- Altes Fenster überschreibt nie neuere Buchungen (23.11.2026, Mietverträge 000569 und 000571 am 22.11. um 13:14 verloren) ----------
+   Ein Fenster, das seit Tagen offen war, schrieb seinen alten Stand der ganzen Liste zurück: neuere Fassungen wurden zurückgedreht,
+   inzwischen woanders angelegte Mietverträge fehlten darin und gingen als gelöscht hoch. Darum merkt sich jede Seite, was sich
+   ohne sie geändert hat (ALTSTAND, ohne Zeitgrenze, bis die Seite den neuen Stand selbst schreibt):
+   - schreibt sie eine ältere Fassung genau so zurück, bleibt die neue;
+   - fehlt in ihrer Liste ein Eintrag, den sie nie gesehen hat, bleibt er. Gelöscht wird nur, was die Seite frisch gelesen hat (LESE). */
+const ALTSTAND={},LESE={};
+function altStandMerken(k,p,a,n){const f=x=>x===undefined||x===null||(x&&x._weg)?undefined:fp(x),fa=f(a),fn=f(n);if(fa===fn)return;
+  const key=k+"|"+p,r=ALTSTAND[key]||(ALTSTAND[key]={alt:{},neu:false});if(fa===undefined)r.neu=true;else r.alt[fa]=1;if(fn!==undefined)delete r.alt[fn]}
+function altFensterSchutz(k,v){
+  // Ganze Liste fehlt (geleert, neues Gerät): das ist kein Löschen, es gibt nichts Neueres zu schützen (wie im Abgleich seit 05.11.2026)
+  const roh0=lsGet(k);if(roh0===null||roh0===""){Object.keys(ALTSTAND).forEach(x=>{if(x.indexOf(k+"|")===0)delete ALTSTAND[x]});GESEHEN[k]=roh0;return v}
+  try{if(lsGet(k)!==GESEHEN[k])fremdPruefen(k,"fenster")}catch(e){}   // was die Seite noch nicht mitbekommen hat, jetzt nachtragen
+  const keys=Object.keys(ALTSTAND).filter(x=>x.indexOf(k+"|")===0);if(!keys.length)return v;
+  const jetztRoh=lsGet(k),l=LESE[k],frisch=!!l&&l.wert===jetztRoh&&Date.now()-l.zeit<3000;   // eben frisch gelesen und geändert: die Seite kennt den Stand
+  let arr;try{arr=JSON.parse(v)}catch(e){return v}if(!Array.isArray(arr))return v;
+  const c=roh2map(k,jetztRoh);if(!c)return v;const pk=SPEICHER[k].pk,geschuetzt=[];
+  keys.forEach(key=>{const r=ALTSTAND[key],p=key.slice(k.length+1),i=arr.findIndex(x=>x&&String(x[pk])===p),jetzt=c[p],da=istObj(jetzt)&&!jetzt._weg;
+    if(i>=0){const e=arr[i];if(!r.alt[fp(e)]){delete ALTSTAND[key];return}   // eigene oder schon neue Fassung: die Seite ist auf dem Stand
+      if(da)arr[i]=jetzt;else arr.splice(i,1);geschuetzt.push(da?jetzt:e);return}
+    if(frisch||!da){delete ALTSTAND[key];return}
+    arr.push(jetzt);geschuetzt.push(jetzt)});
+  if(!geschuetzt.length)return v;
+  const wer=geschuetzt.slice(0,3).map(x=>(BESCHRIFTUNG[k]||(y=>NAMEN[k]||""))(x||{}).trim()).join(", ")+(geschuetzt.length>3?" und "+(geschuetzt.length-3)+" weitere":"");
+  hinweis("Ein älteres, noch offenes Fenster wollte einen alten Stand speichern. Geschützt: "+wer+". Der neue Stand bleibt. Bitte alte Mietix-Fenster einmal neu laden.");
+  return JSON.stringify(arr)}
+Storage.prototype.getItem=function(k){const w=rohLesen.call(this,k);if(this===localStorage&&WACHE[k])LESE[k]={wert:w,zeit:Date.now()};return w};
 // Jede Änderung an den vier Speichern löst kurz danach einen Abgleich aus
 let warte=null;
 // Ohne Anmeldung gespeichert (12.11.2026): einmal je Seite ein roter Hinweis, damit es niemand übersieht. Nur auf der echten Seite, nicht im Test.
@@ -2198,10 +2229,10 @@ let ohneGemeldet=false;
 function ohneAnmeldung(){if(ohneGemeldet||!/github\.io$/.test(location.hostname))return;ohneGemeldet=true;
   setTimeout(()=>{const t="Nicht gesichert: Dieses Gerät ist nicht angemeldet. Was hier gespeichert wird, fehlt auf den anderen Geräten. Bitte auf der Startseite anmelden.";
     if(window.mxFehler)mxFehler(t);else alert(t)},300)}
-Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof v==="string"&&!rueckLaeuft&&!EIGEN)v=altSchutz(k,v);
-  const alt=(this===localStorage&&SPEICHER[k])?localStorage.getItem(k):null;roh.call(this,k,v);if(this===localStorage&&WACHE[k])GESEHEN[k]=v;
+Storage.prototype.setItem=function(k,v){if(this===localStorage&&WACHE[k]&&typeof v==="string"&&!rueckLaeuft&&!EIGEN){v=altFensterSchutz(k,v);v=altSchutz(k,v)}
+  const alt=(this===localStorage&&SPEICHER[k])?lsGet(k):null;roh.call(this,k,v);if(this===localStorage&&WACHE[k])GESEHEN[k]=v;
   if(this===localStorage&&(SPEICHER[k]||k==="mietixEntwurfProtokolle")&&typeof v==="string"&&v.indexOf('"data:image/')>=0)auslagernBald();
-  if(this===localStorage&&SPEICHER[k]&&!sitzung&&!localStorage.getItem("mietixSitzung"))ohneAnmeldung();
+  if(this===localStorage&&SPEICHER[k]&&!sitzung&&!lsGet("mietixSitzung"))ohneAnmeldung();
   if(this===localStorage&&SPEICHER[k]){aenderungen++;if(!ungesichert){ungesichert=true;if(sitzung&&!pwSetzen)zeigen()}clearTimeout(warte);warte=setTimeout(abgleichen,800);if(k!=="mietixStand"&&k!=="mietixPapierkorb")sicherheitsnetz(k,alt,v)}};
 
 /* ---------- Sicherheitsnetz (28.10.2026, Baran: "Verklicken darf nichts verlieren") ----------
@@ -2220,7 +2251,7 @@ function sicherheitsnetz(k,alt,neu){
   // Papierkorb: Einträge, die aus einer Liste verschwunden sind (nicht bei Rückgängig selbst)
   if(!rueckLaeuft){try{const c=SPEICHER[k];const ma=alsMap(k,JSON.parse(alt||"null")||(c.liste?[]:{})),mn=alsMap(k,JSON.parse(neu||"null")||(c.liste?[]:{}));
     // Sperre eines gelöschten Termins: nicht in den Papierkorb, Termin und Sperre kommen zusammen über Termine › Gelöscht zurück (11.11.2026, strenge Prüfung Punkt 4)
-    const tmWeg=p=>{if(k!=="mietixSperren"||!/^termin-/.test(p))return false;let t=null;try{t=((JSON.parse(localStorage.getItem("mietixStand")||"{}")||{}).termine||{})[p.slice(7)]}catch(e){}return !t||!!t._weg||!t.sperren};
+    const tmWeg=p=>{if(k!=="mietixSperren"||!/^termin-/.test(p))return false;let t=null;try{t=((JSON.parse(lsGet("mietixStand")||"{}")||{}).termine||{})[p.slice(7)]}catch(e){}return !t||!!t._weg||!t.sperren};
     const weg=Object.keys(ma).filter(p=>!(p in mn)&&!tmWeg(p));
     if(weg.length){const pk=lies("mietixPapierkorb",[]),jetzt=new Date().toISOString();
       weg.forEach(p=>pk.push({id:k+":"+p+":"+Date.now(),ablage:k,schluessel:p,eintrag:ma[p],zeit:jetzt,text:(BESCHRIFTUNG[k]||(x=>NAMEN[k]+" "+p))(ma[p]||{})}));
@@ -2269,7 +2300,7 @@ function rueckgaengig(){if(!burst)return;
         if(fp(o.verlauf)===fp(n[p].verlauf)){if(a[p].verlauf===undefined)delete o.verlauf;else o.verlauf=a[p].verlauf}
         else if(Array.isArray(o.verlauf)&&nv.length>av.length)nv.slice(av.length).forEach(x=>{const i=o.verlauf.findIndex(y=>fp(y)===fp(x));if(i>=0)o.verlauf.splice(i,1)})}
       m[p]=o;neu=true});
-    if(neu)merk(k,ausMap(k,m))})}finally{rueckLaeuft=false;Object.keys(b).forEach(k=>{if(WACHE[k])try{GESEHEN[k]=localStorage.getItem(k)}catch(e){}})}   // eigene Änderung, kein Hinweis „woanders geändert“
+    if(neu)merk(k,ausMap(k,m))})}finally{rueckLaeuft=false;Object.keys(b).forEach(k=>{if(WACHE[k])try{GESEHEN[k]=lsGet(k)}catch(e){}})}   // eigene Änderung, kein Hinweis „woanders geändert“
   const el=document.getElementById("mietixRueck");
   if(nicht.length||kaputt){if(el){el.classList.remove("an");el.onclick=null}
     if(nicht.length&&window.mxFehler)mxFehler("Rückgängig ging nicht für "+nicht.join(", ")+": inzwischen auf einem anderen Gerät oder in einem anderen Fenster geändert. Bitte von Hand ändern.",8000);
@@ -2277,7 +2308,7 @@ function rueckgaengig(){if(!burst)return;
   else if(el){el.textContent="✓ Zurückgeholt";el.onclick=null;clearTimeout(el.mxT);el.mxT=setTimeout(()=>el.classList.remove("an"),1500)}
   ungesichert=true;zeigen();window.dispatchEvent(new CustomEvent("mietix-abgleich",{detail:Object.keys(b)}));clearTimeout(warte);warte=setTimeout(abgleichen,800)}
 // Angefangenen Entwurf wiederherstellen: ein gerade angefangener anderer geht nicht still verloren, er kommt vorher in den Papierkorb (11.11.2026, Prüfung A A7)
-function entwurfBeiseiteLegen(k,pk,neu){let alt=null;try{alt=JSON.parse(localStorage.getItem(k)||"null")}catch(x){}if(!alt||typeof alt!=="object")return pk;
+function entwurfBeiseiteLegen(k,pk,neu){let alt=null;try{alt=JSON.parse(lsGet(k)||"null")}catch(x){}if(!alt||typeof alt!=="object")return pk;
   const v=k==="mietixEntwurfVertrag",f=alt.f||{},wer=v?[String(f.name||"").trim(),alt.auto].filter(Boolean).join(", "):[String(alt.name||"").trim(),alt.auto].filter(Boolean).join(", ");
   const inhalt=v?!!(String(f.name||"").trim()||alt.auto):!!(String(alt.name||"").trim()||String(alt.tel||"").trim()||alt.auto||alt.von||String(alt.notiz||"").trim());
   const ohneZeit=x=>{const y=Object.assign({},x||{});delete y.zeit;return fp(y)};if(!inhalt||ohneZeit(alt)===ohneZeit(neu))return pk;
