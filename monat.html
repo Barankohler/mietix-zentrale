@@ -812,7 +812,7 @@ function zeichne(){
   LK.zeile(passt.length+(passt.length===1?" Miete":" Mieten")+" im "+monName(M));
   const sum=a=>passt.reduce((s,x)=>s+x.drin.filter(y=>y.art===a).reduce((t,y)=>t+y.b,0),0);
   const anz=a=>passt.filter(x=>x.drin.some(y=>y.art===a)).length;
-  // Einnahmen von Hand (Seite Geld, 16.11.2026): zählen mit wie auf den Seiten Geld und Zahlen, sonst stünde hier weniger als dort
+  // Selbst eingetragene Einnahmen, Wort wie auf Geld (Fehlerliste F78, 24.11.2026); Einnahmen von Hand (Seite Geld, 16.11.2026): zählen mit wie auf den Seiten Geld und Zahlen, sonst stünde hier weniger als dort
   const handAlle=lies("mietixAusgaben",[]).filter(x=>x&&!x._weg&&x.rein&&istTag(String(x.datum||"").slice(0,10))),
     handIn=(m,bis)=>handAlle.filter(x=>String(x.datum).slice(0,7)===m&&(!bis||String(x.datum).slice(0,10)<=bis)).reduce((s,x)=>s+n0(x.betrag),0),
     hand=handAlle.filter(x=>inMon(x.datum)&&(!LK.w.auto||x.auto===LK.w.auto)&&LK.passt([x.art,x.auto,x.notiz].join(" "))).reduce((s,x)=>s+n0(x.betrag),0);
@@ -837,7 +837,7 @@ function zeichne(){
     '<div class="gr"><i>Verlängerungen</i><b>'+eur(verl)+'</b><small>'+st(anz("verl"))+'</small></div>'+
     '<div class="gr"><i>Kaution einbehalten</i><b>'+eur(kEin)+'</b><small>'+st(anz("kaution"))+'</small></div></div>';
   h+='<div class="karte gesamt">'+
-    (hand?'<div class="gz"><span>Einnahmen von Hand</span><b>'+eur(hand)+'</b></div>':"")+
+    (hand?'<div class="gz"><span>Selbst eingetragene Einnahmen</span><b>'+eur(hand)+'</b></div>':"")+
     '<div class="gz summe1"><span>Zusammen im '+MN+'</span><b>'+eur(rein)+'</b></div>'+
     (LK.q||LK.w.auto||M>JETZT?"":d!=null?'<div class="vgl '+(d>=0?"hoch":"runter")+'">'+(d>=0?"▲ ":"▼ ")+Math.abs(d)+' % gegenüber '+VT+' ('+eur(basis)+')</div>':reinVor?'<div class="vgl leise">'+MV+': '+eur(reinVor)+'</div>':"")+
     (offen?'<div class="gz offen"><span>Noch offen</span><b>'+eur(offen)+'</b></div>':"")+
@@ -1025,10 +1025,10 @@ const felderVon=x=>{const f={};if(istObj(x))Object.keys(x).forEach(n=>{f[n]=fp(x
   else if(LISTEN[n]&&Array.isArray(x[n])){const P=LISTEN[n]+"#";f[P+"n"]=String(x[n].length);
     x[n].forEach((e,i)=>{const s=P+elSchl(e,i);f[s]=fp(e);if(istObj(e))Object.keys(e).forEach(t=>f[s+"."+t]=fp(e[t]))})}});return f};
 /* Feldnamen und Werte für rote Hinweise, „Sicher?“ und das offene Fenster (11.11.2026) */
-const FNAMEN={gesamt:"Mietpreis",preis1:"Mietpreis",preis2:"Zusatzfahrer-Preis",bisD:"Rückgabe",bisU:"Rückgabeuhr",vonD:"Abholung",vonU:"Abholuhr",telefon:"Telefon",nummer:"Telefon",name:"Name",
+const FNAMEN={gesamt:"Mietpreis",preis1:"Mietpreis",preis2:"Zusatzfahrer-Preis",bisD:"Rückgabe",bisU:"Rückgabeuhr",vonD:"Übergabe",vonU:"Übergabeuhr",telefon:"Telefon",nummer:"Telefon",name:"Name",
   anschrift:"Anschrift",email:"E-Mail",geb:"Geburtsdatum",gebort:"Geburtsort",auto:"Auto",kz:"Kennzeichen",km:"km",freikm:"Inklusive km",mvRab:"Rabatt",zf:"Zusatzfahrer",paketKm:"Kilometerpaket",
   kautionArt:"Kautionsart",sb:"Selbstbeteiligung",mehrkm:"Mehr-km-Preis",ort:"Ort",status:"Status",notiz:"Notiz",ueb:"Übergabe",rueck:"Rückgabe-Protokoll",unterschrift:"Unterschrift",
-  kautionRueck:"Kaution zurück",endabrechnung:"Endabrechnung",von:"Abholung",bis:"Rückgabe",angebot:"Angebot",anzahlung:"Anzahlung",kostenVorab:"Weitere Kosten",verlaengerungen:"Verlängerung",teilzahlungen:"Teilzahlung",zahlung:"Zahlung"};
+  kautionRueck:"Kaution zurück",endabrechnung:"Endabrechnung",von:"Übergabe",bis:"Rückgabe",angebot:"Angebot",anzahlung:"Anzahlung",kostenVorab:"Weitere Kosten",verlaengerungen:"Verlängerung",teilzahlungen:"Teilzahlung",zahlung:"Zahlung"};
 const ZTEIL={anz:"Anzahlung",rest:"Rest",kaut:"Kaution"};
 // Schadenfall (F11): Namen wie auf der Seite Schäden
 const FALLFELD={status:"Stand",forderung:"Schaden",einbehalten:"Kaution behalten",frist:"Frist",fristDatum:"Frist",schritt:"Nächster Schritt",worum:"Worum es geht",gruppe:"Gruppe",
@@ -1038,7 +1038,7 @@ function feldName(p){p=(p||[]).map(String);const a=p[0],b=p[1],c=p[2];
   if(a==="faelle")return c==="belege"&&p[3]?"Beleg "+(BELEGNAME[p[3]]||p[3]):c?FALLFELD[c]||c:"Schadenfall";   // F11
   if(a==="zahlung"&&ZTEIL[b])return ZTEIL[b]+(c==="am"?(b==="kaut"?" erhalten am":" bezahlt am"):c==="art"?", Zahlart":"");
   if(a==="anzahlung")return "Anzahlung"+(b==="am"?" bezahlt am":b==="art"?", Zahlart":"");
-  if(a==="angebot"&&b)return({preis:"Mietpreis",freikm:"Inklusive km",rabatt:"Rabatt",von:"Abholung",bis:"Rückgabe",auto:"Auto"})[b]||"Angebot";
+  if(a==="angebot"&&b)return({preis:"Mietpreis",freikm:"Inklusive km",rabatt:"Rabatt",von:"Übergabe",bis:"Rückgabe",auto:"Auto"})[b]||"Angebot";
   if(a==="kautionRueck"&&b)return({einbehalt:"Einbehalt",betrag:"Kaution zurück",am:"Kaution zurück am",grund:"Grund für den Einbehalt"})[b]||"Kaution zurück";
   if(a==="verlaengerungen"||a==="teilzahlungen"){const N=a==="verlaengerungen"?"Verlängerung":"Teilzahlung",n=b!=null&&/^\d+$/.test(b)?" "+(+b+1):"";
     return N+n+(c?({aufpreis:", Aufpreis",betrag:", Betrag",bisNeu:", verlängert bis",bezahltAm:", bezahlt am",am:", am",art:", Zahlart",bezahlt:", bezahlt"})[c]||"":"")}

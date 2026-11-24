@@ -1377,11 +1377,11 @@ body.snNeu .snAlt.snLaedt{color:var(--rg-t2)}
     // Mit Uhrzeit wie Buchungen (11.11.2026, Nachtprüfung C5): Rückgabe heute 00:30 ist um 00:52 schon überfällig
     alle.filter(x=>!x._weg&&x.ueb&&x.status!=="zurück"&&rSpaet(x)).forEach(x=>rest.push({t:x.name,i:(x.auto||"")+", Rückgabe war "+(x.bisD===hi?"heute"+(x.bisU?" "+x.bisU+" Uhr":""):de(x.bisD)),k:"Überfällig",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"}));
     // Abholung überfällig (09.11.2026): Beginn lag vor heute, keine Übergabe eingetragen. Nur Mietverträge, Anfragen zählen nicht. Die Übergabe-Liste selbst bleibt weg (01.11.2026, frisst Platz)
-    alle.filter(x=>!x._weg&&!x.ueb&&x.status!=="zurück"&&x.status!=="storniert"&&x.vonD&&x.vonD<hi&&x.vonD>=(d=>{d.setDate(d.getDate()-7);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")})(new Date(hi+"T12:00"))).sort((a,b)=>a.vonD.localeCompare(b.vonD)).forEach(x=>rest.push({t:x.name,i:(x.auto||"")+", Abholung überfällig seit "+de(x.vonD),k:"Überfällig",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"}));
+    alle.filter(x=>!x._weg&&!x.ueb&&x.status!=="zurück"&&x.status!=="storniert"&&x.vonD&&x.vonD<hi&&x.vonD>=(d=>{d.setDate(d.getDate()-7);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")})(new Date(hi+"T12:00"))).sort((a,b)=>a.vonD.localeCompare(b.vonD)).forEach(x=>rest.push({t:x.name,i:(x.auto||"")+", Übergabe überfällig seit "+de(x.vonD),k:"Überfällig",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"}));   // (Fehlerliste F47, 24.11.2026)
     // Fehlerliste F28, 24.11.2026: gebuchte Anfrage ohne Mietvertrag, Beginn verpasst (bis 7 Tage, wie oben). Das Auto bleibt belegt, darum rot bis zum Mietvertrag
     {const nA=t=>String(t||"").toLowerCase().replace(/\s+/g,""),ab7=(d=>{d.setDate(d.getDate()-7);return iso(d)})(new Date(hi+"T12:00"));
       anf.filter(a=>!a._weg&&a.status==="gebucht"&&a.von&&a.von<hi&&a.von>=ab7&&!a.vertrag&&!alle.some(x=>!x._weg&&x.status!=="storniert"&&nA(x.name)===nA(a.name)&&x.vonD===a.von))
-        .sort((a,b)=>a.von.localeCompare(b.von)).forEach(a=>rest.push({t:a.name||a.nummer||"ohne Namen",i:(a.auto||"")+", Abholung überfällig seit "+de(a.von)+", Mietvertrag fehlt",k:"Überfällig",art:"rot",href:B+"mietix-vertrag/?buchung="+encodeURIComponent(a.id)}))}
+        .sort((a,b)=>a.von.localeCompare(b.von)).forEach(a=>rest.push({t:a.name||a.nummer||"ohne Namen",i:(a.auto||"")+", Übergabe überfällig seit "+de(a.von)+", Mietvertrag fehlt",k:"Überfällig",art:"rot",href:B+"mietix-vertrag/?buchung="+encodeURIComponent(a.id)}))}   // (Fehlerliste F47, 24.11.2026)
     // Miete offen nach der Rückgabe (09.11.2026): Rest oder Verlängerung noch nicht bezahlt, ab dem 4. Tag wie die Endabrechnung (Achtung nur über 3 Tage). Die Nachzahlung steht in der Zeile Endabrechnung, nie doppelt
     alle.filter(x=>!x._weg&&x.status==="zurück"&&offenB(x)>0&&tageSeit((x.rueck&&x.rueck.datum)||x.bisD)>3).forEach(x=>rest.push({t:x.name,i:"Miete "+EUR(offenB(x))+" offen seit "+tageSeit((x.rueck&&x.rueck.datum)||x.bisD)+" Tagen",k:"Offen",art:"rot",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe"}));
     alle.filter(x=>!x._weg&&endOffen(x)>0).forEach(x=>{const s=tageSeit((x.rueck&&x.rueck.datum)||x.bisD);rest.push({t:x.name,i:"Endabrechnung "+eur2(endOffen(x))+" € noch offen"+(s>3?", seit "+s+" Tagen!":""),k:"Offen",art:s>3?"rot":"gelb",href:B+"mietix-vertrag/?nr="+encodeURIComponent(x.nr)+"&zeige=mappe",akt:"endbezahlt",nr:x.nr})});
@@ -1985,10 +1985,10 @@ const felderVon=x=>{const f={};if(istObj(x))Object.keys(x).forEach(n=>{f[n]=fp(x
   else if(LISTEN[n]&&Array.isArray(x[n])){const P=LISTEN[n]+"#";f[P+"n"]=String(x[n].length);
     x[n].forEach((e,i)=>{const s=P+elSchl(e,i);f[s]=fp(e);if(istObj(e))Object.keys(e).forEach(t=>f[s+"."+t]=fp(e[t]))})}});return f};
 /* Feldnamen und Werte für rote Hinweise, „Sicher?“ und das offene Fenster (11.11.2026) */
-const FNAMEN={gesamt:"Mietpreis",preis1:"Mietpreis",preis2:"Zusatzfahrer-Preis",bisD:"Rückgabe",bisU:"Rückgabeuhr",vonD:"Abholung",vonU:"Abholuhr",telefon:"Telefon",nummer:"Telefon",name:"Name",
+const FNAMEN={gesamt:"Mietpreis",preis1:"Mietpreis",preis2:"Zusatzfahrer-Preis",bisD:"Rückgabe",bisU:"Rückgabeuhr",vonD:"Übergabe",vonU:"Übergabeuhr",telefon:"Telefon",nummer:"Telefon",name:"Name",
   anschrift:"Anschrift",email:"E-Mail",geb:"Geburtsdatum",gebort:"Geburtsort",auto:"Auto",kz:"Kennzeichen",km:"km",freikm:"Inklusive km",mvRab:"Rabatt",zf:"Zusatzfahrer",paketKm:"Kilometerpaket",
   kautionArt:"Kautionsart",sb:"Selbstbeteiligung",mehrkm:"Mehr-km-Preis",ort:"Ort",status:"Status",notiz:"Notiz",ueb:"Übergabe",rueck:"Rückgabe-Protokoll",unterschrift:"Unterschrift",
-  kautionRueck:"Kaution zurück",endabrechnung:"Endabrechnung",von:"Abholung",bis:"Rückgabe",angebot:"Angebot",anzahlung:"Anzahlung",kostenVorab:"Weitere Kosten",verlaengerungen:"Verlängerung",teilzahlungen:"Teilzahlung",zahlung:"Zahlung"};
+  kautionRueck:"Kaution zurück",endabrechnung:"Endabrechnung",von:"Übergabe",bis:"Rückgabe",angebot:"Angebot",anzahlung:"Anzahlung",kostenVorab:"Weitere Kosten",verlaengerungen:"Verlängerung",teilzahlungen:"Teilzahlung",zahlung:"Zahlung"};
 const ZTEIL={anz:"Anzahlung",rest:"Rest",kaut:"Kaution"};
 // Schadenfall (F11): Namen wie auf der Seite Schäden
 const FALLFELD={status:"Stand",forderung:"Schaden",einbehalten:"Kaution behalten",frist:"Frist",fristDatum:"Frist",schritt:"Nächster Schritt",worum:"Worum es geht",gruppe:"Gruppe",
@@ -1998,7 +1998,7 @@ function feldName(p){p=(p||[]).map(String);const a=p[0],b=p[1],c=p[2];
   if(a==="faelle")return c==="belege"&&p[3]?"Beleg "+(BELEGNAME[p[3]]||p[3]):c?FALLFELD[c]||c:"Schadenfall";   // F11
   if(a==="zahlung"&&ZTEIL[b])return ZTEIL[b]+(c==="am"?(b==="kaut"?" erhalten am":" bezahlt am"):c==="art"?", Zahlart":"");
   if(a==="anzahlung")return "Anzahlung"+(b==="am"?" bezahlt am":b==="art"?", Zahlart":"");
-  if(a==="angebot"&&b)return({preis:"Mietpreis",freikm:"Inklusive km",rabatt:"Rabatt",von:"Abholung",bis:"Rückgabe",auto:"Auto"})[b]||"Angebot";
+  if(a==="angebot"&&b)return({preis:"Mietpreis",freikm:"Inklusive km",rabatt:"Rabatt",von:"Übergabe",bis:"Rückgabe",auto:"Auto"})[b]||"Angebot";
   if(a==="kautionRueck"&&b)return({einbehalt:"Einbehalt",betrag:"Kaution zurück",am:"Kaution zurück am",grund:"Grund für den Einbehalt"})[b]||"Kaution zurück";
   if(a==="verlaengerungen"||a==="teilzahlungen"){const N=a==="verlaengerungen"?"Verlängerung":"Teilzahlung",n=b!=null&&/^\d+$/.test(b)?" "+(+b+1):"";
     return N+n+(c?({aufpreis:", Aufpreis",betrag:", Betrag",bisNeu:", verlängert bis",bezahltAm:", bezahlt am",am:", am",art:", Zahlart",bezahlt:", bezahlt"})[c]||"":"")}
@@ -2963,7 +2963,7 @@ zeigen();abgleichen();auslagernBald();
     else if(akt==="kaution"&&(m=i.match(/^Kaution (.+?) zurückgeben(?:, schon (\d+) Tage!)?$/))){o.l=li("euro","Gelb");o.t="Kaution zurückzahlen";o.i=t+", "+m[1]+(m[2]?", seit "+m[2]+NB+"Tagen":"")}
     else if((m=i.match(/^Kaution (.+?) noch abrechnen, Schaden offen(?:, schon (\d+) Tage!)?$/))){o.l=li("euro","Gelb");o.t="Kaution abrechnen, Schaden offen";o.i=t+", "+m[1]+(m[2]?", seit "+m[2]+NB+"Tagen":"")}   // F1 (24.11.2026): kein Knopf „Zurückzahlen“, erst in der Mappe abrechnen
     else if((m=i.match(/^(.*), Rückgabe war (.*)$/))){o.l=li("uhr","Rot");o.t=m[1]?m[1]+" ist überfällig":"Rückgabe überfällig";o.i=t+", Rückgabe war "+m[2];o.iArt="snWarn"}
-    else if((m=i.match(/^(.*), Abholung überfällig seit (.*)$/))){o.l=li("uhr","Rot");o.t=(m[1]?m[1]+": ":"")+"Übergabe überfällig";o.i=t+", seit "+m[2];o.iArt="snWarn"}
+    else if((m=i.match(/^(.*), (?:Abholung|Übergabe) überfällig seit (.*)$/))){o.l=li("uhr","Rot");o.t=(m[1]?m[1]+": ":"")+"Übergabe überfällig";o.i=t+", seit "+m[2];o.iArt="snWarn"}   // beide Wörter (Fehlerliste F47, 24.11.2026)
     else if((m=i.match(/^Miete (.+?) offen seit (\d+) Tagen$/))){o.l=li("euro","Gelb");o.t="Miete noch offen";o.i=t+", "+m[1]+", seit "+m[2]+NB+"Tagen"}
     else if(akt==="endbezahlt"||/^Endabrechnung /.test(i)){o.l=li("euro","Gelb");o.t="Endabrechnung noch offen";o.i=t+", "+o.i}
     return o}
