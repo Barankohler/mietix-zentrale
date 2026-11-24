@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de"><head><meta name="robots" content="noindex"><link rel="preload" href="https://barankohler.github.io/mietix-zentrale/schrift/Inter.var.woff2" as="font" type="font/woff2" crossorigin>
+<html lang="de"><head><script>/* mxAdresse: Kundendaten hinter # statt ? (stil/adresse.py, 18.11.2026) */(function(){try{var K=["kunde","name","tel","knr"];window.mxAdr=function(u){try{u=String(u);var i=u.indexOf("?");if(i<0)return u;var j=u.indexOf("#",i),b=u.slice(0,i),qs=j<0?u.slice(i+1):u.slice(i+1,j),hs=j<0?"":u.slice(j+1);var q=new URLSearchParams(qs),r=new URLSearchParams(hs),n=0;K.forEach(function(k){if(q.has(k)){r.set(k,q.get(k));q.delete(k);n++}});if(!n)return u;var s=q.toString();return b+(s?"?"+s:"")+"#"+r.toString()}catch(e){return String(u)}};["pageswap","pagereveal"].forEach(function(n){addEventListener(n,function(e){var t=e.viewTransition;if(t)["ready","finished","updateCallbackDone"].forEach(function(p){try{t[p].catch(function(){})}catch(x){}})})});addEventListener("hashchange",function(){if(/(^#|&)(kunde|name|tel|knr)=/.test(location.hash))location.reload()});var h=location.hash;if(!h||h.length<3||h.indexOf("=")<0)return;var r=new URLSearchParams(h.slice(1)),da=K.filter(function(k){return r.has(k)});if(!da.length)return;var q=new URLSearchParams(location.search);da.forEach(function(k){q.set(k,r.get(k));r.delete(k)});var rest=r.toString(),s=q.toString();window.mxAdresse=da.slice();history.replaceState(history.state,"",location.pathname+(s?"?"+s:"")+(rest?"#"+rest:""));var weg=function(){try{var q2=new URLSearchParams(location.search),n=0;da.forEach(function(k){if(q2.has(k)){q2.delete(k);n++}});if(!n)return;var s2=q2.toString();history.replaceState(history.state,"",location.pathname+(s2?"?"+s2:"")+location.hash)}catch(e){}};addEventListener("load",function(){setTimeout(weg,3000)});addEventListener("pagehide",weg)}catch(e){}})();</script><meta name="robots" content="noindex"><link rel="preload" href="https://barankohler.github.io/mietix-zentrale/schrift/Inter.var.woff2" as="font" type="font/woff2" crossorigin>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -507,7 +507,7 @@ const zeit=x=>{const v=x.vonD||x.von,b=x.bisD||x.bis;return{auto:x.auto||"",von:
 /* Wer belegt das Auto in der Zeit? Gleiche Regeln wie Angebot und Kalender: Mietvertrag, Buchung (gebucht), Sperre; Anfragen und Angebote nie (06.11.2026) */
 function belegtDurch(e){const x=e.eintrag||{},w=e.ablage==="mietixSperren"?{auto:x.auto,von:x.von,bis:x.bis,vonU:"00:00",bisU:"00:00"}:zeit(x);if(!w.auto||!w.von||!w.bis)return[];
   const V=lies("mietixVorgaenge",[]).filter(v=>v&&!v._weg),b=[],Z=(t,u)=>t+"T"+(u||"10:00");
-  V.forEach(v=>{if(v.auto===w.auto&&v.vonD&&v.bisD&&v.status!=="zurück")b.push({wer:v.name,was:"Mietvertrag "+(v.nr||""),von:v.vonD,bis:v.bisD,vonU:v.vonU||"10:00",bisU:v.bisU||"10:00"})});
+  V.forEach(v=>{if(v.auto===w.auto&&v.vonD&&v.bisD&&v.status!=="zurück"&&v.status!=="storniert")b.push({wer:v.name,was:"Mietvertrag "+(v.nr||""),von:v.vonD,bis:v.bisD,vonU:v.vonU||"10:00",bisU:v.bisU||"10:00"})});
   lies("mietixAnfragen",[]).forEach(a=>{if(a&&a.auto===w.auto&&a.von&&a.bis&&a.status==="gebucht"&&!a._weg&&!(a.vertrag&&V.some(v=>v.nr===a.vertrag))&&!V.some(v=>nG(v.name)===nG(a.name)&&v.auto===a.auto&&v.vonD&&v.bisD&&v.vonD<a.bis&&v.bisD>a.von))
     b.push({wer:a.name,was:"Buchung",von:a.von,bis:a.bis,vonU:a.vonU||(a.angebot&&a.angebot.vonU)||"10:00",bisU:a.bisU||(a.angebot&&a.angebot.bisU)||"10:00"})});
   lies("mietixSperren",[]).forEach(s=>{if(s&&s.auto===w.auto&&s.von&&s.bis&&!s._weg)b.push({sperre:true,grund:s.grund||"",von:s.von,bis:s.bis,vonU:"00:00",bisU:"00:00"})});
@@ -1210,7 +1210,9 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   ".abgl.status.gelb{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:10px 14px}.abgl.status.rot{background:#FDECEC;color:#C4161C;border-radius:12px;padding:10px 14px}"+
   "";
 document.head.appendChild(css);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen();else if(ungesichert){clearTimeout(warte);abgleichen()}});
+// Seite wird verlassen (WhatsApp, andere App, Schließen): Ungesichertes sofort hochschicken, nicht erst nach 0,8 Sekunden oder beim Zurückkommen (Fehlerliste F17, 24.11.2026)
+addEventListener("pagehide",()=>{if(ungesichert){clearTimeout(warte);abgleichen()}});
 window.addEventListener("storage",e=>{if(e.key==="mietixSitzung"||e.key===null){sitzungFrisch();if(sitzung)abgleichen()}});   // in einem anderen Fenster an- oder abgemeldet (12.11.2026)
 window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
 setInterval(abgleichen,60000);
@@ -1385,7 +1387,7 @@ zeigen();abgleichen();auslagernBald();
     let h=ziel;if(ziel.tagName!=="H1"){h=document.createElement("h1");ziel.appendChild(h)}
     h.innerHTML='<span class="mxTitel">'+titel+'</span>';if(punkt){punkt.style.marginLeft="8px";punkt.style.verticalAlign="middle";h.appendChild(punkt)}
     h.parentNode.insertBefore(top,h);
-    addEventListener("scroll",()=>document.documentElement.classList.toggle("mxKlein",scrollY>40),{passive:true})}
+    /* Kopf klein beim Scrollen mit Abstand (24.11.2026, Herr Köhler: Seite zittert hoch und runter): der kleine Kopf ist bis zu ca. 50 Punkte niedriger, bei einer Grenze von 40 schob das die Seite immer wieder über die Grenze. Jetzt klein ab 120, wieder groß erst unter 8. */{let kl=document.documentElement.classList.contains("mxKlein");addEventListener("scroll",()=>{const y=scrollY;if(!kl&&y>120){kl=true;document.documentElement.classList.add("mxKlein")}else if(kl&&y<8){kl=false;document.documentElement.classList.remove("mxKlein")}},{passive:true})}}
 
   // Wischen vom linken Rand = genau dasselbe wie Zurück (10.11.2026, Prüfung: eigener Weg sprang zu weit)
   const alsApp=navigator.standalone||matchMedia("(display-mode: standalone)").matches;

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de"><head><meta name="robots" content="noindex"><link rel="preload" href="https://barankohler.github.io/mietix-zentrale/schrift/Inter.var.woff2" as="font" type="font/woff2" crossorigin>
+<html lang="de"><head><script>/* mxAdresse: Kundendaten hinter # statt ? (stil/adresse.py, 18.11.2026) */(function(){try{var K=["kunde","name","tel","knr"];window.mxAdr=function(u){try{u=String(u);var i=u.indexOf("?");if(i<0)return u;var j=u.indexOf("#",i),b=u.slice(0,i),qs=j<0?u.slice(i+1):u.slice(i+1,j),hs=j<0?"":u.slice(j+1);var q=new URLSearchParams(qs),r=new URLSearchParams(hs),n=0;K.forEach(function(k){if(q.has(k)){r.set(k,q.get(k));q.delete(k);n++}});if(!n)return u;var s=q.toString();return b+(s?"?"+s:"")+"#"+r.toString()}catch(e){return String(u)}};["pageswap","pagereveal"].forEach(function(n){addEventListener(n,function(e){var t=e.viewTransition;if(t)["ready","finished","updateCallbackDone"].forEach(function(p){try{t[p].catch(function(){})}catch(x){}})})});addEventListener("hashchange",function(){if(/(^#|&)(kunde|name|tel|knr)=/.test(location.hash))location.reload()});var h=location.hash;if(!h||h.length<3||h.indexOf("=")<0)return;var r=new URLSearchParams(h.slice(1)),da=K.filter(function(k){return r.has(k)});if(!da.length)return;var q=new URLSearchParams(location.search);da.forEach(function(k){q.set(k,r.get(k));r.delete(k)});var rest=r.toString(),s=q.toString();window.mxAdresse=da.slice();history.replaceState(history.state,"",location.pathname+(s?"?"+s:"")+(rest?"#"+rest:""));var weg=function(){try{var q2=new URLSearchParams(location.search),n=0;da.forEach(function(k){if(q2.has(k)){q2.delete(k);n++}});if(!n)return;var s2=q2.toString();history.replaceState(history.state,"",location.pathname+(s2?"?"+s2:"")+location.hash)}catch(e){}};addEventListener("load",function(){setTimeout(weg,3000)});addEventListener("pagehide",weg)}catch(e){}})();</script><meta name="robots" content="noindex"><link rel="preload" href="https://barankohler.github.io/mietix-zentrale/schrift/Inter.var.woff2" as="font" type="font/woff2" crossorigin>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -534,7 +534,7 @@ function storno(id,o){o=o||{};const f=blatt(),a=lies("mietixAnfragen",[]).find(x
     const l=lies("mietixAnfragen",[]),y=l.find(x=>x&&x.id===id);if(!y)return weg();const vorher=JSON.stringify(y),jetzt=new Date().toISOString();
     y.status="abgesagt";y.storno={art,betrag:b,am,wann:jetzt};(y.verlauf=Array.isArray(y.verlauf)?y.verlauf:[]).push({am:jetzt,was:"storniert, Anzahlung "+{behalten:"behalten",zurueck:"zurückgezahlt",neu:"auf neue Buchung"}[art]});
     if(!schreib("mietixAnfragen",l))return rot("Nicht gespeichert: der Speicher dieses Geräts ist voll. Bitte Seite neu laden und noch einmal versuchen.");
-    einKnopf();if(art==="neu"){window.mxZahlung.geh("https://barankohler.github.io/mietix-vertrag/?neu=1&name="+encodeURIComponent(a.name||"")+"&tel="+encodeURIComponent(a.nummer||"")+"&anzVon="+encodeURIComponent(id)+(VON==="Buchungen"?"":"&von="+zu()));return}
+    einKnopf();if(art==="neu"){window.mxZahlung.geh((window.mxAdr||String)("https://barankohler.github.io/mietix-vertrag/?neu=1&name="+encodeURIComponent(a.name||"")+"&tel="+encodeURIComponent(a.nummer||"")+"&anzVon="+encodeURIComponent(id)+(VON==="Buchungen"?"":"&von="+zu())));return}   /* Name und Telefon hinter # (stil/adresse.py, 23.11.2026) */
     NACHHER();if(o.fertig)o.fertig();
     f.innerHTML=kopf("Storniert")+'<div class="stOk">✓ Storniert'+(a.auto?", "+esc(a.auto)+" ist wieder frei":"")+'</div><textarea id="eStT" aria-label="Nachricht an den Kunden">'+esc(stornoText(a,art,b,voll,am))+'</textarea>'+
       '<div class="stZw"><button type="button" class="gt" id="eStWa">Per WhatsApp senden</button><button type="button" class="rt" id="eStKo">Kopieren</button></div><div class="stUnten"><button type="button" class="mxAe" id="eStR">Rückgängig</button></div>';
@@ -1734,7 +1734,9 @@ css.textContent=".abgl{background:#fff;border:1px solid #E4E4E7;border-radius:16
   ".abgl.status.gelb{background:#FFF4DB;color:#9A6700;border-radius:12px;padding:10px 14px}.abgl.status.rot{background:#FDECEC;color:#C4161C;border-radius:12px;padding:10px 14px}"+
   "";
 document.head.appendChild(css);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)abgleichen();else if(ungesichert){clearTimeout(warte);abgleichen()}});
+// Seite wird verlassen (WhatsApp, andere App, Schließen): Ungesichertes sofort hochschicken, nicht erst nach 0,8 Sekunden oder beim Zurückkommen (Fehlerliste F17, 24.11.2026)
+addEventListener("pagehide",()=>{if(ungesichert){clearTimeout(warte);abgleichen()}});
 window.addEventListener("storage",e=>{if(e.key==="mietixSitzung"||e.key===null){sitzungFrisch();if(sitzung)abgleichen()}});   // in einem anderen Fenster an- oder abgemeldet (12.11.2026)
 window.addEventListener("online",abgleichen);window.addEventListener("offline",zeigen);   // Sync-Status sofort auf „Ohne Internet“
 setInterval(abgleichen,60000);
@@ -1909,7 +1911,7 @@ zeigen();abgleichen();auslagernBald();
     let h=ziel;if(ziel.tagName!=="H1"){h=document.createElement("h1");ziel.appendChild(h)}
     h.innerHTML='<span class="mxTitel">'+titel+'</span>';if(punkt){punkt.style.marginLeft="8px";punkt.style.verticalAlign="middle";h.appendChild(punkt)}
     h.parentNode.insertBefore(top,h);
-    addEventListener("scroll",()=>document.documentElement.classList.toggle("mxKlein",scrollY>40),{passive:true})}
+    /* Kopf klein beim Scrollen mit Abstand (24.11.2026, Herr Köhler: Seite zittert hoch und runter): der kleine Kopf ist bis zu ca. 50 Punkte niedriger, bei einer Grenze von 40 schob das die Seite immer wieder über die Grenze. Jetzt klein ab 120, wieder groß erst unter 8. */{let kl=document.documentElement.classList.contains("mxKlein");addEventListener("scroll",()=>{const y=scrollY;if(!kl&&y>120){kl=true;document.documentElement.classList.add("mxKlein")}else if(kl&&y<8){kl=false;document.documentElement.classList.remove("mxKlein")}},{passive:true})}}
 
   // Wischen vom linken Rand = genau dasselbe wie Zurück (10.11.2026, Prüfung: eigener Weg sprang zu weit)
   const alsApp=navigator.standalone||matchMedia("(display-mode: standalone)").matches;
